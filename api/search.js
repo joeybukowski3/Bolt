@@ -12,7 +12,7 @@ export default async function handler(req, res) {
   
   try {
     // 2. Call Google Gemini
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
     console.log("Calling Gemini API...");
     
     const response = await fetch(url, {
