@@ -35,7 +35,9 @@ export default async function handler(req, res) {
 
   } catch (error) {
     console.error("Bolt Engine Error:", error);
-    res.status(500).json({ error: "The research engine stalled. Please try again in a moment." });
+    res.status(500).json({ error: "The research engine stalled. Please try again." });
   }
 }
+}
+
 
