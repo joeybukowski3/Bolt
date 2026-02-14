@@ -11,8 +11,8 @@ export default async function handler(req, res) {
   }
   
   try {
-    // 2. Call Google Gemini
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${apiKey}`;
+    // 2. Call Google Gemini (without search tool to allow JSON mode)
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp-01-21:generateContent?key=${apiKey}`;
     console.log("Calling Gemini API...");
     
     const response = await fetch(url, {
@@ -21,46 +21,38 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         contents: [{ 
           parts: [{ 
-            text: `Research the following item and provide a detailed forensic analysis: ${query}. 
+            text: `You are a product research assistant. Research the following item and provide a detailed analysis: ${query}
 
-Return your response in this EXACT JSON format (no markdown, just valid JSON):
+Based on your knowledge and reasoning, return a JSON response with this structure:
 
 {
   "analysis": {
-    "entered": "the user's input",
+    "entered": "${query}",
     "description": "brief description of the item",
     "details": "key specifications or features",
-    "status": "current availability status",
+    "status": "current availability status (e.g., Discontinued, Current Model, etc.)",
     "age": "estimated age or release year",
-    "msrp": "original retail price"
+    "msrp": "original retail price if known"
   },
   "table": [
-    {
-      "label": "Model",
-      "original": "original model details",
-      "brandMatch": "current equivalent from same brand",
-      "option1": "alternative option 1",
-      "option2": "alternative option 2"
-    },
-    {
-      "label": "Price",
-      "original": "original price",
-      "brandMatch": "brand match price",
-      "option1": "option 1 price",
-      "option2": "option 2 price"
-    }
+    {"label": "Model", "original": "original model", "brandMatch": "current equivalent from same brand", "option1": "alternative option 1", "option2": "alternative option 2"},
+    {"label": "Display", "original": "", "brandMatch": "", "option1": "", "option2": ""},
+    {"label": "Price Range", "original": "", "brandMatch": "", "option1": "", "option2": ""},
+    {"label": "Features", "original": "", "brandMatch": "", "option1": "", "option2": ""}
   ],
   "technical": {
-    "manual": "URL to service manual PDF or N/A",
-    "recalls": "any recall information or None found",
-    "failures": "common failure patterns or None documented",
-    "legal": "class action suits or legal issues, or None found"
+    "manual": "N/A",
+    "recalls": "information about recalls or 'None found'",
+    "failures": "common failure patterns or 'None documented'",
+    "legal": "class action information or 'None found'"
   }
-}` 
+}
+
+Return ONLY valid JSON, no markdown code blocks.` 
           }] 
         }],
-        tools: [{ google_search: {} }],
         generationConfig: { 
+          responseMimeType: "application/json",
           temperature: 0.7
         }
       })
@@ -79,10 +71,6 @@ Return your response in this EXACT JSON format (no markdown, just valid JSON):
     
     // 4. Parse the result
     let textResponse = data.candidates[0].content.parts[0].text;
-    
-    // Remove markdown code blocks if present
-    textResponse = textResponse.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-    
     const result = JSON.parse(textResponse);
     res.status(200).json(result);
   } catch (error) {
