@@ -2,19 +2,9 @@ export default async function handler(req, res) {
   const { query } = req.query;
   const apiKey = process.env.GEMINI_API_KEY;
 
-  const systemPrompt = `Analyze the item: ${query}. Return JSON ONLY.
-  Structure:
-  {
-    "analysis": {"entered": "...", "description": "...", "details": "...", "status": "...", "age": "...", "msrp": "..."},
-    "table": [
-      {"label": "Brand", "original": "...", "brandMatch": "...", "option1": "...", "option2": "..."},
-      {"label": "Model #", "original": "...", "brandMatch": "...", "option1": "...", "option2": "..."},
-      {"label": "Capacity/Size", "original": "...", "brandMatch": "...", "option1": "...", "option2": "..."},
-      {"label": "Price (2026)", "original": "N/A", "brandMatch": "$...", "option1": "$...", "option2": "$..."}
-    ],
-    "technical": {"manual": "URL or N/A", "recalls": "...", "failures": "...", "legal": "..."}
+  if (!apiKey) {
+    return res.status(500).json({ error: "API Key is missing in Vercel settings." });
   }
-  For Age: Include serial decoding (1st digit year, 2nd/3rd month). Explaining cycles (e.g. 1=2001/2011/2021).`;
 
   try {
     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, {
@@ -22,15 +12,29 @@ export default async function handler(req, res) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         contents: [{ parts: [{ text: query }] }],
-        systemInstruction: { parts: [{ text: systemPrompt }] },
+        systemInstruction: { 
+          parts: [{ text: `Analyze the item: ${query}. Return JSON ONLY. Use the structure we discussed for Current Item Analysis, Replacement Options, and Technical Info.` }] 
+        },
         tools: [{ google_search: {} }],
-        generationConfig: { responseMimeType: "application/json" }
+        generationConfig: { 
+          responseMimeType: "application/json" 
+        }
       })
     });
+
     const data = await response.json();
+
+    if (data.error) {
+      return res.status(500).json({ error: data.error.message });
+    }
+
     const result = JSON.parse(data.candidates[0].content.parts[0].text);
     res.status(200).json(result);
   } catch (error) {
+    res.status(500).json({ error: "The AI was unable to parse the search results. Please try again." });
+  }
+}
     res.status(500).json({ error: "Failed to fetch data" });
   }
+
 }
