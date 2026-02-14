@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Item Research Assistant</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white !important; padding: 0 !important; }
+            .shadow-lg, .shadow { shadow: none !important; border: 1px solid #eee !important; }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen p-4 md:p-8">
+
+    <div class="max-w-5xl mx-auto">
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-8 border-t-4 border-blue-600 no-print">
+            <h1 class="text-2xl font-bold text-gray-800 mb-4">Item Research Assistant</h1>
+            <div class="flex gap-2">
+                <input type="text" id="query" placeholder="Enter Brand and Model Number..." class="flex-1 p-3 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+                <button onclick="performSearch()" id="btn" class="bg-blue-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-blue-700">Research</button>
+            </div>
+        </div>
+
+        <div id="loader" class="hidden text-center p-12 text-gray-500 italic">Consulting live market data and technical records...</div>
+
+        <div id="results" class="hidden space-y-8">
+            
+            <div class="flex justify-between items-center no-print">
+                <h2 class="text-gray-500 text-sm font-bold uppercase tracking-widest">Research Report</h2>
+                <button onclick="window.print()" class="bg-gray-800 text-white px-4 py-2 rounded font-bold text-sm hover:bg-black">Print to PDF</button>
+            </div>
+
+            <section class="bg-white rounded-xl shadow p-6">
+                <h2 class="text-xl font-bold border-b pb-2 mb-4 text-blue-800">1. Current Item Analysis</h2>
+                <div class="grid md:grid-cols-2 gap-4 text-sm">
+                    <div><span class="font-bold">Information Entered:</span> <span id="r-entered"></span></div>
+                    <div><span class="font-bold">Item Description:</span> <span id="r-desc"></span></div>
+                    <div class="md:col-span-2"><span class="font-bold">Key Details:</span> <span id="r-details"></span></div>
+                    <div><span class="font-bold">Status:</span> <span id="r-status"></span></div>
+                    <div><span class="font-bold">Estimated Age:</span> <span id="r-age"></span></div>
+                    <div><span class="font-bold">Original MSRP:</span> <span id="r-msrp"></span></div>
+                </div>
+            </section>
+
+            <section class="bg-white rounded-xl shadow p-6 overflow-x-auto">
+                <h2 class="text-xl font-bold border-b pb-2 mb-4 text-blue-800">2. Current Replacement Options</h2>
+                <table class="w-full text-left text-sm border-collapse">
+                    <thead>
+                        <tr class="bg-gray-50">
+                            <th class="p-3 border">Feature</th>
+                            <th class="p-3 border">Original Item</th>
+                            <th class="p-3 border text-blue-700">Brand Match</th>
+                            <th class="p-3 border">Option 1</th>
+                            <th class="p-3 border">Option 2</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body"></tbody>
+                </table>
+            </section>
+
+            <section class="bg-white rounded-xl shadow p-6">
+                <h2 class="text-xl font-bold border-b pb-2 mb-4 text-blue-800">3. Relevant Technical Information</h2>
+                <div class="space-y-4 text-sm">
+                    <div id="manual-box"></div>
+                    <div><h3 class="font-bold text-red-700">Recall Notices:</h3> <p id="r-recalls" class="text-gray-700"></p></div>
+                    <div><h3 class="font-bold text-gray-700">Failure Patterns:</h3> <p id="r-failures" class="text-gray-700"></p></div>
+                    <div><h3 class="font-bold text-gray-700">Legal/Class Action:</h3> <p id="r-legal" class="text-gray-700"></p></div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        async function performSearch() {
+            const query = document.getElementById('query').value;
+            if(!query) return;
+            document.getElementById('loader').classList.remove('hidden');
+            document.getElementById('results').classList.add('hidden');
+            try {
+                const res = await fetch(`/api/search?query=${encodeURIComponent(query)}`);
+                const data = await res.json();
+                document.getElementById('r-entered').innerText = data.analysis.entered;
+                document.getElementById('r-desc').innerText = data.analysis.description;
+                document.getElementById('r-details').innerText = data.analysis.details;
+                document.getElementById('r-status').innerText = data.analysis.status;
+                document.getElementById('r-age').innerText = data.analysis.age;
+                document.getElementById('r-msrp').innerText = data.analysis.msrp;
+                const tbody = document.getElementById('table-body');
+                tbody.innerHTML = data.table.map(row => `
+                    <tr>
+                        <td class="p-3 border font-bold bg-gray-50">${row.label}</td>
+                        <td class="p-3 border">${row.original}</td>
+                        <td class="p-3 border font-medium text-blue-700 bg-blue-50">${row.brandMatch}</td>
+                        <td class="p-3 border">${row.option1}</td>
+                        <td class="p-3 border">${row.option2}</td>
+                    </tr>
+                `).join('');
+                const manualBox = document.getElementById('manual-box');
+                manualBox.innerHTML = data.technical.manual !== 'N/A' 
+                    ? `<a href="${data.technical.manual}" target="_blank" class="bg-green-100 text-green-800 px-4 py-2 rounded-full text-xs font-bold hover:bg-green-200 no-print inline-block">📄 VIEW SERVICE MANUAL (PDF)</a>`
+                    : `<span class="text-gray-400 italic text-xs">Service manual not available.</span>`;
+                document.getElementById('r-recalls').innerText = data.technical.recalls;
+                document.getElementById('r-failures').innerText = data.technical.failures;
+                document.getElementById('r-legal').innerText = data.technical.legal;
+                document.getElementById('results').classList.remove('hidden');
+            } catch (e) { alert("Error retrieving data."); } finally { document.getElementById('loader').classList.add('hidden'); }
+        }
+    </script>
+</body>
+</html>
