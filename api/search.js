@@ -28,11 +28,18 @@ Provide a detailed analysis in this EXACT JSON format (no extra text, just valid
 {
   "analysis": {
     "entered": "${query}",
-    "description": "brief description",
-    "details": "key specifications",
+    "descriptionMain": "1-2 sentence brief description",
+    "descriptionExtra": "additional description details and context",
+    "detailsMain": "1-2 sentence key specifications summary",
+    "detailsExtra": "remaining detailed specifications and notes",
     "status": "availability status",
     "age": "release year or age",
-    "msrp": "original price"
+    "msrp": "original price",
+    "decodingMethod": {
+      "available": true,
+      "summary": "short label like Serial number encodes year and factory",
+      "details": "full decoding breakdown, e.g. 1st character is year: R=2004, T=2006, etc."
+    }
   },
   "table": [
     {"label": "Model", "original": "details", "brandMatch": "current version", "option1": "alt 1", "option2": "alt 2"},
@@ -45,7 +52,9 @@ Provide a detailed analysis in this EXACT JSON format (no extra text, just valid
     "failures": "common issues or None",
     "legal": "legal issues or None"
   }
-}` 
+}
+
+IMPORTANT for decodingMethod: If the product has a known serial number decoding scheme (like many electronics, guitars, appliances, etc.), set available to true and provide the summary and details. If no serial number decoding information is known, set available to false, summary to "", and details to "".` 
           }] 
         }],
         generationConfig: { 

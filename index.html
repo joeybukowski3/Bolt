@@ -11,6 +11,63 @@
             body { background: white !important; padding: 0 !important; }
             .shadow-lg, .shadow { shadow: none !important; border: 1px solid #eee !important; }
         }
+
+        /* Loading dog animation */
+        @keyframes runDog {
+            0% { transform: translateX(-100px); }
+            100% { transform: translateX(calc(100% + 100px)); }
+        }
+        #loader-dog {
+            font-size: 2.5rem;
+            animation: runDog 2.5s linear infinite;
+            display: inline-block;
+        }
+        #loader-track {
+            width: 300px;
+            max-width: 80vw;
+            overflow: hidden;
+            margin: 0 auto 1rem auto;
+        }
+
+        /* Collapsible sections */
+        .collapsible-toggle {
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            color: #2563eb;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 6px;
+            user-select: none;
+        }
+        .collapsible-toggle:hover {
+            color: #1d4ed8;
+        }
+        .collapsible-toggle .arrow {
+            display: inline-block;
+            transition: transform 0.3s ease;
+            font-size: 0.6rem;
+        }
+        .collapsible-toggle.open .arrow {
+            transform: rotate(90deg);
+        }
+        .collapsible-content {
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, opacity 0.3s ease;
+        }
+        .collapsible-content.open {
+            max-height: 500px;
+            opacity: 1;
+        }
+
+        /* Section 1 detail items blue left border */
+        .detail-item {
+            border-left: 3px solid #2563eb;
+            padding-left: 12px;
+        }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen p-4 md:p-8">
@@ -22,9 +79,12 @@
                 <button onclick="performSearch()" id="btn" class="bg-blue-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-blue-700">Research</button>
             </div>
         </div>
-        <div id="loader" class="hidden text-center p-12 text-gray-500 italic">Consulting live market data and technical records...</div>
+        <div id="loader" class="hidden text-center p-12 text-gray-500 italic">
+            <div id="loader-track"><div id="loader-dog">🐕</div></div>
+            Consulting live market data and technical records...
+        </div>
         <div id="results" class="hidden space-y-8">
-            
+
             <div class="flex justify-between items-center no-print">
                 <h2 class="text-gray-500 text-sm font-bold uppercase tracking-widest">Research Report</h2>
                 <button onclick="window.print()" class="bg-gray-800 text-white px-4 py-2 rounded font-bold text-sm hover:bg-black">Print to PDF</button>
@@ -32,12 +92,36 @@
             <section class="bg-white rounded-xl shadow p-6">
                 <h2 class="text-xl font-bold border-b pb-2 mb-4 text-blue-800">1. Current Item Analysis</h2>
                 <div class="grid md:grid-cols-2 gap-4 text-sm">
-                    <div><span class="font-bold">Information Entered:</span> <span id="r-entered"></span></div>
-                    <div><span class="font-bold">Item Description:</span> <span id="r-desc"></span></div>
-                    <div class="md:col-span-2"><span class="font-bold">Key Details:</span> <span id="r-details"></span></div>
-                    <div><span class="font-bold">Status:</span> <span id="r-status"></span></div>
-                    <div><span class="font-bold">Estimated Age:</span> <span id="r-age"></span></div>
-                    <div><span class="font-bold">Original MSRP:</span> <span id="r-msrp"></span></div>
+                    <div class="detail-item"><span class="font-bold">Information Entered:</span> <span id="r-entered"></span></div>
+                    <div class="detail-item">
+                        <span class="font-bold">Item Description:</span>
+                        <span id="r-desc-main"></span>
+                        <span class="collapsible-toggle" onclick="toggleCollapse('desc')">
+                            <span class="arrow">&#9654;</span> More Info
+                        </span>
+                        <span id="collapsible-desc" class="collapsible-content"><br><span id="r-desc-extra"></span></span>
+                    </div>
+                    <div class="md:col-span-2 detail-item">
+                        <span class="font-bold">Key Details:</span>
+                        <span id="r-details-main"></span>
+                        <span class="collapsible-toggle" onclick="toggleCollapse('details')">
+                            <span class="arrow">&#9654;</span> More Info
+                        </span>
+                        <span id="collapsible-details" class="collapsible-content"><br><span id="r-details-extra"></span></span>
+                    </div>
+                    <div class="detail-item"><span class="font-bold">Status:</span> <span id="r-status"></span></div>
+                    <div class="detail-item"><span class="font-bold">Estimated Age:</span> <span id="r-age"></span></div>
+                    <div class="detail-item"><span class="font-bold">Original MSRP:</span> <span id="r-msrp"></span></div>
+                    <div class="detail-item">
+                        <span class="font-bold">Decoding Methods:</span>
+                        <span id="r-decode-summary"></span>
+                        <span id="decode-toggle-wrapper" class="hidden">
+                            <span class="collapsible-toggle" onclick="toggleCollapse('decode')">
+                                <span class="arrow">&#9654;</span> More Info
+                            </span>
+                            <span id="collapsible-decode" class="collapsible-content"><br><span id="r-decode-details"></span></span>
+                        </span>
+                    </div>
                 </div>
             </section>
             <section class="bg-white rounded-xl shadow p-6 overflow-x-auto">
@@ -67,6 +151,15 @@
         </div>
     </div>
     <script>
+        function toggleCollapse(id) {
+            const content = document.getElementById('collapsible-' + id);
+            const toggle = content.previousElementSibling || content.closest('.detail-item').querySelector('.collapsible-toggle');
+            // Find the toggle button associated with this collapsible
+            const btn = document.querySelector(`[onclick="toggleCollapse('${id}')"]`);
+            content.classList.toggle('open');
+            btn.classList.toggle('open');
+        }
+
         async function performSearch() {
             const query = document.getElementById('query').value;
             if(!query) return;
@@ -76,11 +169,25 @@
                 const res = await fetch(`/api/search?query=${encodeURIComponent(query)}`);
                 const data = await res.json();
                 document.getElementById('r-entered').innerText = data.analysis.entered;
-                document.getElementById('r-desc').innerText = data.analysis.description;
-                document.getElementById('r-details').innerText = data.analysis.details;
+                document.getElementById('r-desc-main').innerText = data.analysis.descriptionMain;
+                document.getElementById('r-desc-extra').innerText = data.analysis.descriptionExtra;
+                document.getElementById('r-details-main').innerText = data.analysis.detailsMain;
+                document.getElementById('r-details-extra').innerText = data.analysis.detailsExtra;
                 document.getElementById('r-status').innerText = data.analysis.status;
                 document.getElementById('r-age').innerText = data.analysis.age;
                 document.getElementById('r-msrp').innerText = data.analysis.msrp;
+
+                // Decoding Methods
+                const dm = data.analysis.decodingMethod;
+                if (dm && dm.available) {
+                    document.getElementById('r-decode-summary').innerText = dm.summary;
+                    document.getElementById('r-decode-details').innerText = dm.details;
+                    document.getElementById('decode-toggle-wrapper').classList.remove('hidden');
+                } else {
+                    document.getElementById('r-decode-summary').innerText = 'N/A';
+                    document.getElementById('decode-toggle-wrapper').classList.add('hidden');
+                }
+
                 const tbody = document.getElementById('table-body');
                 tbody.innerHTML = data.table.map(row => `
                     <tr>
@@ -92,7 +199,7 @@
                     </tr>
                 `).join('');
                 const manualBox = document.getElementById('manual-box');
-                manualBox.innerHTML = data.technical.manual !== 'N/A' 
+                manualBox.innerHTML = data.technical.manual !== 'N/A'
                     ? `<a href="${data.technical.manual}" target="_blank" class="bg-green-100 text-green-800 px-4 py-2 rounded-full text-xs font-bold hover:bg-green-200 no-print inline-block">📄 VIEW SERVICE MANUAL (PDF)</a>`
                     : `<span class="text-gray-400 italic text-xs">Service manual not available.</span>`;
                 document.getElementById('r-recalls').innerText = data.technical.recalls;
@@ -104,4 +211,3 @@
     </script>
 </body>
 </html>
-
