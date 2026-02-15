@@ -42,9 +42,10 @@ Provide a detailed analysis in this EXACT JSON format (no extra text, just valid
     }
   },
   "table": [
-    {"label": "Model", "original": "details", "brandMatch": "current version", "option1": "alt 1", "option2": "alt 2"},
-    {"label": "Display", "original": "", "brandMatch": "", "option1": "", "option2": ""},
-    {"label": "Price", "original": "", "brandMatch": "", "option1": "", "option2": ""}
+    {"label": "Model", "original": "exact model name/number of original", "brandMatch": "specific model name/number of same-brand replacement", "option1": "specific model name/number alt 1", "option2": "specific model name/number alt 2"},
+    {"label": "Key Specs", "original": "key specs of original", "brandMatch": "key specs", "option1": "key specs", "option2": "key specs"},
+    {"label": "Price (New)", "original": "original MSRP or current new price", "brandMatch": "current retail price", "option1": "current retail price", "option2": "current retail price"},
+    {"label": "Retailers", "original": "2-3 retailers that sell it new (e.g. Amazon, Best Buy)", "brandMatch": "2-3 retailers", "option1": "2-3 retailers", "option2": "2-3 retailers"}
   ],
   "technical": {
     "manual": "N/A",
@@ -53,6 +54,8 @@ Provide a detailed analysis in this EXACT JSON format (no extra text, just valid
     "legal": "legal issues or None"
   }
 }
+
+IMPORTANT for table: Always include specific model names/numbers (not generic descriptions) for brandMatch, option1, and option2. Include actual current retail prices. For Retailers, list 2-3 stores where each option can be purchased brand new (e.g. Amazon, Best Buy, Home Depot, Sweetwater, etc.).
 
 IMPORTANT for decodingMethod: If the product has a known serial number decoding scheme (like many electronics, guitars, appliances, etc.), set available to true and provide the summary and details. If no serial number decoding information is known, set available to false, summary to "", and details to "".` 
           }] 
