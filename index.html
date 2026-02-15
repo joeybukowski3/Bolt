@@ -14,19 +14,22 @@
 
         /* Loading dog animation */
         @keyframes runDog {
-            0% { transform: translateX(-100px); }
-            100% { transform: translateX(calc(100% + 100px)); }
+            0% { left: -50px; }
+            100% { left: 100%; }
         }
         #loader-dog {
             font-size: 2.5rem;
+            position: absolute;
+            top: 0;
             animation: runDog 2.5s linear infinite;
-            display: inline-block;
         }
         #loader-track {
             width: 300px;
             max-width: 80vw;
             overflow: hidden;
             margin: 0 auto 1rem auto;
+            position: relative;
+            height: 3rem;
         }
 
         /* Collapsible sections */
@@ -168,11 +171,12 @@
             try {
                 const res = await fetch(`/api/search?query=${encodeURIComponent(query)}`);
                 const data = await res.json();
-                document.getElementById('r-entered').innerText = data.analysis.entered;
-                document.getElementById('r-desc-main').innerText = data.analysis.descriptionMain;
-                document.getElementById('r-desc-extra').innerText = data.analysis.descriptionExtra;
-                document.getElementById('r-details-main').innerText = data.analysis.detailsMain;
-                document.getElementById('r-details-extra').innerText = data.analysis.detailsExtra;
+                const a = data.analysis;
+                document.getElementById('r-entered').innerText = a.entered;
+                document.getElementById('r-desc-main').innerText = a.descriptionMain || a.description || '';
+                document.getElementById('r-desc-extra').innerText = a.descriptionExtra || '';
+                document.getElementById('r-details-main').innerText = a.detailsMain || a.details || '';
+                document.getElementById('r-details-extra').innerText = a.detailsExtra || '';
                 document.getElementById('r-status').innerText = data.analysis.status;
                 document.getElementById('r-age').innerText = data.analysis.age;
                 document.getElementById('r-msrp').innerText = data.analysis.msrp;
