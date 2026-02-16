@@ -42,580 +42,170 @@
             line-height: 1.6;
         }
 
-        /* ── Circuit board background (dark header area only) ── */
         .circuit-bg {
-            position: fixed;
-            inset: 0;
-            z-index: 0;
-            overflow: hidden;
-            pointer-events: none;
+            position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none;
         }
         .circuit-bg::before {
-            content: '';
-            position: absolute;
-            inset: 0;
+            content: ''; position: absolute; inset: 0;
             background:
                 linear-gradient(90deg, transparent 49.5%, rgba(234,179,8,0.04) 49.5%, rgba(234,179,8,0.04) 50.5%, transparent 50.5%),
                 linear-gradient(0deg, transparent 49.5%, rgba(234,179,8,0.04) 49.5%, rgba(234,179,8,0.04) 50.5%, transparent 50.5%);
             background-size: 60px 60px;
         }
         .circuit-bg::after {
-            content: '';
-            position: absolute;
-            inset: 0;
+            content: ''; position: absolute; inset: 0;
             background: radial-gradient(ellipse at 50% 0%, rgba(234,179,8,0.06) 0%, transparent 60%),
                         radial-gradient(ellipse at 50% 100%, rgba(59,130,246,0.04) 0%, transparent 60%);
         }
-
-        .lightning-bolts {
-            position: fixed;
-            inset: 0;
-            z-index: 0;
-            pointer-events: none;
-            overflow: hidden;
-        }
-        .bolt-shape {
-            position: absolute;
-            font-size: 15rem;
-            opacity: 0.03;
-            color: var(--accent);
-            font-weight: 800;
-            transform: rotate(-12deg);
-            user-select: none;
-        }
+        .lightning-bolts { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+        .bolt-shape { position: absolute; font-size: 15rem; opacity: 0.03; color: var(--accent); font-weight: 800; transform: rotate(-12deg); user-select: none; }
         .bolt-shape:nth-child(1) { top: 10%; left: 5%; }
         .bolt-shape:nth-child(2) { top: 15%; left: 30%; font-size: 20rem; }
         .bolt-shape:nth-child(3) { top: 8%; right: 25%; font-size: 18rem; transform: rotate(8deg); }
         .bolt-shape:nth-child(4) { top: 12%; right: 5%; }
 
-        .app-container {
-            position: relative;
-            z-index: 1;
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 0 1.5rem;
-        }
+        .app-container { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 0 1.5rem; }
 
         /* ── Navigation ── */
-        .nav {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0.75rem 0;
-        }
-        .nav-left {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-        .nav-brand {
-            display: flex;
-            align-items: center;
-            gap: 0.3rem;
-            font-size: 1.3rem;
-            font-weight: 800;
-            color: var(--text-white);
-            text-decoration: none;
-            white-space: nowrap;
-        }
+        .nav { display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 0; }
+        .nav-left { display: flex; align-items: center; gap: 0.75rem; }
+        .nav-brand { display: flex; align-items: center; gap: 0.3rem; font-size: 1.3rem; font-weight: 800; color: var(--text-white); text-decoration: none; white-space: nowrap; }
         .nav-brand .bolt-icon { color: var(--accent); }
-        .brand-tagline {
-            font-size: 0.75rem;
-            font-style: italic;
-            color: #64748b;
-            white-space: nowrap;
-        }
-        .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        .nav-link {
-            color: var(--text-light);
-            text-decoration: none;
-            font-size: 0.875rem;
-            font-weight: 500;
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            transition: all 0.2s;
-            cursor: pointer;
-            white-space: nowrap;
-        }
+        .brand-tagline { font-size: 0.75rem; font-style: italic; color: #64748b; white-space: nowrap; }
+        .nav-links { display: flex; align-items: center; gap: 0.5rem; }
+        .nav-link { color: var(--text-light); text-decoration: none; font-size: 0.875rem; font-weight: 500; padding: 0.5rem 1rem; border-radius: 8px; transition: all 0.2s; cursor: pointer; white-space: nowrap; }
         .nav-link:hover { color: var(--text-white); background: rgba(255,255,255,0.06); }
         .nav-link.active { background: var(--accent); color: #000; font-weight: 600; }
         .nav-link.active:hover { background: var(--accent-hover); }
 
-        /* ── Hero Section ── */
-        .hero {
-            text-align: center;
-            padding: 2.5rem 0 2rem;
-        }
-
-        .hero-tagline {
-            font-size: 1.1rem;
-            color: var(--text-light);
-            max-width: 550px;
-            margin: 0 auto 2rem;
-            line-height: 1.7;
-        }
-
-        /* ── Search Bar ── */
-        .search-container {
-            max-width: 700px;
-            margin: 0 auto 2rem;
-            display: flex;
-            background: var(--bg-input);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 16px;
-            overflow: hidden;
-            transition: border-color 0.3s;
-        }
-        .search-container:focus-within {
-            border-color: rgba(234,179,8,0.4);
-            box-shadow: 0 0 0 3px rgba(234,179,8,0.1);
-        }
-        .search-input {
-            flex: 1;
-            background: transparent;
-            border: none;
-            outline: none;
-            padding: 1rem 1.5rem;
-            font-size: 1rem;
-            color: var(--text-white);
-            font-family: inherit;
-        }
+        /* ── Hero ── */
+        .hero { text-align: center; padding: 2.5rem 0 2rem; }
+        .search-container { max-width: 700px; margin: 0 auto 2rem; display: flex; background: var(--bg-input); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; overflow: hidden; transition: border-color 0.3s; }
+        .search-container:focus-within { border-color: rgba(234,179,8,0.4); box-shadow: 0 0 0 3px rgba(234,179,8,0.1); }
+        .search-input { flex: 1; background: transparent; border: none; outline: none; padding: 1rem 1.5rem; font-size: 1rem; color: var(--text-white); font-family: inherit; }
         .search-input::placeholder { color: var(--text-muted-dark); }
-        .search-btn {
-            background: var(--accent);
-            color: #000;
-            border: none;
-            padding: 1rem 2rem;
-            font-size: 0.95rem;
-            font-weight: 700;
-            font-family: inherit;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            transition: background 0.2s;
-            white-space: nowrap;
-        }
+        .search-btn { background: var(--accent); color: #000; border: none; padding: 1rem 2rem; font-size: 0.95rem; font-weight: 700; font-family: inherit; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: background 0.2s; white-space: nowrap; }
         .search-btn:hover { background: var(--accent-hover); }
 
         /* ── Stats Bar ── */
-        .stats-bar {
-            display: flex;
-            justify-content: center;
-            gap: 1.5rem;
-            margin-bottom: 1rem;
-            flex-wrap: wrap;
-        }
-        .stat-item {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 12px;
-            padding: 0.75rem 1.25rem;
-        }
+        .stats-bar { display: flex; justify-content: center; gap: 1.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
+        .stat-item { display: flex; align-items: center; gap: 0.75rem; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 0.75rem 1.25rem; }
         .stat-icon { color: var(--accent); font-size: 1.1rem; }
         .stat-text { display: flex; flex-direction: column; }
-        .stat-label {
-            font-size: 0.6rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            color: var(--text-muted-dark);
-        }
+        .stat-label { font-size: 0.6rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted-dark); }
         .stat-value { font-size: 0.9rem; font-weight: 700; color: var(--text-white); }
 
-        /* ── Mascot area above search ── */
-        @keyframes runDogLoader {
-            0% { left: -80px; }
-            100% { left: calc(100% + 80px); }
-        }
-        @keyframes pulse-glow {
-            0%, 100% { opacity: 0.5; }
-            50% { opacity: 1; }
-        }
-        @keyframes cape-flutter {
-            0%, 100% { transform: rotate(-15deg) skewX(0deg); }
-            50% { transform: rotate(-25deg) skewX(-5deg); }
-        }
-        .mascot-area {
-            text-align: center;
-            min-height: 5.5rem;
-            margin-bottom: 0.75rem;
-        }
-        #loader-track {
-            width: 400px;
-            max-width: 90vw;
-            overflow: hidden;
-            margin: 0 auto 0.5rem;
-            position: relative;
-            height: 4.5rem;
-        }
-        #loader-dog {
-            position: absolute;
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 60px;
-            height: 60px;
-        }
-        #loader-dog.running {
-            left: -80px;
-            transform: none;
-            animation: runDogLoader 2.8s linear infinite;
-        }
-        #loader-dog.running .dog-cape {
-            animation: cape-flutter 0.4s ease-in-out infinite;
-        }
-        .loader-text {
-            color: var(--text-light);
-            font-style: italic;
-            font-size: 0.9rem;
-            display: none;
-        }
-        .loader-text.visible {
-            display: block;
-            animation: pulse-glow 2s ease-in-out infinite;
-        }
+        /* ── Mascot loader ── */
+        @keyframes runDogLoader { 0% { left: -80px; } 100% { left: calc(100% + 80px); } }
+        @keyframes pulse-glow { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+        @keyframes cape-flutter { 0%, 100% { transform: rotate(-15deg) skewX(0deg); } 50% { transform: rotate(-25deg) skewX(-5deg); } }
+        .mascot-area { text-align: center; min-height: 5.5rem; margin-bottom: 0.75rem; }
+        #loader-track { width: 400px; max-width: 90vw; overflow: hidden; margin: 0 auto 0.5rem; position: relative; height: 4.5rem; }
+        #loader-dog { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 60px; height: 60px; }
+        #loader-dog.running { left: -80px; transform: none; animation: runDogLoader 2.8s linear infinite; }
+        #loader-dog.running .dog-cape { animation: cape-flutter 0.4s ease-in-out infinite; }
+        .loader-text { color: var(--text-light); font-style: italic; font-size: 0.9rem; display: none; }
+        .loader-text.visible { display: block; animation: pulse-glow 2s ease-in-out infinite; }
 
-        /* ── White results zone ── */
-        .results-zone {
-            background: #f1f5f9;
-            border-radius: 24px 24px 0 0;
-            margin: 0 -1.5rem;
-            padding: 2rem 1.5rem 3rem;
-            min-height: 60vh;
-        }
-        .results-inner {
-            max-width: 1100px;
-            margin: 0 auto;
-        }
-        .results-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-        .results-label {
-            font-size: 0.7rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.12em;
-            color: var(--text-muted-dark);
-        }
-        .results-header-actions {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        .print-btn, .view-toggle-btn {
-            background: white;
-            color: var(--text-mid);
-            border: 1px solid var(--border-color);
-            padding: 0.4rem 1rem;
-            border-radius: 8px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            font-family: inherit;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
+        /* ── Results zone ── */
+        .results-zone { background: #f1f5f9; border-radius: 24px 24px 0 0; margin: 0 -1.5rem; padding: 2rem 1.5rem 3rem; min-height: 60vh; }
+        .results-inner { max-width: 1100px; margin: 0 auto; }
+        .results-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .results-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-muted-dark); }
+        .results-header-actions { display: flex; align-items: center; gap: 0.5rem; }
+        .print-btn, .view-toggle-btn { background: white; color: var(--text-mid); border: 1px solid var(--border-color); padding: 0.4rem 1rem; border-radius: 8px; font-size: 0.75rem; font-weight: 600; font-family: inherit; cursor: pointer; transition: all 0.2s; }
         .print-btn:hover, .view-toggle-btn:hover { background: #f8fafc; border-color: var(--accent); color: var(--text-dark); }
         .view-toggle-btn.active { background: var(--accent); color: #000; border-color: var(--accent); }
 
-        /* ── Cards (white on light gray bg) ── */
-        .card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 14px;
-            padding: 1.25rem 1.5rem;
-            margin-bottom: 1rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02);
-        }
-        .card-title {
-            font-size: 0.95rem;
-            font-weight: 700;
-            color: var(--text-dark);
-            margin-bottom: 0.85rem;
-            padding-bottom: 0.6rem;
-            border-bottom: 2px solid var(--accent-dim);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        .card-title .title-icon {
-            color: var(--accent);
-            font-size: 1.1rem;
-        }
-        .card-title .title-number {
-            background: var(--accent);
-            color: #000;
-            width: 22px;
-            height: 22px;
-            border-radius: 6px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.7rem;
-            font-weight: 800;
-        }
+        /* ── Cards ── */
+        .card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 1.25rem 1.5rem; margin-bottom: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02); }
+        .card-title { font-size: 0.95rem; font-weight: 700; color: var(--text-dark); margin-bottom: 0.85rem; padding-bottom: 0.6rem; border-bottom: 2px solid var(--accent-dim); display: flex; align-items: center; gap: 0.5rem; }
+        .card-title .title-icon { color: var(--accent); font-size: 1.1rem; }
+        .card-title .title-number { background: var(--accent); color: #000; width: 22px; height: 22px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 800; }
+        .card-accent-stripe { height: 3px; background: linear-gradient(90deg, var(--accent), var(--blue), var(--accent)); border-radius: 3px; margin-bottom: 0.85rem; opacity: 0.6; }
 
-        /* ── Detail Grid (compact) ── */
-        .detail-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 0;
-        }
-        .detail-item {
-            border-left: 3px solid var(--accent);
-            padding: 0.5rem 0.75rem;
-            font-size: 0.8rem;
-            background: transparent;
-            border-bottom: 1px solid #f1f5f9;
-        }
-        .detail-item:nth-child(odd) { background: var(--bg-card-alt); }
-        .detail-item.full-width { grid-column: 1 / -1; }
-        .detail-label {
-            font-weight: 700;
-            color: var(--text-mid);
-            font-size: 0.65rem;
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-            margin-bottom: 0.1rem;
-        }
-        .detail-value { color: var(--text-dark); line-height: 1.5; }
+        /* ── Report text styles (matching screenshot) ── */
+        .report-overview { font-size: 0.85rem; color: var(--text-mid); line-height: 1.7; margin-bottom: 1rem; }
+        .report-list { list-style: none; padding: 0; margin: 0; }
+        .report-list li { padding: 0.4rem 0; font-size: 0.85rem; color: var(--text-mid); line-height: 1.6; border-bottom: 1px solid #f1f5f9; display: flex; align-items: baseline; gap: 0.5rem; }
+        .report-list li:last-child { border-bottom: none; }
+        .report-list li::before { content: '\2022'; color: var(--accent); font-weight: 700; flex-shrink: 0; }
+        .report-list .label { font-weight: 700; color: var(--text-dark); white-space: nowrap; }
+        .report-list .label::after { content: ':'; }
 
-        /* ── Collapsible ── */
-        .collapsible-toggle {
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 3px;
-            color: var(--blue);
-            font-size: 0.65rem;
-            font-weight: 600;
-            margin-left: 4px;
-            user-select: none;
-            transition: color 0.2s;
-        }
-        .collapsible-toggle:hover { color: #2563eb; }
-        .collapsible-toggle .arrow {
-            display: inline-block;
-            transition: transform 0.3s ease;
-            font-size: 0.5rem;
-        }
-        .collapsible-toggle.open .arrow { transform: rotate(90deg); }
-        .collapsible-content {
-            max-height: 0;
-            opacity: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease, opacity 0.3s ease;
-        }
-        .collapsible-content.open { max-height: 500px; opacity: 1; }
-
-        /* ── Table (compact) ── */
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.78rem;
-        }
-        .data-table th {
-            background: var(--bg-card-alt);
-            color: var(--text-muted-dark);
-            font-size: 0.65rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-            padding: 0.55rem 0.65rem;
-            text-align: left;
-            border-bottom: 2px solid var(--border-color);
-        }
-        .data-table th.highlight { color: var(--accent); }
-        .data-table td {
-            padding: 0.55rem 0.65rem;
-            border-bottom: 1px solid #f1f5f9;
-            color: var(--text-mid);
-            line-height: 1.4;
-        }
-        .data-table tr:last-child td { border-bottom: none; }
-        .data-table tr:hover td { background: #fefce8; }
-        .data-table td:first-child {
-            font-weight: 600;
-            color: var(--text-dark);
-            background: var(--bg-card-alt);
-            white-space: nowrap;
-        }
-        .data-table td.brand-match {
-            color: #92400e;
-            font-weight: 600;
-            background: #fef9c3;
-        }
-
-        /* ── Technical Section (compact, side by side) ── */
-        .tech-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 0.6rem;
-        }
-        .tech-grid.has-manual { margin-top: 0.6rem; }
-        .tech-item {
-            padding: 0.65rem 0.75rem;
-            background: var(--bg-card-alt);
-            border-radius: 8px;
-            border-left: 3px solid var(--border-color);
-        }
-        .tech-item.recall-item { border-left-color: var(--red); background: var(--red-light); }
-        .tech-item.neutral-item { border-left-color: var(--text-light); }
-        .tech-label {
-            font-size: 0.65rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 0.2rem;
-        }
-        .tech-label.recall { color: var(--red); }
-        .tech-label.neutral { color: var(--text-muted-dark); }
-        .tech-value {
-            font-size: 0.78rem;
-            color: var(--text-mid);
-            line-height: 1.5;
-        }
-        .manual-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.4rem;
-            background: var(--green-light);
-            color: #15803d;
-            padding: 0.45rem 1rem;
-            border-radius: 999px;
-            font-size: 0.7rem;
-            font-weight: 700;
-            text-decoration: none;
-            border: 1px solid rgba(34,197,94,0.2);
-            transition: all 0.2s;
-        }
-        .manual-link:hover { background: #dcfce7; border-color: rgba(34,197,94,0.4); }
-
-        /* ── Decorative accents on cards ── */
-        .card-accent-stripe {
-            height: 3px;
-            background: linear-gradient(90deg, var(--accent), var(--blue), var(--accent));
-            border-radius: 3px;
-            margin-bottom: 0.85rem;
-            opacity: 0.6;
-        }
+        .section-subtitle { font-size: 0.88rem; font-weight: 700; color: var(--text-dark); margin: 1.25rem 0 0.6rem; padding-bottom: 0.3rem; border-bottom: 1px solid var(--border-color); }
 
         /* ── Quick View ── */
-        .quick-view-strip {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.75rem;
-        }
-        .quick-view-item {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-left: 4px solid var(--accent);
-            border-radius: 10px;
-            padding: 0.75rem 1rem;
-            flex: 1 1 160px;
-            min-width: 140px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-        }
-        .quick-view-label {
-            font-size: 0.6rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-            color: var(--text-muted-dark);
-            margin-bottom: 0.2rem;
-        }
-        .quick-view-value {
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: var(--text-dark);
-        }
-        .quick-view-value.acv-highlight {
-            color: var(--green);
-            font-weight: 700;
-        }
+        .quick-view-strip { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+        .quick-view-item { background: var(--bg-card); border: 1px solid var(--border-color); border-left: 4px solid var(--accent); border-radius: 10px; padding: 0.75rem 1rem; flex: 1 1 160px; min-width: 140px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+        .quick-view-label { font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted-dark); margin-bottom: 0.2rem; }
+        .quick-view-value { font-size: 0.9rem; font-weight: 600; color: var(--text-dark); }
+        .quick-view-value.acv-highlight { color: var(--green); font-weight: 700; }
 
         /* ── Estimation Banner ── */
-        .estimation-banner {
-            background: #fef9c3;
-            border: 1px solid #fde68a;
-            border-left: 4px solid #f59e0b;
-            border-radius: 10px;
-            padding: 0.75rem 1rem;
-            margin-bottom: 1rem;
-            color: #92400e;
-            font-size: 0.82rem;
-            line-height: 1.5;
-            display: flex;
-            align-items: flex-start;
-            gap: 0.5rem;
-        }
+        .estimation-banner { background: #fef9c3; border: 1px solid #fde68a; border-left: 4px solid #f59e0b; border-radius: 10px; padding: 0.75rem 1rem; margin-bottom: 1rem; color: #92400e; font-size: 0.82rem; line-height: 1.5; display: flex; align-items: flex-start; gap: 0.5rem; }
         .estimation-banner .banner-icon { font-size: 1.1rem; flex-shrink: 0; }
 
-        /* ── Valuation Table ── */
-        .valuation-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.82rem;
-        }
-        .valuation-table td {
-            padding: 0.55rem 0.75rem;
-            border-bottom: 1px solid #f1f5f9;
-        }
-        .valuation-table tr:last-child td { border-bottom: none; }
-        .valuation-table td:first-child {
-            font-weight: 600;
-            color: var(--text-mid);
-            width: 45%;
-        }
-        .valuation-table td:last-child { color: var(--text-dark); }
-        .valuation-table tr:nth-child(odd) td { background: var(--bg-card-alt); }
+        /* ── Valuation interactive ── */
         .acv-value { color: var(--green); font-weight: 700; font-size: 1rem; }
         .acv-formula { font-style: italic; color: var(--text-muted-dark); font-size: 0.78rem; }
+        .acv-note { font-size: 0.82rem; color: var(--text-mid); margin-top: 0.5rem; line-height: 1.5; font-style: italic; }
+        .age-input-row { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.25rem; }
+        .age-input { width: 60px; padding: 0.3rem 0.5rem; border: 1px solid var(--border-color); border-radius: 6px; font-size: 0.85rem; font-family: inherit; text-align: center; color: var(--text-dark); }
+        .age-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-dim); }
+        .age-label { font-size: 0.8rem; color: var(--text-muted-dark); }
+        .recalc-btn { background: var(--accent); color: #000; border: none; padding: 0.3rem 0.75rem; border-radius: 6px; font-size: 0.75rem; font-weight: 700; font-family: inherit; cursor: pointer; transition: background 0.2s; }
+        .recalc-btn:hover { background: var(--accent-hover); }
+
+        /* ── Technical grid ── */
+        .tech-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.6rem; }
+        .tech-grid.has-manual { margin-top: 0.6rem; }
+        .tech-item { padding: 0.65rem 0.75rem; background: var(--bg-card-alt); border-radius: 8px; border-left: 3px solid var(--border-color); }
+        .tech-item.recall-item { border-left-color: var(--red); background: var(--red-light); }
+        .tech-item.neutral-item { border-left-color: var(--text-light); }
+        .tech-label { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.2rem; }
+        .tech-label.recall { color: var(--red); }
+        .tech-label.neutral { color: var(--text-muted-dark); }
+        .tech-value { font-size: 0.78rem; color: var(--text-mid); line-height: 1.5; }
+        .manual-link { display: inline-flex; align-items: center; gap: 0.4rem; background: var(--green-light); color: #15803d; padding: 0.45rem 1rem; border-radius: 999px; font-size: 0.7rem; font-weight: 700; text-decoration: none; border: 1px solid rgba(34,197,94,0.2); transition: all 0.2s; }
+        .manual-link:hover { background: #dcfce7; border-color: rgba(34,197,94,0.4); }
+
+        /* ── Error Codes ── */
+        .error-codes-section { margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--border-color); }
+        .error-codes-title { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-dark); margin-bottom: 0.5rem; }
+        .error-codes-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
+        .error-codes-table th { background: var(--bg-card-alt); color: var(--text-muted-dark); font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; padding: 0.4rem 0.6rem; text-align: left; border-bottom: 1px solid var(--border-color); }
+        .error-codes-table td { padding: 0.4rem 0.6rem; border-bottom: 1px solid #f1f5f9; color: var(--text-mid); }
+        .error-codes-table td:first-child { font-weight: 700; color: var(--red); white-space: nowrap; width: 80px; }
+        .error-codes-table tr:last-child td { border-bottom: none; }
+        .error-codes-link { display: inline-flex; align-items: center; gap: 0.3rem; color: var(--blue); font-size: 0.75rem; font-weight: 600; text-decoration: none; margin-top: 0.5rem; }
+        .error-codes-link:hover { text-decoration: underline; }
+
+        /* ── Table (compact) ── */
+        .data-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
+        .data-table th { background: var(--bg-card-alt); color: var(--text-muted-dark); font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; padding: 0.55rem 0.65rem; text-align: left; border-bottom: 2px solid var(--border-color); }
+        .data-table th.highlight { color: var(--accent); }
+        .data-table td { padding: 0.55rem 0.65rem; border-bottom: 1px solid #f1f5f9; color: var(--text-mid); line-height: 1.4; }
+        .data-table tr:last-child td { border-bottom: none; }
+        .data-table tr:hover td { background: #fefce8; }
+        .data-table td:first-child { font-weight: 600; color: var(--text-dark); background: var(--bg-card-alt); white-space: nowrap; }
+        .data-table td.brand-match { color: #92400e; font-weight: 600; background: #fef9c3; }
 
         /* ── How It Works ── */
-        .how-it-works-text {
-            font-size: 0.85rem;
-            color: var(--text-mid);
-            line-height: 1.7;
-        }
+        .how-it-works-text { font-size: 0.85rem; color: var(--text-mid); line-height: 1.7; }
 
         /* ── Diagnostics List ── */
-        .diagnostics-list {
-            list-style: none;
-            padding: 0;
-        }
-        .diagnostics-list li {
-            padding: 0.5rem 0;
-            border-bottom: 1px solid #f1f5f9;
-            font-size: 0.82rem;
-        }
+        .diagnostics-list { list-style: none; padding: 0; }
+        .diagnostics-list li { padding: 0.5rem 0; border-bottom: 1px solid #f1f5f9; font-size: 0.82rem; }
         .diagnostics-list li:last-child { border-bottom: none; }
-        .diagnostics-list a {
-            color: var(--blue);
-            text-decoration: none;
-            font-weight: 600;
-        }
+        .diagnostics-list a { color: var(--blue); text-decoration: none; font-weight: 600; }
         .diagnostics-list a:hover { text-decoration: underline; }
         .diagnostics-list .diag-source { color: var(--text-muted-dark); }
-        .diagnostics-empty {
-            color: var(--text-muted-dark);
-            font-style: italic;
-            font-size: 0.82rem;
-        }
+        .diagnostics-empty { color: var(--text-muted-dark); font-style: italic; font-size: 0.82rem; }
 
         .hidden { display: none !important; }
 
-        /* ── Print Styles ── */
+        /* ── Print ── */
         @media print {
             .no-print { display: none !important; }
             body { background: white !important; color: #000 !important; }
@@ -625,10 +215,7 @@
         }
 
         /* ── Responsive ── */
-        @media (max-width: 768px) {
-            .detail-grid { grid-template-columns: 1fr; }
-            .tech-grid { grid-template-columns: 1fr; }
-        }
+        @media (max-width: 768px) { .tech-grid { grid-template-columns: 1fr; } }
         @media (max-width: 640px) {
             .nav { flex-direction: column; gap: 0.5rem; align-items: flex-start; }
             .nav-left { flex-wrap: wrap; }
@@ -655,7 +242,6 @@
     </div>
 
     <div class="app-container">
-        <!-- Navigation -->
         <nav class="nav no-print">
             <div class="nav-left">
                 <a class="nav-brand" href="index.html">Bolt <span class="bolt-icon">&#9889;</span></a>
@@ -668,76 +254,44 @@
             </div>
         </nav>
 
-        <!-- Hero -->
         <div class="hero no-print" id="hero-section">
-            <!-- Mascot: still by default, runs left-to-right when loading -->
             <div class="mascot-area">
                 <div id="loader-track"><div id="loader-dog"><svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg" width="60" height="60">
-                    <!-- Cape (flutters when running) -->
                     <g class="dog-cape">
                         <path d="M22 28 L8 46 L28 40 Z" fill="#dc2626" opacity="0.9"/>
                         <path d="M24 30 L12 50 L30 42 Z" fill="#b91c1c" opacity="0.7"/>
                     </g>
-                    <!-- Body -->
                     <ellipse cx="30" cy="38" rx="14" ry="12" fill="white"/>
-                    <!-- Head -->
                     <circle cx="38" cy="22" r="12" fill="white"/>
-                    <!-- Ears -->
                     <ellipse cx="30" cy="12" rx="4" ry="7" fill="white" transform="rotate(-15 30 12)"/>
                     <ellipse cx="31" cy="13" rx="2.5" ry="5" fill="#fecaca" transform="rotate(-15 31 13)"/>
                     <ellipse cx="46" cy="14" rx="4" ry="7" fill="white" transform="rotate(15 46 14)"/>
                     <ellipse cx="45" cy="15" rx="2.5" ry="5" fill="#fecaca" transform="rotate(15 45 15)"/>
-                    <!-- Eyes -->
                     <circle cx="34" cy="20" r="2.5" fill="#1e293b"/>
                     <circle cx="42" cy="20" r="2.5" fill="#1e293b"/>
                     <circle cx="35" cy="19" r="0.8" fill="white"/>
                     <circle cx="43" cy="19" r="0.8" fill="white"/>
-                    <!-- Nose -->
                     <ellipse cx="39" cy="25" rx="2" ry="1.5" fill="#1e293b"/>
-                    <!-- Mouth / smile -->
                     <path d="M37 27 Q39 30 41 27" stroke="#1e293b" fill="none" stroke-width="0.8"/>
-                    <!-- Lightning bolt on chest -->
                     <polygon points="28,32 31,36 29,36 32,42 27,37 30,37" fill="#eab308"/>
-                    <!-- Legs -->
                     <rect x="20" y="46" width="5" height="8" rx="2.5" fill="white"/>
                     <rect x="35" y="46" width="5" height="8" rx="2.5" fill="white"/>
-                    <!-- Tail -->
                     <path d="M18 35 Q10 28 14 22" stroke="white" fill="none" stroke-width="3" stroke-linecap="round"/>
                 </svg></div></div>
                 <span id="loader-text" class="loader-text">Consulting live market data and technical records...</span>
             </div>
-
             <div class="search-container">
                 <input type="text" id="query" class="search-input" placeholder="Search any product...">
                 <button onclick="performSearch()" id="btn" class="search-btn">&#128269; Search</button>
             </div>
-
             <div class="stats-bar">
-                <div class="stat-item">
-                    <span class="stat-icon">&#9889;</span>
-                    <div class="stat-text">
-                        <span class="stat-label">Real-Time Data</span>
-                        <span class="stat-value">Instant</span>
-                    </div>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-icon">&#128737;</span>
-                    <div class="stat-text">
-                        <span class="stat-label">Verified Sources</span>
-                        <span class="stat-value">100+</span>
-                    </div>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-icon">&#128200;</span>
-                    <div class="stat-text">
-                        <span class="stat-label">Products Tracked</span>
-                        <span class="stat-value">10M+</span>
-                    </div>
-                </div>
+                <div class="stat-item"><span class="stat-icon">&#9889;</span><div class="stat-text"><span class="stat-label">Real-Time Data</span><span class="stat-value">Instant</span></div></div>
+                <div class="stat-item"><span class="stat-icon">&#128737;</span><div class="stat-text"><span class="stat-label">Verified Sources</span><span class="stat-value">100+</span></div></div>
+                <div class="stat-item"><span class="stat-icon">&#128200;</span><div class="stat-text"><span class="stat-label">Products Tracked</span><span class="stat-value">10M+</span></div></div>
             </div>
         </div>
 
-        <!-- Results (white zone) -->
+        <!-- Results -->
         <div id="results" class="hidden">
             <div class="results-zone">
                 <div class="results-inner">
@@ -745,100 +299,69 @@
                     <div class="results-header no-print">
                         <span class="results-label">Research Report</span>
                         <div class="results-header-actions">
-                            <button id="view-toggle" onclick="toggleView()" class="view-toggle-btn">Detailed View</button>
+                            <button id="view-toggle" onclick="toggleView()" class="view-toggle-btn active">Quick View</button>
                             <button onclick="window.print()" class="print-btn">&#128424; Print to PDF</button>
                         </div>
                     </div>
 
-                    <!-- Estimation Banner (hidden by default) -->
                     <div id="estimation-banner" class="estimation-banner hidden">
                         <span class="banner-icon">&#9888;</span>
                         <span id="estimation-text"></span>
                     </div>
 
                     <!-- Quick View -->
-                    <div id="quick-view">
+                    <div id="quick-view" class="hidden">
                         <div class="quick-view-strip">
-                            <div class="quick-view-item">
-                                <div class="quick-view-label">Category</div>
-                                <div class="quick-view-value" id="qv-category"></div>
-                            </div>
-                            <div class="quick-view-item">
-                                <div class="quick-view-label">Status</div>
-                                <div class="quick-view-value" id="qv-status"></div>
-                            </div>
-                            <div class="quick-view-item">
-                                <div class="quick-view-label">Age</div>
-                                <div class="quick-view-value" id="qv-age"></div>
-                            </div>
-                            <div class="quick-view-item">
-                                <div class="quick-view-label">MSRP</div>
-                                <div class="quick-view-value" id="qv-msrp"></div>
-                            </div>
-                            <div class="quick-view-item">
-                                <div class="quick-view-label">Est. ACV</div>
-                                <div class="quick-view-value acv-highlight" id="qv-acv"></div>
-                            </div>
+                            <div class="quick-view-item"><div class="quick-view-label">Category</div><div class="quick-view-value" id="qv-category"></div></div>
+                            <div class="quick-view-item"><div class="quick-view-label">Status</div><div class="quick-view-value" id="qv-status"></div></div>
+                            <div class="quick-view-item"><div class="quick-view-label">Age</div><div class="quick-view-value" id="qv-age"></div></div>
+                            <div class="quick-view-item"><div class="quick-view-label">MSRP</div><div class="quick-view-value" id="qv-msrp"></div></div>
+                            <div class="quick-view-item"><div class="quick-view-label">Est. ACV</div><div class="quick-view-value acv-highlight" id="qv-acv"></div></div>
                         </div>
                     </div>
 
-                    <!-- Detailed View -->
-                    <div id="detailed-view" class="hidden">
+                    <!-- Detailed View (default) -->
+                    <div id="detailed-view">
 
-                        <!-- Section 1: Analysis -->
+                        <!-- Section 1: Current Item Analysis -->
                         <div class="card">
                             <div class="card-title"><span class="title-number">1</span> Current Item Analysis <span class="title-icon">&#9889;</span></div>
                             <div class="card-accent-stripe"></div>
-                            <div class="detail-grid">
-                                <div class="detail-item">
-                                    <div class="detail-label">Information Entered</div>
-                                    <div class="detail-value" id="r-entered"></div>
-                                </div>
-                                <div class="detail-item">
-                                    <div class="detail-label">Status</div>
-                                    <div class="detail-value" id="r-status"></div>
-                                </div>
-                                <div class="detail-item">
-                                    <div class="detail-label">Estimated Age</div>
-                                    <div class="detail-value" id="r-age"></div>
-                                </div>
-                                <div class="detail-item">
-                                    <div class="detail-label">Original MSRP</div>
-                                    <div class="detail-value" id="r-msrp"></div>
-                                </div>
-                                <div class="detail-item full-width">
-                                    <div class="detail-label">Item Description</div>
-                                    <div class="detail-value">
-                                        <span id="r-desc-main"></span>
-                                        <span class="collapsible-toggle" onclick="toggleCollapse('desc')">
-                                            <span class="arrow">&#9654;</span> More
-                                        </span>
-                                        <span id="collapsible-desc" class="collapsible-content"><br><span id="r-desc-extra"></span></span>
-                                    </div>
-                                </div>
-                                <div class="detail-item full-width">
-                                    <div class="detail-label">Key Details</div>
-                                    <div class="detail-value">
-                                        <span id="r-details-main"></span>
-                                        <span class="collapsible-toggle" onclick="toggleCollapse('details')">
-                                            <span class="arrow">&#9654;</span> More
-                                        </span>
-                                        <span id="collapsible-details" class="collapsible-content"><br><span id="r-details-extra"></span></span>
-                                    </div>
-                                </div>
-                                <div class="detail-item full-width">
-                                    <div class="detail-label">Decoding Methods</div>
-                                    <div class="detail-value">
-                                        <span id="r-decode-summary"></span>
-                                        <span id="decode-toggle-wrapper" class="hidden">
-                                            <span class="collapsible-toggle" onclick="toggleCollapse('decode')">
-                                                <span class="arrow">&#9654;</span> More
-                                            </span>
-                                            <span id="collapsible-decode" class="collapsible-content"><br><span id="r-decode-details"></span></span>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
+                            <p class="report-overview" id="r-overview"></p>
+                            <ul class="report-list">
+                                <li><span class="label">Item Description</span> <span id="r-item-desc"></span></li>
+                                <li><span class="label">Key Details</span> <span id="r-key-details"></span></li>
+                                <li><span class="label">Technical Specs</span> <span id="r-tech-specs"></span></li>
+                                <li><span class="label">Materials</span> <span id="r-materials"></span></li>
+                            </ul>
+
+                            <div class="section-subtitle">Release Date &amp; Age</div>
+                            <ul class="report-list">
+                                <li><span class="label">Production Era</span> <span id="r-production-era"></span></li>
+                                <li><span class="label">Discontinuation</span> <span id="r-discontinuation"></span></li>
+                                <li><span class="label">Estimated Age</span> <span id="r-estimated-age"></span></li>
+                                <li><span class="label">Service Life</span> <span id="r-service-life"></span></li>
+                            </ul>
+
+                            <div class="section-subtitle">Valuation &amp; Depreciation</div>
+                            <ul class="report-list">
+                                <li><span class="label">Original MSRP</span> <span id="r-msrp"></span></li>
+                                <li><span class="label">Annual Depreciation</span> <span id="r-depreciation-display"></span></li>
+                                <li>
+                                    <span class="label">ACV Calculation</span>
+                                    <span>
+                                        <span class="acv-value" id="r-acv"></span>
+                                        <span class="acv-formula" id="r-acv-formula" style="display:block; margin-top:0.2rem;"></span>
+                                        <span class="acv-note" id="r-acv-note"></span>
+                                        <div class="age-input-row">
+                                            <span class="age-label">Adjust age:</span>
+                                            <input type="number" id="acv-age-input" class="age-input" min="0" max="100" value="0">
+                                            <span class="age-label">years</span>
+                                            <button onclick="recalcACV()" class="recalc-btn">Recalculate</button>
+                                        </div>
+                                    </span>
+                                </li>
+                            </ul>
                         </div>
 
                         <!-- Section 2: Replacement Options -->
@@ -846,126 +369,89 @@
                             <div class="card-title"><span class="title-number">2</span> Current Replacement Options <span class="title-icon">&#128260;</span></div>
                             <div class="card-accent-stripe"></div>
                             <table class="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>Feature</th>
-                                        <th>Original Item</th>
-                                        <th class="highlight">Brand Match</th>
-                                        <th>Option 1</th>
-                                        <th>Option 2</th>
-                                    </tr>
-                                </thead>
+                                <thead><tr>
+                                    <th>Feature</th><th>Original Item</th><th class="highlight">Brand Match</th><th>Option 1</th><th>Option 2</th>
+                                </tr></thead>
                                 <tbody id="table-body"></tbody>
                             </table>
                         </div>
 
-                        <!-- Section 3: Valuation & Depreciation -->
+                        <!-- Section 3: Technical Info -->
                         <div class="card">
-                            <div class="card-title"><span class="title-number">3</span> Valuation &amp; Depreciation <span class="title-icon">&#128176;</span></div>
-                            <div class="card-accent-stripe"></div>
-                            <table class="valuation-table">
-                                <tr>
-                                    <td>Annual Depreciation Rate</td>
-                                    <td id="r-depreciation-rate"></td>
-                                </tr>
-                                <tr>
-                                    <td>Life Expectancy</td>
-                                    <td id="r-life-expectancy"></td>
-                                </tr>
-                                <tr>
-                                    <td>Condition Factor</td>
-                                    <td id="r-condition-factor"></td>
-                                </tr>
-                                <tr>
-                                    <td>Estimated ACV</td>
-                                    <td><span class="acv-value" id="r-acv"></span></td>
-                                </tr>
-                                <tr>
-                                    <td>ACV Formula</td>
-                                    <td><span class="acv-formula" id="r-acv-formula"></span></td>
-                                </tr>
-                            </table>
-                        </div>
-
-                        <!-- Section 4: Technical Info -->
-                        <div class="card">
-                            <div class="card-title"><span class="title-number">4</span> Relevant Technical Information <span class="title-icon">&#128295;</span></div>
+                            <div class="card-title"><span class="title-number">3</span> Relevant Technical Information <span class="title-icon">&#128295;</span></div>
                             <div class="card-accent-stripe"></div>
                             <div id="manual-box" style="margin-bottom: 0.5rem;"></div>
                             <div class="tech-grid has-manual">
-                                <div class="tech-item recall-item">
-                                    <div class="tech-label recall">Recall Notices</div>
-                                    <div class="tech-value" id="r-recalls"></div>
-                                </div>
-                                <div class="tech-item neutral-item">
-                                    <div class="tech-label neutral">Failure Patterns</div>
-                                    <div class="tech-value" id="r-failures"></div>
-                                </div>
-                                <div class="tech-item neutral-item">
-                                    <div class="tech-label neutral">Legal / Class Action</div>
-                                    <div class="tech-value" id="r-legal"></div>
-                                </div>
+                                <div class="tech-item recall-item"><div class="tech-label recall">Recall Notices</div><div class="tech-value" id="r-recalls"></div></div>
+                                <div class="tech-item neutral-item"><div class="tech-label neutral">Failure Patterns</div><div class="tech-value" id="r-failures"></div></div>
+                                <div class="tech-item neutral-item"><div class="tech-label neutral">Legal / Class Action</div><div class="tech-value" id="r-legal"></div></div>
                             </div>
+                            <div id="error-codes-container"></div>
                         </div>
 
-                        <!-- Section 5: How It Works -->
+                        <!-- Section 4: How It Works -->
                         <div class="card">
-                            <div class="card-title"><span class="title-number">5</span> How It Works <span class="title-icon">&#128161;</span></div>
+                            <div class="card-title"><span class="title-number">4</span> How It Works <span class="title-icon">&#128161;</span></div>
                             <div class="card-accent-stripe"></div>
                             <div class="how-it-works-text" id="r-how-it-works"></div>
                         </div>
 
-                        <!-- Section 6: Diagnostics & Repair Resources -->
+                        <!-- Section 5: Diagnostics -->
                         <div class="card">
-                            <div class="card-title"><span class="title-number">6</span> Diagnostics &amp; Repair Resources <span class="title-icon">&#128736;</span></div>
+                            <div class="card-title"><span class="title-number">5</span> Diagnostics &amp; Repair Resources <span class="title-icon">&#128736;</span></div>
                             <div class="card-accent-stripe"></div>
                             <div id="r-diagnostics"></div>
                         </div>
 
                     </div><!-- /detailed-view -->
-
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        let currentView = 'quick';
+        let currentView = 'detailed';
+        let acvData = {};
 
         document.getElementById('query').addEventListener('keydown', function(e) {
             if (e.key === 'Enter') performSearch();
         });
 
-        function toggleCollapse(id) {
-            const content = document.getElementById('collapsible-' + id);
-            const btn = document.querySelector(`[onclick="toggleCollapse('${id}')"]`);
-            content.classList.toggle('open');
-            btn.classList.toggle('open');
-        }
-
         function toggleView() {
             const quickView = document.getElementById('quick-view');
             const detailedView = document.getElementById('detailed-view');
             const toggleBtn = document.getElementById('view-toggle');
-
-            if (currentView === 'quick') {
-                quickView.classList.add('hidden');
-                detailedView.classList.remove('hidden');
-                toggleBtn.textContent = 'Quick View';
-                toggleBtn.classList.add('active');
-                currentView = 'detailed';
-            } else {
+            if (currentView === 'detailed') {
                 detailedView.classList.add('hidden');
                 quickView.classList.remove('hidden');
                 toggleBtn.textContent = 'Detailed View';
                 toggleBtn.classList.remove('active');
                 currentView = 'quick';
+            } else {
+                quickView.classList.add('hidden');
+                detailedView.classList.remove('hidden');
+                toggleBtn.textContent = 'Quick View';
+                toggleBtn.classList.add('active');
+                currentView = 'detailed';
             }
+        }
+
+        function recalcACV() {
+            const age = parseFloat(document.getElementById('acv-age-input').value);
+            if (isNaN(age) || age < 0 || !acvData.msrp) return;
+            const msrp = acvData.msrp;
+            const rate = acvData.rate / 100;
+            const condition = acvData.condition;
+            const newACV = msrp * Math.pow(1 - rate, age) * condition;
+            document.getElementById('r-acv').innerText = '$' + newACV.toFixed(2);
+            document.getElementById('r-acv-formula').innerText =
+                '$' + msrp.toFixed(2) + ' \u00D7 (1 - ' + (rate).toFixed(2) + ')^' + age + ' \u00D7 ' + condition + ' = $' + newACV.toFixed(2);
+            document.getElementById('qv-acv').innerText = '$' + newACV.toFixed(2);
         }
 
         async function performSearch() {
             const query = document.getElementById('query').value;
-            if(!query) return;
+            if (!query) return;
             document.getElementById('loader-dog').classList.add('running');
             document.getElementById('loader-text').classList.add('visible');
             document.getElementById('results').classList.add('hidden');
@@ -973,26 +459,37 @@
                 const res = await fetch(`/api/search?query=${encodeURIComponent(query)}`);
                 const data = await res.json();
                 const a = data.analysis;
+                const rd = data.releaseDate || {};
+                const v = data.valuation || {};
 
                 // Section 1: Analysis
-                document.getElementById('r-entered').innerText = a.entered;
-                document.getElementById('r-desc-main').innerText = a.descriptionMain || a.description || '';
-                document.getElementById('r-desc-extra').innerText = a.descriptionExtra || '';
-                document.getElementById('r-details-main').innerText = a.detailsMain || a.details || '';
-                document.getElementById('r-details-extra').innerText = a.detailsExtra || '';
-                document.getElementById('r-status').innerText = a.status;
-                document.getElementById('r-age').innerText = a.age;
-                document.getElementById('r-msrp').innerText = a.msrp;
+                document.getElementById('r-overview').innerText = a.overview || '';
+                document.getElementById('r-item-desc').innerText = a.itemDescription || a.descriptionMain || '';
+                document.getElementById('r-key-details').innerText = a.keyDetails || a.detailsMain || '';
+                document.getElementById('r-tech-specs').innerText = a.technicalSpecs || '';
+                document.getElementById('r-materials').innerText = a.materials || 'Not specified';
 
-                const dm = a.decodingMethod;
-                if (dm && dm.available) {
-                    document.getElementById('r-decode-summary').innerText = dm.summary;
-                    document.getElementById('r-decode-details').innerText = dm.details;
-                    document.getElementById('decode-toggle-wrapper').classList.remove('hidden');
-                } else {
-                    document.getElementById('r-decode-summary').innerText = 'N/A';
-                    document.getElementById('decode-toggle-wrapper').classList.add('hidden');
-                }
+                // Release Date & Age
+                document.getElementById('r-production-era').innerText = rd.productionEra || a.age || 'Unknown';
+                document.getElementById('r-discontinuation').innerText = rd.discontinuation || a.status || '';
+                document.getElementById('r-estimated-age').innerText = rd.estimatedAge || a.age || 'Unknown';
+                document.getElementById('r-service-life').innerText = rd.serviceLife || '';
+
+                // Valuation
+                document.getElementById('r-msrp').innerText = a.msrp || '';
+                document.getElementById('r-depreciation-display').innerText = v.annualDepreciationDisplay || (v.annualDepreciationPercent + '%') || '';
+                document.getElementById('r-acv').innerText = v.estimatedACV || '';
+                document.getElementById('r-acv-formula').innerText = v.acvFormula || '';
+                document.getElementById('r-acv-note').innerText = v.acvNote || '';
+
+                // Store for recalculation
+                const ageNum = rd.ageNumeric || 0;
+                acvData = {
+                    msrp: a.msrpNumeric || parseFloat(String(a.msrp).replace(/[^0-9.]/g, '')) || 0,
+                    rate: v.annualDepreciationPercent || 10,
+                    condition: v.conditionFactor || 0.75
+                };
+                document.getElementById('acv-age-input').value = ageNum;
 
                 // Section 2: Replacement Table
                 const tbody = document.getElementById('table-body');
@@ -1006,17 +503,7 @@
                     </tr>
                 `).join('');
 
-                // Section 3: Valuation
-                const v = data.valuation;
-                if (v) {
-                    document.getElementById('r-depreciation-rate').innerText = v.annualDepreciationPercent + '%';
-                    document.getElementById('r-life-expectancy').innerText = v.lifeExpectancyYears + ' years';
-                    document.getElementById('r-condition-factor').innerText = v.conditionFactor;
-                    document.getElementById('r-acv').innerText = v.estimatedACV;
-                    document.getElementById('r-acv-formula').innerText = v.acvFormula;
-                }
-
-                // Section 4: Technical
+                // Section 3: Technical
                 const manualBox = document.getElementById('manual-box');
                 manualBox.innerHTML = data.technical.manual !== 'N/A'
                     ? `<a href="${data.technical.manual}" target="_blank" class="manual-link no-print">&#128196; VIEW SERVICE MANUAL (PDF)</a>`
@@ -1025,10 +512,28 @@
                 document.getElementById('r-failures').innerText = data.technical.failures;
                 document.getElementById('r-legal').innerText = data.technical.legal;
 
-                // Section 5: How It Works
+                // Error Codes
+                const ecContainer = document.getElementById('error-codes-container');
+                const ec = data.technical.errorCodes;
+                const ecSource = data.technical.errorCodesSource;
+                if (ec && ec.length > 0) {
+                    let html = '<div class="error-codes-section"><div class="error-codes-title">Known Error / Fault Codes</div>';
+                    html += '<table class="error-codes-table"><thead><tr><th>Code</th><th>Description</th></tr></thead><tbody>';
+                    html += ec.map(e => `<tr><td>${e.code}</td><td>${e.description}</td></tr>`).join('');
+                    html += '</tbody></table>';
+                    if (ecSource && ecSource.url) {
+                        html += `<a href="${ecSource.url}" target="_blank" class="error-codes-link">&#128279; ${ecSource.title || 'View full error code reference'}</a>`;
+                    }
+                    html += '</div>';
+                    ecContainer.innerHTML = html;
+                } else {
+                    ecContainer.innerHTML = '';
+                }
+
+                // Section 4: How It Works
                 document.getElementById('r-how-it-works').innerText = data.howItWorks || 'No explanation available.';
 
-                // Section 6: Diagnostics
+                // Section 5: Diagnostics
                 const diagContainer = document.getElementById('r-diagnostics');
                 if (data.diagnostics && data.diagnostics.length > 0) {
                     diagContainer.innerHTML = '<ul class="diagnostics-list">' +
@@ -1040,10 +545,10 @@
 
                 // Quick View
                 document.getElementById('qv-category').innerText = a.quickSummary || 'N/A';
-                document.getElementById('qv-status').innerText = a.status;
-                document.getElementById('qv-age').innerText = a.age;
-                document.getElementById('qv-msrp').innerText = a.msrp;
-                document.getElementById('qv-acv').innerText = (v && v.estimatedACV) ? v.estimatedACV : 'N/A';
+                document.getElementById('qv-status').innerText = a.status || '';
+                document.getElementById('qv-age').innerText = rd.estimatedAge || a.age || '';
+                document.getElementById('qv-msrp').innerText = a.msrp || '';
+                document.getElementById('qv-acv').innerText = v.estimatedACV || 'N/A';
 
                 // Estimation Banner
                 const banner = document.getElementById('estimation-banner');
@@ -1055,12 +560,12 @@
                     banner.classList.add('hidden');
                 }
 
-                // Reset to Quick View on new search
-                currentView = 'quick';
-                document.getElementById('quick-view').classList.remove('hidden');
-                document.getElementById('detailed-view').classList.add('hidden');
-                document.getElementById('view-toggle').textContent = 'Detailed View';
-                document.getElementById('view-toggle').classList.remove('active');
+                // Default to detailed view on new search
+                currentView = 'detailed';
+                document.getElementById('detailed-view').classList.remove('hidden');
+                document.getElementById('quick-view').classList.add('hidden');
+                document.getElementById('view-toggle').textContent = 'Quick View';
+                document.getElementById('view-toggle').classList.add('active');
 
                 document.getElementById('results').classList.remove('hidden');
             } catch (e) { alert("Error retrieving data."); } finally {
