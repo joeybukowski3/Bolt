@@ -3,16 +3,265 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Item Research Assistant</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Bolt - Item Research Assistant</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        @media print {
-            .no-print { display: none !important; }
-            body { background: white !important; padding: 0 !important; }
-            .shadow-lg, .shadow { shadow: none !important; border: 1px solid #eee !important; }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg-primary: #0f1629;
+            --bg-secondary: #161d35;
+            --bg-card: #1a2240;
+            --bg-card-hover: #1f2a4d;
+            --bg-input: rgba(255,255,255,0.06);
+            --border-color: rgba(255,255,255,0.08);
+            --border-accent: rgba(234,179,8,0.3);
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --accent: #eab308;
+            --accent-hover: #facc15;
+            --accent-dim: rgba(234,179,8,0.15);
+            --blue: #3b82f6;
+            --blue-dim: rgba(59,130,246,0.15);
+            --red: #ef4444;
+            --green: #22c55e;
         }
 
-        /* Loading dog animation */
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* ── Circuit board background ── */
+        .circuit-bg {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+        .circuit-bg::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(90deg, transparent 49.5%, rgba(234,179,8,0.04) 49.5%, rgba(234,179,8,0.04) 50.5%, transparent 50.5%),
+                linear-gradient(0deg, transparent 49.5%, rgba(234,179,8,0.04) 49.5%, rgba(234,179,8,0.04) 50.5%, transparent 50.5%);
+            background-size: 60px 60px;
+        }
+        .circuit-bg::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at 50% 0%, rgba(234,179,8,0.06) 0%, transparent 60%),
+                        radial-gradient(ellipse at 50% 100%, rgba(59,130,246,0.04) 0%, transparent 60%);
+        }
+
+        /* ── Lightning bolt decorations ── */
+        .lightning-bolts {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        .bolt-shape {
+            position: absolute;
+            font-size: 15rem;
+            opacity: 0.03;
+            color: var(--accent);
+            font-weight: 800;
+            transform: rotate(-12deg);
+            user-select: none;
+        }
+        .bolt-shape:nth-child(1) { top: 10%; left: 5%; }
+        .bolt-shape:nth-child(2) { top: 15%; left: 30%; font-size: 20rem; }
+        .bolt-shape:nth-child(3) { top: 8%; right: 25%; font-size: 18rem; transform: rotate(8deg); }
+        .bolt-shape:nth-child(4) { top: 12%; right: 5%; }
+
+        .app-container {
+            position: relative;
+            z-index: 1;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        /* ── Navigation ── */
+        .nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.25rem 0;
+        }
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+        .nav-brand .bolt-icon { color: var(--accent); }
+        .nav-mascot-small {
+            width: 36px;
+            height: 36px;
+            background: var(--bg-card);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            border: 2px solid var(--border-color);
+        }
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .nav-link:hover { color: var(--text-primary); background: var(--bg-input); }
+        .nav-link.active {
+            background: var(--accent);
+            color: #000;
+            font-weight: 600;
+        }
+        .nav-link.active:hover { background: var(--accent-hover); }
+
+        /* ── Hero Section ── */
+        .hero {
+            text-align: center;
+            padding: 3rem 0 2rem;
+        }
+        .mascot-container {
+            width: 140px;
+            height: 140px;
+            margin: 0 auto 1.5rem;
+            background: white;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.1);
+        }
+        .mascot-dog {
+            font-size: 4rem;
+            line-height: 1;
+            position: relative;
+        }
+        .mascot-dog::after {
+            content: '\26A1';
+            font-size: 1.5rem;
+            position: absolute;
+            bottom: 0.2rem;
+            right: -0.4rem;
+        }
+        .hero-tagline {
+            font-size: 1.15rem;
+            color: var(--text-secondary);
+            max-width: 550px;
+            margin: 0 auto 2.5rem;
+            line-height: 1.7;
+        }
+
+        /* ── Search Bar ── */
+        .search-container {
+            max-width: 700px;
+            margin: 0 auto 2.5rem;
+            display: flex;
+            gap: 0;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: border-color 0.3s;
+        }
+        .search-container:focus-within {
+            border-color: rgba(234,179,8,0.4);
+            box-shadow: 0 0 0 3px rgba(234,179,8,0.1);
+        }
+        .search-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            padding: 1rem 1.5rem;
+            font-size: 1rem;
+            color: var(--text-primary);
+            font-family: inherit;
+        }
+        .search-input::placeholder { color: var(--text-muted); }
+        .search-btn {
+            background: var(--accent);
+            color: #000;
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 0.95rem;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: background 0.2s;
+            white-space: nowrap;
+        }
+        .search-btn:hover { background: var(--accent-hover); }
+
+        /* ── Stats Bar ── */
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 0.85rem 1.5rem;
+        }
+        .stat-icon {
+            color: var(--accent);
+            font-size: 1.1rem;
+        }
+        .stat-text {
+            display: flex;
+            flex-direction: column;
+        }
+        .stat-label {
+            font-size: 0.65rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+        }
+        .stat-value {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        /* ── Loader ── */
         @keyframes runDog {
             0% { left: -50px; }
             100% { left: 100%; }
@@ -27,34 +276,116 @@
             width: 300px;
             max-width: 80vw;
             overflow: hidden;
-            margin: 0 auto 1rem auto;
+            margin: 0 auto 1rem;
             position: relative;
             height: 3rem;
         }
+        .loader-section {
+            text-align: center;
+            padding: 4rem 1rem;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
 
-        /* Collapsible sections */
+        /* ── Results Area ── */
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        .results-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--text-muted);
+        }
+        .print-btn {
+            background: var(--bg-card);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+            padding: 0.5rem 1.25rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .print-btn:hover {
+            background: var(--bg-card-hover);
+            color: var(--text-primary);
+            border-color: var(--border-accent);
+        }
+
+        /* ── Cards ── */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.75rem;
+            margin-bottom: 1.5rem;
+            transition: border-color 0.3s;
+        }
+        .card:hover { border-color: rgba(255,255,255,0.12); }
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .card-title .title-icon { color: var(--accent); }
+
+        /* ── Detail Grid ── */
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+        .detail-item {
+            border-left: 3px solid var(--accent);
+            padding: 0.75rem 1rem;
+            background: rgba(255,255,255,0.02);
+            border-radius: 0 8px 8px 0;
+            font-size: 0.875rem;
+        }
+        .detail-item.full-width { grid-column: 1 / -1; }
+        .detail-label {
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.25rem;
+        }
+        .detail-value { color: var(--text-primary); }
+
+        /* ── Collapsible ── */
         .collapsible-toggle {
             cursor: pointer;
             display: inline-flex;
             align-items: center;
             gap: 4px;
-            color: #2563eb;
-            font-size: 0.75rem;
+            color: var(--accent);
+            font-size: 0.7rem;
             font-weight: 600;
             margin-left: 6px;
             user-select: none;
+            transition: color 0.2s;
         }
-        .collapsible-toggle:hover {
-            color: #1d4ed8;
-        }
+        .collapsible-toggle:hover { color: var(--accent-hover); }
         .collapsible-toggle .arrow {
             display: inline-block;
             transition: transform 0.3s ease;
-            font-size: 0.6rem;
+            font-size: 0.55rem;
         }
-        .collapsible-toggle.open .arrow {
-            transform: rotate(90deg);
-        }
+        .collapsible-toggle.open .arrow { transform: rotate(90deg); }
         .collapsible-content {
             max-height: 0;
             opacity: 0;
@@ -66,98 +397,277 @@
             opacity: 1;
         }
 
-        /* Section 1 detail items blue left border */
-        .detail-item {
-            border-left: 3px solid #2563eb;
-            padding-left: 12px;
+        /* ── Table ── */
+        .data-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 0.85rem;
+        }
+        .data-table th {
+            background: rgba(255,255,255,0.04);
+            color: var(--text-muted);
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            padding: 0.85rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .data-table th.highlight { color: var(--accent); }
+        .data-table td {
+            padding: 0.85rem 1rem;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+        .data-table tr:last-child td { border-bottom: none; }
+        .data-table td:first-child {
+            font-weight: 600;
+            color: var(--text-primary);
+            background: rgba(255,255,255,0.02);
+        }
+        .data-table td.brand-match {
+            color: var(--accent);
+            font-weight: 500;
+            background: var(--accent-dim);
+        }
+
+        /* ── Technical Section ── */
+        .tech-item {
+            padding: 1rem;
+            background: rgba(255,255,255,0.02);
+            border-radius: 10px;
+            margin-bottom: 0.75rem;
+        }
+        .tech-item:last-child { margin-bottom: 0; }
+        .tech-label {
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-bottom: 0.35rem;
+        }
+        .tech-label.recall { color: var(--red); }
+        .tech-label.neutral { color: var(--text-secondary); }
+        .tech-value {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+        .manual-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(34,197,94,0.12);
+            color: var(--green);
+            padding: 0.6rem 1.25rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+        .manual-link:hover { background: rgba(34,197,94,0.2); }
+
+        /* ── Print Styles ── */
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white !important; color: #000 !important; }
+            .circuit-bg, .lightning-bolts { display: none !important; }
+            .card { background: #fff !important; border: 1px solid #ddd !important; color: #000 !important; }
+            .detail-item { background: transparent !important; }
+            .detail-label, .detail-value, .tech-value, .data-table td, .data-table th { color: #000 !important; }
+            .card-title { color: #1e3a5f !important; }
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 640px) {
+            .hero { padding: 2rem 0 1.5rem; }
+            .mascot-container { width: 100px; height: 100px; border-radius: 16px; }
+            .mascot-dog { font-size: 3rem; }
+            .stats-bar { gap: 0.75rem; }
+            .stat-item { padding: 0.6rem 1rem; }
+            .detail-grid { grid-template-columns: 1fr; }
+            .nav-links { gap: 0.25rem; }
+            .nav-link { padding: 0.4rem 0.75rem; font-size: 0.8rem; }
+            .card { padding: 1.25rem; }
         }
     </style>
 </head>
-<body class="bg-gray-100 min-h-screen p-4 md:p-8">
-    <div class="max-w-5xl mx-auto">
-        <div class="bg-white rounded-xl shadow-lg p-6 mb-8 border-t-4 border-blue-600 no-print">
-            <h1 class="text-2xl font-bold text-gray-800 mb-4">Item Research Assistant</h1>
-            <div class="flex gap-2">
-                <input type="text" id="query" placeholder="Enter Brand and Model Number..." class="flex-1 p-3 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
-                <button onclick="performSearch()" id="btn" class="bg-blue-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-blue-700">Research</button>
-            </div>
-        </div>
-        <div id="loader" class="hidden text-center p-12 text-gray-500 italic">
-            <div id="loader-track"><div id="loader-dog">🐕</div></div>
-            Consulting live market data and technical records...
-        </div>
-        <div id="results" class="hidden space-y-8">
+<body>
+    <div class="circuit-bg"></div>
+    <div class="lightning-bolts">
+        <div class="bolt-shape">&#9889;</div>
+        <div class="bolt-shape">&#9889;</div>
+        <div class="bolt-shape">&#9889;</div>
+        <div class="bolt-shape">&#9889;</div>
+    </div>
 
-            <div class="flex justify-between items-center no-print">
-                <h2 class="text-gray-500 text-sm font-bold uppercase tracking-widest">Research Report</h2>
-                <button onclick="window.print()" class="bg-gray-800 text-white px-4 py-2 rounded font-bold text-sm hover:bg-black">Print to PDF</button>
+    <div class="app-container">
+        <!-- Navigation -->
+        <nav class="nav no-print">
+            <a class="nav-brand" href="#">
+                <span class="nav-mascot-small">&#128054;</span>
+                Bolt <span class="bolt-icon">&#9889;</span>
+            </a>
+            <div class="nav-links">
+                <span class="nav-link active">Item Lookup</span>
+                <span class="nav-link">How Old is my Item?</span>
             </div>
-            <section class="bg-white rounded-xl shadow p-6">
-                <h2 class="text-xl font-bold border-b pb-2 mb-4 text-blue-800">1. Current Item Analysis</h2>
-                <div class="grid md:grid-cols-2 gap-4 text-sm">
-                    <div class="detail-item"><span class="font-bold">Information Entered:</span> <span id="r-entered"></span></div>
-                    <div class="detail-item">
-                        <span class="font-bold">Item Description:</span>
-                        <span id="r-desc-main"></span>
-                        <span class="collapsible-toggle" onclick="toggleCollapse('desc')">
-                            <span class="arrow">&#9654;</span> More Info
-                        </span>
-                        <span id="collapsible-desc" class="collapsible-content"><br><span id="r-desc-extra"></span></span>
-                    </div>
-                    <div class="md:col-span-2 detail-item">
-                        <span class="font-bold">Key Details:</span>
-                        <span id="r-details-main"></span>
-                        <span class="collapsible-toggle" onclick="toggleCollapse('details')">
-                            <span class="arrow">&#9654;</span> More Info
-                        </span>
-                        <span id="collapsible-details" class="collapsible-content"><br><span id="r-details-extra"></span></span>
-                    </div>
-                    <div class="detail-item"><span class="font-bold">Status:</span> <span id="r-status"></span></div>
-                    <div class="detail-item"><span class="font-bold">Estimated Age:</span> <span id="r-age"></span></div>
-                    <div class="detail-item"><span class="font-bold">Original MSRP:</span> <span id="r-msrp"></span></div>
-                    <div class="detail-item">
-                        <span class="font-bold">Decoding Methods:</span>
-                        <span id="r-decode-summary"></span>
-                        <span id="decode-toggle-wrapper" class="hidden">
-                            <span class="collapsible-toggle" onclick="toggleCollapse('decode')">
-                                <span class="arrow">&#9654;</span> More Info
-                            </span>
-                            <span id="collapsible-decode" class="collapsible-content"><br><span id="r-decode-details"></span></span>
-                        </span>
+        </nav>
+
+        <!-- Hero -->
+        <div class="hero no-print" id="hero-section">
+            <div class="mascot-container">
+                <div class="mascot-dog">&#128054;</div>
+            </div>
+            <p class="hero-tagline">Instant product intelligence &mdash; search any item by brand, type, and model for real-time data.</p>
+
+            <!-- Search Bar -->
+            <div class="search-container">
+                <input type="text" id="query" class="search-input" placeholder="Search any product...">
+                <button onclick="performSearch()" id="btn" class="search-btn">&#128269; Search</button>
+            </div>
+
+            <!-- Stats -->
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <span class="stat-icon">&#9889;</span>
+                    <div class="stat-text">
+                        <span class="stat-label">Real-Time Data</span>
+                        <span class="stat-value">Instant</span>
                     </div>
                 </div>
-            </section>
-            <section class="bg-white rounded-xl shadow p-6 overflow-x-auto">
-                <h2 class="text-xl font-bold border-b pb-2 mb-4 text-blue-800">2. Current Replacement Options</h2>
-                <table class="w-full text-left text-sm border-collapse">
+                <div class="stat-item">
+                    <span class="stat-icon">&#128737;</span>
+                    <div class="stat-text">
+                        <span class="stat-label">Verified Sources</span>
+                        <span class="stat-value">100+</span>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-icon">&#128200;</span>
+                    <div class="stat-text">
+                        <span class="stat-label">Products Tracked</span>
+                        <span class="stat-value">10M+</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loader -->
+        <div id="loader" class="hidden loader-section">
+            <div id="loader-track"><div id="loader-dog">&#128021;</div></div>
+            Consulting live market data and technical records...
+        </div>
+
+        <!-- Results -->
+        <div id="results" class="hidden" style="padding-bottom: 3rem;">
+
+            <div class="results-header no-print">
+                <span class="results-label">Research Report</span>
+                <button onclick="window.print()" class="print-btn">&#128424; Print to PDF</button>
+            </div>
+
+            <!-- Section 1: Analysis -->
+            <div class="card">
+                <div class="card-title"><span class="title-icon">&#9889;</span> Current Item Analysis</div>
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <div class="detail-label">Information Entered</div>
+                        <div class="detail-value" id="r-entered"></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Item Description</div>
+                        <div class="detail-value">
+                            <span id="r-desc-main"></span>
+                            <span class="collapsible-toggle" onclick="toggleCollapse('desc')">
+                                <span class="arrow">&#9654;</span> More
+                            </span>
+                            <span id="collapsible-desc" class="collapsible-content"><br><span id="r-desc-extra"></span></span>
+                        </div>
+                    </div>
+                    <div class="detail-item full-width">
+                        <div class="detail-label">Key Details</div>
+                        <div class="detail-value">
+                            <span id="r-details-main"></span>
+                            <span class="collapsible-toggle" onclick="toggleCollapse('details')">
+                                <span class="arrow">&#9654;</span> More
+                            </span>
+                            <span id="collapsible-details" class="collapsible-content"><br><span id="r-details-extra"></span></span>
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Status</div>
+                        <div class="detail-value" id="r-status"></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Estimated Age</div>
+                        <div class="detail-value" id="r-age"></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Original MSRP</div>
+                        <div class="detail-value" id="r-msrp"></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Decoding Methods</div>
+                        <div class="detail-value">
+                            <span id="r-decode-summary"></span>
+                            <span id="decode-toggle-wrapper" class="hidden">
+                                <span class="collapsible-toggle" onclick="toggleCollapse('decode')">
+                                    <span class="arrow">&#9654;</span> More
+                                </span>
+                                <span id="collapsible-decode" class="collapsible-content"><br><span id="r-decode-details"></span></span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 2: Replacement Options -->
+            <div class="card" style="overflow-x: auto;">
+                <div class="card-title"><span class="title-icon">&#128260;</span> Current Replacement Options</div>
+                <table class="data-table">
                     <thead>
-                        <tr class="bg-gray-50">
-                            <th class="p-3 border">Feature</th>
-                            <th class="p-3 border">Original Item</th>
-                            <th class="p-3 border text-blue-700">Brand Match</th>
-                            <th class="p-3 border">Option 1</th>
-                            <th class="p-3 border">Option 2</th>
+                        <tr>
+                            <th>Feature</th>
+                            <th>Original Item</th>
+                            <th class="highlight">Brand Match</th>
+                            <th>Option 1</th>
+                            <th>Option 2</th>
                         </tr>
                     </thead>
                     <tbody id="table-body"></tbody>
                 </table>
-            </section>
-            <section class="bg-white rounded-xl shadow p-6">
-                <h2 class="text-xl font-bold border-b pb-2 mb-4 text-blue-800">3. Relevant Technical Information</h2>
-                <div class="space-y-4 text-sm">
-                    <div id="manual-box"></div>
-                    <div><h3 class="font-bold text-red-700">Recall Notices:</h3> <p id="r-recalls" class="text-gray-700"></p></div>
-                    <div><h3 class="font-bold text-gray-700">Failure Patterns:</h3> <p id="r-failures" class="text-gray-700"></p></div>
-                    <div><h3 class="font-bold text-gray-700">Legal/Class Action:</h3> <p id="r-legal" class="text-gray-700"></p></div>
+            </div>
+
+            <!-- Section 3: Technical Info -->
+            <div class="card">
+                <div class="card-title"><span class="title-icon">&#128295;</span> Relevant Technical Information</div>
+                <div id="manual-box" style="margin-bottom: 0.75rem;"></div>
+                <div class="tech-item">
+                    <div class="tech-label recall">Recall Notices</div>
+                    <div class="tech-value" id="r-recalls"></div>
                 </div>
-            </section>
+                <div class="tech-item">
+                    <div class="tech-label neutral">Failure Patterns</div>
+                    <div class="tech-value" id="r-failures"></div>
+                </div>
+                <div class="tech-item">
+                    <div class="tech-label neutral">Legal / Class Action</div>
+                    <div class="tech-value" id="r-legal"></div>
+                </div>
+            </div>
         </div>
     </div>
+
     <script>
+        // Enter key triggers search
+        document.getElementById('query').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') performSearch();
+        });
+
         function toggleCollapse(id) {
             const content = document.getElementById('collapsible-' + id);
-            const toggle = content.previousElementSibling || content.closest('.detail-item').querySelector('.collapsible-toggle');
-            // Find the toggle button associated with this collapsible
             const btn = document.querySelector(`[onclick="toggleCollapse('${id}')"]`);
             content.classList.toggle('open');
             btn.classList.toggle('open');
@@ -177,12 +687,12 @@
                 document.getElementById('r-desc-extra').innerText = a.descriptionExtra || '';
                 document.getElementById('r-details-main').innerText = a.detailsMain || a.details || '';
                 document.getElementById('r-details-extra').innerText = a.detailsExtra || '';
-                document.getElementById('r-status').innerText = data.analysis.status;
-                document.getElementById('r-age').innerText = data.analysis.age;
-                document.getElementById('r-msrp').innerText = data.analysis.msrp;
+                document.getElementById('r-status').innerText = a.status;
+                document.getElementById('r-age').innerText = a.age;
+                document.getElementById('r-msrp').innerText = a.msrp;
 
                 // Decoding Methods
-                const dm = data.analysis.decodingMethod;
+                const dm = a.decodingMethod;
                 if (dm && dm.available) {
                     document.getElementById('r-decode-summary').innerText = dm.summary;
                     document.getElementById('r-decode-details').innerText = dm.details;
@@ -195,17 +705,17 @@
                 const tbody = document.getElementById('table-body');
                 tbody.innerHTML = data.table.map(row => `
                     <tr>
-                        <td class="p-3 border font-bold bg-gray-50">${row.label}</td>
-                        <td class="p-3 border">${row.original}</td>
-                        <td class="p-3 border font-medium text-blue-700 bg-blue-50">${row.brandMatch}</td>
-                        <td class="p-3 border">${row.option1}</td>
-                        <td class="p-3 border">${row.option2}</td>
+                        <td>${row.label}</td>
+                        <td>${row.original}</td>
+                        <td class="brand-match">${row.brandMatch}</td>
+                        <td>${row.option1}</td>
+                        <td>${row.option2}</td>
                     </tr>
                 `).join('');
                 const manualBox = document.getElementById('manual-box');
                 manualBox.innerHTML = data.technical.manual !== 'N/A'
-                    ? `<a href="${data.technical.manual}" target="_blank" class="bg-green-100 text-green-800 px-4 py-2 rounded-full text-xs font-bold hover:bg-green-200 no-print inline-block">📄 VIEW SERVICE MANUAL (PDF)</a>`
-                    : `<span class="text-gray-400 italic text-xs">Service manual not available.</span>`;
+                    ? `<a href="${data.technical.manual}" target="_blank" class="manual-link no-print">&#128196; VIEW SERVICE MANUAL (PDF)</a>`
+                    : `<span style="color: var(--text-muted); font-style: italic; font-size: 0.8rem;">Service manual not available.</span>`;
                 document.getElementById('r-recalls').innerText = data.technical.recalls;
                 document.getElementById('r-failures').innerText = data.technical.failures;
                 document.getElementById('r-legal').innerText = data.technical.legal;
