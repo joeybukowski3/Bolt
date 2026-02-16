@@ -228,36 +228,48 @@
         }
         .stat-value { font-size: 0.9rem; font-weight: 700; color: var(--text-white); }
 
-        /* ── Loader (in hero area) ── */
+        /* ── Mascot area above search ── */
         @keyframes runDogLoader {
-            0% { left: -50px; }
-            100% { left: 100%; }
+            0% { left: calc(100% + 50px); }
+            100% { left: -50px; }
         }
         @keyframes pulse-glow {
             0%, 100% { opacity: 0.5; }
             50% { opacity: 1; }
         }
-        #loader-dog {
-            font-size: 2.5rem;
-            position: absolute;
-            top: 0;
-            animation: runDogLoader 2.5s linear infinite;
+        .mascot-area {
+            text-align: center;
+            min-height: 5rem;
+            margin-bottom: 0.75rem;
         }
         #loader-track {
             width: 300px;
             max-width: 80vw;
             overflow: hidden;
-            margin: 0 auto 1rem;
+            margin: 0 auto 0.5rem;
             position: relative;
-            height: 3rem;
+            height: 3.5rem;
         }
-        .loader-section {
-            text-align: center;
-            padding: 3rem 1rem;
+        #loader-dog {
+            font-size: 2.8rem;
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%) scaleX(-1);
+        }
+        #loader-dog.running {
+            left: calc(100% + 50px);
+            transform: scaleX(-1);
+            animation: runDogLoader 2.5s linear infinite;
+        }
+        .loader-text {
             color: var(--text-light);
             font-style: italic;
+            font-size: 0.9rem;
+            display: none;
         }
-        .loader-section .loader-text {
+        .loader-text.visible {
+            display: block;
             animation: pulse-glow 2s ease-in-out infinite;
         }
 
@@ -531,10 +543,10 @@
 
         <!-- Hero -->
         <div class="hero no-print" id="hero-section">
-            <!-- Loader sits above search bar -->
-            <div id="loader" class="hidden loader-section">
+            <!-- Mascot: still by default, runs right-to-left when loading -->
+            <div class="mascot-area">
                 <div id="loader-track"><div id="loader-dog">&#128021;</div></div>
-                <span class="loader-text">Consulting live market data and technical records...</span>
+                <span id="loader-text" class="loader-text">Consulting live market data and technical records...</span>
             </div>
 
             <div class="search-container">
@@ -692,7 +704,8 @@
         async function performSearch() {
             const query = document.getElementById('query').value;
             if(!query) return;
-            document.getElementById('loader').classList.remove('hidden');
+            document.getElementById('loader-dog').classList.add('running');
+            document.getElementById('loader-text').classList.add('visible');
             document.getElementById('results').classList.add('hidden');
             try {
                 const res = await fetch(`/api/search?query=${encodeURIComponent(query)}`);
@@ -735,7 +748,10 @@
                 document.getElementById('r-failures').innerText = data.technical.failures;
                 document.getElementById('r-legal').innerText = data.technical.legal;
                 document.getElementById('results').classList.remove('hidden');
-            } catch (e) { alert("Error retrieving data."); } finally { document.getElementById('loader').classList.add('hidden'); }
+            } catch (e) { alert("Error retrieving data."); } finally {
+                document.getElementById('loader-dog').classList.remove('running');
+                document.getElementById('loader-text').classList.remove('visible');
+            }
         }
     </script>
 </body>
