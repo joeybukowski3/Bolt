@@ -21,13 +21,16 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         contents: [{ 
           parts: [{ 
-            text: `You are a product research assistant. Research the following item: ${query}
+            text: `You are a product research assistant for insurance claims adjusters. Research the following item: ${query}
 
 Provide a detailed analysis in this EXACT JSON format (no extra text, just valid JSON):
 
 {
   "analysis": {
     "entered": "${query}",
+    "quickSummary": "short category label under 8 words, e.g. Consumer Grade Laptop Computer",
+    "modelConfidence": "exact or estimated",
+    "estimatedModel": "the specific model you based your research on",
     "descriptionMain": "1-2 sentence brief description",
     "descriptionExtra": "additional description details and context",
     "detailsMain": "1-2 sentence key specifications summary",
@@ -41,6 +44,13 @@ Provide a detailed analysis in this EXACT JSON format (no extra text, just valid
       "details": "full decoding breakdown, e.g. 1st character is year: R=2004, T=2006, etc."
     }
   },
+  "valuation": {
+    "annualDepreciationPercent": "annual depreciation rate as a number, e.g. 15",
+    "lifeExpectancyYears": "expected useful life in years, e.g. 7",
+    "conditionFactor": "0.75",
+    "estimatedACV": "calculated ACV as a dollar string, e.g. $487.23",
+    "acvFormula": "the formula used, e.g. $899 × (1 - 0.15)^3 × 0.75 = $487.23"
+  },
   "table": [
     {"label": "Model", "original": "exact model name/number of original", "brandMatch": "specific model name/number of same-brand replacement", "option1": "specific model name/number alt 1", "option2": "specific model name/number alt 2"},
     {"label": "Key Specs", "original": "key specs of original", "brandMatch": "key specs", "option1": "key specs", "option2": "key specs"},
@@ -52,12 +62,26 @@ Provide a detailed analysis in this EXACT JSON format (no extra text, just valid
     "recalls": "recall info or None found",
     "failures": "common issues or None",
     "legal": "legal issues or None"
-  }
+  },
+  "howItWorks": "2-4 sentence plain-language explanation of how the product works, written at a middle-school reading level with no jargon",
+  "diagnostics": [
+    {"title": "descriptive link title", "url": "full URL to manufacturer repair/diagnostic page", "source": "manufacturer or site name"}
+  ]
 }
+
+IMPORTANT for quickSummary: Provide a short category-style label under 8 words (e.g. "Consumer Grade Laptop Computer", "French Door Refrigerator", "Professional Grade Gas Range").
+
+IMPORTANT for modelConfidence: Set to "exact" if the user provided a full, specific model number in their query. Set to "estimated" if the query is vague, partial, or only a general description (e.g. "old fridge", "Samsung TV", "laptop"). When estimated, set estimatedModel to the specific model you chose to base your research on.
+
+IMPORTANT for valuation: Calculate Actual Cash Value (ACV) using insurance industry depreciation standards from ClaimsPages.com. Use these rates by category: Electronics ~15-20% per year, Appliances ~10-12% per year, Furniture ~10% per year, Clothing ~20-25% per year. Assume "Good" condition with a conditionFactor of 0.75. Formula: ACV = MSRP × (1 - annualDepreciationRate)^age × conditionFactor. Show the full formula with actual numbers in acvFormula.
 
 IMPORTANT for table: Always include specific model names/numbers (not generic descriptions) for brandMatch, option1, and option2. Include actual current retail prices. For Retailers, list 2-3 stores where each option can be purchased brand new (e.g. Amazon, Best Buy, Home Depot, Sweetwater, etc.).
 
-IMPORTANT for decodingMethod: If the product has a known serial number decoding scheme (like many electronics, guitars, appliances, etc.), set available to true and provide the summary and details. If no serial number decoding information is known, set available to false, summary to "", and details to "".` 
+IMPORTANT for decodingMethod: If the product has a known serial number decoding scheme (like many electronics, guitars, appliances, etc.), set available to true and provide the summary and details. If no serial number decoding information is known, set available to false, summary to "", and details to "".
+
+IMPORTANT for howItWorks: Write a 2-4 sentence explanation of how this product works in plain language. Aim for a middle-school reading level. Avoid technical jargon.
+
+IMPORTANT for diagnostics: Provide 2-5 real, working URLs to manufacturer repair pages, diagnostic tools, troubleshooting guides, or parts lookup pages relevant to this product. Use actual manufacturer websites. If no legitimate diagnostic resources exist, return an empty array [].` 
           }] 
         }],
         generationConfig: { 

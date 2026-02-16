@@ -103,6 +103,10 @@
             justify-content: space-between;
             padding: 1.25rem 0;
         }
+        .nav-brand-group {
+            display: flex;
+            flex-direction: column;
+        }
         .nav-brand {
             display: flex;
             align-items: center;
@@ -113,6 +117,11 @@
             text-decoration: none;
         }
         .nav-brand .bolt-icon { color: var(--accent); }
+        .brand-tagline {
+            font-size: 0.9rem;
+            font-style: italic;
+            color: #64748b;
+        }
         /* nav-mascot-small defined in mascot area section */
         .nav-links {
             display: flex;
@@ -305,7 +314,12 @@
             letter-spacing: 0.12em;
             color: var(--text-muted-dark);
         }
-        .print-btn {
+        .results-header-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .print-btn, .view-toggle-btn {
             background: white;
             color: var(--text-mid);
             border: 1px solid var(--border-color);
@@ -317,7 +331,8 @@
             cursor: pointer;
             transition: all 0.2s;
         }
-        .print-btn:hover { background: #f8fafc; border-color: var(--accent); color: var(--text-dark); }
+        .print-btn:hover, .view-toggle-btn:hover { background: #f8fafc; border-color: var(--accent); color: var(--text-dark); }
+        .view-toggle-btn.active { background: var(--accent); color: #000; border-color: var(--accent); }
 
         /* ── Cards (white on light gray bg) ── */
         .card {
@@ -501,6 +516,111 @@
             opacity: 0.6;
         }
 
+        /* ── Quick View ── */
+        .quick-view-strip {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+        .quick-view-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-left: 4px solid var(--accent);
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            flex: 1 1 160px;
+            min-width: 140px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+        .quick-view-label {
+            font-size: 0.6rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-muted-dark);
+            margin-bottom: 0.2rem;
+        }
+        .quick-view-value {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+        .quick-view-value.acv-highlight {
+            color: var(--green);
+            font-weight: 700;
+        }
+
+        /* ── Estimation Banner ── */
+        .estimation-banner {
+            background: #fef9c3;
+            border: 1px solid #fde68a;
+            border-left: 4px solid #f59e0b;
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            margin-bottom: 1rem;
+            color: #92400e;
+            font-size: 0.82rem;
+            line-height: 1.5;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+        .estimation-banner .banner-icon { font-size: 1.1rem; flex-shrink: 0; }
+
+        /* ── Valuation Table ── */
+        .valuation-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.82rem;
+        }
+        .valuation-table td {
+            padding: 0.55rem 0.75rem;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .valuation-table tr:last-child td { border-bottom: none; }
+        .valuation-table td:first-child {
+            font-weight: 600;
+            color: var(--text-mid);
+            width: 45%;
+        }
+        .valuation-table td:last-child { color: var(--text-dark); }
+        .valuation-table tr:nth-child(odd) td { background: var(--bg-card-alt); }
+        .acv-value { color: var(--green); font-weight: 700; font-size: 1rem; }
+        .acv-formula { font-style: italic; color: var(--text-muted-dark); font-size: 0.78rem; }
+
+        /* ── How It Works ── */
+        .how-it-works-text {
+            font-size: 0.85rem;
+            color: var(--text-mid);
+            line-height: 1.7;
+        }
+
+        /* ── Diagnostics List ── */
+        .diagnostics-list {
+            list-style: none;
+            padding: 0;
+        }
+        .diagnostics-list li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 0.82rem;
+        }
+        .diagnostics-list li:last-child { border-bottom: none; }
+        .diagnostics-list a {
+            color: var(--blue);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .diagnostics-list a:hover { text-decoration: underline; }
+        .diagnostics-list .diag-source { color: var(--text-muted-dark); }
+        .diagnostics-empty {
+            color: var(--text-muted-dark);
+            font-style: italic;
+            font-size: 0.82rem;
+        }
+
+        .hidden { display: none !important; }
+
         /* ── Print Styles ── */
         @media print {
             .no-print { display: none !important; }
@@ -517,12 +637,15 @@
         }
         @media (max-width: 640px) {
             .hero { padding: 1.5rem 0 1rem; }
-.stats-bar { gap: 0.5rem; }
+            .stats-bar { gap: 0.5rem; }
             .stat-item { padding: 0.5rem 0.75rem; }
             .nav-links { gap: 0.25rem; }
             .nav-link { padding: 0.4rem 0.6rem; font-size: 0.75rem; }
             .card { padding: 1rem; }
             .results-zone { padding: 1.25rem 1rem 2rem; border-radius: 16px 16px 0 0; }
+            .brand-tagline { font-size: 0.75rem; }
+            .quick-view-strip { gap: 0.5rem; }
+            .quick-view-item { flex: 1 1 100%; }
         }
     </style>
 </head>
@@ -538,42 +661,46 @@
     <div class="app-container">
         <!-- Navigation -->
         <nav class="nav no-print">
-            <a class="nav-brand" href="#">
-                <span class="nav-mascot-small"><svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
-                    <!-- Cape -->
-                    <path d="M22 28 L10 45 L28 40 Z" fill="#dc2626" opacity="0.9"/>
-                    <path d="M24 30 L14 48 L30 42 Z" fill="#b91c1c" opacity="0.7"/>
-                    <!-- Body -->
-                    <ellipse cx="30" cy="38" rx="14" ry="12" fill="white"/>
-                    <!-- Head -->
-                    <circle cx="38" cy="22" r="12" fill="white"/>
-                    <!-- Ears -->
-                    <ellipse cx="30" cy="12" rx="4" ry="7" fill="white" transform="rotate(-15 30 12)"/>
-                    <ellipse cx="31" cy="13" rx="2.5" ry="5" fill="#fecaca" transform="rotate(-15 31 13)"/>
-                    <ellipse cx="46" cy="14" rx="4" ry="7" fill="white" transform="rotate(15 46 14)"/>
-                    <ellipse cx="45" cy="15" rx="2.5" ry="5" fill="#fecaca" transform="rotate(15 45 15)"/>
-                    <!-- Eyes -->
-                    <circle cx="34" cy="20" r="2.5" fill="#1e293b"/>
-                    <circle cx="42" cy="20" r="2.5" fill="#1e293b"/>
-                    <circle cx="35" cy="19" r="0.8" fill="white"/>
-                    <circle cx="43" cy="19" r="0.8" fill="white"/>
-                    <!-- Nose -->
-                    <ellipse cx="39" cy="25" rx="2" ry="1.5" fill="#1e293b"/>
-                    <!-- Mouth -->
-                    <path d="M37 27 Q39 30 41 27" stroke="#1e293b" fill="none" stroke-width="0.8"/>
-                    <!-- Lightning bolt on chest -->
-                    <polygon points="28,32 31,36 29,36 32,42 27,37 30,37" fill="#eab308"/>
-                    <!-- Legs -->
-                    <rect x="20" y="46" width="5" height="8" rx="2.5" fill="white"/>
-                    <rect x="35" y="46" width="5" height="8" rx="2.5" fill="white"/>
-                    <!-- Tail -->
-                    <path d="M18 35 Q10 28 14 22" stroke="white" fill="none" stroke-width="3" stroke-linecap="round"/>
-                </svg></span>
-                Bolt <span class="bolt-icon">&#9889;</span>
-            </a>
+            <div class="nav-brand-group">
+                <a class="nav-brand" href="index.html">
+                    <span class="nav-mascot-small"><svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Cape -->
+                        <path d="M22 28 L10 45 L28 40 Z" fill="#dc2626" opacity="0.9"/>
+                        <path d="M24 30 L14 48 L30 42 Z" fill="#b91c1c" opacity="0.7"/>
+                        <!-- Body -->
+                        <ellipse cx="30" cy="38" rx="14" ry="12" fill="white"/>
+                        <!-- Head -->
+                        <circle cx="38" cy="22" r="12" fill="white"/>
+                        <!-- Ears -->
+                        <ellipse cx="30" cy="12" rx="4" ry="7" fill="white" transform="rotate(-15 30 12)"/>
+                        <ellipse cx="31" cy="13" rx="2.5" ry="5" fill="#fecaca" transform="rotate(-15 31 13)"/>
+                        <ellipse cx="46" cy="14" rx="4" ry="7" fill="white" transform="rotate(15 46 14)"/>
+                        <ellipse cx="45" cy="15" rx="2.5" ry="5" fill="#fecaca" transform="rotate(15 45 15)"/>
+                        <!-- Eyes -->
+                        <circle cx="34" cy="20" r="2.5" fill="#1e293b"/>
+                        <circle cx="42" cy="20" r="2.5" fill="#1e293b"/>
+                        <circle cx="35" cy="19" r="0.8" fill="white"/>
+                        <circle cx="43" cy="19" r="0.8" fill="white"/>
+                        <!-- Nose -->
+                        <ellipse cx="39" cy="25" rx="2" ry="1.5" fill="#1e293b"/>
+                        <!-- Mouth -->
+                        <path d="M37 27 Q39 30 41 27" stroke="#1e293b" fill="none" stroke-width="0.8"/>
+                        <!-- Lightning bolt on chest -->
+                        <polygon points="28,32 31,36 29,36 32,42 27,37 30,37" fill="#eab308"/>
+                        <!-- Legs -->
+                        <rect x="20" y="46" width="5" height="8" rx="2.5" fill="white"/>
+                        <rect x="35" y="46" width="5" height="8" rx="2.5" fill="white"/>
+                        <!-- Tail -->
+                        <path d="M18 35 Q10 28 14 22" stroke="white" fill="none" stroke-width="3" stroke-linecap="round"/>
+                    </svg></span>
+                    Bolt <span class="bolt-icon">&#9889;</span>
+                </a>
+                <div class="brand-tagline">The World's 1st AI assistant built for the insurance industry experts by insurance industry experts</div>
+            </div>
             <div class="nav-links">
-                <span class="nav-link active">Item Lookup</span>
-                <span class="nav-link">How Old is my Item?</span>
+                <a href="index.html" class="nav-link active">Item Lookup</a>
+                <a href="#" class="nav-link">How Old is my Item?</a>
+                <a href="who-we-are.html" class="nav-link">Who We Are</a>
             </div>
         </nav>
 
@@ -653,103 +780,185 @@
 
                     <div class="results-header no-print">
                         <span class="results-label">Research Report</span>
-                        <button onclick="window.print()" class="print-btn">&#128424; Print to PDF</button>
+                        <div class="results-header-actions">
+                            <button id="view-toggle" onclick="toggleView()" class="view-toggle-btn">Detailed View</button>
+                            <button onclick="window.print()" class="print-btn">&#128424; Print to PDF</button>
+                        </div>
                     </div>
 
-                    <!-- Section 1: Analysis -->
-                    <div class="card">
-                        <div class="card-title"><span class="title-number">1</span> Current Item Analysis <span class="title-icon">&#9889;</span></div>
-                        <div class="card-accent-stripe"></div>
-                        <div class="detail-grid">
-                            <div class="detail-item">
-                                <div class="detail-label">Information Entered</div>
-                                <div class="detail-value" id="r-entered"></div>
+                    <!-- Estimation Banner (hidden by default) -->
+                    <div id="estimation-banner" class="estimation-banner hidden">
+                        <span class="banner-icon">&#9888;</span>
+                        <span id="estimation-text"></span>
+                    </div>
+
+                    <!-- Quick View -->
+                    <div id="quick-view">
+                        <div class="quick-view-strip">
+                            <div class="quick-view-item">
+                                <div class="quick-view-label">Category</div>
+                                <div class="quick-view-value" id="qv-category"></div>
                             </div>
-                            <div class="detail-item">
-                                <div class="detail-label">Status</div>
-                                <div class="detail-value" id="r-status"></div>
+                            <div class="quick-view-item">
+                                <div class="quick-view-label">Status</div>
+                                <div class="quick-view-value" id="qv-status"></div>
                             </div>
-                            <div class="detail-item">
-                                <div class="detail-label">Estimated Age</div>
-                                <div class="detail-value" id="r-age"></div>
+                            <div class="quick-view-item">
+                                <div class="quick-view-label">Age</div>
+                                <div class="quick-view-value" id="qv-age"></div>
                             </div>
-                            <div class="detail-item">
-                                <div class="detail-label">Original MSRP</div>
-                                <div class="detail-value" id="r-msrp"></div>
+                            <div class="quick-view-item">
+                                <div class="quick-view-label">MSRP</div>
+                                <div class="quick-view-value" id="qv-msrp"></div>
                             </div>
-                            <div class="detail-item full-width">
-                                <div class="detail-label">Item Description</div>
-                                <div class="detail-value">
-                                    <span id="r-desc-main"></span>
-                                    <span class="collapsible-toggle" onclick="toggleCollapse('desc')">
-                                        <span class="arrow">&#9654;</span> More
-                                    </span>
-                                    <span id="collapsible-desc" class="collapsible-content"><br><span id="r-desc-extra"></span></span>
+                            <div class="quick-view-item">
+                                <div class="quick-view-label">Est. ACV</div>
+                                <div class="quick-view-value acv-highlight" id="qv-acv"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Detailed View -->
+                    <div id="detailed-view" class="hidden">
+
+                        <!-- Section 1: Analysis -->
+                        <div class="card">
+                            <div class="card-title"><span class="title-number">1</span> Current Item Analysis <span class="title-icon">&#9889;</span></div>
+                            <div class="card-accent-stripe"></div>
+                            <div class="detail-grid">
+                                <div class="detail-item">
+                                    <div class="detail-label">Information Entered</div>
+                                    <div class="detail-value" id="r-entered"></div>
                                 </div>
-                            </div>
-                            <div class="detail-item full-width">
-                                <div class="detail-label">Key Details</div>
-                                <div class="detail-value">
-                                    <span id="r-details-main"></span>
-                                    <span class="collapsible-toggle" onclick="toggleCollapse('details')">
-                                        <span class="arrow">&#9654;</span> More
-                                    </span>
-                                    <span id="collapsible-details" class="collapsible-content"><br><span id="r-details-extra"></span></span>
+                                <div class="detail-item">
+                                    <div class="detail-label">Status</div>
+                                    <div class="detail-value" id="r-status"></div>
                                 </div>
-                            </div>
-                            <div class="detail-item full-width">
-                                <div class="detail-label">Decoding Methods</div>
-                                <div class="detail-value">
-                                    <span id="r-decode-summary"></span>
-                                    <span id="decode-toggle-wrapper" class="hidden">
-                                        <span class="collapsible-toggle" onclick="toggleCollapse('decode')">
+                                <div class="detail-item">
+                                    <div class="detail-label">Estimated Age</div>
+                                    <div class="detail-value" id="r-age"></div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">Original MSRP</div>
+                                    <div class="detail-value" id="r-msrp"></div>
+                                </div>
+                                <div class="detail-item full-width">
+                                    <div class="detail-label">Item Description</div>
+                                    <div class="detail-value">
+                                        <span id="r-desc-main"></span>
+                                        <span class="collapsible-toggle" onclick="toggleCollapse('desc')">
                                             <span class="arrow">&#9654;</span> More
                                         </span>
-                                        <span id="collapsible-decode" class="collapsible-content"><br><span id="r-decode-details"></span></span>
-                                    </span>
+                                        <span id="collapsible-desc" class="collapsible-content"><br><span id="r-desc-extra"></span></span>
+                                    </div>
+                                </div>
+                                <div class="detail-item full-width">
+                                    <div class="detail-label">Key Details</div>
+                                    <div class="detail-value">
+                                        <span id="r-details-main"></span>
+                                        <span class="collapsible-toggle" onclick="toggleCollapse('details')">
+                                            <span class="arrow">&#9654;</span> More
+                                        </span>
+                                        <span id="collapsible-details" class="collapsible-content"><br><span id="r-details-extra"></span></span>
+                                    </div>
+                                </div>
+                                <div class="detail-item full-width">
+                                    <div class="detail-label">Decoding Methods</div>
+                                    <div class="detail-value">
+                                        <span id="r-decode-summary"></span>
+                                        <span id="decode-toggle-wrapper" class="hidden">
+                                            <span class="collapsible-toggle" onclick="toggleCollapse('decode')">
+                                                <span class="arrow">&#9654;</span> More
+                                            </span>
+                                            <span id="collapsible-decode" class="collapsible-content"><br><span id="r-decode-details"></span></span>
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Section 2: Replacement Options -->
-                    <div class="card" style="overflow-x: auto;">
-                        <div class="card-title"><span class="title-number">2</span> Current Replacement Options <span class="title-icon">&#128260;</span></div>
-                        <div class="card-accent-stripe"></div>
-                        <table class="data-table">
-                            <thead>
+                        <!-- Section 2: Replacement Options -->
+                        <div class="card" style="overflow-x: auto;">
+                            <div class="card-title"><span class="title-number">2</span> Current Replacement Options <span class="title-icon">&#128260;</span></div>
+                            <div class="card-accent-stripe"></div>
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Feature</th>
+                                        <th>Original Item</th>
+                                        <th class="highlight">Brand Match</th>
+                                        <th>Option 1</th>
+                                        <th>Option 2</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-body"></tbody>
+                            </table>
+                        </div>
+
+                        <!-- Section 3: Valuation & Depreciation -->
+                        <div class="card">
+                            <div class="card-title"><span class="title-number">3</span> Valuation &amp; Depreciation <span class="title-icon">&#128176;</span></div>
+                            <div class="card-accent-stripe"></div>
+                            <table class="valuation-table">
                                 <tr>
-                                    <th>Feature</th>
-                                    <th>Original Item</th>
-                                    <th class="highlight">Brand Match</th>
-                                    <th>Option 1</th>
-                                    <th>Option 2</th>
+                                    <td>Annual Depreciation Rate</td>
+                                    <td id="r-depreciation-rate"></td>
                                 </tr>
-                            </thead>
-                            <tbody id="table-body"></tbody>
-                        </table>
-                    </div>
+                                <tr>
+                                    <td>Life Expectancy</td>
+                                    <td id="r-life-expectancy"></td>
+                                </tr>
+                                <tr>
+                                    <td>Condition Factor</td>
+                                    <td id="r-condition-factor"></td>
+                                </tr>
+                                <tr>
+                                    <td>Estimated ACV</td>
+                                    <td><span class="acv-value" id="r-acv"></span></td>
+                                </tr>
+                                <tr>
+                                    <td>ACV Formula</td>
+                                    <td><span class="acv-formula" id="r-acv-formula"></span></td>
+                                </tr>
+                            </table>
+                        </div>
 
-                    <!-- Section 3: Technical Info -->
-                    <div class="card">
-                        <div class="card-title"><span class="title-number">3</span> Relevant Technical Information <span class="title-icon">&#128295;</span></div>
-                        <div class="card-accent-stripe"></div>
-                        <div id="manual-box" style="margin-bottom: 0.5rem;"></div>
-                        <div class="tech-grid has-manual">
-                            <div class="tech-item recall-item">
-                                <div class="tech-label recall">Recall Notices</div>
-                                <div class="tech-value" id="r-recalls"></div>
-                            </div>
-                            <div class="tech-item neutral-item">
-                                <div class="tech-label neutral">Failure Patterns</div>
-                                <div class="tech-value" id="r-failures"></div>
-                            </div>
-                            <div class="tech-item neutral-item">
-                                <div class="tech-label neutral">Legal / Class Action</div>
-                                <div class="tech-value" id="r-legal"></div>
+                        <!-- Section 4: Technical Info -->
+                        <div class="card">
+                            <div class="card-title"><span class="title-number">4</span> Relevant Technical Information <span class="title-icon">&#128295;</span></div>
+                            <div class="card-accent-stripe"></div>
+                            <div id="manual-box" style="margin-bottom: 0.5rem;"></div>
+                            <div class="tech-grid has-manual">
+                                <div class="tech-item recall-item">
+                                    <div class="tech-label recall">Recall Notices</div>
+                                    <div class="tech-value" id="r-recalls"></div>
+                                </div>
+                                <div class="tech-item neutral-item">
+                                    <div class="tech-label neutral">Failure Patterns</div>
+                                    <div class="tech-value" id="r-failures"></div>
+                                </div>
+                                <div class="tech-item neutral-item">
+                                    <div class="tech-label neutral">Legal / Class Action</div>
+                                    <div class="tech-value" id="r-legal"></div>
+                                </div>
                             </div>
                         </div>
-                    </div>
+
+                        <!-- Section 5: How It Works -->
+                        <div class="card">
+                            <div class="card-title"><span class="title-number">5</span> How It Works <span class="title-icon">&#128161;</span></div>
+                            <div class="card-accent-stripe"></div>
+                            <div class="how-it-works-text" id="r-how-it-works"></div>
+                        </div>
+
+                        <!-- Section 6: Diagnostics & Repair Resources -->
+                        <div class="card">
+                            <div class="card-title"><span class="title-number">6</span> Diagnostics &amp; Repair Resources <span class="title-icon">&#128736;</span></div>
+                            <div class="card-accent-stripe"></div>
+                            <div id="r-diagnostics"></div>
+                        </div>
+
+                    </div><!-- /detailed-view -->
 
                 </div>
             </div>
@@ -757,6 +966,8 @@
     </div>
 
     <script>
+        let currentView = 'quick';
+
         document.getElementById('query').addEventListener('keydown', function(e) {
             if (e.key === 'Enter') performSearch();
         });
@@ -766,6 +977,26 @@
             const btn = document.querySelector(`[onclick="toggleCollapse('${id}')"]`);
             content.classList.toggle('open');
             btn.classList.toggle('open');
+        }
+
+        function toggleView() {
+            const quickView = document.getElementById('quick-view');
+            const detailedView = document.getElementById('detailed-view');
+            const toggleBtn = document.getElementById('view-toggle');
+
+            if (currentView === 'quick') {
+                quickView.classList.add('hidden');
+                detailedView.classList.remove('hidden');
+                toggleBtn.textContent = 'Quick View';
+                toggleBtn.classList.add('active');
+                currentView = 'detailed';
+            } else {
+                detailedView.classList.add('hidden');
+                quickView.classList.remove('hidden');
+                toggleBtn.textContent = 'Detailed View';
+                toggleBtn.classList.remove('active');
+                currentView = 'quick';
+            }
         }
 
         async function performSearch() {
@@ -778,6 +1009,8 @@
                 const res = await fetch(`/api/search?query=${encodeURIComponent(query)}`);
                 const data = await res.json();
                 const a = data.analysis;
+
+                // Section 1: Analysis
                 document.getElementById('r-entered').innerText = a.entered;
                 document.getElementById('r-desc-main').innerText = a.descriptionMain || a.description || '';
                 document.getElementById('r-desc-extra').innerText = a.descriptionExtra || '';
@@ -797,6 +1030,7 @@
                     document.getElementById('decode-toggle-wrapper').classList.add('hidden');
                 }
 
+                // Section 2: Replacement Table
                 const tbody = document.getElementById('table-body');
                 tbody.innerHTML = data.table.map(row => `
                     <tr>
@@ -807,6 +1041,18 @@
                         <td>${row.option2}</td>
                     </tr>
                 `).join('');
+
+                // Section 3: Valuation
+                const v = data.valuation;
+                if (v) {
+                    document.getElementById('r-depreciation-rate').innerText = v.annualDepreciationPercent + '%';
+                    document.getElementById('r-life-expectancy').innerText = v.lifeExpectancyYears + ' years';
+                    document.getElementById('r-condition-factor').innerText = v.conditionFactor;
+                    document.getElementById('r-acv').innerText = v.estimatedACV;
+                    document.getElementById('r-acv-formula').innerText = v.acvFormula;
+                }
+
+                // Section 4: Technical
                 const manualBox = document.getElementById('manual-box');
                 manualBox.innerHTML = data.technical.manual !== 'N/A'
                     ? `<a href="${data.technical.manual}" target="_blank" class="manual-link no-print">&#128196; VIEW SERVICE MANUAL (PDF)</a>`
@@ -814,6 +1060,44 @@
                 document.getElementById('r-recalls').innerText = data.technical.recalls;
                 document.getElementById('r-failures').innerText = data.technical.failures;
                 document.getElementById('r-legal').innerText = data.technical.legal;
+
+                // Section 5: How It Works
+                document.getElementById('r-how-it-works').innerText = data.howItWorks || 'No explanation available.';
+
+                // Section 6: Diagnostics
+                const diagContainer = document.getElementById('r-diagnostics');
+                if (data.diagnostics && data.diagnostics.length > 0) {
+                    diagContainer.innerHTML = '<ul class="diagnostics-list">' +
+                        data.diagnostics.map(d => `<li><a href="${d.url}" target="_blank">${d.title}</a> <span class="diag-source">- ${d.source}</span></li>`).join('') +
+                        '</ul>';
+                } else {
+                    diagContainer.innerHTML = '<p class="diagnostics-empty">No diagnostic resources found.</p>';
+                }
+
+                // Quick View
+                document.getElementById('qv-category').innerText = a.quickSummary || 'N/A';
+                document.getElementById('qv-status').innerText = a.status;
+                document.getElementById('qv-age').innerText = a.age;
+                document.getElementById('qv-msrp').innerText = a.msrp;
+                document.getElementById('qv-acv').innerText = (v && v.estimatedACV) ? v.estimatedACV : 'N/A';
+
+                // Estimation Banner
+                const banner = document.getElementById('estimation-banner');
+                if (a.modelConfidence === 'estimated') {
+                    document.getElementById('estimation-text').innerText =
+                        'Full model number not provided. Information below is based on an estimated model of ' + (a.estimatedModel || 'unknown') + '.';
+                    banner.classList.remove('hidden');
+                } else {
+                    banner.classList.add('hidden');
+                }
+
+                // Reset to Quick View on new search
+                currentView = 'quick';
+                document.getElementById('quick-view').classList.remove('hidden');
+                document.getElementById('detailed-view').classList.add('hidden');
+                document.getElementById('view-toggle').textContent = 'Detailed View';
+                document.getElementById('view-toggle').classList.remove('active');
+
                 document.getElementById('results').classList.remove('hidden');
             } catch (e) { alert("Error retrieving data."); } finally {
                 document.getElementById('loader-dog').classList.remove('running');
