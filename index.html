@@ -113,17 +113,7 @@
             text-decoration: none;
         }
         .nav-brand .bolt-icon { color: var(--accent); }
-        .nav-mascot-small {
-            width: 36px;
-            height: 36px;
-            background: var(--bg-secondary);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            border: 2px solid rgba(255,255,255,0.08);
-        }
+        /* nav-mascot-small defined in mascot area section */
         .nav-links {
             display: flex;
             align-items: center;
@@ -230,37 +220,45 @@
 
         /* ── Mascot area above search ── */
         @keyframes runDogLoader {
-            0% { left: calc(100% + 50px); }
-            100% { left: -50px; }
+            0% { left: -80px; }
+            100% { left: calc(100% + 80px); }
         }
         @keyframes pulse-glow {
             0%, 100% { opacity: 0.5; }
             50% { opacity: 1; }
         }
+        @keyframes cape-flutter {
+            0%, 100% { transform: rotate(-15deg) skewX(0deg); }
+            50% { transform: rotate(-25deg) skewX(-5deg); }
+        }
         .mascot-area {
             text-align: center;
-            min-height: 5rem;
+            min-height: 5.5rem;
             margin-bottom: 0.75rem;
         }
         #loader-track {
-            width: 300px;
-            max-width: 80vw;
+            width: 400px;
+            max-width: 90vw;
             overflow: hidden;
             margin: 0 auto 0.5rem;
             position: relative;
-            height: 3.5rem;
+            height: 4.5rem;
         }
         #loader-dog {
-            font-size: 2.8rem;
             position: absolute;
             top: 0;
             left: 50%;
-            transform: translateX(-50%) scaleX(-1);
+            transform: translateX(-50%);
+            width: 60px;
+            height: 60px;
         }
         #loader-dog.running {
-            left: calc(100% + 50px);
-            transform: scaleX(-1);
-            animation: runDogLoader 2.5s linear infinite;
+            left: -80px;
+            transform: none;
+            animation: runDogLoader 2.8s linear infinite;
+        }
+        #loader-dog.running .dog-cape {
+            animation: cape-flutter 0.4s ease-in-out infinite;
         }
         .loader-text {
             color: var(--text-light);
@@ -272,6 +270,15 @@
             display: block;
             animation: pulse-glow 2s ease-in-out infinite;
         }
+        /* Nav mascot */
+        .nav-mascot-small {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .nav-mascot-small svg { width: 34px; height: 34px; }
 
         /* ── White results zone ── */
         .results-zone {
@@ -532,7 +539,36 @@
         <!-- Navigation -->
         <nav class="nav no-print">
             <a class="nav-brand" href="#">
-                <span class="nav-mascot-small">&#128054;</span>
+                <span class="nav-mascot-small"><svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Cape -->
+                    <path d="M22 28 L10 45 L28 40 Z" fill="#dc2626" opacity="0.9"/>
+                    <path d="M24 30 L14 48 L30 42 Z" fill="#b91c1c" opacity="0.7"/>
+                    <!-- Body -->
+                    <ellipse cx="30" cy="38" rx="14" ry="12" fill="white"/>
+                    <!-- Head -->
+                    <circle cx="38" cy="22" r="12" fill="white"/>
+                    <!-- Ears -->
+                    <ellipse cx="30" cy="12" rx="4" ry="7" fill="white" transform="rotate(-15 30 12)"/>
+                    <ellipse cx="31" cy="13" rx="2.5" ry="5" fill="#fecaca" transform="rotate(-15 31 13)"/>
+                    <ellipse cx="46" cy="14" rx="4" ry="7" fill="white" transform="rotate(15 46 14)"/>
+                    <ellipse cx="45" cy="15" rx="2.5" ry="5" fill="#fecaca" transform="rotate(15 45 15)"/>
+                    <!-- Eyes -->
+                    <circle cx="34" cy="20" r="2.5" fill="#1e293b"/>
+                    <circle cx="42" cy="20" r="2.5" fill="#1e293b"/>
+                    <circle cx="35" cy="19" r="0.8" fill="white"/>
+                    <circle cx="43" cy="19" r="0.8" fill="white"/>
+                    <!-- Nose -->
+                    <ellipse cx="39" cy="25" rx="2" ry="1.5" fill="#1e293b"/>
+                    <!-- Mouth -->
+                    <path d="M37 27 Q39 30 41 27" stroke="#1e293b" fill="none" stroke-width="0.8"/>
+                    <!-- Lightning bolt on chest -->
+                    <polygon points="28,32 31,36 29,36 32,42 27,37 30,37" fill="#eab308"/>
+                    <!-- Legs -->
+                    <rect x="20" y="46" width="5" height="8" rx="2.5" fill="white"/>
+                    <rect x="35" y="46" width="5" height="8" rx="2.5" fill="white"/>
+                    <!-- Tail -->
+                    <path d="M18 35 Q10 28 14 22" stroke="white" fill="none" stroke-width="3" stroke-linecap="round"/>
+                </svg></span>
                 Bolt <span class="bolt-icon">&#9889;</span>
             </a>
             <div class="nav-links">
@@ -543,9 +579,40 @@
 
         <!-- Hero -->
         <div class="hero no-print" id="hero-section">
-            <!-- Mascot: still by default, runs right-to-left when loading -->
+            <!-- Mascot: still by default, runs left-to-right when loading -->
             <div class="mascot-area">
-                <div id="loader-track"><div id="loader-dog">&#128021;</div></div>
+                <div id="loader-track"><div id="loader-dog"><svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg" width="60" height="60">
+                    <!-- Cape (flutters when running) -->
+                    <g class="dog-cape">
+                        <path d="M22 28 L8 46 L28 40 Z" fill="#dc2626" opacity="0.9"/>
+                        <path d="M24 30 L12 50 L30 42 Z" fill="#b91c1c" opacity="0.7"/>
+                    </g>
+                    <!-- Body -->
+                    <ellipse cx="30" cy="38" rx="14" ry="12" fill="white"/>
+                    <!-- Head -->
+                    <circle cx="38" cy="22" r="12" fill="white"/>
+                    <!-- Ears -->
+                    <ellipse cx="30" cy="12" rx="4" ry="7" fill="white" transform="rotate(-15 30 12)"/>
+                    <ellipse cx="31" cy="13" rx="2.5" ry="5" fill="#fecaca" transform="rotate(-15 31 13)"/>
+                    <ellipse cx="46" cy="14" rx="4" ry="7" fill="white" transform="rotate(15 46 14)"/>
+                    <ellipse cx="45" cy="15" rx="2.5" ry="5" fill="#fecaca" transform="rotate(15 45 15)"/>
+                    <!-- Eyes -->
+                    <circle cx="34" cy="20" r="2.5" fill="#1e293b"/>
+                    <circle cx="42" cy="20" r="2.5" fill="#1e293b"/>
+                    <circle cx="35" cy="19" r="0.8" fill="white"/>
+                    <circle cx="43" cy="19" r="0.8" fill="white"/>
+                    <!-- Nose -->
+                    <ellipse cx="39" cy="25" rx="2" ry="1.5" fill="#1e293b"/>
+                    <!-- Mouth / smile -->
+                    <path d="M37 27 Q39 30 41 27" stroke="#1e293b" fill="none" stroke-width="0.8"/>
+                    <!-- Lightning bolt on chest -->
+                    <polygon points="28,32 31,36 29,36 32,42 27,37 30,37" fill="#eab308"/>
+                    <!-- Legs -->
+                    <rect x="20" y="46" width="5" height="8" rx="2.5" fill="white"/>
+                    <rect x="35" y="46" width="5" height="8" rx="2.5" fill="white"/>
+                    <!-- Tail -->
+                    <path d="M18 35 Q10 28 14 22" stroke="white" fill="none" stroke-width="3" stroke-linecap="round"/>
+                </svg></div></div>
                 <span id="loader-text" class="loader-text">Consulting live market data and technical records...</span>
             </div>
 
