@@ -149,34 +149,6 @@
             padding: 2.5rem 0 2rem;
         }
 
-        /* ── Dog runner in hero (replaces static mascot) ── */
-        @keyframes runDogHero {
-            0% { left: -60px; }
-            100% { left: calc(100% + 60px); }
-        }
-        .hero-dog-track {
-            width: 500px;
-            max-width: 90vw;
-            height: 4.5rem;
-            margin: 0 auto 0.75rem;
-            position: relative;
-            overflow: hidden;
-        }
-        .hero-dog-track .running-dog {
-            font-size: 3.5rem;
-            position: absolute;
-            top: 0;
-            animation: runDogHero 3s linear infinite;
-        }
-        .hero-dog-track .paw-trail {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, rgba(234,179,8,0.3), transparent);
-        }
-
         .hero-tagline {
             font-size: 1.1rem;
             color: var(--text-light);
@@ -526,8 +498,7 @@
         }
         @media (max-width: 640px) {
             .hero { padding: 1.5rem 0 1rem; }
-            .hero-dog-track { width: 100%; }
-            .stats-bar { gap: 0.5rem; }
+.stats-bar { gap: 0.5rem; }
             .stat-item { padding: 0.5rem 0.75rem; }
             .nav-links { gap: 0.25rem; }
             .nav-link { padding: 0.4rem 0.6rem; font-size: 0.75rem; }
@@ -560,13 +531,11 @@
 
         <!-- Hero -->
         <div class="hero no-print" id="hero-section">
-            <!-- Running dog replaces static mascot -->
-            <div class="hero-dog-track" id="hero-dog-idle">
-                <div class="running-dog">&#128054;</div>
-                <div class="paw-trail"></div>
+            <!-- Loader sits above search bar -->
+            <div id="loader" class="hidden loader-section">
+                <div id="loader-track"><div id="loader-dog">&#128021;</div></div>
+                <span class="loader-text">Consulting live market data and technical records...</span>
             </div>
-
-            <p class="hero-tagline">Instant product intelligence &mdash; search any item by brand, type, and model for real-time data.</p>
 
             <div class="search-container">
                 <input type="text" id="query" class="search-input" placeholder="Search any product...">
@@ -596,12 +565,6 @@
                     </div>
                 </div>
             </div>
-        </div>
-
-        <!-- Loader -->
-        <div id="loader" class="hidden loader-section">
-            <div id="loader-track"><div id="loader-dog">&#128021;</div></div>
-            <span class="loader-text">Consulting live market data and technical records...</span>
         </div>
 
         <!-- Results (white zone) -->
