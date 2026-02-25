@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -66,7 +66,7 @@
 
         .app-container { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 0 1.5rem; }
 
-        /* ── Navigation ── */
+        /* â”€â”€ Navigation â”€â”€ */
         .nav { display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 0; }
         .nav-left { display: flex; align-items: center; gap: 0.75rem; }
         .nav-brand { display: flex; align-items: center; gap: 0.3rem; font-size: 1.3rem; font-weight: 800; color: var(--text-white); text-decoration: none; white-space: nowrap; }
@@ -78,7 +78,7 @@
         .nav-link.active { background: var(--accent); color: #000; font-weight: 600; }
         .nav-link.active:hover { background: var(--accent-hover); }
 
-        /* ── Hero ── */
+        /* â”€â”€ Hero â”€â”€ */
         .hero { text-align: center; padding: 2.5rem 0 2rem; }
         .search-container { max-width: 700px; margin: 0 auto 2rem; display: flex; background: var(--bg-input); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; overflow: hidden; transition: border-color 0.3s; }
         .search-container:focus-within { border-color: rgba(234,179,8,0.4); box-shadow: 0 0 0 3px rgba(234,179,8,0.1); }
@@ -87,7 +87,7 @@
         .search-btn { background: var(--accent); color: #000; border: none; padding: 1rem 2rem; font-size: 0.95rem; font-weight: 700; font-family: inherit; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: background 0.2s; white-space: nowrap; }
         .search-btn:hover { background: var(--accent-hover); }
 
-        /* ── Stats Bar ── */
+        /* â”€â”€ Stats Bar â”€â”€ */
         .stats-bar { display: flex; justify-content: center; gap: 1.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
         .stat-item { display: flex; align-items: center; gap: 0.75rem; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 0.75rem 1.25rem; }
         .stat-icon { color: var(--accent); font-size: 1.1rem; }
@@ -95,7 +95,7 @@
         .stat-label { font-size: 0.6rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted-dark); }
         .stat-value { font-size: 0.9rem; font-weight: 700; color: var(--text-white); }
 
-        /* ── Mascot loader ── */
+        /* â”€â”€ Mascot loader â”€â”€ */
         @keyframes runDogLoader { 0% { left: -80px; } 100% { left: calc(100% + 80px); } }
         @keyframes pulse-glow { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
         @keyframes cape-flutter { 0%, 100% { transform: rotate(-15deg) skewX(0deg); } 50% { transform: rotate(-25deg) skewX(-5deg); } }
@@ -107,7 +107,7 @@
         .loader-text { color: var(--text-light); font-style: italic; font-size: 0.9rem; display: none; }
         .loader-text.visible { display: block; animation: pulse-glow 2s ease-in-out infinite; }
 
-        /* ── Results zone ── */
+        /* â”€â”€ Results zone â”€â”€ */
         .results-zone { background: #f1f5f9; border-radius: 24px 24px 0 0; margin: 0 -1.5rem; padding: 2rem 1.5rem 3rem; min-height: 60vh; }
         .results-inner { max-width: 1100px; margin: 0 auto; }
         .results-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
@@ -117,14 +117,14 @@
         .print-btn:hover, .view-toggle-btn:hover { background: #f8fafc; border-color: var(--accent); color: var(--text-dark); }
         .view-toggle-btn.active { background: var(--accent); color: #000; border-color: var(--accent); }
 
-        /* ── Cards ── */
+        /* â”€â”€ Cards â”€â”€ */
         .card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 1.25rem 1.5rem; margin-bottom: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02); }
         .card-title { font-size: 0.95rem; font-weight: 700; color: var(--text-dark); margin-bottom: 0.85rem; padding-bottom: 0.6rem; border-bottom: 2px solid var(--accent-dim); display: flex; align-items: center; gap: 0.5rem; }
         .card-title .title-icon { color: var(--accent); font-size: 1.1rem; }
         .card-title .title-number { background: var(--accent); color: #000; width: 22px; height: 22px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 800; }
         .card-accent-stripe { height: 3px; background: linear-gradient(90deg, var(--accent), var(--blue), var(--accent)); border-radius: 3px; margin-bottom: 0.85rem; opacity: 0.6; }
 
-        /* ── Report text styles (matching screenshot) ── */
+        /* â”€â”€ Report text styles (matching screenshot) â”€â”€ */
         .report-overview { font-size: 0.85rem; color: var(--text-mid); line-height: 1.7; margin-bottom: 1rem; }
         .report-list { list-style: none; padding: 0; margin: 0; }
         .report-list li { padding: 0.4rem 0; font-size: 0.85rem; color: var(--text-mid); line-height: 1.6; border-bottom: 1px solid #f1f5f9; display: flex; align-items: baseline; gap: 0.5rem; }
@@ -135,18 +135,18 @@
 
         .section-subtitle { font-size: 0.88rem; font-weight: 700; color: var(--text-dark); margin: 1.25rem 0 0.6rem; padding-bottom: 0.3rem; border-bottom: 1px solid var(--border-color); }
 
-        /* ── Quick View ── */
+        /* â”€â”€ Quick View â”€â”€ */
         .quick-view-strip { display: flex; flex-wrap: wrap; gap: 0.75rem; }
         .quick-view-item { background: var(--bg-card); border: 1px solid var(--border-color); border-left: 4px solid var(--accent); border-radius: 10px; padding: 0.75rem 1rem; flex: 1 1 160px; min-width: 140px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
         .quick-view-label { font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted-dark); margin-bottom: 0.2rem; }
         .quick-view-value { font-size: 0.9rem; font-weight: 600; color: var(--text-dark); }
         .quick-view-value.acv-highlight { color: var(--green); font-weight: 700; }
 
-        /* ── Estimation Banner ── */
+        /* â”€â”€ Estimation Banner â”€â”€ */
         .estimation-banner { background: #fef9c3; border: 1px solid #fde68a; border-left: 4px solid #f59e0b; border-radius: 10px; padding: 0.75rem 1rem; margin-bottom: 1rem; color: #92400e; font-size: 0.82rem; line-height: 1.5; display: flex; align-items: flex-start; gap: 0.5rem; }
         .estimation-banner .banner-icon { font-size: 1.1rem; flex-shrink: 0; }
 
-        /* ── Valuation interactive ── */
+        /* â”€â”€ Valuation interactive â”€â”€ */
         .acv-value { color: var(--green); font-weight: 700; font-size: 1rem; }
         .acv-formula { font-style: italic; color: var(--text-muted-dark); font-size: 0.78rem; }
         .acv-note { font-size: 0.82rem; color: var(--text-mid); margin-top: 0.5rem; line-height: 1.5; font-style: italic; }
@@ -157,7 +157,7 @@
         .recalc-btn { background: var(--accent); color: #000; border: none; padding: 0.3rem 0.75rem; border-radius: 6px; font-size: 0.75rem; font-weight: 700; font-family: inherit; cursor: pointer; transition: background 0.2s; }
         .recalc-btn:hover { background: var(--accent-hover); }
 
-        /* ── Technical grid ── */
+        /* â”€â”€ Technical grid â”€â”€ */
         .tech-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.6rem; }
         .tech-grid.has-manual { margin-top: 0.6rem; }
         .tech-item { padding: 0.65rem 0.75rem; background: var(--bg-card-alt); border-radius: 8px; border-left: 3px solid var(--border-color); }
@@ -170,7 +170,7 @@
         .manual-link { display: inline-flex; align-items: center; gap: 0.4rem; background: var(--green-light); color: #15803d; padding: 0.45rem 1rem; border-radius: 999px; font-size: 0.7rem; font-weight: 700; text-decoration: none; border: 1px solid rgba(34,197,94,0.2); transition: all 0.2s; }
         .manual-link:hover { background: #dcfce7; border-color: rgba(34,197,94,0.4); }
 
-        /* ── Error Codes ── */
+        /* â”€â”€ Error Codes â”€â”€ */
         .error-codes-section { margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--border-color); }
         .error-codes-title { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-dark); margin-bottom: 0.5rem; }
         .error-codes-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
@@ -181,7 +181,7 @@
         .error-codes-link { display: inline-flex; align-items: center; gap: 0.3rem; color: var(--blue); font-size: 0.75rem; font-weight: 600; text-decoration: none; margin-top: 0.5rem; }
         .error-codes-link:hover { text-decoration: underline; }
 
-        /* ── Table (compact) ── */
+        /* â”€â”€ Table (compact) â”€â”€ */
         .data-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
         .data-table th { background: var(--bg-card-alt); color: var(--text-muted-dark); font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; padding: 0.55rem 0.65rem; text-align: left; border-bottom: 2px solid var(--border-color); }
         .data-table th.highlight { color: var(--accent); }
@@ -191,10 +191,10 @@
         .data-table td:first-child { font-weight: 600; color: var(--text-dark); background: var(--bg-card-alt); white-space: nowrap; }
         .data-table td.brand-match { color: #92400e; font-weight: 600; background: #fef9c3; }
 
-        /* ── How It Works ── */
+        /* â”€â”€ How It Works â”€â”€ */
         .how-it-works-text { font-size: 0.85rem; color: var(--text-mid); line-height: 1.7; }
 
-        /* ── Diagnostics List ── */
+        /* â”€â”€ Diagnostics List â”€â”€ */
         .diagnostics-list { list-style: none; padding: 0; }
         .diagnostics-list li { padding: 0.5rem 0; border-bottom: 1px solid #f1f5f9; font-size: 0.82rem; }
         .diagnostics-list li:last-child { border-bottom: none; }
@@ -205,7 +205,7 @@
 
         .hidden { display: none !important; }
 
-        /* ── Print ── */
+        /* â”€â”€ Print â”€â”€ */
         @media print {
             .no-print { display: none !important; }
             body { background: white !important; color: #000 !important; }
@@ -214,7 +214,7 @@
             .card { box-shadow: none !important; border: 1px solid #ddd !important; }
         }
 
-        /* ── Responsive ── */
+        /* â”€â”€ Responsive â”€â”€ */
         @media (max-width: 768px) { .tech-grid { grid-template-columns: 1fr; } }
         @media (max-width: 640px) {
             .nav { flex-direction: column; gap: 0.5rem; align-items: flex-start; }
@@ -282,7 +282,7 @@
             </div>
             <div class="search-container">
                 <input type="text" id="query" class="search-input" placeholder="Search any product...">
-                <button onclick="performSearch()" id="btn" class="search-btn">&#128269; Search</button>
+                <button id="btn" class="search-btn">&#128269; Search</button>
             </div>
             <div class="stats-bar">
                 <div class="stat-item"><span class="stat-icon">&#9889;</span><div class="stat-text"><span class="stat-label">Real-Time Data</span><span class="stat-value">Instant</span></div></div>
@@ -299,8 +299,8 @@
                     <div class="results-header no-print">
                         <span class="results-label">Research Report</span>
                         <div class="results-header-actions">
-                            <button id="view-toggle" onclick="toggleView()" class="view-toggle-btn active">Quick View</button>
-                            <button onclick="window.print()" class="print-btn">&#128424; Print to PDF</button>
+                            <button id="view-toggle" class="view-toggle-btn active">Quick View</button>
+                            <button class="print-btn" id="print-btn">&#128424; Print to PDF</button>
                         </div>
                     </div>
 
@@ -357,7 +357,7 @@
                                             <span class="age-label">Adjust age:</span>
                                             <input type="number" id="acv-age-input" class="age-input" min="0" max="100" value="0">
                                             <span class="age-label">years</span>
-                                            <button onclick="recalcACV()" class="recalc-btn">Recalculate</button>
+                                            <button class="recalc-btn" id="recalc-btn">Recalculate</button>
                                         </div>
                                     </span>
                                 </li>
@@ -409,170 +409,7 @@
         </div>
     </div>
 
-    <script>
-        let currentView = 'detailed';
-        let acvData = {};
-
-        document.getElementById('query').addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') performSearch();
-        });
-
-        function toggleView() {
-            const quickView = document.getElementById('quick-view');
-            const detailedView = document.getElementById('detailed-view');
-            const toggleBtn = document.getElementById('view-toggle');
-            if (currentView === 'detailed') {
-                detailedView.classList.add('hidden');
-                quickView.classList.remove('hidden');
-                toggleBtn.textContent = 'Detailed View';
-                toggleBtn.classList.remove('active');
-                currentView = 'quick';
-            } else {
-                quickView.classList.add('hidden');
-                detailedView.classList.remove('hidden');
-                toggleBtn.textContent = 'Quick View';
-                toggleBtn.classList.add('active');
-                currentView = 'detailed';
-            }
-        }
-
-        function recalcACV() {
-            const age = parseFloat(document.getElementById('acv-age-input').value);
-            if (isNaN(age) || age < 0 || !acvData.msrp) return;
-            const msrp = acvData.msrp;
-            const rate = acvData.rate / 100;
-            const condition = acvData.condition;
-            const newACV = msrp * Math.pow(1 - rate, age) * condition;
-            document.getElementById('r-acv').innerText = '$' + newACV.toFixed(2);
-            document.getElementById('r-acv-formula').innerText =
-                '$' + msrp.toFixed(2) + ' \u00D7 (1 - ' + (rate).toFixed(2) + ')^' + age + ' \u00D7 ' + condition + ' = $' + newACV.toFixed(2);
-            document.getElementById('qv-acv').innerText = '$' + newACV.toFixed(2);
-        }
-
-        async function performSearch() {
-            const query = document.getElementById('query').value;
-            if (!query) return;
-            document.getElementById('loader-dog').classList.add('running');
-            document.getElementById('loader-text').classList.add('visible');
-            document.getElementById('results').classList.add('hidden');
-            try {
-                const res = await fetch(`/api/search?query=${encodeURIComponent(query)}`);
-                const data = await res.json();
-                const a = data.analysis;
-                const rd = data.releaseDate || {};
-                const v = data.valuation || {};
-
-                // Section 1: Analysis
-                document.getElementById('r-overview').innerText = a.overview || '';
-                document.getElementById('r-item-desc').innerText = a.itemDescription || a.descriptionMain || '';
-                document.getElementById('r-key-details').innerText = a.keyDetails || a.detailsMain || '';
-                document.getElementById('r-tech-specs').innerText = a.technicalSpecs || '';
-                document.getElementById('r-materials').innerText = a.materials || 'Not specified';
-
-                // Release Date & Age
-                document.getElementById('r-production-era').innerText = rd.productionEra || a.age || 'Unknown';
-                document.getElementById('r-discontinuation').innerText = rd.discontinuation || a.status || '';
-                document.getElementById('r-estimated-age').innerText = rd.estimatedAge || a.age || 'Unknown';
-                document.getElementById('r-service-life').innerText = rd.serviceLife || '';
-
-                // Valuation
-                document.getElementById('r-msrp').innerText = a.msrp || '';
-                document.getElementById('r-depreciation-display').innerText = v.annualDepreciationDisplay || (v.annualDepreciationPercent + '%') || '';
-                document.getElementById('r-acv').innerText = v.estimatedACV || '';
-                document.getElementById('r-acv-formula').innerText = v.acvFormula || '';
-                document.getElementById('r-acv-note').innerText = v.acvNote || '';
-
-                // Store for recalculation
-                const ageNum = rd.ageNumeric || 0;
-                acvData = {
-                    msrp: a.msrpNumeric || parseFloat(String(a.msrp).replace(/[^0-9.]/g, '')) || 0,
-                    rate: v.annualDepreciationPercent || 10,
-                    condition: v.conditionFactor || 0.75
-                };
-                document.getElementById('acv-age-input').value = ageNum;
-
-                // Section 2: Replacement Table
-                const tbody = document.getElementById('table-body');
-                tbody.innerHTML = data.table.map(row => `
-                    <tr>
-                        <td>${row.label}</td>
-                        <td>${row.original}</td>
-                        <td class="brand-match">${row.brandMatch}</td>
-                        <td>${row.option1}</td>
-                        <td>${row.option2}</td>
-                    </tr>
-                `).join('');
-
-                // Section 3: Technical
-                const manualBox = document.getElementById('manual-box');
-                manualBox.innerHTML = data.technical.manual !== 'N/A'
-                    ? `<a href="${data.technical.manual}" target="_blank" class="manual-link no-print">&#128196; VIEW SERVICE MANUAL (PDF)</a>`
-                    : `<span style="color: var(--text-muted-dark); font-style: italic; font-size: 0.75rem;">Service manual not available.</span>`;
-                document.getElementById('r-recalls').innerText = data.technical.recalls;
-                document.getElementById('r-failures').innerText = data.technical.failures;
-                document.getElementById('r-legal').innerText = data.technical.legal;
-
-                // Error Codes
-                const ecContainer = document.getElementById('error-codes-container');
-                const ec = data.technical.errorCodes;
-                const ecSource = data.technical.errorCodesSource;
-                if (ec && ec.length > 0) {
-                    let html = '<div class="error-codes-section"><div class="error-codes-title">Known Error / Fault Codes</div>';
-                    html += '<table class="error-codes-table"><thead><tr><th>Code</th><th>Description</th></tr></thead><tbody>';
-                    html += ec.map(e => `<tr><td>${e.code}</td><td>${e.description}</td></tr>`).join('');
-                    html += '</tbody></table>';
-                    if (ecSource && ecSource.url) {
-                        html += `<a href="${ecSource.url}" target="_blank" class="error-codes-link">&#128279; ${ecSource.title || 'View full error code reference'}</a>`;
-                    }
-                    html += '</div>';
-                    ecContainer.innerHTML = html;
-                } else {
-                    ecContainer.innerHTML = '';
-                }
-
-                // Section 4: How It Works
-                document.getElementById('r-how-it-works').innerText = data.howItWorks || 'No explanation available.';
-
-                // Section 5: Diagnostics
-                const diagContainer = document.getElementById('r-diagnostics');
-                if (data.diagnostics && data.diagnostics.length > 0) {
-                    diagContainer.innerHTML = '<ul class="diagnostics-list">' +
-                        data.diagnostics.map(d => `<li><a href="${d.url}" target="_blank">${d.title}</a> <span class="diag-source">- ${d.source}</span></li>`).join('') +
-                        '</ul>';
-                } else {
-                    diagContainer.innerHTML = '<p class="diagnostics-empty">No diagnostic resources found.</p>';
-                }
-
-                // Quick View
-                document.getElementById('qv-category').innerText = a.quickSummary || 'N/A';
-                document.getElementById('qv-status').innerText = a.status || '';
-                document.getElementById('qv-age').innerText = rd.estimatedAge || a.age || '';
-                document.getElementById('qv-msrp').innerText = a.msrp || '';
-                document.getElementById('qv-acv').innerText = v.estimatedACV || 'N/A';
-
-                // Estimation Banner
-                const banner = document.getElementById('estimation-banner');
-                if (a.modelConfidence === 'estimated') {
-                    document.getElementById('estimation-text').innerText =
-                        'Full model number not provided. Information below is based on an estimated model of ' + (a.estimatedModel || 'unknown') + '.';
-                    banner.classList.remove('hidden');
-                } else {
-                    banner.classList.add('hidden');
-                }
-
-                // Default to detailed view on new search
-                currentView = 'detailed';
-                document.getElementById('detailed-view').classList.remove('hidden');
-                document.getElementById('quick-view').classList.add('hidden');
-                document.getElementById('view-toggle').textContent = 'Quick View';
-                document.getElementById('view-toggle').classList.add('active');
-
-                document.getElementById('results').classList.remove('hidden');
-            } catch (e) { alert("Error retrieving data."); } finally {
-                document.getElementById('loader-dog').classList.remove('running');
-                document.getElementById('loader-text').classList.remove('visible');
-            }
-        }
-    </script>
+    <script src="index.js" defer></script>
 </body>
 </html>
+
