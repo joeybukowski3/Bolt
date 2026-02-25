@@ -67,6 +67,17 @@
         .search-top {
             padding: 2.5rem 0 1.5rem;
         }
+        .mascot-area { text-align: center; min-height: 5.5rem; margin-bottom: 0.75rem; }
+        #loader-track { width: 420px; max-width: 90vw; overflow: hidden; margin: 0 auto 0.5rem; position: relative; height: 4.5rem; }
+        #loader-dog { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 60px; height: 60px; }
+        #loader-dog.running { left: -80px; transform: none; animation: runDogLoader 2.8s linear infinite; }
+        #loader-dog.running .dog-cape { animation: cape-flutter 0.4s ease-in-out infinite; }
+        .loader-text { color: var(--ink-500); font-style: italic; font-size: 0.9rem; display: none; }
+        .loader-text.visible { display: block; animation: pulse-glow 2s ease-in-out infinite; }
+
+        @keyframes runDogLoader { 0% { left: -80px; } 100% { left: calc(100% + 80px); } }
+        @keyframes pulse-glow { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+        @keyframes cape-flutter { 0%, 100% { transform: rotate(-15deg) skewX(0deg); } 50% { transform: rotate(-25deg) skewX(-5deg); } }
         .search-card {
             background: var(--paper-100);
             color: var(--ink-900);
@@ -261,6 +272,35 @@
             <div class="container search-card">
                 <h1>Claim-Ready Search Workspace</h1>
                 <p>Run a search to generate compact results, then expand for full claim documentation.</p>
+                <div class="mascot-area" aria-live="polite">
+                    <div id="loader-track">
+                        <div id="loader-dog" aria-hidden="true">
+                            <svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg" width="60" height="60">
+                                <g class="dog-cape">
+                                    <path d="M22 28 L8 46 L28 40 Z" fill="#dc2626" opacity="0.9"/>
+                                    <path d="M24 30 L12 50 L30 42 Z" fill="#b91c1c" opacity="0.7"/>
+                                </g>
+                                <ellipse cx="30" cy="38" rx="14" ry="12" fill="white"/>
+                                <circle cx="38" cy="22" r="12" fill="white"/>
+                                <ellipse cx="30" cy="12" rx="4" ry="7" fill="white" transform="rotate(-15 30 12)"/>
+                                <ellipse cx="31" cy="13" rx="2.5" ry="5" fill="#fecaca" transform="rotate(-15 31 13)"/>
+                                <ellipse cx="46" cy="14" rx="4" ry="7" fill="white" transform="rotate(15 46 14)"/>
+                                <ellipse cx="45" cy="15" rx="2.5" ry="5" fill="#fecaca" transform="rotate(15 45 15)"/>
+                                <circle cx="34" cy="20" r="2.5" fill="#1e293b"/>
+                                <circle cx="42" cy="20" r="2.5" fill="#1e293b"/>
+                                <circle cx="35" cy="19" r="0.8" fill="white"/>
+                                <circle cx="43" cy="19" r="0.8" fill="white"/>
+                                <ellipse cx="39" cy="25" rx="2" ry="1.5" fill="#1e293b"/>
+                                <path d="M37 27 Q39 30 41 27" stroke="#1e293b" fill="none" stroke-width="0.8"/>
+                                <polygon points="28,32 31,36 29,36 32,42 27,37 30,37" fill="#eab308"/>
+                                <rect x="20" y="46" width="5" height="8" rx="2.5" fill="white"/>
+                                <rect x="35" y="46" width="5" height="8" rx="2.5" fill="white"/>
+                                <path d="M18 35 Q10 28 14 22" stroke="white" fill="none" stroke-width="3" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <span id="loader-text" class="loader-text">Consulting live market data and technical records...</span>
+                </div>
                 <div class="search-field">
                     <input type="text" id="query" class="search-input" placeholder="Example: Whirlpool WRS321SDHZ, MacBook Pro A2141, Dyson V10">
                     <button class="search-btn" id="btn">Search</button>

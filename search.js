@@ -46,6 +46,20 @@
     $('cache-status').innerText = text;
   }
 
+  function showLoader() {
+    const dog = $('loader-dog');
+    const text = $('loader-text');
+    if (dog) dog.classList.add('running');
+    if (text) text.classList.add('visible');
+  }
+
+  function hideLoader() {
+    const dog = $('loader-dog');
+    const text = $('loader-text');
+    if (dog) dog.classList.remove('running');
+    if (text) text.classList.remove('visible');
+  }
+
   function showCacheBanner(isCached, timestamp) {
     const banner = $('cache-banner');
     if (!isCached) {
@@ -314,6 +328,7 @@
       showExpandedView();
       return;
     }
+    showLoader();
     try {
       const res = await fetch(`/api/search?query=${encodeURIComponent(lastQuery)}&mode=expanded`);
       const data = await res.json();
@@ -323,6 +338,8 @@
       showExpandedView();
     } catch {
       alert('Error retrieving expanded data.');
+    } finally {
+      hideLoader();
     }
   }
 
@@ -346,11 +363,13 @@
       showCacheBanner(true, cached.timestamp);
       updateCacheStatus('Serving cached result.');
       $('results').classList.remove('hidden');
+      hideLoader();
       return;
     }
 
     updateCacheStatus('Searching...');
     $('results').classList.add('hidden');
+    showLoader();
 
     try {
       const res = await fetch(`/api/search?query=${encodeURIComponent(query)}&mode=compact`);
@@ -365,6 +384,8 @@
     } catch {
       alert('Error retrieving data.');
       updateCacheStatus('Search failed.');
+    } finally {
+      hideLoader();
     }
   }
 
