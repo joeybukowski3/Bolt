@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -95,7 +95,7 @@
             padding: 0 1.5rem;
         }
 
-        /* ── Navigation ── */
+        /* â”€â”€ Navigation â”€â”€ */
         .nav {
             display: flex;
             align-items: center;
@@ -144,7 +144,7 @@
         .nav-link.active { background: var(--accent); color: #000; font-weight: 600; }
         .nav-link.active:hover { background: var(--accent-hover); }
 
-        /* ── Content Zone ── */
+        /* â”€â”€ Content Zone â”€â”€ */
         .content-zone {
             background: #ffffff;
             border-radius: 24px 24px 0 0;
@@ -169,7 +169,7 @@
             line-height: 1.6;
         }
 
-        /* ── Form ── */
+        /* â”€â”€ Form â”€â”€ */
         .lookup-form {
             display: flex;
             flex-direction: column;
@@ -218,7 +218,7 @@
         }
         .submit-btn:hover { background: var(--accent-hover); }
 
-        /* ── Alternative Dropdown ── */
+        /* â”€â”€ Alternative Dropdown â”€â”€ */
         .alt-toggle {
             display: inline-flex;
             align-items: center;
@@ -275,7 +275,7 @@
             letter-spacing: 0.08em;
         }
 
-        /* ── Result Area ── */
+        /* â”€â”€ Result Area â”€â”€ */
         .result-card {
             margin-top: 2rem;
             background: var(--bg-card-alt);
@@ -365,7 +365,7 @@
                 <p class="page-subtitle">Enter the brand and serial number to decode the manufacture date. If you don't have a serial number, use the alternative lookup below.</p>
 
                 <!-- Primary: Brand + Serial -->
-                <form class="lookup-form" id="serial-form" onsubmit="event.preventDefault(); performAgeLookup('serial');">
+                <form class="lookup-form" id="serial-form">
                     <div class="form-group">
                         <label class="form-label" for="brand-serial">Brand</label>
                         <input type="text" id="brand-serial" class="form-input" placeholder="e.g. Samsung, Whirlpool, LG" required>
@@ -378,7 +378,7 @@
                 </form>
 
                 <!-- Alt toggle -->
-                <span class="alt-toggle" onclick="toggleAlt()">
+                <span class="alt-toggle" id="alt-toggle">
                     <span class="arrow">&#9654;</span> Don't have a serial number?
                 </span>
 
@@ -386,7 +386,7 @@
                 <div id="alt-section" class="alt-section">
                     <div class="alt-section-inner">
                         <div class="alt-divider"><span>Alternative Lookup</span></div>
-                        <form class="lookup-form" id="model-form" onsubmit="event.preventDefault(); performAgeLookup('model');">
+                        <form class="lookup-form" id="model-form">
                             <div class="form-group">
                                 <label class="form-label" for="brand-model">Brand</label>
                                 <input type="text" id="brand-model" class="form-input" placeholder="e.g. Samsung, Whirlpool, LG">
@@ -429,53 +429,7 @@
         </div>
     </footer>
 
-    <script>
-        function toggleAlt() {
-            const section = document.getElementById('alt-section');
-            const toggle = document.querySelector('.alt-toggle');
-            section.classList.toggle('open');
-            toggle.classList.toggle('open');
-        }
-
-        async function performAgeLookup(method) {
-            let query;
-            if (method === 'serial') {
-                const brand = document.getElementById('brand-serial').value.trim();
-                const serial = document.getElementById('serial-number').value.trim();
-                if (!brand || !serial) return;
-                query = `How old is this item? Brand: ${brand}, Serial Number: ${serial}. Decode the serial number to determine the manufacture date and age.`;
-            } else {
-                const brand = document.getElementById('brand-model').value.trim();
-                const model = document.getElementById('model-number').value.trim();
-                if (!brand || !model) return;
-                query = `How old is this item? Brand: ${brand}, Model: ${model}. Determine the manufacture date range and age based on the model number.`;
-            }
-
-            document.getElementById('age-result').classList.add('hidden');
-            document.getElementById('age-loading').classList.remove('hidden');
-
-            try {
-                const res = await fetch(`/api/search?query=${encodeURIComponent(query)}`);
-                const data = await res.json();
-                const a = data.analysis;
-
-                document.getElementById('result-title').innerText = a.entered || 'Result';
-                let body = '';
-                if (a.age) body += `Estimated Age: ${a.age}\n`;
-                if (a.descriptionMain) body += `\n${a.descriptionMain}`;
-                if (a.descriptionExtra) body += ` ${a.descriptionExtra}`;
-                if (a.decodingMethod && a.decodingMethod.available) {
-                    body += `\n\nSerial Decoding: ${a.decodingMethod.summary}`;
-                    if (a.decodingMethod.details) body += `\n${a.decodingMethod.details}`;
-                }
-                document.getElementById('result-body').innerText = body.trim();
-                document.getElementById('age-loading').classList.add('hidden');
-                document.getElementById('age-result').classList.remove('hidden');
-            } catch (e) {
-                document.getElementById('age-loading').classList.add('hidden');
-                alert('Error looking up item age. Please try again.');
-            }
-        }
-    </script>
+    <script src="item-age.js" defer></script>
 </body>
 </html>
+
