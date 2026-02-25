@@ -1,864 +1,439 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bolt Research Team | Universal Item Research for Claims</title>
-    <meta name="description" content="Search any item, model, serial, or keyword and get an age estimate, plain-English overview, and LKQ replacement options with live pricing formatted for claim documentation.">
-    <meta property="og:title" content="Universal Item Research for Claims">
-    <meta property="og:description" content="Claim-ready item research with age estimates, overview, and LKQ replacement options with live pricing.">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://boltresearchteam.com/">
+    <title>Bolt - Item Research Assistant</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
         :root {
-            --ink-900: #0b1020;
-            --ink-800: #142033;
-            --ink-700: #1c2a44;
-            --ink-600: #344868;
-            --ink-500: #5f6f8c;
-            --paper-100: #f7f5ef;
-            --paper-200: #f0ede4;
-            --paper-300: #e3e0d6;
-            --accent-500: #f97316;
-            --accent-600: #ea580c;
-            --accent-700: #c2410c;
-            --steel-500: #3b82f6;
-            --emerald-500: #16a34a;
-            --signal-500: #f59e0b;
-            --card-shadow: 0 18px 40px rgba(10, 20, 35, 0.15);
-            --radius-lg: 18px;
-            --radius-md: 12px;
-            --radius-sm: 8px;
+            --bg-primary: #0f1629;
+            --bg-secondary: #161d35;
+            --bg-card: #ffffff;
+            --bg-card-alt: #f8fafc;
+            --bg-input: rgba(255,255,255,0.06);
+            --border-color: #e2e8f0;
+            --border-accent: rgba(234,179,8,0.4);
+            --text-dark: #1e293b;
+            --text-mid: #475569;
+            --text-light: #94a3b8;
+            --text-white: #f1f5f9;
+            --text-muted-dark: #64748b;
+            --accent: #eab308;
+            --accent-hover: #facc15;
+            --accent-dim: rgba(234,179,8,0.1);
+            --accent-dim-dark: rgba(234,179,8,0.15);
+            --blue: #3b82f6;
+            --blue-light: #dbeafe;
+            --red: #ef4444;
+            --red-light: #fef2f2;
+            --green: #22c55e;
+            --green-light: #f0fdf4;
         }
+
         body {
-            font-family: 'Source Sans 3', 'Segoe UI', sans-serif;
-            background: radial-gradient(circle at top, #1f2b45 0%, #101522 38%, #0b0f1a 100%);
-            color: var(--paper-100);
-            line-height: 1.6;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-white);
             min-height: 100vh;
-        }
-        h1, h2, h3, .brand { font-family: 'Space Grotesk', 'Segoe UI', sans-serif; }
-        a { color: inherit; }
-
-        .bg-grid {
-            position: fixed;
-            inset: 0;
-            pointer-events: none;
-            background-image:
-                linear-gradient(120deg, rgba(249, 115, 22, 0.08), transparent 40%),
-                radial-gradient(circle at 20% 20%, rgba(59, 130, 246, 0.12), transparent 45%),
-                radial-gradient(circle at 80% 20%, rgba(249, 115, 22, 0.12), transparent 45%);
-        }
-        .bg-grid::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background-image:
-                linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
-            background-size: 80px 80px;
-            opacity: 0.25;
+            line-height: 1.6;
         }
 
-        .container { max-width: 1120px; margin: 0 auto; padding: 0 1.5rem; }
+        .circuit-bg {
+            position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none;
+        }
+        .circuit-bg::before {
+            content: ''; position: absolute; inset: 0;
+            background:
+                linear-gradient(90deg, transparent 49.5%, rgba(234,179,8,0.04) 49.5%, rgba(234,179,8,0.04) 50.5%, transparent 50.5%),
+                linear-gradient(0deg, transparent 49.5%, rgba(234,179,8,0.04) 49.5%, rgba(234,179,8,0.04) 50.5%, transparent 50.5%);
+            background-size: 60px 60px;
+        }
+        .circuit-bg::after {
+            content: ''; position: absolute; inset: 0;
+            background: radial-gradient(ellipse at 50% 0%, rgba(234,179,8,0.06) 0%, transparent 60%),
+                        radial-gradient(ellipse at 50% 100%, rgba(59,130,246,0.04) 0%, transparent 60%);
+        }
+        .lightning-bolts { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+        .bolt-shape { position: absolute; font-size: 15rem; opacity: 0.03; color: var(--accent); font-weight: 800; transform: rotate(-12deg); user-select: none; }
+        .bolt-shape:nth-child(1) { top: 10%; left: 5%; }
+        .bolt-shape:nth-child(2) { top: 15%; left: 30%; font-size: 20rem; }
+        .bolt-shape:nth-child(3) { top: 8%; right: 25%; font-size: 18rem; transform: rotate(8deg); }
+        .bolt-shape:nth-child(4) { top: 12%; right: 5%; }
 
-        .site-header {
-            position: sticky;
-            top: 0;
-            z-index: 20;
-            background: rgba(8, 12, 22, 0.7);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(255,255,255,0.08);
-        }
-        .header-inner {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0.8rem 0;
-            gap: 1rem;
-        }
-        .brand {
-            font-size: 1.2rem;
-            font-weight: 700;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.4rem;
-        }
-        .brand span { color: var(--accent-500); }
-        .header-nav {
-            display: flex;
-            gap: 0.75rem;
-            flex-wrap: wrap;
-        }
-        .header-nav a {
-            font-size: 0.85rem;
-            text-decoration: none;
-            color: rgba(247,245,239,0.75);
-            padding: 0.35rem 0.6rem;
-            border-radius: 999px;
-            transition: all 0.2s ease;
-        }
-        .header-nav a:hover { background: rgba(249,115,22,0.15); color: var(--paper-100); }
-        .header-ctas {
-            display: flex;
-            gap: 0.6rem;
-            align-items: center;
-        }
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 999px;
-            padding: 0.5rem 1.1rem;
-            font-size: 0.85rem;
-            font-weight: 600;
-            text-decoration: none;
-            border: 1px solid transparent;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            font-family: 'Space Grotesk', 'Segoe UI', sans-serif;
-        }
-        .btn.primary { background: var(--accent-500); color: #140600; border-color: transparent; }
-        .btn.primary:hover { background: var(--accent-600); }
-        .btn.ghost { border-color: rgba(247,245,239,0.25); color: var(--paper-100); background: transparent; }
-        .btn.ghost:hover { border-color: var(--accent-500); color: var(--accent-500); }
-        .btn.light { background: var(--paper-100); color: var(--ink-900); border-color: transparent; }
-        .btn.light:hover { background: var(--paper-200); }
+        .app-container { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 0 1.5rem; }
 
-        .hero {
-            padding: 4.5rem 0 2.5rem;
-        }
-        .hero-grid {
-            display: grid;
-            grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
-            gap: 2.5rem;
-            align-items: center;
-        }
-        .eyebrow {
-            text-transform: uppercase;
-            letter-spacing: 0.18em;
-            font-size: 0.7rem;
-            color: rgba(247,245,239,0.65);
-            margin-bottom: 0.75rem;
-        }
-        .hero h1 {
-            font-size: clamp(2.4rem, 4vw, 3.6rem);
-            line-height: 1.1;
-            margin-bottom: 1rem;
-        }
-        .hero p {
-            font-size: 1.05rem;
-            color: rgba(247,245,239,0.75);
-            margin-bottom: 1.5rem;
-        }
-        .hero-actions {
-            display: flex;
-            gap: 0.8rem;
-            flex-wrap: wrap;
-        }
-        .hero-metrics {
-            margin-top: 2rem;
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 0.8rem;
-        }
-        .metric-card {
-            padding: 0.75rem 1rem;
-            border-radius: var(--radius-md);
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.08);
-        }
-        .metric-label {
-            font-size: 0.65rem;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            color: rgba(247,245,239,0.5);
-        }
-        .metric-value { font-size: 0.95rem; font-weight: 600; margin-top: 0.3rem; }
+        /* ── Navigation ── */
+        .nav { display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 0; }
+        .nav-left { display: flex; align-items: center; gap: 0.75rem; }
+        .nav-brand { display: flex; align-items: center; gap: 0.3rem; font-size: 1.3rem; font-weight: 800; color: var(--text-white); text-decoration: none; white-space: nowrap; }
+        .nav-brand .bolt-icon { color: var(--accent); }
+        .brand-tagline { font-size: 0.75rem; font-style: italic; color: #64748b; white-space: nowrap; }
+        .nav-links { display: flex; align-items: center; gap: 0.5rem; }
+        .nav-link { color: var(--text-light); text-decoration: none; font-size: 0.875rem; font-weight: 500; padding: 0.5rem 1rem; border-radius: 8px; transition: all 0.2s; cursor: pointer; white-space: nowrap; }
+        .nav-link:hover { color: var(--text-white); background: rgba(255,255,255,0.06); }
+        .nav-link.active { background: var(--accent); color: #000; font-weight: 600; }
+        .nav-link.active:hover { background: var(--accent-hover); }
 
-        .search-card {
-            background: rgba(246, 244, 237, 0.94);
-            color: var(--ink-900);
-            border-radius: var(--radius-lg);
-            padding: 1.6rem;
-            box-shadow: var(--card-shadow);
-            border: 1px solid rgba(255,255,255,0.6);
-        }
-        .search-card h3 {
-            font-size: 1.1rem;
-            margin-bottom: 0.4rem;
-        }
-        .search-card p {
-            font-size: 0.9rem;
-            color: var(--ink-600);
-            margin-bottom: 1.2rem;
-        }
-        .search-field {
-            display: flex;
-            background: #fff;
-            border-radius: 999px;
-            border: 1px solid var(--paper-300);
-            overflow: hidden;
-            box-shadow: inset 0 0 0 1px rgba(0,0,0,0.02);
-        }
-        .search-input {
-            flex: 1;
-            padding: 0.9rem 1.1rem;
-            border: none;
-            outline: none;
-            font-size: 0.95rem;
-            font-family: inherit;
-            background: transparent;
-        }
-        .search-btn {
-            background: var(--accent-500);
-            border: none;
-            padding: 0.9rem 1.5rem;
-            font-weight: 700;
-            font-family: 'Space Grotesk', 'Segoe UI', sans-serif;
-            cursor: pointer;
-        }
-        .search-btn:hover { background: var(--accent-600); }
+        /* ── Hero ── */
+        .hero { text-align: center; padding: 2.5rem 0 2rem; }
+        .search-container { max-width: 700px; margin: 0 auto 2rem; display: flex; background: var(--bg-input); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; overflow: hidden; transition: border-color 0.3s; }
+        .search-container:focus-within { border-color: rgba(234,179,8,0.4); box-shadow: 0 0 0 3px rgba(234,179,8,0.1); }
+        .search-input { flex: 1; background: transparent; border: none; outline: none; padding: 1rem 1.5rem; font-size: 1rem; color: var(--text-white); font-family: inherit; }
+        .search-input::placeholder { color: var(--text-muted-dark); }
+        .search-btn { background: var(--accent); color: #000; border: none; padding: 1rem 2rem; font-size: 0.95rem; font-weight: 700; font-family: inherit; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: background 0.2s; white-space: nowrap; }
+        .search-btn:hover { background: var(--accent-hover); }
 
-        .examples {
-            margin-top: 1rem;
-        }
-        .examples span {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.4rem;
-            padding: 0.3rem 0.6rem;
-            border-radius: 999px;
-            background: var(--paper-200);
-            font-size: 0.75rem;
-            margin: 0.2rem 0.2rem 0 0;
-            color: var(--ink-600);
-        }
+        /* ── Stats Bar ── */
+        .stats-bar { display: flex; justify-content: center; gap: 1.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
+        .stat-item { display: flex; align-items: center; gap: 0.75rem; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 0.75rem 1.25rem; }
+        .stat-icon { color: var(--accent); font-size: 1.1rem; }
+        .stat-text { display: flex; flex-direction: column; }
+        .stat-label { font-size: 0.6rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted-dark); }
+        .stat-value { font-size: 0.9rem; font-weight: 700; color: var(--text-white); }
 
-        .utility-bar {
-            margin-top: 1.1rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 0.8rem;
-            flex-wrap: wrap;
-        }
-        .utility-bar small { color: var(--ink-500); }
-        .utility-btn {
-            border: 1px solid var(--paper-300);
-            background: transparent;
-            padding: 0.4rem 0.8rem;
-            border-radius: 999px;
-            cursor: pointer;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
+        /* ── Mascot loader ── */
+        @keyframes runDogLoader { 0% { left: -80px; } 100% { left: calc(100% + 80px); } }
+        @keyframes pulse-glow { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+        @keyframes cape-flutter { 0%, 100% { transform: rotate(-15deg) skewX(0deg); } 50% { transform: rotate(-25deg) skewX(-5deg); } }
+        .mascot-area { text-align: center; min-height: 5.5rem; margin-bottom: 0.75rem; }
+        #loader-track { width: 400px; max-width: 90vw; overflow: hidden; margin: 0 auto 0.5rem; position: relative; height: 4.5rem; }
+        #loader-dog { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 60px; height: 60px; }
+        #loader-dog.running { left: -80px; transform: none; animation: runDogLoader 2.8s linear infinite; }
+        #loader-dog.running .dog-cape { animation: cape-flutter 0.4s ease-in-out infinite; }
+        .loader-text { color: var(--text-light); font-style: italic; font-size: 0.9rem; display: none; }
+        .loader-text.visible { display: block; animation: pulse-glow 2s ease-in-out infinite; }
 
-        .section {
-            padding: 3.5rem 0;
-        }
-        .section h2 {
-            font-size: 1.6rem;
-            margin-bottom: 1rem;
-        }
-        .section p {
-            color: rgba(247,245,239,0.75);
-        }
-        .feature-grid {
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 1rem;
-            margin-top: 1.5rem;
-        }
-        .feature-card {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: var(--radius-md);
-            padding: 1.2rem;
-        }
-        .feature-card h3 { font-size: 1rem; margin-bottom: 0.4rem; }
-        .feature-card p { font-size: 0.9rem; color: rgba(247,245,239,0.7); }
+        /* ── Results zone ── */
+        .results-zone { background: #f1f5f9; border-radius: 24px 24px 0 0; margin: 0 -1.5rem; padding: 2rem 1.5rem 3rem; min-height: 60vh; }
+        .results-inner { max-width: 1100px; margin: 0 auto; }
+        .results-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .results-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-muted-dark); }
+        .results-header-actions { display: flex; align-items: center; gap: 0.5rem; }
+        .print-btn, .view-toggle-btn { background: white; color: var(--text-mid); border: 1px solid var(--border-color); padding: 0.4rem 1rem; border-radius: 8px; font-size: 0.75rem; font-weight: 600; font-family: inherit; cursor: pointer; transition: all 0.2s; }
+        .print-btn:hover, .view-toggle-btn:hover { background: #f8fafc; border-color: var(--accent); color: var(--text-dark); }
+        .view-toggle-btn.active { background: var(--accent); color: #000; border-color: var(--accent); }
 
-        .results-zone {
-            background: var(--paper-100);
-            color: var(--ink-900);
-            border-radius: 28px 28px 0 0;
-            padding: 2.5rem 0 3rem;
-            margin-top: 2rem;
-        }
-        .results-inner { max-width: 1120px; margin: 0 auto; padding: 0 1.5rem; }
-        .results-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-            flex-wrap: wrap;
-        }
-        .results-header h2 { font-size: 1.5rem; }
-        .results-actions { display: flex; gap: 0.6rem; flex-wrap: wrap; }
-        .results-actions button { border-radius: 999px; border: 1px solid var(--paper-300); background: #fff; padding: 0.5rem 0.9rem; font-weight: 600; cursor: pointer; }
-        .results-actions button:hover { border-color: var(--accent-500); color: var(--accent-600); }
+        /* ── Cards ── */
+        .card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 1.25rem 1.5rem; margin-bottom: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02); }
+        .card-title { font-size: 0.95rem; font-weight: 700; color: var(--text-dark); margin-bottom: 0.85rem; padding-bottom: 0.6rem; border-bottom: 2px solid var(--accent-dim); display: flex; align-items: center; gap: 0.5rem; }
+        .card-title .title-icon { color: var(--accent); font-size: 1.1rem; }
+        .card-title .title-number { background: var(--accent); color: #000; width: 22px; height: 22px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 800; }
+        .card-accent-stripe { height: 3px; background: linear-gradient(90deg, var(--accent), var(--blue), var(--accent)); border-radius: 3px; margin-bottom: 0.85rem; opacity: 0.6; }
 
-        .cache-banner {
-            background: #fff3d4;
-            border: 1px solid #fcd49b;
-            color: #8a4b0f;
-            padding: 0.6rem 1rem;
-            border-radius: var(--radius-sm);
-            margin-bottom: 1rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 0.6rem;
-        }
-        .cache-banner button { border: 1px solid #fcd49b; background: #fff; padding: 0.3rem 0.7rem; border-radius: 999px; font-weight: 600; cursor: pointer; }
-
-        .report-grid {
-            display: grid;
-            gap: 1.2rem;
-        }
-        .report-card {
-            background: #fff;
-            border: 1px solid var(--paper-300);
-            border-radius: var(--radius-md);
-            padding: 1.2rem 1.4rem;
-            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
-        }
-        .report-card h3 {
-            font-size: 1rem;
-            margin-bottom: 0.75rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        .report-card h3 span {
-            display: inline-flex;
-            width: 24px;
-            height: 24px;
-            align-items: center;
-            justify-content: center;
-            background: var(--accent-500);
-            color: #1b0a02;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            font-weight: 700;
-        }
-        .report-list { list-style: none; display: grid; gap: 0.45rem; }
-        .report-list li { display: flex; justify-content: space-between; gap: 1rem; border-bottom: 1px solid var(--paper-200); padding-bottom: 0.4rem; }
+        /* ── Report text styles (matching screenshot) ── */
+        .report-overview { font-size: 0.85rem; color: var(--text-mid); line-height: 1.7; margin-bottom: 1rem; }
+        .report-list { list-style: none; padding: 0; margin: 0; }
+        .report-list li { padding: 0.4rem 0; font-size: 0.85rem; color: var(--text-mid); line-height: 1.6; border-bottom: 1px solid #f1f5f9; display: flex; align-items: baseline; gap: 0.5rem; }
         .report-list li:last-child { border-bottom: none; }
-        .report-label { font-weight: 600; color: var(--ink-600); }
-        .report-value { text-align: right; font-weight: 600; color: var(--ink-800); }
+        .report-list li::before { content: '\2022'; color: var(--accent); font-weight: 700; flex-shrink: 0; }
+        .report-list .label { font-weight: 700; color: var(--text-dark); white-space: nowrap; }
+        .report-list .label::after { content: ':'; }
 
-        .overview-text { color: var(--ink-600); font-size: 0.95rem; margin-bottom: 0.8rem; }
-        .bullet-list { list-style: none; display: grid; gap: 0.4rem; color: var(--ink-600); font-size: 0.9rem; }
-        .bullet-list li::before { content: '*'; margin-right: 0.5rem; color: var(--accent-500); }
+        .section-subtitle { font-size: 0.88rem; font-weight: 700; color: var(--text-dark); margin: 1.25rem 0 0.6rem; padding-bottom: 0.3rem; border-bottom: 1px solid var(--border-color); }
 
-        .value-row {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 0.8rem;
-        }
-        .value-box {
-            background: var(--paper-200);
-            border-radius: var(--radius-sm);
-            padding: 0.8rem 1rem;
-        }
-        .value-box h4 { font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-500); }
-        .value-box p { font-size: 1rem; font-weight: 700; margin-top: 0.3rem; color: var(--ink-800); }
+        /* ── Quick View ── */
+        .quick-view-strip { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+        .quick-view-item { background: var(--bg-card); border: 1px solid var(--border-color); border-left: 4px solid var(--accent); border-radius: 10px; padding: 0.75rem 1rem; flex: 1 1 160px; min-width: 140px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+        .quick-view-label { font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted-dark); margin-bottom: 0.2rem; }
+        .quick-view-value { font-size: 0.9rem; font-weight: 600; color: var(--text-dark); }
+        .quick-view-value.acv-highlight { color: var(--green); font-weight: 700; }
 
-        .age-adjust {
-            margin-top: 0.8rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-        }
-        .age-adjust input {
-            width: 70px;
-            padding: 0.35rem 0.5rem;
-            border-radius: 6px;
-            border: 1px solid var(--paper-300);
-        }
-        .age-adjust button {
-            padding: 0.35rem 0.7rem;
-            border-radius: 6px;
-            border: none;
-            background: var(--accent-500);
-            font-weight: 700;
-            cursor: pointer;
-        }
-        .age-adjust button:hover { background: var(--accent-600); }
+        /* ── Estimation Banner ── */
+        .estimation-banner { background: #fef9c3; border: 1px solid #fde68a; border-left: 4px solid #f59e0b; border-radius: 10px; padding: 0.75rem 1rem; margin-bottom: 1rem; color: #92400e; font-size: 0.82rem; line-height: 1.5; display: flex; align-items: flex-start; gap: 0.5rem; }
+        .estimation-banner .banner-icon { font-size: 1.1rem; flex-shrink: 0; }
 
-        .replacement-block {
-            border: 1px solid var(--paper-300);
-            border-radius: var(--radius-sm);
-            padding: 0.9rem 1rem;
-            margin-bottom: 1rem;
-            background: var(--paper-200);
-        }
-        .replacement-status {
-            font-size: 0.85rem;
-            font-weight: 700;
-            margin-bottom: 0.6rem;
-        }
-        .replacement-status.match { color: var(--emerald-500); }
-        .replacement-status.none { color: var(--signal-500); }
+        /* ── Valuation interactive ── */
+        .acv-value { color: var(--green); font-weight: 700; font-size: 1rem; }
+        .acv-formula { font-style: italic; color: var(--text-muted-dark); font-size: 0.78rem; }
+        .acv-note { font-size: 0.82rem; color: var(--text-mid); margin-top: 0.5rem; line-height: 1.5; font-style: italic; }
+        .age-input-row { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.25rem; }
+        .age-input { width: 60px; padding: 0.3rem 0.5rem; border: 1px solid var(--border-color); border-radius: 6px; font-size: 0.85rem; font-family: inherit; text-align: center; color: var(--text-dark); }
+        .age-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-dim); }
+        .age-label { font-size: 0.8rem; color: var(--text-muted-dark); }
+        .recalc-btn { background: var(--accent); color: #000; border: none; padding: 0.3rem 0.75rem; border-radius: 6px; font-size: 0.75rem; font-weight: 700; font-family: inherit; cursor: pointer; transition: background 0.2s; }
+        .recalc-btn:hover { background: var(--accent-hover); }
 
-        .listing-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 0.8rem;
-        }
-        .listing-card {
-            background: #fff;
-            border-radius: var(--radius-sm);
-            padding: 0.7rem 0.8rem;
-            border: 1px solid var(--paper-300);
-        }
-        .listing-card a { text-decoration: none; color: var(--steel-500); font-weight: 600; }
+        /* ── Technical grid ── */
+        .tech-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.6rem; }
+        .tech-grid.has-manual { margin-top: 0.6rem; }
+        .tech-item { padding: 0.65rem 0.75rem; background: var(--bg-card-alt); border-radius: 8px; border-left: 3px solid var(--border-color); }
+        .tech-item.recall-item { border-left-color: var(--red); background: var(--red-light); }
+        .tech-item.neutral-item { border-left-color: var(--text-light); }
+        .tech-label { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.2rem; }
+        .tech-label.recall { color: var(--red); }
+        .tech-label.neutral { color: var(--text-muted-dark); }
+        .tech-value { font-size: 0.78rem; color: var(--text-mid); line-height: 1.5; }
+        .manual-link { display: inline-flex; align-items: center; gap: 0.4rem; background: var(--green-light); color: #15803d; padding: 0.45rem 1rem; border-radius: 999px; font-size: 0.7rem; font-weight: 700; text-decoration: none; border: 1px solid rgba(34,197,94,0.2); transition: all 0.2s; }
+        .manual-link:hover { background: #dcfce7; border-color: rgba(34,197,94,0.4); }
 
-        .equivalent-card {
-            border: 1px solid var(--paper-300);
-            border-radius: var(--radius-sm);
-            padding: 1rem;
-            margin-bottom: 1rem;
-            background: #fff;
-        }
-        .equivalent-card h4 { font-size: 1rem; margin-bottom: 0.5rem; }
-        .spec-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.85rem;
-            margin-top: 0.8rem;
-        }
-        .spec-table th, .spec-table td {
-            border-bottom: 1px solid var(--paper-300);
-            padding: 0.4rem 0.5rem;
-            text-align: left;
-        }
-        .spec-table th { color: var(--ink-500); font-weight: 700; text-transform: uppercase; font-size: 0.65rem; }
+        /* ── Error Codes ── */
+        .error-codes-section { margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--border-color); }
+        .error-codes-title { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-dark); margin-bottom: 0.5rem; }
+        .error-codes-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
+        .error-codes-table th { background: var(--bg-card-alt); color: var(--text-muted-dark); font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; padding: 0.4rem 0.6rem; text-align: left; border-bottom: 1px solid var(--border-color); }
+        .error-codes-table td { padding: 0.4rem 0.6rem; border-bottom: 1px solid #f1f5f9; color: var(--text-mid); }
+        .error-codes-table td:first-child { font-weight: 700; color: var(--red); white-space: nowrap; width: 80px; }
+        .error-codes-table tr:last-child td { border-bottom: none; }
+        .error-codes-link { display: inline-flex; align-items: center; gap: 0.3rem; color: var(--blue); font-size: 0.75rem; font-weight: 600; text-decoration: none; margin-top: 0.5rem; }
+        .error-codes-link:hover { text-decoration: underline; }
 
-        .method-box { background: var(--paper-200); border-radius: var(--radius-sm); padding: 0.9rem 1rem; }
-        .disclosure-list { list-style: none; margin-top: 0.6rem; display: grid; gap: 0.3rem; color: var(--ink-600); font-size: 0.85rem; }
-        .disclosure-list li::before { content: '*'; margin-right: 0.4rem; color: var(--accent-500); }
+        /* ── Table (compact) ── */
+        .data-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
+        .data-table th { background: var(--bg-card-alt); color: var(--text-muted-dark); font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; padding: 0.55rem 0.65rem; text-align: left; border-bottom: 2px solid var(--border-color); }
+        .data-table th.highlight { color: var(--accent); }
+        .data-table td { padding: 0.55rem 0.65rem; border-bottom: 1px solid #f1f5f9; color: var(--text-mid); line-height: 1.4; }
+        .data-table tr:last-child td { border-bottom: none; }
+        .data-table tr:hover td { background: #fefce8; }
+        .data-table td:first-child { font-weight: 600; color: var(--text-dark); background: var(--bg-card-alt); white-space: nowrap; }
+        .data-table td.brand-match { color: #92400e; font-weight: 600; background: #fef9c3; }
 
-        .copy-box {
-            background: var(--ink-900);
-            color: var(--paper-100);
-            border-radius: var(--radius-sm);
-            padding: 1rem;
-        }
-        .copy-box textarea {
-            width: 100%;
-            min-height: 150px;
-            background: rgba(255,255,255,0.08);
-            color: var(--paper-100);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: var(--radius-sm);
-            padding: 0.7rem;
-            font-family: 'Source Sans 3', 'Segoe UI', sans-serif;
-            font-size: 0.85rem;
-        }
-        .copy-actions {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 0.6rem;
-            flex-wrap: wrap;
-            gap: 0.6rem;
-        }
-        .copy-actions small { color: rgba(247,245,239,0.7); }
+        /* ── How It Works ── */
+        .how-it-works-text { font-size: 0.85rem; color: var(--text-mid); line-height: 1.7; }
 
-        .faq-grid {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 1rem;
-        }
-        .faq-card {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: var(--radius-md);
-            padding: 1rem;
-        }
-        .faq-card h4 { font-size: 1rem; margin-bottom: 0.4rem; }
-        .faq-card p { font-size: 0.9rem; color: rgba(247,245,239,0.7); }
-
-        .footer {
-            padding: 2.5rem 0 3rem;
-            border-top: 1px solid rgba(255,255,255,0.08);
-            margin-top: 3rem;
-        }
-        .footer-inner {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 2rem;
-            flex-wrap: wrap;
-        }
-        .footer-links {
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-            font-size: 0.85rem;
-            color: rgba(247,245,239,0.7);
-        }
-        .footer-links a { text-decoration: none; }
+        /* ── Diagnostics List ── */
+        .diagnostics-list { list-style: none; padding: 0; }
+        .diagnostics-list li { padding: 0.5rem 0; border-bottom: 1px solid #f1f5f9; font-size: 0.82rem; }
+        .diagnostics-list li:last-child { border-bottom: none; }
+        .diagnostics-list a { color: var(--blue); text-decoration: none; font-weight: 600; }
+        .diagnostics-list a:hover { text-decoration: underline; }
+        .diagnostics-list .diag-source { color: var(--text-muted-dark); }
+        .diagnostics-empty { color: var(--text-muted-dark); font-style: italic; font-size: 0.82rem; }
 
         .hidden { display: none !important; }
 
-        @media (max-width: 900px) {
-            .hero-grid { grid-template-columns: 1fr; }
-            .feature-grid { grid-template-columns: 1fr; }
-            .faq-grid { grid-template-columns: 1fr; }
-            .value-row { grid-template-columns: 1fr; }
-        }
-        @media (max-width: 720px) {
-            .header-inner { flex-direction: column; align-items: flex-start; }
-            .header-ctas { width: 100%; justify-content: flex-start; flex-wrap: wrap; }
-            .hero { padding-top: 3rem; }
-        }
+        /* ── Print ── */
         @media print {
             .no-print { display: none !important; }
-            body { background: #fff; color: #000; }
-            .results-zone { margin-top: 0; }
-            .report-card { box-shadow: none; }
+            body { background: white !important; color: #000 !important; }
+            .circuit-bg, .lightning-bolts { display: none !important; }
+            .results-zone { background: white !important; margin: 0 !important; padding: 0 !important; }
+            .card { box-shadow: none !important; border: 1px solid #ddd !important; }
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 768px) { .tech-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 640px) {
+            .nav { flex-direction: column; gap: 0.5rem; align-items: flex-start; }
+            .nav-left { flex-wrap: wrap; }
+            .brand-tagline { display: none; }
+            .hero { padding: 1.5rem 0 1rem; }
+            .stats-bar { gap: 0.5rem; }
+            .stat-item { padding: 0.5rem 0.75rem; }
+            .nav-links { gap: 0.25rem; }
+            .nav-link { padding: 0.4rem 0.6rem; font-size: 0.75rem; }
+            .card { padding: 1rem; }
+            .results-zone { padding: 1.25rem 1rem 2rem; border-radius: 16px 16px 0 0; }
+            .quick-view-strip { gap: 0.5rem; }
+            .quick-view-item { flex: 1 1 100%; }
         }
     </style>
 </head>
 <body>
-    <div class="bg-grid"></div>
+    <div class="circuit-bg"></div>
+    <div class="lightning-bolts">
+        <div class="bolt-shape">&#9889;</div>
+        <div class="bolt-shape">&#9889;</div>
+        <div class="bolt-shape">&#9889;</div>
+        <div class="bolt-shape">&#9889;</div>
+    </div>
 
-    <header class="site-header no-print">
-        <div class="container header-inner">
-            <a class="brand" href="index.html">Bolt Research Team <span>*</span></a>
-            <nav class="header-nav">
-                <a href="#features">Features</a>
-                <a href="#how-it-works">How It Works</a>
-                <a href="#example">Example</a>
-                <a href="#access">Advanced Access</a>
-                <a href="#faq">FAQ</a>
-                <a href="#contact">Contact</a>
-            </nav>
-            <div class="header-ctas">
-                <a class="btn ghost" href="#access">Request Advanced Access</a>
-                <a class="btn primary" href="#search">Try a Search</a>
+    <div class="app-container">
+        <nav class="nav no-print">
+            <div class="nav-left">
+                <a class="nav-brand" href="index.html">Bolt <span class="bolt-icon">&#9889;</span></a>
+                <span class="brand-tagline">The World's 1st AI assistant built for insurance industry experts by insurance industry experts</span>
+            </div>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link active">Item Lookup</a>
+                <a href="item-age.html" class="nav-link">How Old is my Item?</a>
+                <a href="who-we-are.html" class="nav-link">Who We Are</a>
+            </div>
+        </nav>
+
+        <div class="hero no-print" id="hero-section">
+            <div class="mascot-area">
+                <div id="loader-track"><div id="loader-dog"><svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg" width="60" height="60">
+                    <g class="dog-cape">
+                        <path d="M22 28 L8 46 L28 40 Z" fill="#dc2626" opacity="0.9"/>
+                        <path d="M24 30 L12 50 L30 42 Z" fill="#b91c1c" opacity="0.7"/>
+                    </g>
+                    <ellipse cx="30" cy="38" rx="14" ry="12" fill="white"/>
+                    <circle cx="38" cy="22" r="12" fill="white"/>
+                    <ellipse cx="30" cy="12" rx="4" ry="7" fill="white" transform="rotate(-15 30 12)"/>
+                    <ellipse cx="31" cy="13" rx="2.5" ry="5" fill="#fecaca" transform="rotate(-15 31 13)"/>
+                    <ellipse cx="46" cy="14" rx="4" ry="7" fill="white" transform="rotate(15 46 14)"/>
+                    <ellipse cx="45" cy="15" rx="2.5" ry="5" fill="#fecaca" transform="rotate(15 45 15)"/>
+                    <circle cx="34" cy="20" r="2.5" fill="#1e293b"/>
+                    <circle cx="42" cy="20" r="2.5" fill="#1e293b"/>
+                    <circle cx="35" cy="19" r="0.8" fill="white"/>
+                    <circle cx="43" cy="19" r="0.8" fill="white"/>
+                    <ellipse cx="39" cy="25" rx="2" ry="1.5" fill="#1e293b"/>
+                    <path d="M37 27 Q39 30 41 27" stroke="#1e293b" fill="none" stroke-width="0.8"/>
+                    <polygon points="28,32 31,36 29,36 32,42 27,37 30,37" fill="#eab308"/>
+                    <rect x="20" y="46" width="5" height="8" rx="2.5" fill="white"/>
+                    <rect x="35" y="46" width="5" height="8" rx="2.5" fill="white"/>
+                    <path d="M18 35 Q10 28 14 22" stroke="white" fill="none" stroke-width="3" stroke-linecap="round"/>
+                </svg></div></div>
+                <span id="loader-text" class="loader-text">Consulting live market data and technical records...</span>
+            </div>
+            <div class="search-container">
+                <input type="text" id="query" class="search-input" placeholder="Search any product...">
+                <button onclick="performSearch()" id="btn" class="search-btn">&#128269; Search</button>
+            </div>
+            <div class="stats-bar">
+                <div class="stat-item"><span class="stat-icon">&#9889;</span><div class="stat-text"><span class="stat-label">Real-Time Data</span><span class="stat-value">Instant</span></div></div>
+                <div class="stat-item"><span class="stat-icon">&#128737;</span><div class="stat-text"><span class="stat-label">Verified Sources</span><span class="stat-value">100+</span></div></div>
+                <div class="stat-item"><span class="stat-icon">&#128200;</span><div class="stat-text"><span class="stat-label">Products Tracked</span><span class="stat-value">10M+</span></div></div>
             </div>
         </div>
-    </header>
 
-    <main>
-        <section class="hero" id="search">
-            <div class="container hero-grid">
-                <div>
-                    <div class="eyebrow">Claims Documentation Workflow</div>
-                    <h1>Universal Item Research for Claims</h1>
-                    <p>Search any item, model, serial, or keyword and get an age estimate, plain-English item overview, and LKQ replacement options with live pricing, formatted for claim documentation.</p>
-                    <div class="hero-actions">
-                        <a class="btn primary" href="#search">Try a Search</a>
-                        <a class="btn ghost" href="#access">Request Advanced Access</a>
-                    </div>
-                    <div class="hero-metrics">
-                        <div class="metric-card">
-                            <div class="metric-label">Outputs</div>
-                            <div class="metric-value">Age, Overview, LKQ</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-label">Format</div>
-                            <div class="metric-value">Claim-ready report</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-label">Use</div>
-                            <div class="metric-value">Search, print, document</div>
+        <!-- Results -->
+        <div id="results" class="hidden">
+            <div class="results-zone">
+                <div class="results-inner">
+
+                    <div class="results-header no-print">
+                        <span class="results-label">Research Report</span>
+                        <div class="results-header-actions">
+                            <button id="view-toggle" onclick="toggleView()" class="view-toggle-btn active">Quick View</button>
+                            <button onclick="window.print()" class="print-btn">&#128424; Print to PDF</button>
                         </div>
                     </div>
-                </div>
-                <div class="search-card">
-                    <h3>Start a claim-ready search</h3>
-                    <p>Enter an item, model, serial, or descriptive keyword. Results include age estimate, overview, and replacements.</p>
-                    <div class="search-field">
-                        <input type="text" id="query" class="search-input" placeholder="Example: Whirlpool WRS321SDHZ, MacBook Pro A2141, Dyson V10">
-                        <button class="search-btn" id="btn" onclick="performSearch()">Search</button>
-                    </div>
-                    <div class="examples">
-                        <span>"LG refrigerator LFXS26973"</span>
-                        <span>"Samsung QN65Q80"</span>
-                        <span>"Serial: C112233445"</span>
-                    </div>
-                    <div class="utility-bar">
-                        <small id="cache-status">No cached result.</small>
-                        <button class="utility-btn" onclick="clearCache()">Clear cache</button>
-                    </div>
-                </div>
-            </div>
-        </section>
 
-        <section id="features" class="section">
-            <div class="container">
-                <h2>Features Built for Claims Teams</h2>
-                <p>Structured outputs so your documentation reads cleanly and defensibly.</p>
-                <div class="feature-grid">
-                    <div class="feature-card">
-                        <h3>Age and manufacturer range</h3>
-                        <p>Estimated date range with confidence and rationale for your claim file.</p>
-                    </div>
-                    <div class="feature-card">
-                        <h3>Plain-English item overview</h3>
-                        <p>Clear descriptions and key differentiators versus similar items.</p>
-                    </div>
-                    <div class="feature-card">
-                        <h3>Replacement logic</h3>
-                        <p>Exact match detection and equivalent selection with spec comparison.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="example" class="section">
-            <div class="container">
-                <h2>Example Report Output</h2>
-                <p>Run a search to generate a structured report ready to print or copy into claim notes.</p>
-            </div>
-        </section>
-
-        <div id="results" class="results-zone hidden">
-            <div class="results-inner">
-                <div class="results-header">
-                    <h2>Claim Research Report</h2>
-                    <div class="results-actions">
-                        <button onclick="copySummary()">Copy Summary</button>
-                        <button onclick="window.print()">Print to PDF</button>
-                    </div>
-                </div>
-
-                <div id="cache-banner" class="cache-banner hidden">
-                    <span id="cache-banner-text">Cached result.</span>
-                    <button onclick="refreshSearch()">Refresh</button>
-                </div>
-
-                <div class="report-grid">
-                    <div class="report-card">
-                        <h3><span>1</span> Item Overview</h3>
-                        <p class="overview-text" id="r-overview">Loading...</p>
-                        <ul class="bullet-list" id="r-key-differentiators"></ul>
-                        <ul class="report-list" style="margin-top: 0.8rem;">
-                            <li><span class="report-label">Technical Specs</span><span class="report-value" id="r-tech-specs"></span></li>
-                            <li><span class="report-label">Materials / Build</span><span class="report-value" id="r-materials"></span></li>
-                        </ul>
+                    <div id="estimation-banner" class="estimation-banner hidden">
+                        <span class="banner-icon">&#9888;</span>
+                        <span id="estimation-text"></span>
                     </div>
 
-                    <div class="report-card">
-                        <h3><span>2</span> Age and Manufacturer Date</h3>
-                        <ul class="report-list">
-                            <li><span class="report-label">Manufacturer Date Range</span><span class="report-value" id="r-production-era"></span></li>
-                            <li><span class="report-label">Estimated Age</span><span class="report-value" id="r-estimated-age"></span></li>
-                            <li><span class="report-label">Confidence</span><span class="report-value" id="r-confidence"></span></li>
-                            <li><span class="report-label">Rationale</span><span class="report-value" id="r-rationale"></span></li>
-                        </ul>
+                    <!-- Quick View -->
+                    <div id="quick-view" class="hidden">
+                        <div class="quick-view-strip">
+                            <div class="quick-view-item"><div class="quick-view-label">Category</div><div class="quick-view-value" id="qv-category"></div></div>
+                            <div class="quick-view-item"><div class="quick-view-label">Status</div><div class="quick-view-value" id="qv-status"></div></div>
+                            <div class="quick-view-item"><div class="quick-view-label">Age</div><div class="quick-view-value" id="qv-age"></div></div>
+                            <div class="quick-view-item"><div class="quick-view-label">MSRP</div><div class="quick-view-value" id="qv-msrp"></div></div>
+                            <div class="quick-view-item"><div class="quick-view-label">Est. ACV</div><div class="quick-view-value acv-highlight" id="qv-acv"></div></div>
+                        </div>
                     </div>
 
-                    <div class="report-card">
-                        <h3><span>3</span> Value</h3>
-                        <div class="value-row">
-                            <div class="value-box">
-                                <h4>Estimated Replacement Cost</h4>
-                                <p id="r-replacement-cost"></p>
+                    <!-- Detailed View (default) -->
+                    <div id="detailed-view">
+
+                        <!-- Section 1: Current Item Analysis -->
+                        <div class="card">
+                            <div class="card-title"><span class="title-number">1</span> Current Item Analysis <span class="title-icon">&#9889;</span></div>
+                            <div class="card-accent-stripe"></div>
+                            <p class="report-overview" id="r-overview"></p>
+                            <ul class="report-list">
+                                <li><span class="label">Item Description</span> <span id="r-item-desc"></span></li>
+                                <li><span class="label">Key Details</span> <span id="r-key-details"></span></li>
+                                <li><span class="label">Technical Specs</span> <span id="r-tech-specs"></span></li>
+                                <li><span class="label">Materials</span> <span id="r-materials"></span></li>
+                            </ul>
+
+                            <div class="section-subtitle">Release Date &amp; Age</div>
+                            <ul class="report-list">
+                                <li><span class="label">Production Era</span> <span id="r-production-era"></span></li>
+                                <li><span class="label">Discontinuation</span> <span id="r-discontinuation"></span></li>
+                                <li><span class="label">Estimated Age</span> <span id="r-estimated-age"></span></li>
+                                <li><span class="label">Service Life</span> <span id="r-service-life"></span></li>
+                            </ul>
+
+                            <div class="section-subtitle">Valuation &amp; Depreciation</div>
+                            <ul class="report-list">
+                                <li><span class="label">Original MSRP</span> <span id="r-msrp"></span></li>
+                                <li><span class="label">Annual Depreciation</span> <span id="r-depreciation-display"></span></li>
+                                <li>
+                                    <span class="label">ACV Calculation</span>
+                                    <span>
+                                        <span class="acv-value" id="r-acv"></span>
+                                        <span class="acv-formula" id="r-acv-formula" style="display:block; margin-top:0.2rem;"></span>
+                                        <span class="acv-note" id="r-acv-note"></span>
+                                        <div class="age-input-row">
+                                            <span class="age-label">Adjust age:</span>
+                                            <input type="number" id="acv-age-input" class="age-input" min="0" max="100" value="0">
+                                            <span class="age-label">years</span>
+                                            <button onclick="recalcACV()" class="recalc-btn">Recalculate</button>
+                                        </div>
+                                    </span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Section 2: Replacement Options -->
+                        <div class="card" style="overflow-x: auto;">
+                            <div class="card-title"><span class="title-number">2</span> Current Replacement Options <span class="title-icon">&#128260;</span></div>
+                            <div class="card-accent-stripe"></div>
+                            <table class="data-table">
+                                <thead><tr>
+                                    <th>Feature</th><th>Original Item</th><th class="highlight">Brand Match</th><th>Option 1</th><th>Option 2</th>
+                                </tr></thead>
+                                <tbody id="table-body"></tbody>
+                            </table>
+                        </div>
+
+                        <!-- Section 3: Technical Info -->
+                        <div class="card">
+                            <div class="card-title"><span class="title-number">3</span> Relevant Technical Information <span class="title-icon">&#128295;</span></div>
+                            <div class="card-accent-stripe"></div>
+                            <div id="manual-box" style="margin-bottom: 0.5rem;"></div>
+                            <div class="tech-grid has-manual">
+                                <div class="tech-item recall-item"><div class="tech-label recall">Recall Notices</div><div class="tech-value" id="r-recalls"></div></div>
+                                <div class="tech-item neutral-item"><div class="tech-label neutral">Failure Patterns</div><div class="tech-value" id="r-failures"></div></div>
+                                <div class="tech-item neutral-item"><div class="tech-label neutral">Legal / Class Action</div><div class="tech-value" id="r-legal"></div></div>
                             </div>
-                            <div class="value-box">
-                                <h4>Estimated ACV</h4>
-                                <p id="r-acv"></p>
-                            </div>
+                            <div id="error-codes-container"></div>
                         </div>
-                        <p class="overview-text" id="r-value-note" style="margin-top: 0.6rem;"></p>
-                        <div class="age-adjust">
-                            <label for="acv-age-input">Adjust age (years):</label>
-                            <input type="number" id="acv-age-input" min="0" max="100" value="0">
-                            <button onclick="recalcACV()">Recalculate</button>
-                            <small id="r-acv-formula"></small>
+
+                        <!-- Section 4: How It Works -->
+                        <div class="card">
+                            <div class="card-title"><span class="title-number">4</span> How It Works <span class="title-icon">&#128161;</span></div>
+                            <div class="card-accent-stripe"></div>
+                            <div class="how-it-works-text" id="r-how-it-works"></div>
                         </div>
-                    </div>
 
-                    <div class="report-card">
-                        <h3><span>4</span> LKQ Replacements</h3>
-                        <div class="replacement-block" id="exact-match-block"></div>
-                        <div id="equivalents-block"></div>
-                        <div class="overview-text" id="replacement-note"></div>
-                        <div id="replacement-table"></div>
-                    </div>
-
-                    <div class="report-card">
-                        <h3><span>5</span> Methodology and Disclosures</h3>
-                        <div class="method-box" id="r-method"></div>
-                        <ul class="disclosure-list" id="r-disclosures"></ul>
-                        <div class="overview-text" style="margin-top: 0.8rem;"><strong>Technical References</strong></div>
-                        <ul class="bullet-list" id="r-tech-refs"></ul>
-                        <div class="overview-text" style="margin-top: 0.8rem;"><strong>Diagnostics Resources</strong></div>
-                        <div id="r-diagnostics"></div>
-                    </div>
-
-                    <div class="report-card">
-                        <h3><span>6</span> Copy Summary</h3>
-                        <div class="copy-box">
-                            <textarea id="copy-summary-text" readonly></textarea>
-                            <div class="copy-actions">
-                                <small id="copy-status">Ready to copy.</small>
-                                <button class="btn light" onclick="copySummary()">Copy Summary</button>
-                            </div>
+                        <!-- Section 5: Diagnostics -->
+                        <div class="card">
+                            <div class="card-title"><span class="title-number">5</span> Diagnostics &amp; Repair Resources <span class="title-icon">&#128736;</span></div>
+                            <div class="card-accent-stripe"></div>
+                            <div id="r-diagnostics"></div>
                         </div>
-                    </div>
+
+                    </div><!-- /detailed-view -->
                 </div>
             </div>
         </div>
-        <section id="how-it-works" class="section">
-            <div class="container">
-                <h2>How It Works</h2>
-                <p>We assemble item description, age range, valuation inputs, and replacement logic into a standardized claim note, with explicit disclosures for auditability.</p>
-            </div>
-        </section>
-
-        <section id="access" class="section">
-            <div class="container">
-                <h2>Advanced Access</h2>
-                <p>Need claims workflow integrations, bulk research, or carrier-specific reporting? Request advanced access and tell us what you need.</p>
-                <div class="search-card" style="margin-top: 1.5rem;">
-                    <form onsubmit="event.preventDefault(); alert('Thanks for your request. We will follow up soon.'); this.reset();">
-                        <div style="display: grid; gap: 0.8rem;">
-                            <input type="text" class="search-input" placeholder="Full name" required>
-                            <input type="email" class="search-input" placeholder="Work email" required>
-                            <input type="text" class="search-input" placeholder="Company / team" required>
-                            <textarea class="search-input" placeholder="Tell us about your claims workflow" rows="3" required></textarea>
-                            <button class="btn primary" type="submit">Request Advanced Access</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </section>
-
-        <section id="faq" class="section">
-            <div class="container">
-                <h2>FAQ</h2>
-                <div class="faq-grid">
-                    <div class="faq-card">
-                        <h4>Is the data verified?</h4>
-                        <p>We surface available market listings and product signals with clear disclosures for validation.</p>
-                    </div>
-                    <div class="faq-card">
-                        <h4>Does it support ACV?</h4>
-                        <p>If ACV is included in the results, it is shown separately from replacement cost.</p>
-                    </div>
-                    <div class="faq-card">
-                        <h4>Can I export?</h4>
-                        <p>Use Print to PDF for claim files or copy the condensed summary.</p>
-                    </div>
-                    <div class="faq-card">
-                        <h4>Can I request integrations?</h4>
-                        <p>Yes, use the Advanced Access request and we will follow up.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="contact" class="section">
-            <div class="container">
-                <h2>Contact</h2>
-                <p>For access requests or questions, email <strong>contact@yourcompany.com</strong>.</p>
-                <p style="margin-top:0.5rem; font-size:0.9rem; color: rgba(247,245,239,0.6);">Replace with your preferred contact email.</p>
-            </div>
-        </section>
-    </main>
-
-    <footer class="footer">
-        <div class="container footer-inner">
-            <div>
-                <div class="brand">Bolt Research Team <span>*</span></div>
-                <p style="color: rgba(247,245,239,0.6); margin-top: 0.6rem; max-width: 380px;">Claim-ready item research for adjusters and claims teams. Search, document, and export with defensible structure.</p>
-            </div>
-            <div class="footer-links">
-                <a href="privacy.html">Privacy</a>
-                <a href="terms.html">Terms</a>
-                <a href="disclaimer.html">Disclaimer</a>
-                <a href="item-age.html">Item Age Lookup</a>
-                <a href="who-we-are.html">Who We Are</a>
-            </div>
-        </div>
-    </footer>
+    </div>
 
     <script>
-        const CACHE_VERSION = 1;
-        const CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+        let currentView = 'detailed';
         let acvData = {};
-        let lastQuery = '';
-        let lastFilters = {};
-        let lastResult = null;
 
         document.getElementById('query').addEventListener('keydown', function(e) {
             if (e.key === 'Enter') performSearch();
         });
 
-        function normalizeQuery(query) {
-            return query.trim().toLowerCase().replace(/\s+/g, ' ');
-        }
-
-        function getFilters() {
-            return {};
-        }
-
-        function buildCacheKey(query, filters) {
-            const filterKey = encodeURIComponent(JSON.stringify(filters));
-            return `bolt_cache_v${CACHE_VERSION}_${normalizeQuery(query)}_${filterKey}`;
-        }
-
-        function readCache(key) {
-            const raw = localStorage.getItem(key);
-            if (!raw) return null;
-            try {
-                const payload = JSON.parse(raw);
-                if (!payload || !payload.timestamp || !payload.data || payload.version !== CACHE_VERSION) return null;
-                if (Date.now() - payload.timestamp > CACHE_TTL_MS) return null;
-                return payload;
-            } catch {
-                return null;
+        function toggleView() {
+            const quickView = document.getElementById('quick-view');
+            const detailedView = document.getElementById('detailed-view');
+            const toggleBtn = document.getElementById('view-toggle');
+            if (currentView === 'detailed') {
+                detailedView.classList.add('hidden');
+                quickView.classList.remove('hidden');
+                toggleBtn.textContent = 'Detailed View';
+                toggleBtn.classList.remove('active');
+                currentView = 'quick';
+            } else {
+                quickView.classList.add('hidden');
+                detailedView.classList.remove('hidden');
+                toggleBtn.textContent = 'Quick View';
+                toggleBtn.classList.add('active');
+                currentView = 'detailed';
             }
-        }
-
-        function writeCache(key, data) {
-            localStorage.setItem(key, JSON.stringify({
-                version: CACHE_VERSION,
-                timestamp: Date.now(),
-                data
-            }));
-        }
-
-        function updateCacheStatus(text) {
-            document.getElementById('cache-status').innerText = text;
-        }
-
-        function showCacheBanner(isCached, timestamp) {
-            const banner = document.getElementById('cache-banner');
-            if (!isCached) {
-                banner.classList.add('hidden');
-                return;
-            }
-            const date = new Date(timestamp);
-            document.getElementById('cache-banner-text').innerText = `Cached result (last updated ${date.toLocaleString()}).`;
-            banner.classList.remove('hidden');
-        }
-
-        function refreshSearch() {
-            performSearch({ forceRefresh: true });
-        }
-
-        function clearCache() {
-            Object.keys(localStorage).forEach(key => {
-                if (key.startsWith('bolt_cache_v')) localStorage.removeItem(key);
-            });
-            updateCacheStatus('Cache cleared.');
         }
 
         function recalcACV() {
@@ -870,348 +445,132 @@
             const newACV = msrp * Math.pow(1 - rate, age) * condition;
             document.getElementById('r-acv').innerText = '$' + newACV.toFixed(2);
             document.getElementById('r-acv-formula').innerText =
-                '$' + msrp.toFixed(2) + ' x (1 - ' + rate.toFixed(2) + ')^' + age + ' x ' + condition + ' = $' + newACV.toFixed(2);
+                '$' + msrp.toFixed(2) + ' \u00D7 (1 - ' + (rate).toFixed(2) + ')^' + age + ' \u00D7 ' + condition + ' = $' + newACV.toFixed(2);
+            document.getElementById('qv-acv').innerText = '$' + newACV.toFixed(2);
         }
 
-        function buildOutboundLink(url, meta) {
-            return url;
-        }
-
-        function formatMoney(value) {
-            if (!value) return 'Not provided';
-            if (typeof value === 'string') return value;
-            return '$' + Number(value).toFixed(2);
-        }
-
-        function makeArrayFromText(text) {
-            if (!text) return [];
-            if (Array.isArray(text)) return text;
-            return String(text).split(/\.|;|\n/).map(s => s.trim()).filter(Boolean).slice(0, 4);
-        }
-
-        function selectSpecRow(table, keywords) {
-            if (!table || table.length === 0) return null;
-            return table.find(row => keywords.some(k => String(row.label || '').toLowerCase().includes(k))) || null;
-        }
-
-        function buildSpecComparison(table, optionKey) {
-            const categories = [
-                { label: 'Form factor / type', keywords: ['type', 'form'] },
-                { label: 'Capacity / size', keywords: ['capacity', 'size', 'volume', 'width', 'height', 'depth', 'inch', 'cu'] },
-                { label: 'Core performance', keywords: ['power', 'speed', 'rpm', 'btu', 'watt', 'voltage', 'amp', 'performance'] },
-                { label: 'Materials / build tier', keywords: ['material', 'build', 'construction', 'finish'] },
-                { label: 'Feature tier', keywords: ['feature', 'smart', 'mode', 'tech'] },
-                { label: 'Warranty class', keywords: ['warranty', 'coverage'] }
-            ];
-            return categories.map(cat => {
-                const row = selectSpecRow(table, cat.keywords);
-                return {
-                    label: cat.label,
-                    original: row ? row.original : 'Not provided',
-                    option: row ? row[optionKey] : 'Not provided'
-                };
-            });
-        }
-
-        function buildEquivalentsFromTable(table) {
-            if (!table || table.length === 0) return [];
-            const modelRow = table.find(row => String(row.label || '').toLowerCase().includes('model'));
-            const option1Name = (modelRow && modelRow.option1) ? modelRow.option1 : 'Option 1';
-            const option2Name = (modelRow && modelRow.option2) ? modelRow.option2 : 'Option 2';
-            const reasons = table.slice(0, 3).map(row => `${row.label}: ${row.option1 || row.option2 || row.brandMatch || ''}`.trim()).filter(Boolean);
-            return [
-                {
-                    name: option1Name,
-                    tier: 'Closest available option in current replacement table',
-                    reasons: reasons.slice(0, 3),
-                    specs: buildSpecComparison(table, 'option1'),
-                    listings: []
-                },
-                {
-                    name: option2Name,
-                    tier: 'Alternate comparable option in current replacement table',
-                    reasons: reasons.slice(0, 3),
-                    specs: buildSpecComparison(table, 'option2'),
-                    listings: []
-                }
-            ];
-        }
-
-        function buildCopySummary(data, query) {
-            const a = data.analysis || {};
-            const rd = data.releaseDate || {};
-            const v = data.valuation || {};
-            const replacements = data.replacements || {};
-            const hasExact = replacements.exactMatches && replacements.exactMatches[0];
-            const firstExact = hasExact ? replacements.exactMatches[0] : null;
-            const firstEquivalent = (replacements.equivalents && replacements.equivalents[0]) ? replacements.equivalents[0] : null;
-            const exact = hasExact
-                ? `Exact match found: ${firstExact.title || 'Exact match'}`
-                : `Best equivalent: ${(firstEquivalent && firstEquivalent.name) ? firstEquivalent.name : 'Closest available option'} (closest spec match)`;
-            const listingSummary = (replacements.exactMatches && replacements.exactMatches.length)
-                ? replacements.exactMatches.slice(0, 3).map(l => `${l.retailer} - ${l.price}`).join(', ')
-                : (replacements.equivalents && replacements.equivalents[0] && replacements.equivalents[0].listings)
-                    ? replacements.equivalents[0].listings.slice(0, 3).map(l => `${l.retailer} - ${l.price}`).join(', ')
-                    : 'Listings not provided';
-            const range = rd.productionEra || a.age || 'Unknown';
-            const confidence = rd.confidence || a.modelConfidence || 'Unknown';
-            const method = data.howItWorks ? String(data.howItWorks).split('. ')[0] + '.' : 'Signals include model and serial inputs with replacement selection based on match and closest equivalent logic.';
-            const brand = a.brand || 'Unknown';
-            const model = a.model || 'Unknown';
-
-            return `Claim Note - Bolt Research Team\n` +
-                `Item: ${query}\n` +
-                `Brand/Model: ${brand} ${model}\n` +
-                `Estimated Mfr Date/Age: ${range} (${confidence})\n` +
-                `Value: Est. Replacement Cost: ${formatMoney(v.estimatedReplacementCost || a.msrp || '')} | Est. ACV: ${v.estimatedACV || 'Not provided'}\n` +
-                `LKQ Replacement: ${exact}\n` +
-                `Comparable Listings: ${listingSummary}\n` +
-                `Method: ${method}\n` +
-                `Disclosure: Estimates; verify where required.`;
-        }
-
-        function renderReplacements(data, table) {
-            const replacements = data.replacements || {};
-            const exactMatches = replacements.exactMatches || [];
-            const exactBlock = document.getElementById('exact-match-block');
-
-            if (exactMatches.length > 0) {
-                exactBlock.innerHTML = `
-                    <div class="replacement-status match">Exact match found</div>
-                    <div class="listing-grid">
-                        ${exactMatches.slice(0, 3).map(match => {
-                            const link = buildOutboundLink(match.url, { retailer: match.retailer, sku: match.sku });
-                            return `
-                                <div class="listing-card">
-                                    <div><strong>${match.title || 'Exact match'}</strong></div>
-                                    <div>${match.retailer || 'Retailer'} - ${match.price || 'Price unavailable'}</div>
-                                    <a href="${link}" target="_blank" rel="sponsored noopener noreferrer">View listing</a>
-                                </div>
-                            `;
-                        }).join('')}
-                    </div>
-                `;
-            } else {
-                exactBlock.innerHTML = `
-                    <div class="replacement-status none">No exact match found in current dataset</div>
-                    <p class="overview-text">If an exact model appears at known retailers, it will be listed here.</p>
-                `;
-            }
-
-            let equivalents = replacements.equivalents || [];
-            if (!equivalents.length) equivalents = buildEquivalentsFromTable(table);
-
-            const equivalentsBlock = document.getElementById('equivalents-block');
-            if (!equivalents.length) {
-                equivalentsBlock.innerHTML = '<p class="overview-text">No equivalents provided.</p>';
-                return;
-            }
-
-            equivalentsBlock.innerHTML = equivalents.map((eq, index) => {
-                const reasons = (eq.reasons || []).slice(0, 3);
-                const listings = eq.listings || [];
-                const specs = eq.specs || buildSpecComparison(table, index === 0 ? 'option1' : 'option2');
-
-                return `
-                    <div class="equivalent-card">
-                        <h4>${eq.name || 'Equivalent'} <small style="color: var(--ink-500); font-weight: 600;">${eq.tier || ''}</small></h4>
-                        <div class="overview-text">Why it is comparable:</div>
-                        <ul class="bullet-list">
-                            ${reasons.length ? reasons.map(r => `<li>${r}</li>`).join('') : '<li>Comparable specification tier based on available data.</li>'}
-                        </ul>
-                        <table class="spec-table">
-                            <thead>
-                                <tr><th>Category</th><th>Original</th><th>Equivalent</th></tr>
-                            </thead>
-                            <tbody>
-                                ${specs.map(row => `
-                                    <tr>
-                                        <td>${row.label}</td>
-                                        <td>${row.original || 'Not provided'}</td>
-                                        <td>${row.option || 'Not provided'}</td>
-                                    </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
-                        <div class="listing-grid" style="margin-top: 0.8rem;">
-                            ${listings.length ? listings.slice(0, 3).map(listing => {
-                                const link = buildOutboundLink(listing.url, { retailer: listing.retailer, sku: listing.sku });
-                                return `
-                                    <div class="listing-card">
-                                        <div><strong>${listing.retailer || 'Retailer'}</strong></div>
-                                        <div>${listing.price || 'Price unavailable'}</div>
-                                        <a href="${link}" target="_blank" rel="sponsored noopener noreferrer">View listing</a>
-                                    </div>
-                                `;
-                            }).join('') : '<div class="listing-card">No active listings provided.</div>'}
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function renderReplacementTable(table) {
-            if (!table || !table.length) {
-                document.getElementById('replacement-table').innerHTML = '';
-                return;
-            }
-            const headers = `<tr><th>Feature</th><th>Original</th><th>Brand Match</th><th>Option 1</th><th>Option 2</th></tr>`;
-            const rows = table.map(row => `
-                <tr>
-                    <td>${row.label}</td>
-                    <td>${row.original}</td>
-                    <td>${row.brandMatch}</td>
-                    <td>${row.option1}</td>
-                    <td>${row.option2}</td>
-                </tr>
-            `).join('');
-            document.getElementById('replacement-table').innerHTML = `
-                <div class="overview-text" style="margin-top:0.8rem;">Replacement comparison matrix:</div>
-                <table class="spec-table">${headers}${rows}</table>
-            `;
-        }
-
-        function renderResults(data, options) {
-            const a = data.analysis || {};
-            const rd = data.releaseDate || {};
-            const v = data.valuation || {};
-            const table = data.table || [];
-            const technical = data.technical || {};
-            const replacements = data.replacements || {};
-
-            const outboundLinks = [];
-            if (replacements.exactMatches) {
-                replacements.exactMatches.forEach(match => {
-                    outboundLinks.push({ retailer: match.retailer, sku: match.sku, url: match.url });
-                });
-            }
-            if (replacements.equivalents) {
-                replacements.equivalents.forEach(eq => {
-                    if (eq.listings) {
-                        eq.listings.forEach(listing => {
-                            outboundLinks.push({ retailer: listing.retailer, sku: listing.sku, url: listing.url });
-                        });
-                    }
-                });
-            }
-            data.outboundLinks = outboundLinks;
-
-            document.getElementById('r-overview').innerText = a.overview || a.descriptionMain || 'No overview provided.';
-            const differentiators = makeArrayFromText(a.keyDetails || a.detailsMain || a.descriptionExtra || '');
-            document.getElementById('r-key-differentiators').innerHTML = differentiators.length
-                ? differentiators.map(item => `<li>${item}</li>`).join('')
-                : '<li>No differentiators provided.</li>';
-
-            document.getElementById('r-tech-specs').innerText = a.technicalSpecs || 'Not provided';
-            document.getElementById('r-materials').innerText = a.materials || 'Not provided';
-
-            document.getElementById('r-production-era').innerText = rd.productionEra || a.age || 'Unknown';
-            document.getElementById('r-estimated-age').innerText = rd.estimatedAge || a.age || 'Unknown';
-            document.getElementById('r-confidence').innerText = rd.confidence || a.modelConfidence || 'Unknown';
-            document.getElementById('r-rationale').innerText = rd.rationale || (a.decodingMethod && a.decodingMethod.summary) || 'Based on available model and serial inputs with product lifecycle references.';
-
-            document.getElementById('r-replacement-cost').innerText = formatMoney(v.estimatedReplacementCost || a.msrp || v.msrp || '');
-            document.getElementById('r-acv').innerText = v.estimatedACV || 'Not provided';
-            document.getElementById('r-value-note').innerText = v.acvNote || v.annualDepreciationDisplay || '';
-
-            acvData = {
-                msrp: a.msrpNumeric || parseFloat(String(a.msrp || '').replace(/[^0-9.]/g, '')) || 0,
-                rate: v.annualDepreciationPercent || 10,
-                condition: v.conditionFactor || 0.75
-            };
-            document.getElementById('acv-age-input').value = rd.ageNumeric || 0;
-            document.getElementById('r-acv-formula').innerText = v.acvFormula || '';
-
-            renderReplacements(data, table);
-            renderReplacementTable(table);
-            document.getElementById('replacement-note').innerText = data.replacementNotes || '';
-
-            document.getElementById('r-method').innerText = data.howItWorks || 'Methodology not provided.';
-            document.getElementById('r-disclosures').innerHTML = [
-                'Estimates are provided for documentation support only.',
-                'Verify exact model and pricing where required.',
-                'Listings and availability can change after report generation.'
-            ].map(item => `<li>${item}</li>`).join('');
-
-            const techRefs = [];
-            if (technical.manual && technical.manual !== 'N/A') {
-                const manualLink = buildOutboundLink(technical.manual, { type: 'manual' });
-                techRefs.push(`<li><a href="${manualLink}" target="_blank" rel="sponsored noopener noreferrer">Service manual</a></li>`);
-            }
-            if (technical.recalls) techRefs.push(`<li>Recalls: ${technical.recalls}</li>`);
-            if (technical.failures) techRefs.push(`<li>Failure patterns: ${technical.failures}</li>`);
-            if (technical.legal) techRefs.push(`<li>Legal / class action: ${technical.legal}</li>`);
-            if (technical.errorCodes && technical.errorCodes.length) techRefs.push(`<li>Error codes: ${technical.errorCodes.length} documented</li>`);
-            document.getElementById('r-tech-refs').innerHTML = techRefs.length ? techRefs.join('') : '<li>No technical references provided.</li>';
-
-            const diagContainer = document.getElementById('r-diagnostics');
-            if (data.diagnostics && data.diagnostics.length) {
-                diagContainer.innerHTML = '<ul class="bullet-list">' +
-                    data.diagnostics.map(d => {
-                        const link = buildOutboundLink(d.url, { source: d.source });
-                        return `<li><a href="${link}" target="_blank" rel="sponsored noopener noreferrer">${d.title}</a> - ${d.source || 'Source'}</li>`;
-                    }).join('') +
-                    '</ul>';
-            } else {
-                diagContainer.innerHTML = '<p class="overview-text">No diagnostic resources provided.</p>';
-            }
-
-            const summaryText = buildCopySummary(data, lastQuery);
-            document.getElementById('copy-summary-text').value = summaryText;
-
-            if (options && options.cached) {
-                showCacheBanner(true, options.timestamp);
-                updateCacheStatus('Serving cached result.');
-            } else {
-                showCacheBanner(false);
-                updateCacheStatus('Results updated just now.');
-            }
-
-            document.getElementById('results').classList.remove('hidden');
-        }
-
-        async function performSearch(options = {}) {
-            const queryInput = document.getElementById('query');
-            const query = queryInput.value.trim();
+        async function performSearch() {
+            const query = document.getElementById('query').value;
             if (!query) return;
-            lastQuery = query;
-            lastFilters = getFilters();
-
-            const cacheKey = buildCacheKey(query, lastFilters);
-            if (!options.forceRefresh) {
-                const cached = readCache(cacheKey);
-                if (cached) {
-                    lastResult = cached.data;
-                    renderResults(cached.data, { cached: true, timestamp: cached.timestamp });
-                    return;
-                }
-            }
-
+            document.getElementById('loader-dog').classList.add('running');
+            document.getElementById('loader-text').classList.add('visible');
             document.getElementById('results').classList.add('hidden');
-            updateCacheStatus('Searching...');
-
             try {
                 const res = await fetch(`/api/search?query=${encodeURIComponent(query)}`);
                 const data = await res.json();
-                lastResult = data;
-                writeCache(cacheKey, data);
-                renderResults(data, { cached: false });
-            } catch (e) {
-                alert('Error retrieving data.');
-                updateCacheStatus('Search failed.');
-            }
-        }
+                const a = data.analysis;
+                const rd = data.releaseDate || {};
+                const v = data.valuation || {};
 
-        async function copySummary() {
-            const textarea = document.getElementById('copy-summary-text');
-            if (!textarea.value) return;
-            try {
-                await navigator.clipboard.writeText(textarea.value);
-                document.getElementById('copy-status').innerText = 'Copied to clipboard.';
-            } catch {
-                textarea.select();
-                document.execCommand('copy');
-                document.getElementById('copy-status').innerText = 'Copied to clipboard.';
+                // Section 1: Analysis
+                document.getElementById('r-overview').innerText = a.overview || '';
+                document.getElementById('r-item-desc').innerText = a.itemDescription || a.descriptionMain || '';
+                document.getElementById('r-key-details').innerText = a.keyDetails || a.detailsMain || '';
+                document.getElementById('r-tech-specs').innerText = a.technicalSpecs || '';
+                document.getElementById('r-materials').innerText = a.materials || 'Not specified';
+
+                // Release Date & Age
+                document.getElementById('r-production-era').innerText = rd.productionEra || a.age || 'Unknown';
+                document.getElementById('r-discontinuation').innerText = rd.discontinuation || a.status || '';
+                document.getElementById('r-estimated-age').innerText = rd.estimatedAge || a.age || 'Unknown';
+                document.getElementById('r-service-life').innerText = rd.serviceLife || '';
+
+                // Valuation
+                document.getElementById('r-msrp').innerText = a.msrp || '';
+                document.getElementById('r-depreciation-display').innerText = v.annualDepreciationDisplay || (v.annualDepreciationPercent + '%') || '';
+                document.getElementById('r-acv').innerText = v.estimatedACV || '';
+                document.getElementById('r-acv-formula').innerText = v.acvFormula || '';
+                document.getElementById('r-acv-note').innerText = v.acvNote || '';
+
+                // Store for recalculation
+                const ageNum = rd.ageNumeric || 0;
+                acvData = {
+                    msrp: a.msrpNumeric || parseFloat(String(a.msrp).replace(/[^0-9.]/g, '')) || 0,
+                    rate: v.annualDepreciationPercent || 10,
+                    condition: v.conditionFactor || 0.75
+                };
+                document.getElementById('acv-age-input').value = ageNum;
+
+                // Section 2: Replacement Table
+                const tbody = document.getElementById('table-body');
+                tbody.innerHTML = data.table.map(row => `
+                    <tr>
+                        <td>${row.label}</td>
+                        <td>${row.original}</td>
+                        <td class="brand-match">${row.brandMatch}</td>
+                        <td>${row.option1}</td>
+                        <td>${row.option2}</td>
+                    </tr>
+                `).join('');
+
+                // Section 3: Technical
+                const manualBox = document.getElementById('manual-box');
+                manualBox.innerHTML = data.technical.manual !== 'N/A'
+                    ? `<a href="${data.technical.manual}" target="_blank" class="manual-link no-print">&#128196; VIEW SERVICE MANUAL (PDF)</a>`
+                    : `<span style="color: var(--text-muted-dark); font-style: italic; font-size: 0.75rem;">Service manual not available.</span>`;
+                document.getElementById('r-recalls').innerText = data.technical.recalls;
+                document.getElementById('r-failures').innerText = data.technical.failures;
+                document.getElementById('r-legal').innerText = data.technical.legal;
+
+                // Error Codes
+                const ecContainer = document.getElementById('error-codes-container');
+                const ec = data.technical.errorCodes;
+                const ecSource = data.technical.errorCodesSource;
+                if (ec && ec.length > 0) {
+                    let html = '<div class="error-codes-section"><div class="error-codes-title">Known Error / Fault Codes</div>';
+                    html += '<table class="error-codes-table"><thead><tr><th>Code</th><th>Description</th></tr></thead><tbody>';
+                    html += ec.map(e => `<tr><td>${e.code}</td><td>${e.description}</td></tr>`).join('');
+                    html += '</tbody></table>';
+                    if (ecSource && ecSource.url) {
+                        html += `<a href="${ecSource.url}" target="_blank" class="error-codes-link">&#128279; ${ecSource.title || 'View full error code reference'}</a>`;
+                    }
+                    html += '</div>';
+                    ecContainer.innerHTML = html;
+                } else {
+                    ecContainer.innerHTML = '';
+                }
+
+                // Section 4: How It Works
+                document.getElementById('r-how-it-works').innerText = data.howItWorks || 'No explanation available.';
+
+                // Section 5: Diagnostics
+                const diagContainer = document.getElementById('r-diagnostics');
+                if (data.diagnostics && data.diagnostics.length > 0) {
+                    diagContainer.innerHTML = '<ul class="diagnostics-list">' +
+                        data.diagnostics.map(d => `<li><a href="${d.url}" target="_blank">${d.title}</a> <span class="diag-source">- ${d.source}</span></li>`).join('') +
+                        '</ul>';
+                } else {
+                    diagContainer.innerHTML = '<p class="diagnostics-empty">No diagnostic resources found.</p>';
+                }
+
+                // Quick View
+                document.getElementById('qv-category').innerText = a.quickSummary || 'N/A';
+                document.getElementById('qv-status').innerText = a.status || '';
+                document.getElementById('qv-age').innerText = rd.estimatedAge || a.age || '';
+                document.getElementById('qv-msrp').innerText = a.msrp || '';
+                document.getElementById('qv-acv').innerText = v.estimatedACV || 'N/A';
+
+                // Estimation Banner
+                const banner = document.getElementById('estimation-banner');
+                if (a.modelConfidence === 'estimated') {
+                    document.getElementById('estimation-text').innerText =
+                        'Full model number not provided. Information below is based on an estimated model of ' + (a.estimatedModel || 'unknown') + '.';
+                    banner.classList.remove('hidden');
+                } else {
+                    banner.classList.add('hidden');
+                }
+
+                // Default to detailed view on new search
+                currentView = 'detailed';
+                document.getElementById('detailed-view').classList.remove('hidden');
+                document.getElementById('quick-view').classList.add('hidden');
+                document.getElementById('view-toggle').textContent = 'Quick View';
+                document.getElementById('view-toggle').classList.add('active');
+
+                document.getElementById('results').classList.remove('hidden');
+            } catch (e) { alert("Error retrieving data."); } finally {
+                document.getElementById('loader-dog').classList.remove('running');
+                document.getElementById('loader-text').classList.remove('visible');
             }
         }
     </script>

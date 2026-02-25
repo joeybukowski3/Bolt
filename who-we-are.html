@@ -1,11 +1,11 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bolt Research Team - Who We Are</title>
+    <title>Bolt - Who We Are</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -35,7 +35,7 @@
         }
 
         body {
-            font-family: 'Source Sans 3', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: var(--bg-primary);
             color: var(--text-white);
             min-height: 100vh;
@@ -95,7 +95,7 @@
             padding: 0 1.5rem;
         }
 
-        /* â”€â”€ Navigation â”€â”€ */
+        /* ── Navigation ── */
         .nav {
             display: flex;
             align-items: center;
@@ -144,7 +144,7 @@
         .nav-link.active { background: var(--accent); color: #000; font-weight: 600; }
         .nav-link.active:hover { background: var(--accent-hover); }
 
-        /* â”€â”€ Content Zone â”€â”€ */
+        /* ── Content Zone ── */
         .content-zone {
             background: #ffffff;
             border-radius: 24px 24px 0 0;
@@ -172,7 +172,7 @@
             margin-bottom: 1.25rem;
         }
 
-        /* â”€â”€ Newsletter Form â”€â”€ */
+        /* ── Newsletter Form ── */
         .newsletter-section {
             margin-top: 2.5rem;
             padding: 2rem;
@@ -233,27 +233,6 @@
             .content-zone { padding: 2rem 1rem 3rem; border-radius: 16px 16px 0 0; }
             .newsletter-form { flex-direction: column; }
         }
-
-        .footer {
-            border-top: 1px solid rgba(255,255,255,0.08);
-            margin-top: 2rem;
-            padding: 1.5rem 0 2rem;
-        }
-        .footer-inner {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 1.5rem;
-            flex-wrap: wrap;
-            font-size: 0.85rem;
-            color: var(--text-light);
-        }
-        .footer-links {
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-        .footer-links a { color: var(--text-light); text-decoration: none; }
     </style>
 </head>
 <body>
@@ -270,7 +249,7 @@
         <nav class="nav">
             <div class="nav-left">
                 <a class="nav-brand" href="index.html">Bolt <span class="bolt-icon">&#9889;</span></a>
-                <span class="brand-tagline">Claim-ready item research for insurance teams</span>
+                <span class="brand-tagline">The World's 1st AI assistant built for insurance industry experts by insurance industry experts</span>
             </div>
             <div class="nav-links">
                 <a href="index.html" class="nav-link">Item Lookup</a>
@@ -286,13 +265,13 @@
 
                 <p>Bolt was built by active insurance industry professionals who understand the daily challenges adjusters face. From estimating replacement costs to determining actual cash value, our team has spent years in the trenches handling claims, writing estimates, and navigating the complexities of property and casualty insurance. We created Bolt because we saw a need for a tool that truly speaks the language of adjusters.</p>
 
-                <p>By combining decades of real-world claims experience with the latest advances in artificial intelligence, Bolt delivers fast, accurate product research tailored specifically for the insurance workflow. Our mission is to save adjusters time, reduce errors, and bring transparency to every claim â€” all powered by technology designed by the people who understand it best.</p>
+                <p>By combining decades of real-world claims experience with the latest advances in artificial intelligence, Bolt delivers fast, accurate product research tailored specifically for the insurance workflow. Our mission is to save adjusters time, reduce errors, and bring transparency to every claim — all powered by technology designed by the people who understand it best.</p>
 
                 <!-- Newsletter Signup -->
                 <div class="newsletter-section">
                     <h2>Stay in the Loop</h2>
                     <p>Subscribe to our newsletter for product updates, industry tips, and early access to new features.</p>
-                    <form class="newsletter-form" id="newsletter-form">
+                    <form class="newsletter-form" onsubmit="event.preventDefault(); alert('Thank you for subscribing! We will be in touch soon.'); this.reset();">
                         <input type="email" class="newsletter-input" placeholder="Enter your email address" required>
                         <button type="submit" class="newsletter-btn">Subscribe</button>
                     </form>
@@ -300,20 +279,5 @@
             </div>
         </div>
     </div>
-
-    <footer class="footer">
-        <div class="app-container footer-inner">
-            <div>Bolt Research Team</div>
-            <div class="footer-links">
-                <a href="privacy.html">Privacy</a>
-                <a href="terms.html">Terms</a>
-                <a href="disclaimer.html">Disclaimer</a>
-                <a href="index.html">Item Lookup</a>
-                <a href="item-age.html">Item Age Lookup</a>
-            </div>
-        </div>
-    </footer>
-<script src="who-we-are.js" defer></script>
 </body>
 </html>
-
