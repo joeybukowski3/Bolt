@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bolt Research Team | Universal Item Research for Claims</title>
-    <meta name="description" content="Search any item, model, serial, or keyword and get an age estimate, plain-English overview, and LKQ replacement options with live pricing formatted for claim documentation.">
+    <meta name="description" content="Claim-ready item research with age estimates, plain-English overview, and LKQ replacement options with live pricing.">
     <meta property="og:title" content="Universal Item Research for Claims">
     <meta property="og:description" content="Claim-ready item research with age estimates, overview, and LKQ replacement options with live pricing.">
     <meta property="og:type" content="website">
@@ -15,53 +15,35 @@
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         :root {
-            --ink-900: #0b1020;
-            --ink-800: #142033;
-            --ink-700: #1c2a44;
-            --ink-600: #344868;
-            --ink-500: #5f6f8c;
-            --paper-100: #f7f5ef;
-            --paper-200: #f0ede4;
-            --paper-300: #e3e0d6;
+            --ink-900: #0c111c;
+            --ink-700: #1e2b3c;
+            --ink-600: #2f3f55;
+            --ink-500: #5f6b7b;
+            --paper-100: #f6f4ef;
+            --paper-200: #efebe2;
+            --paper-300: #e2ddd2;
             --accent-500: #f97316;
             --accent-600: #ea580c;
-            --accent-700: #c2410c;
-            --steel-500: #3b82f6;
-            --emerald-500: #16a34a;
-            --signal-500: #f59e0b;
-            --card-shadow: 0 18px 40px rgba(10, 20, 35, 0.15);
-            --radius-lg: 18px;
+            --steel-500: #2563eb;
+            --radius-lg: 20px;
             --radius-md: 12px;
             --radius-sm: 8px;
         }
         body {
             font-family: 'Source Sans 3', 'Segoe UI', sans-serif;
-            background: radial-gradient(circle at top, #1f2b45 0%, #101522 38%, #0b0f1a 100%);
-            color: var(--paper-100);
+            background: #0b0f1a;
+            color: #f8fafc;
             line-height: 1.6;
             min-height: 100vh;
         }
         h1, h2, h3, .brand { font-family: 'Space Grotesk', 'Segoe UI', sans-serif; }
-        a { color: inherit; }
+        a { color: inherit; text-decoration: none; }
 
-        .bg-grid {
+        .bg {
             position: fixed;
             inset: 0;
             pointer-events: none;
-            background-image:
-                linear-gradient(120deg, rgba(249, 115, 22, 0.08), transparent 40%),
-                radial-gradient(circle at 20% 20%, rgba(59, 130, 246, 0.12), transparent 45%),
-                radial-gradient(circle at 80% 20%, rgba(249, 115, 22, 0.12), transparent 45%);
-        }
-        .bg-grid::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background-image:
-                linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
-            background-size: 80px 80px;
-            opacity: 0.25;
+            background: radial-gradient(circle at top, #1c2638 0%, #0b0f1a 60%);
         }
 
         .container { max-width: 1120px; margin: 0 auto; padding: 0 1.5rem; }
@@ -70,21 +52,21 @@
             position: sticky;
             top: 0;
             z-index: 20;
-            background: rgba(8, 12, 22, 0.7);
-            backdrop-filter: blur(12px);
+            background: rgba(8, 12, 22, 0.8);
             border-bottom: 1px solid rgba(255,255,255,0.08);
+            backdrop-filter: blur(8px);
         }
         .header-inner {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0.8rem 0;
+            padding: 0.85rem 0;
             gap: 1rem;
+            flex-wrap: wrap;
         }
         .brand {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: 700;
-            text-decoration: none;
             display: inline-flex;
             align-items: center;
             gap: 0.4rem;
@@ -97,178 +79,120 @@
         }
         .header-nav a {
             font-size: 0.85rem;
-            text-decoration: none;
-            color: rgba(247,245,239,0.75);
-            padding: 0.35rem 0.6rem;
+            color: rgba(248,250,252,0.75);
+            padding: 0.3rem 0.7rem;
             border-radius: 999px;
             transition: all 0.2s ease;
         }
-        .header-nav a:hover { background: rgba(249,115,22,0.15); color: var(--paper-100); }
-        .header-ctas {
-            display: flex;
-            gap: 0.6rem;
-            align-items: center;
-        }
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 999px;
-            padding: 0.5rem 1.1rem;
-            font-size: 0.85rem;
-            font-weight: 600;
-            text-decoration: none;
-            border: 1px solid transparent;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            font-family: 'Space Grotesk', 'Segoe UI', sans-serif;
-        }
-        .btn.primary { background: var(--accent-500); color: #140600; border-color: transparent; }
-        .btn.primary:hover { background: var(--accent-600); }
-        .btn.ghost { border-color: rgba(247,245,239,0.25); color: var(--paper-100); background: transparent; }
-        .btn.ghost:hover { border-color: var(--accent-500); color: var(--accent-500); }
-        .btn.light { background: var(--paper-100); color: var(--ink-900); border-color: transparent; }
-        .btn.light:hover { background: var(--paper-200); }
+        .header-nav a:hover { background: rgba(249,115,22,0.15); color: #fff; }
 
         .hero {
-            padding: 4.5rem 0 2.5rem;
+            padding: 4rem 0 2rem;
         }
         .hero-grid {
             display: grid;
             grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
-            gap: 2.5rem;
-            align-items: center;
+            gap: 2rem;
+            align-items: start;
         }
         .eyebrow {
             text-transform: uppercase;
-            letter-spacing: 0.18em;
+            letter-spacing: 0.2em;
             font-size: 0.7rem;
-            color: rgba(247,245,239,0.65);
+            color: rgba(248,250,252,0.6);
             margin-bottom: 0.75rem;
         }
         .hero h1 {
-            font-size: clamp(2.4rem, 4vw, 3.6rem);
+            font-size: clamp(2.4rem, 4vw, 3.4rem);
             line-height: 1.1;
             margin-bottom: 1rem;
         }
         .hero p {
             font-size: 1.05rem;
-            color: rgba(247,245,239,0.75);
+            color: rgba(248,250,252,0.72);
             margin-bottom: 1.5rem;
         }
-        .hero-actions {
-            display: flex;
-            gap: 0.8rem;
-            flex-wrap: wrap;
-        }
         .hero-metrics {
-            margin-top: 2rem;
             display: grid;
             grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 0.8rem;
+            gap: 0.75rem;
         }
         .metric-card {
-            padding: 0.75rem 1rem;
-            border-radius: var(--radius-md);
-            background: rgba(255,255,255,0.05);
+            background: rgba(255,255,255,0.06);
             border: 1px solid rgba(255,255,255,0.08);
+            border-radius: var(--radius-md);
+            padding: 0.7rem 0.9rem;
         }
         .metric-label {
             font-size: 0.65rem;
-            letter-spacing: 0.1em;
             text-transform: uppercase;
-            color: rgba(247,245,239,0.5);
+            letter-spacing: 0.1em;
+            color: rgba(248,250,252,0.55);
         }
-        .metric-value { font-size: 0.95rem; font-weight: 600; margin-top: 0.3rem; }
+        .metric-value { font-size: 0.95rem; font-weight: 600; margin-top: 0.25rem; }
+
+        .cta-row {
+            margin-top: 1.2rem;
+        }
+        .cta-row a {
+            display: block;
+            width: 100%;
+            text-align: center;
+            padding: 0.85rem 1rem;
+            border-radius: 999px;
+            background: var(--accent-500);
+            color: #140600;
+            font-weight: 700;
+            transition: background 0.2s ease;
+        }
+        .cta-row a:hover { background: var(--accent-600); }
 
         .search-card {
-            background: rgba(246, 244, 237, 0.94);
+            background: var(--paper-100);
             color: var(--ink-900);
             border-radius: var(--radius-lg);
-            padding: 1.6rem;
-            box-shadow: var(--card-shadow);
-            border: 1px solid rgba(255,255,255,0.6);
+            padding: 1.5rem;
+            border: 1px solid var(--paper-300);
         }
-        .search-card h3 {
-            font-size: 1.1rem;
-            margin-bottom: 0.4rem;
-        }
-        .search-card p {
-            font-size: 0.9rem;
-            color: var(--ink-600);
-            margin-bottom: 1.2rem;
-        }
+        .search-card h3 { font-size: 1.1rem; margin-bottom: 0.4rem; }
+        .search-card p { font-size: 0.9rem; color: var(--ink-500); margin-bottom: 1.1rem; }
         .search-field {
             display: flex;
-            background: #fff;
             border-radius: 999px;
-            border: 1px solid var(--paper-300);
             overflow: hidden;
-            box-shadow: inset 0 0 0 1px rgba(0,0,0,0.02);
+            border: 1px solid var(--paper-300);
+            background: #fff;
         }
         .search-input {
             flex: 1;
-            padding: 0.9rem 1.1rem;
+            padding: 0.9rem 1rem;
             border: none;
             outline: none;
             font-size: 0.95rem;
-            font-family: inherit;
-            background: transparent;
         }
         .search-btn {
             background: var(--accent-500);
             border: none;
             padding: 0.9rem 1.5rem;
             font-weight: 700;
-            font-family: 'Space Grotesk', 'Segoe UI', sans-serif;
             cursor: pointer;
         }
         .search-btn:hover { background: var(--accent-600); }
-
-        .examples {
-            margin-top: 1rem;
-        }
-        .examples span {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.4rem;
+        .example-chips { margin-top: 0.9rem; display: flex; flex-wrap: wrap; gap: 0.4rem; }
+        .example-chips span {
+            font-size: 0.75rem;
+            background: var(--paper-200);
+            color: var(--ink-500);
             padding: 0.3rem 0.6rem;
             border-radius: 999px;
-            background: var(--paper-200);
-            font-size: 0.75rem;
-            margin: 0.2rem 0.2rem 0 0;
-            color: var(--ink-600);
-        }
-
-        .utility-bar {
-            margin-top: 1.1rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 0.8rem;
-            flex-wrap: wrap;
-        }
-        .utility-bar small { color: var(--ink-500); }
-        .utility-btn {
-            border: 1px solid var(--paper-300);
-            background: transparent;
-            padding: 0.4rem 0.8rem;
-            border-radius: 999px;
-            cursor: pointer;
-            font-size: 0.75rem;
-            font-weight: 600;
         }
 
         .section {
-            padding: 3.5rem 0;
+            padding: 3rem 0;
         }
-        .section h2 {
-            font-size: 1.6rem;
-            margin-bottom: 1rem;
-        }
-        .section p {
-            color: rgba(247,245,239,0.75);
-        }
+        .section h2 { font-size: 1.6rem; margin-bottom: 1rem; }
+        .section p { color: rgba(248,250,252,0.7); }
+
         .feature-grid {
             display: grid;
             grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -282,274 +206,59 @@
             padding: 1.2rem;
         }
         .feature-card h3 { font-size: 1rem; margin-bottom: 0.4rem; }
-        .feature-card p { font-size: 0.9rem; color: rgba(247,245,239,0.7); }
+        .feature-card p { font-size: 0.9rem; color: rgba(248,250,252,0.7); }
 
-        .results-zone {
-            background: var(--paper-100);
-            color: var(--ink-900);
-            border-radius: 28px 28px 0 0;
-            padding: 2.5rem 0 3rem;
-            margin-top: 2rem;
-        }
-        .results-inner { max-width: 1120px; margin: 0 auto; padding: 0 1.5rem; }
-        .results-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-            flex-wrap: wrap;
-        }
-        .results-header h2 { font-size: 1.5rem; }
-        .results-actions { display: flex; gap: 0.6rem; flex-wrap: wrap; }
-        .results-actions button { border-radius: 999px; border: 1px solid var(--paper-300); background: #fff; padding: 0.5rem 0.9rem; font-weight: 600; cursor: pointer; }
-        .results-actions button:hover { border-color: var(--accent-500); color: var(--accent-600); }
-
-        .cache-banner {
-            background: #fff3d4;
-            border: 1px solid #fcd49b;
-            color: #8a4b0f;
-            padding: 0.6rem 1rem;
-            border-radius: var(--radius-sm);
-            margin-bottom: 1rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 0.6rem;
-        }
-        .cache-banner button { border: 1px solid #fcd49b; background: #fff; padding: 0.3rem 0.7rem; border-radius: 999px; font-weight: 600; cursor: pointer; }
-
-        .report-grid {
-            display: grid;
-            gap: 1.2rem;
-        }
-        .report-card {
-            background: #fff;
-            border: 1px solid var(--paper-300);
-            border-radius: var(--radius-md);
-            padding: 1.2rem 1.4rem;
-            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
-        }
-        .report-card h3 {
-            font-size: 1rem;
-            margin-bottom: 0.75rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        .report-card h3 span {
-            display: inline-flex;
-            width: 24px;
-            height: 24px;
-            align-items: center;
-            justify-content: center;
-            background: var(--accent-500);
-            color: #1b0a02;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            font-weight: 700;
-        }
-        .report-list { list-style: none; display: grid; gap: 0.45rem; }
-        .report-list li { display: flex; justify-content: space-between; gap: 1rem; border-bottom: 1px solid var(--paper-200); padding-bottom: 0.4rem; }
-        .report-list li:last-child { border-bottom: none; }
-        .report-label { font-weight: 600; color: var(--ink-600); }
-        .report-value { text-align: right; font-weight: 600; color: var(--ink-800); }
-
-        .overview-text { color: var(--ink-600); font-size: 0.95rem; margin-bottom: 0.8rem; }
-        .bullet-list { list-style: none; display: grid; gap: 0.4rem; color: var(--ink-600); font-size: 0.9rem; }
-        .bullet-list li::before { content: '*'; margin-right: 0.5rem; color: var(--accent-500); }
-
-        .value-row {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 0.8rem;
-        }
-        .value-box {
-            background: var(--paper-200);
-            border-radius: var(--radius-sm);
-            padding: 0.8rem 1rem;
-        }
-        .value-box h4 { font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-500); }
-        .value-box p { font-size: 1rem; font-weight: 700; margin-top: 0.3rem; color: var(--ink-800); }
-
-        .age-adjust {
-            margin-top: 0.8rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-        }
-        .age-adjust input {
-            width: 70px;
-            padding: 0.35rem 0.5rem;
-            border-radius: 6px;
-            border: 1px solid var(--paper-300);
-        }
-        .age-adjust button {
-            padding: 0.35rem 0.7rem;
-            border-radius: 6px;
-            border: none;
-            background: var(--accent-500);
-            font-weight: 700;
-            cursor: pointer;
-        }
-        .age-adjust button:hover { background: var(--accent-600); }
-
-        .replacement-block {
-            border: 1px solid var(--paper-300);
-            border-radius: var(--radius-sm);
-            padding: 0.9rem 1rem;
-            margin-bottom: 1rem;
-            background: var(--paper-200);
-        }
-        .replacement-status {
-            font-size: 0.85rem;
-            font-weight: 700;
-            margin-bottom: 0.6rem;
-        }
-        .replacement-status.match { color: var(--emerald-500); }
-        .replacement-status.none { color: var(--signal-500); }
-
-        .listing-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 0.8rem;
-        }
-        .listing-card {
-            background: #fff;
-            border-radius: var(--radius-sm);
-            padding: 0.7rem 0.8rem;
-            border: 1px solid var(--paper-300);
-        }
-        .listing-card a { text-decoration: none; color: var(--steel-500); font-weight: 600; }
-
-        .equivalent-card {
-            border: 1px solid var(--paper-300);
-            border-radius: var(--radius-sm);
-            padding: 1rem;
-            margin-bottom: 1rem;
-            background: #fff;
-        }
-        .equivalent-card h4 { font-size: 1rem; margin-bottom: 0.5rem; }
-        .spec-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.85rem;
-            margin-top: 0.8rem;
-        }
-        .spec-table th, .spec-table td {
-            border-bottom: 1px solid var(--paper-300);
-            padding: 0.4rem 0.5rem;
-            text-align: left;
-        }
-        .spec-table th { color: var(--ink-500); font-weight: 700; text-transform: uppercase; font-size: 0.65rem; }
-
-        .method-box { background: var(--paper-200); border-radius: var(--radius-sm); padding: 0.9rem 1rem; }
-        .disclosure-list { list-style: none; margin-top: 0.6rem; display: grid; gap: 0.3rem; color: var(--ink-600); font-size: 0.85rem; }
-        .disclosure-list li::before { content: '*'; margin-right: 0.4rem; color: var(--accent-500); }
-
-        .copy-box {
-            background: var(--ink-900);
-            color: var(--paper-100);
-            border-radius: var(--radius-sm);
-            padding: 1rem;
-        }
-        .copy-box textarea {
-            width: 100%;
-            min-height: 150px;
-            background: rgba(255,255,255,0.08);
-            color: var(--paper-100);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: var(--radius-sm);
-            padding: 0.7rem;
-            font-family: 'Source Sans 3', 'Segoe UI', sans-serif;
-            font-size: 0.85rem;
-        }
-        .copy-actions {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 0.6rem;
-            flex-wrap: wrap;
-            gap: 0.6rem;
-        }
-        .copy-actions small { color: rgba(247,245,239,0.7); }
-
-        .faq-grid {
+        .credibility-grid {
             display: grid;
             grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 1rem;
+            margin-top: 1.5rem;
         }
-        .faq-card {
-            background: rgba(255,255,255,0.05);
+        .cred-card {
+            background: rgba(255,255,255,0.04);
             border: 1px solid rgba(255,255,255,0.08);
             border-radius: var(--radius-md);
-            padding: 1rem;
+            padding: 1.2rem;
         }
-        .faq-card h4 { font-size: 1rem; margin-bottom: 0.4rem; }
-        .faq-card p { font-size: 0.9rem; color: rgba(247,245,239,0.7); }
+        .cred-card h3 { font-size: 1rem; margin-bottom: 0.5rem; }
+        .cred-card p { font-size: 0.9rem; color: rgba(248,250,252,0.7); }
 
         .footer {
-            padding: 2.5rem 0 3rem;
             border-top: 1px solid rgba(255,255,255,0.08);
-            margin-top: 3rem;
+            padding: 2rem 0;
+            margin-top: 2rem;
         }
         .footer-inner {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            gap: 2rem;
-            flex-wrap: wrap;
-        }
-        .footer-links {
-            display: flex;
             gap: 1rem;
             flex-wrap: wrap;
             font-size: 0.85rem;
-            color: rgba(247,245,239,0.7);
+            color: rgba(248,250,252,0.7);
         }
-        .footer-links a { text-decoration: none; }
-
-        .hidden { display: none !important; }
+        .footer-links { display: flex; flex-wrap: wrap; gap: 1rem; }
 
         @media (max-width: 900px) {
             .hero-grid { grid-template-columns: 1fr; }
             .feature-grid { grid-template-columns: 1fr; }
-            .faq-grid { grid-template-columns: 1fr; }
-            .value-row { grid-template-columns: 1fr; }
-        }
-        @media (max-width: 720px) {
-            .header-inner { flex-direction: column; align-items: flex-start; }
-            .header-ctas { width: 100%; justify-content: flex-start; flex-wrap: wrap; }
-            .hero { padding-top: 3rem; }
-        }
-        @media print {
-            .no-print { display: none !important; }
-            body { background: #fff; color: #000; }
-            .results-zone { margin-top: 0; }
-            .report-card { box-shadow: none; }
+            .credibility-grid { grid-template-columns: 1fr; }
+            .hero-metrics { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
-    <div class="bg-grid"></div>
-
-    <header class="site-header no-print">
+    <div class="bg"></div>
+    <header class="site-header">
         <div class="container header-inner">
             <a class="brand" href="index.html">Bolt Research Team <span>*</span></a>
             <nav class="header-nav">
                 <a href="#features">Features</a>
-                <a href="#how-it-works">How It Works</a>
-                <a href="#example">Example</a>
-                <a href="#access">Advanced Access</a>
-                <a href="#faq">FAQ</a>
+                <a href="#credibility">Credibility</a>
+                <a href="#workflow">Workflow</a>
                 <a href="#contact">Contact</a>
+                <a href="search.html">Search</a>
             </nav>
-            <div class="header-ctas">
-                <a class="btn ghost" href="#access">Request Advanced Access</a>
-                <a class="btn primary" href="#search">Try a Search</a>
-            </div>
         </div>
     </header>
 
@@ -559,11 +268,7 @@
                 <div>
                     <div class="eyebrow">Claims Documentation Workflow</div>
                     <h1>Universal Item Research for Claims</h1>
-                    <p>Search any item, model, serial, or keyword and get an age estimate, plain-English item overview, and LKQ replacement options with live pricing, formatted for claim documentation.</p>
-                    <div class="hero-actions">
-                        <a class="btn primary" href="#search">Try a Search</a>
-                        <a class="btn ghost" href="#access">Request Advanced Access</a>
-                    </div>
+                    <p>Search any item, model, serial, or keyword and get an age estimate, plain-English item overview, and LKQ replacement options with live pricing formatted for claim documentation.</p>
                     <div class="hero-metrics">
                         <div class="metric-card">
                             <div class="metric-label">Outputs</div>
@@ -578,28 +283,27 @@
                             <div class="metric-value">Search, print, document</div>
                         </div>
                     </div>
+                    <div class="cta-row">
+                        <a href="#search">Start a Claim-Ready Search</a>
+                    </div>
                 </div>
                 <div class="search-card">
-                    <h3>Start a claim-ready search</h3>
-                    <p>Enter an item, model, serial, or descriptive keyword. Results include age estimate, overview, and replacements.</p>
-                    <div class="search-field">
-                        <input type="text" id="query" class="search-input" placeholder="Example: Whirlpool WRS321SDHZ, MacBook Pro A2141, Dyson V10">
-                        <button class="search-btn" id="btn" onclick="performSearch()">Search</button>
-                    </div>
-                    <div class="examples">
+                    <h3>Search the claims workspace</h3>
+                    <p>Enter an item, model, serial, or descriptive keyword. You will be taken to the search workspace.</p>
+                    <form class="search-field" action="search.html" method="get">
+                        <input type="text" name="q" id="query" class="search-input" placeholder="Example: Whirlpool WRS321SDHZ, MacBook Pro A2141, Dyson V10" required>
+                        <button class="search-btn" type="submit">Search</button>
+                    </form>
+                    <div class="example-chips">
                         <span>"LG refrigerator LFXS26973"</span>
                         <span>"Samsung QN65Q80"</span>
                         <span>"Serial: C112233445"</span>
-                    </div>
-                    <div class="utility-bar">
-                        <small id="cache-status">No cached result.</small>
-                        <button class="utility-btn" onclick="clearCache()">Clear cache</button>
                     </div>
                 </div>
             </div>
         </section>
 
-        <section id="features" class="section">
+        <section class="section" id="features">
             <div class="container">
                 <h2>Features Built for Claims Teams</h2>
                 <p>Structured outputs so your documentation reads cleanly and defensibly.</p>
@@ -614,161 +318,41 @@
                     </div>
                     <div class="feature-card">
                         <h3>Replacement logic</h3>
-                        <p>Exact match detection and equivalent selection with spec comparison.</p>
+                        <p>Exact match detection and equivalent selection with concise comparison tables.</p>
                     </div>
                 </div>
             </div>
         </section>
 
-        <section id="example" class="section">
+        <section class="section" id="credibility">
             <div class="container">
-                <h2>Example Report Output</h2>
-                <p>Run a search to generate a structured report ready to print or copy into claim notes.</p>
+                <h2>Credibility and Controls</h2>
+                <p>Transparent outputs designed for claim file review and audit readiness.</p>
+                <div class="credibility-grid">
+                    <div class="cred-card">
+                        <h3>Transparent methodology</h3>
+                        <p>Each report includes a methodology and disclosure section so reviewers can see how outputs were derived.</p>
+                    </div>
+                    <div class="cred-card">
+                        <h3>Retailer filtering</h3>
+                        <p>Listings are prioritized for major direct retailers and filtered to avoid unverified marketplaces.</p>
+                    </div>
+                </div>
             </div>
         </section>
 
-        <div id="results" class="results-zone hidden">
-            <div class="results-inner">
-                <div class="results-header">
-                    <h2>Claim Research Report</h2>
-                    <div class="results-actions">
-                        <button onclick="copySummary()">Copy Summary</button>
-                        <button onclick="window.print()">Print to PDF</button>
-                    </div>
-                </div>
-
-                <div id="cache-banner" class="cache-banner hidden">
-                    <span id="cache-banner-text">Cached result.</span>
-                    <button onclick="refreshSearch()">Refresh</button>
-                </div>
-
-                <div class="report-grid">
-                    <div class="report-card">
-                        <h3><span>1</span> Item Overview</h3>
-                        <p class="overview-text" id="r-overview">Loading...</p>
-                        <ul class="bullet-list" id="r-key-differentiators"></ul>
-                        <ul class="report-list" style="margin-top: 0.8rem;">
-                            <li><span class="report-label">Technical Specs</span><span class="report-value" id="r-tech-specs"></span></li>
-                            <li><span class="report-label">Materials / Build</span><span class="report-value" id="r-materials"></span></li>
-                        </ul>
-                    </div>
-
-                    <div class="report-card">
-                        <h3><span>2</span> Age and Manufacturer Date</h3>
-                        <ul class="report-list">
-                            <li><span class="report-label">Manufacturer Date Range</span><span class="report-value" id="r-production-era"></span></li>
-                            <li><span class="report-label">Estimated Age</span><span class="report-value" id="r-estimated-age"></span></li>
-                            <li><span class="report-label">Confidence</span><span class="report-value" id="r-confidence"></span></li>
-                            <li><span class="report-label">Rationale</span><span class="report-value" id="r-rationale"></span></li>
-                        </ul>
-                    </div>
-
-                    <div class="report-card">
-                        <h3><span>3</span> Value</h3>
-                        <div class="value-row">
-                            <div class="value-box">
-                                <h4>Estimated Replacement Cost</h4>
-                                <p id="r-replacement-cost"></p>
-                            </div>
-                            <div class="value-box">
-                                <h4>Estimated ACV</h4>
-                                <p id="r-acv"></p>
-                            </div>
-                        </div>
-                        <p class="overview-text" id="r-value-note" style="margin-top: 0.6rem;"></p>
-                        <div class="age-adjust">
-                            <label for="acv-age-input">Adjust age (years):</label>
-                            <input type="number" id="acv-age-input" min="0" max="100" value="0">
-                            <button onclick="recalcACV()">Recalculate</button>
-                            <small id="r-acv-formula"></small>
-                        </div>
-                    </div>
-
-                    <div class="report-card">
-                        <h3><span>4</span> LKQ Replacements</h3>
-                        <div class="replacement-block" id="exact-match-block"></div>
-                        <div id="equivalents-block"></div>
-                        <div class="overview-text" id="replacement-note"></div>
-                        <div id="replacement-table"></div>
-                    </div>
-
-                    <div class="report-card">
-                        <h3><span>5</span> Methodology and Disclosures</h3>
-                        <div class="method-box" id="r-method"></div>
-                        <ul class="disclosure-list" id="r-disclosures"></ul>
-                        <div class="overview-text" style="margin-top: 0.8rem;"><strong>Technical References</strong></div>
-                        <ul class="bullet-list" id="r-tech-refs"></ul>
-                        <div class="overview-text" style="margin-top: 0.8rem;"><strong>Diagnostics Resources</strong></div>
-                        <div id="r-diagnostics"></div>
-                    </div>
-
-                    <div class="report-card">
-                        <h3><span>6</span> Copy Summary</h3>
-                        <div class="copy-box">
-                            <textarea id="copy-summary-text" readonly></textarea>
-                            <div class="copy-actions">
-                                <small id="copy-status">Ready to copy.</small>
-                                <button class="btn light" onclick="copySummary()">Copy Summary</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <section id="how-it-works" class="section">
+        <section class="section" id="workflow">
             <div class="container">
-                <h2>How It Works</h2>
-                <p>We assemble item description, age range, valuation inputs, and replacement logic into a standardized claim note, with explicit disclosures for auditability.</p>
+                <h2>Workflow Fit</h2>
+                <p>Use the search workspace for structured results, print to PDF, and copy summaries directly into claim notes.</p>
             </div>
         </section>
 
-        <section id="access" class="section">
-            <div class="container">
-                <h2>Advanced Access</h2>
-                <p>Need claims workflow integrations, bulk research, or carrier-specific reporting? Request advanced access and tell us what you need.</p>
-                <div class="search-card" style="margin-top: 1.5rem;">
-                    <form onsubmit="event.preventDefault(); alert('Thanks for your request. We will follow up soon.'); this.reset();">
-                        <div style="display: grid; gap: 0.8rem;">
-                            <input type="text" class="search-input" placeholder="Full name" required>
-                            <input type="email" class="search-input" placeholder="Work email" required>
-                            <input type="text" class="search-input" placeholder="Company / team" required>
-                            <textarea class="search-input" placeholder="Tell us about your claims workflow" rows="3" required></textarea>
-                            <button class="btn primary" type="submit">Request Advanced Access</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </section>
-
-        <section id="faq" class="section">
-            <div class="container">
-                <h2>FAQ</h2>
-                <div class="faq-grid">
-                    <div class="faq-card">
-                        <h4>Is the data verified?</h4>
-                        <p>We surface available market listings and product signals with clear disclosures for validation.</p>
-                    </div>
-                    <div class="faq-card">
-                        <h4>Does it support ACV?</h4>
-                        <p>If ACV is included in the results, it is shown separately from replacement cost.</p>
-                    </div>
-                    <div class="faq-card">
-                        <h4>Can I export?</h4>
-                        <p>Use Print to PDF for claim files or copy the condensed summary.</p>
-                    </div>
-                    <div class="faq-card">
-                        <h4>Can I request integrations?</h4>
-                        <p>Yes, use the Advanced Access request and we will follow up.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="contact" class="section">
+        <section class="section" id="contact">
             <div class="container">
                 <h2>Contact</h2>
                 <p>For access requests or questions, email <strong>contact@yourcompany.com</strong>.</p>
-                <p style="margin-top:0.5rem; font-size:0.9rem; color: rgba(247,245,239,0.6);">Replace with your preferred contact email.</p>
+                <p style="margin-top:0.5rem; font-size:0.9rem; color: rgba(248,250,252,0.6);">Replace with your preferred contact email.</p>
             </div>
         </section>
     </main>
@@ -777,443 +361,17 @@
         <div class="container footer-inner">
             <div>
                 <div class="brand">Bolt Research Team <span>*</span></div>
-                <p style="color: rgba(247,245,239,0.6); margin-top: 0.6rem; max-width: 380px;">Claim-ready item research for adjusters and claims teams. Search, document, and export with defensible structure.</p>
+                <p style="margin-top:0.5rem; max-width:360px;">Claim-ready item research for adjusters and claims teams.</p>
             </div>
             <div class="footer-links">
                 <a href="privacy.html">Privacy</a>
                 <a href="terms.html">Terms</a>
                 <a href="disclaimer.html">Disclaimer</a>
+                <a href="search.html">Search</a>
                 <a href="item-age.html">Item Age Lookup</a>
                 <a href="who-we-are.html">Who We Are</a>
             </div>
         </div>
     </footer>
-
-    <script>
-        const CACHE_VERSION = 1;
-        const CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
-        let acvData = {};
-        let lastQuery = '';
-        let lastFilters = {};
-        let lastResult = null;
-
-        document.getElementById('query').addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') performSearch();
-        });
-
-        function normalizeQuery(query) {
-            return query.trim().toLowerCase().replace(/\s+/g, ' ');
-        }
-
-        function getFilters() {
-            return {};
-        }
-
-        function buildCacheKey(query, filters) {
-            const filterKey = encodeURIComponent(JSON.stringify(filters));
-            return `bolt_cache_v${CACHE_VERSION}_${normalizeQuery(query)}_${filterKey}`;
-        }
-
-        function readCache(key) {
-            const raw = localStorage.getItem(key);
-            if (!raw) return null;
-            try {
-                const payload = JSON.parse(raw);
-                if (!payload || !payload.timestamp || !payload.data || payload.version !== CACHE_VERSION) return null;
-                if (Date.now() - payload.timestamp > CACHE_TTL_MS) return null;
-                return payload;
-            } catch {
-                return null;
-            }
-        }
-
-        function writeCache(key, data) {
-            localStorage.setItem(key, JSON.stringify({
-                version: CACHE_VERSION,
-                timestamp: Date.now(),
-                data
-            }));
-        }
-
-        function updateCacheStatus(text) {
-            document.getElementById('cache-status').innerText = text;
-        }
-
-        function showCacheBanner(isCached, timestamp) {
-            const banner = document.getElementById('cache-banner');
-            if (!isCached) {
-                banner.classList.add('hidden');
-                return;
-            }
-            const date = new Date(timestamp);
-            document.getElementById('cache-banner-text').innerText = `Cached result (last updated ${date.toLocaleString()}).`;
-            banner.classList.remove('hidden');
-        }
-
-        function refreshSearch() {
-            performSearch({ forceRefresh: true });
-        }
-
-        function clearCache() {
-            Object.keys(localStorage).forEach(key => {
-                if (key.startsWith('bolt_cache_v')) localStorage.removeItem(key);
-            });
-            updateCacheStatus('Cache cleared.');
-        }
-
-        function recalcACV() {
-            const age = parseFloat(document.getElementById('acv-age-input').value);
-            if (isNaN(age) || age < 0 || !acvData.msrp) return;
-            const msrp = acvData.msrp;
-            const rate = acvData.rate / 100;
-            const condition = acvData.condition;
-            const newACV = msrp * Math.pow(1 - rate, age) * condition;
-            document.getElementById('r-acv').innerText = '$' + newACV.toFixed(2);
-            document.getElementById('r-acv-formula').innerText =
-                '$' + msrp.toFixed(2) + ' x (1 - ' + rate.toFixed(2) + ')^' + age + ' x ' + condition + ' = $' + newACV.toFixed(2);
-        }
-
-        function buildOutboundLink(url, meta) {
-            return url;
-        }
-
-        function formatMoney(value) {
-            if (!value) return 'Not provided';
-            if (typeof value === 'string') return value;
-            return '$' + Number(value).toFixed(2);
-        }
-
-        function makeArrayFromText(text) {
-            if (!text) return [];
-            if (Array.isArray(text)) return text;
-            return String(text).split(/\.|;|\n/).map(s => s.trim()).filter(Boolean).slice(0, 4);
-        }
-
-        function selectSpecRow(table, keywords) {
-            if (!table || table.length === 0) return null;
-            return table.find(row => keywords.some(k => String(row.label || '').toLowerCase().includes(k))) || null;
-        }
-
-        function buildSpecComparison(table, optionKey) {
-            const categories = [
-                { label: 'Form factor / type', keywords: ['type', 'form'] },
-                { label: 'Capacity / size', keywords: ['capacity', 'size', 'volume', 'width', 'height', 'depth', 'inch', 'cu'] },
-                { label: 'Core performance', keywords: ['power', 'speed', 'rpm', 'btu', 'watt', 'voltage', 'amp', 'performance'] },
-                { label: 'Materials / build tier', keywords: ['material', 'build', 'construction', 'finish'] },
-                { label: 'Feature tier', keywords: ['feature', 'smart', 'mode', 'tech'] },
-                { label: 'Warranty class', keywords: ['warranty', 'coverage'] }
-            ];
-            return categories.map(cat => {
-                const row = selectSpecRow(table, cat.keywords);
-                return {
-                    label: cat.label,
-                    original: row ? row.original : 'Not provided',
-                    option: row ? row[optionKey] : 'Not provided'
-                };
-            });
-        }
-
-        function buildEquivalentsFromTable(table) {
-            if (!table || table.length === 0) return [];
-            const modelRow = table.find(row => String(row.label || '').toLowerCase().includes('model'));
-            const option1Name = (modelRow && modelRow.option1) ? modelRow.option1 : 'Option 1';
-            const option2Name = (modelRow && modelRow.option2) ? modelRow.option2 : 'Option 2';
-            const reasons = table.slice(0, 3).map(row => `${row.label}: ${row.option1 || row.option2 || row.brandMatch || ''}`.trim()).filter(Boolean);
-            return [
-                {
-                    name: option1Name,
-                    tier: 'Closest available option in current replacement table',
-                    reasons: reasons.slice(0, 3),
-                    specs: buildSpecComparison(table, 'option1'),
-                    listings: []
-                },
-                {
-                    name: option2Name,
-                    tier: 'Alternate comparable option in current replacement table',
-                    reasons: reasons.slice(0, 3),
-                    specs: buildSpecComparison(table, 'option2'),
-                    listings: []
-                }
-            ];
-        }
-
-        function buildCopySummary(data, query) {
-            const a = data.analysis || {};
-            const rd = data.releaseDate || {};
-            const v = data.valuation || {};
-            const replacements = data.replacements || {};
-            const hasExact = replacements.exactMatches && replacements.exactMatches[0];
-            const firstExact = hasExact ? replacements.exactMatches[0] : null;
-            const firstEquivalent = (replacements.equivalents && replacements.equivalents[0]) ? replacements.equivalents[0] : null;
-            const exact = hasExact
-                ? `Exact match found: ${firstExact.title || 'Exact match'}`
-                : `Best equivalent: ${(firstEquivalent && firstEquivalent.name) ? firstEquivalent.name : 'Closest available option'} (closest spec match)`;
-            const listingSummary = (replacements.exactMatches && replacements.exactMatches.length)
-                ? replacements.exactMatches.slice(0, 3).map(l => `${l.retailer} - ${l.price}`).join(', ')
-                : (replacements.equivalents && replacements.equivalents[0] && replacements.equivalents[0].listings)
-                    ? replacements.equivalents[0].listings.slice(0, 3).map(l => `${l.retailer} - ${l.price}`).join(', ')
-                    : 'Listings not provided';
-            const range = rd.productionEra || a.age || 'Unknown';
-            const confidence = rd.confidence || a.modelConfidence || 'Unknown';
-            const method = data.howItWorks ? String(data.howItWorks).split('. ')[0] + '.' : 'Signals include model and serial inputs with replacement selection based on match and closest equivalent logic.';
-            const brand = a.brand || 'Unknown';
-            const model = a.model || 'Unknown';
-
-            return `Claim Note - Bolt Research Team\n` +
-                `Item: ${query}\n` +
-                `Brand/Model: ${brand} ${model}\n` +
-                `Estimated Mfr Date/Age: ${range} (${confidence})\n` +
-                `Value: Est. Replacement Cost: ${formatMoney(v.estimatedReplacementCost || a.msrp || '')} | Est. ACV: ${v.estimatedACV || 'Not provided'}\n` +
-                `LKQ Replacement: ${exact}\n` +
-                `Comparable Listings: ${listingSummary}\n` +
-                `Method: ${method}\n` +
-                `Disclosure: Estimates; verify where required.`;
-        }
-
-        function renderReplacements(data, table) {
-            const replacements = data.replacements || {};
-            const exactMatches = replacements.exactMatches || [];
-            const exactBlock = document.getElementById('exact-match-block');
-
-            if (exactMatches.length > 0) {
-                exactBlock.innerHTML = `
-                    <div class="replacement-status match">Exact match found</div>
-                    <div class="listing-grid">
-                        ${exactMatches.slice(0, 3).map(match => {
-                            const link = buildOutboundLink(match.url, { retailer: match.retailer, sku: match.sku });
-                            return `
-                                <div class="listing-card">
-                                    <div><strong>${match.title || 'Exact match'}</strong></div>
-                                    <div>${match.retailer || 'Retailer'} - ${match.price || 'Price unavailable'}</div>
-                                    <a href="${link}" target="_blank" rel="sponsored noopener noreferrer">View listing</a>
-                                </div>
-                            `;
-                        }).join('')}
-                    </div>
-                `;
-            } else {
-                exactBlock.innerHTML = `
-                    <div class="replacement-status none">No exact match found in current dataset</div>
-                    <p class="overview-text">If an exact model appears at known retailers, it will be listed here.</p>
-                `;
-            }
-
-            let equivalents = replacements.equivalents || [];
-            if (!equivalents.length) equivalents = buildEquivalentsFromTable(table);
-
-            const equivalentsBlock = document.getElementById('equivalents-block');
-            if (!equivalents.length) {
-                equivalentsBlock.innerHTML = '<p class="overview-text">No equivalents provided.</p>';
-                return;
-            }
-
-            equivalentsBlock.innerHTML = equivalents.map((eq, index) => {
-                const reasons = (eq.reasons || []).slice(0, 3);
-                const listings = eq.listings || [];
-                const specs = eq.specs || buildSpecComparison(table, index === 0 ? 'option1' : 'option2');
-
-                return `
-                    <div class="equivalent-card">
-                        <h4>${eq.name || 'Equivalent'} <small style="color: var(--ink-500); font-weight: 600;">${eq.tier || ''}</small></h4>
-                        <div class="overview-text">Why it is comparable:</div>
-                        <ul class="bullet-list">
-                            ${reasons.length ? reasons.map(r => `<li>${r}</li>`).join('') : '<li>Comparable specification tier based on available data.</li>'}
-                        </ul>
-                        <table class="spec-table">
-                            <thead>
-                                <tr><th>Category</th><th>Original</th><th>Equivalent</th></tr>
-                            </thead>
-                            <tbody>
-                                ${specs.map(row => `
-                                    <tr>
-                                        <td>${row.label}</td>
-                                        <td>${row.original || 'Not provided'}</td>
-                                        <td>${row.option || 'Not provided'}</td>
-                                    </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
-                        <div class="listing-grid" style="margin-top: 0.8rem;">
-                            ${listings.length ? listings.slice(0, 3).map(listing => {
-                                const link = buildOutboundLink(listing.url, { retailer: listing.retailer, sku: listing.sku });
-                                return `
-                                    <div class="listing-card">
-                                        <div><strong>${listing.retailer || 'Retailer'}</strong></div>
-                                        <div>${listing.price || 'Price unavailable'}</div>
-                                        <a href="${link}" target="_blank" rel="sponsored noopener noreferrer">View listing</a>
-                                    </div>
-                                `;
-                            }).join('') : '<div class="listing-card">No active listings provided.</div>'}
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function renderReplacementTable(table) {
-            if (!table || !table.length) {
-                document.getElementById('replacement-table').innerHTML = '';
-                return;
-            }
-            const headers = `<tr><th>Feature</th><th>Original</th><th>Brand Match</th><th>Option 1</th><th>Option 2</th></tr>`;
-            const rows = table.map(row => `
-                <tr>
-                    <td>${row.label}</td>
-                    <td>${row.original}</td>
-                    <td>${row.brandMatch}</td>
-                    <td>${row.option1}</td>
-                    <td>${row.option2}</td>
-                </tr>
-            `).join('');
-            document.getElementById('replacement-table').innerHTML = `
-                <div class="overview-text" style="margin-top:0.8rem;">Replacement comparison matrix:</div>
-                <table class="spec-table">${headers}${rows}</table>
-            `;
-        }
-
-        function renderResults(data, options) {
-            const a = data.analysis || {};
-            const rd = data.releaseDate || {};
-            const v = data.valuation || {};
-            const table = data.table || [];
-            const technical = data.technical || {};
-            const replacements = data.replacements || {};
-
-            const outboundLinks = [];
-            if (replacements.exactMatches) {
-                replacements.exactMatches.forEach(match => {
-                    outboundLinks.push({ retailer: match.retailer, sku: match.sku, url: match.url });
-                });
-            }
-            if (replacements.equivalents) {
-                replacements.equivalents.forEach(eq => {
-                    if (eq.listings) {
-                        eq.listings.forEach(listing => {
-                            outboundLinks.push({ retailer: listing.retailer, sku: listing.sku, url: listing.url });
-                        });
-                    }
-                });
-            }
-            data.outboundLinks = outboundLinks;
-
-            document.getElementById('r-overview').innerText = a.overview || a.descriptionMain || 'No overview provided.';
-            const differentiators = makeArrayFromText(a.keyDetails || a.detailsMain || a.descriptionExtra || '');
-            document.getElementById('r-key-differentiators').innerHTML = differentiators.length
-                ? differentiators.map(item => `<li>${item}</li>`).join('')
-                : '<li>No differentiators provided.</li>';
-
-            document.getElementById('r-tech-specs').innerText = a.technicalSpecs || 'Not provided';
-            document.getElementById('r-materials').innerText = a.materials || 'Not provided';
-
-            document.getElementById('r-production-era').innerText = rd.productionEra || a.age || 'Unknown';
-            document.getElementById('r-estimated-age').innerText = rd.estimatedAge || a.age || 'Unknown';
-            document.getElementById('r-confidence').innerText = rd.confidence || a.modelConfidence || 'Unknown';
-            document.getElementById('r-rationale').innerText = rd.rationale || (a.decodingMethod && a.decodingMethod.summary) || 'Based on available model and serial inputs with product lifecycle references.';
-
-            document.getElementById('r-replacement-cost').innerText = formatMoney(v.estimatedReplacementCost || a.msrp || v.msrp || '');
-            document.getElementById('r-acv').innerText = v.estimatedACV || 'Not provided';
-            document.getElementById('r-value-note').innerText = v.acvNote || v.annualDepreciationDisplay || '';
-
-            acvData = {
-                msrp: a.msrpNumeric || parseFloat(String(a.msrp || '').replace(/[^0-9.]/g, '')) || 0,
-                rate: v.annualDepreciationPercent || 10,
-                condition: v.conditionFactor || 0.75
-            };
-            document.getElementById('acv-age-input').value = rd.ageNumeric || 0;
-            document.getElementById('r-acv-formula').innerText = v.acvFormula || '';
-
-            renderReplacements(data, table);
-            renderReplacementTable(table);
-            document.getElementById('replacement-note').innerText = data.replacementNotes || '';
-
-            document.getElementById('r-method').innerText = data.howItWorks || 'Methodology not provided.';
-            document.getElementById('r-disclosures').innerHTML = [
-                'Estimates are provided for documentation support only.',
-                'Verify exact model and pricing where required.',
-                'Listings and availability can change after report generation.'
-            ].map(item => `<li>${item}</li>`).join('');
-
-            const techRefs = [];
-            if (technical.manual && technical.manual !== 'N/A') {
-                const manualLink = buildOutboundLink(technical.manual, { type: 'manual' });
-                techRefs.push(`<li><a href="${manualLink}" target="_blank" rel="sponsored noopener noreferrer">Service manual</a></li>`);
-            }
-            if (technical.recalls) techRefs.push(`<li>Recalls: ${technical.recalls}</li>`);
-            if (technical.failures) techRefs.push(`<li>Failure patterns: ${technical.failures}</li>`);
-            if (technical.legal) techRefs.push(`<li>Legal / class action: ${technical.legal}</li>`);
-            if (technical.errorCodes && technical.errorCodes.length) techRefs.push(`<li>Error codes: ${technical.errorCodes.length} documented</li>`);
-            document.getElementById('r-tech-refs').innerHTML = techRefs.length ? techRefs.join('') : '<li>No technical references provided.</li>';
-
-            const diagContainer = document.getElementById('r-diagnostics');
-            if (data.diagnostics && data.diagnostics.length) {
-                diagContainer.innerHTML = '<ul class="bullet-list">' +
-                    data.diagnostics.map(d => {
-                        const link = buildOutboundLink(d.url, { source: d.source });
-                        return `<li><a href="${link}" target="_blank" rel="sponsored noopener noreferrer">${d.title}</a> - ${d.source || 'Source'}</li>`;
-                    }).join('') +
-                    '</ul>';
-            } else {
-                diagContainer.innerHTML = '<p class="overview-text">No diagnostic resources provided.</p>';
-            }
-
-            const summaryText = buildCopySummary(data, lastQuery);
-            document.getElementById('copy-summary-text').value = summaryText;
-
-            if (options && options.cached) {
-                showCacheBanner(true, options.timestamp);
-                updateCacheStatus('Serving cached result.');
-            } else {
-                showCacheBanner(false);
-                updateCacheStatus('Results updated just now.');
-            }
-
-            document.getElementById('results').classList.remove('hidden');
-        }
-
-        async function performSearch(options = {}) {
-            const queryInput = document.getElementById('query');
-            const query = queryInput.value.trim();
-            if (!query) return;
-            lastQuery = query;
-            lastFilters = getFilters();
-
-            const cacheKey = buildCacheKey(query, lastFilters);
-            if (!options.forceRefresh) {
-                const cached = readCache(cacheKey);
-                if (cached) {
-                    lastResult = cached.data;
-                    renderResults(cached.data, { cached: true, timestamp: cached.timestamp });
-                    return;
-                }
-            }
-
-            document.getElementById('results').classList.add('hidden');
-            updateCacheStatus('Searching...');
-
-            try {
-                const res = await fetch(`/api/search?query=${encodeURIComponent(query)}`);
-                const data = await res.json();
-                lastResult = data;
-                writeCache(cacheKey, data);
-                renderResults(data, { cached: false });
-            } catch (e) {
-                alert('Error retrieving data.');
-                updateCacheStatus('Search failed.');
-            }
-        }
-
-        async function copySummary() {
-            const textarea = document.getElementById('copy-summary-text');
-            if (!textarea.value) return;
-            try {
-                await navigator.clipboard.writeText(textarea.value);
-                document.getElementById('copy-status').innerText = 'Copied to clipboard.';
-            } catch {
-                textarea.select();
-                document.execCommand('copy');
-                document.getElementById('copy-status').innerText = 'Copied to clipboard.';
-            }
-        }
-    </script>
 </body>
 </html>
