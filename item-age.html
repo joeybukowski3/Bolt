@@ -118,12 +118,6 @@
             white-space: nowrap;
         }
         .nav-brand .bolt-icon { color: var(--accent); }
-        .brand-tagline {
-            font-size: 0.75rem;
-            font-style: italic;
-            color: #64748b;
-            white-space: nowrap;
-        }
         .nav-links {
             display: flex;
             align-items: center;
@@ -306,7 +300,6 @@
         @media (max-width: 640px) {
             .nav { flex-direction: column; gap: 0.5rem; align-items: flex-start; }
             .nav-left { flex-wrap: wrap; }
-            .brand-tagline { display: none; }
             .nav-links { gap: 0.25rem; }
             .nav-link { padding: 0.4rem 0.6rem; font-size: 0.75rem; }
             .content-zone { padding: 2rem 1rem 3rem; border-radius: 16px 16px 0 0; }
@@ -327,12 +320,10 @@
         <nav class="nav">
             <div class="nav-left">
                 <a class="nav-brand" href="index.html">Bolt <span class="bolt-icon">&#9889;</span></a>
-                <span class="brand-tagline">The World's 1st AI assistant built for insurance industry experts by insurance industry experts</span>
             </div>
             <div class="nav-links">
                 <a href="index.html" class="nav-link">Item Lookup</a>
                 <a href="item-age.html" class="nav-link active">How Old is my Item?</a>
-                <a href="who-we-are.html" class="nav-link">Who We Are</a>
             </div>
         </nav>
 

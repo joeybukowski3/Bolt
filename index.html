@@ -70,8 +70,6 @@
         .nav { display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 0; }
         .nav-left { display: flex; align-items: center; gap: 0.75rem; }
         .nav-brand { display: flex; align-items: center; gap: 0.3rem; font-size: 1.3rem; font-weight: 800; color: var(--text-white); text-decoration: none; white-space: nowrap; }
-        .nav-brand .bolt-icon { color: var(--accent); }
-        .brand-tagline { font-size: 0.75rem; font-style: italic; color: #64748b; white-space: nowrap; }
         .nav-links { display: flex; align-items: center; gap: 0.5rem; }
         .nav-link { color: var(--text-light); text-decoration: none; font-size: 0.875rem; font-weight: 500; padding: 0.5rem 1rem; border-radius: 8px; transition: all 0.2s; cursor: pointer; white-space: nowrap; }
         .nav-link:hover { color: var(--text-white); background: rgba(255,255,255,0.06); }
@@ -219,7 +217,6 @@
         @media (max-width: 640px) {
             .nav { flex-direction: column; gap: 0.5rem; align-items: flex-start; }
             .nav-left { flex-wrap: wrap; }
-            .brand-tagline { display: none; }
             .hero { padding: 1.5rem 0 1rem; }
             .stats-bar { gap: 0.5rem; }
             .stat-item { padding: 0.5rem 0.75rem; }
@@ -245,12 +242,10 @@
         <nav class="nav no-print">
             <div class="nav-left">
                 <a class="nav-brand" href="index.html">Bolt <span class="bolt-icon">&#9889;</span></a>
-                <span class="brand-tagline">The World's 1st AI assistant built for insurance industry experts by insurance industry experts</span>
             </div>
             <div class="nav-links">
                 <a href="index.html" class="nav-link active">Item Lookup</a>
                 <a href="item-age.html" class="nav-link">How Old is my Item?</a>
-                <a href="who-we-are.html" class="nav-link">Who We Are</a>
             </div>
         </nav>
 
