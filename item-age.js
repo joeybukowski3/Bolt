@@ -11,13 +11,14 @@
         example: 'R1234567890',
         decode: (serial) => {
           if (serial.length < 10) return null;
-          const char8 = serial.charAt(serial.length - 3).toUpperCase();
-          const char9 = serial.charAt(serial.length - 2).toUpperCase();
-          const year = YEAR_MAP_S[char8];
+          // Robust targeting for 15-char vs variable lengths
+          const yearChar = serial.length >= 15 ? serial.charAt(7).toUpperCase() : serial.charAt(serial.length - 3).toUpperCase();
+          const monthChar = serial.length >= 15 ? serial.charAt(8).toUpperCase() : serial.charAt(serial.length - 2).toUpperCase();
+          const year = YEAR_MAP_S[yearChar];
           const monthCodes = { '1': 'Jan', '2': 'Feb', '3': 'Mar', '4': 'Apr', '5': 'May', '6': 'Jun', '7': 'Jul', '8': 'Aug', '9': 'Sep', 'A': 'Oct', 'B': 'Nov', 'C': 'Dec' };
-          const month = monthCodes[char9];
+          const month = monthCodes[monthChar];
           if (!year || !month) return null;
-          return { month, year, details: `Samsung: Char 8 (${char8}) = Year, Char 9 (${char9}) = Month.` };
+          return { month, year, details: `Samsung: Character at position ${serial.length >= 15 ? 8 : '8 from end'} is year, next is month.` };
         }
       },
       'Whirlpool': { example: 'CYW1234567', decode: (s) => decodeWhirlpoolStyle(s, 2) },
@@ -217,7 +218,7 @@
     document.getElementById('age-loading').classList.remove('hidden');
 
     try {
-      const res = await fetch(`/api/search?query=${encodeURIComponent(query)}`);
+      const res = await fetch(`/api/search?mode=age&query=${encodeURIComponent(query)}`);
       const data = await res.json();
       const a = data.analysis || {};
       const rd = data.releaseDate || {};
@@ -306,7 +307,7 @@
         document.getElementById('age-loading').classList.remove('hidden');
 
         try {
-          const res = await fetch(`/api/search?query=${encodeURIComponent(query)}`);
+          const res = await fetch(`/api/search?mode=age&query=${encodeURIComponent(query)}`);
           const data = await res.json();
           document.getElementById('result-title').innerText = `${brand} Model Research: ${model}`;
           document.getElementById('result-body').innerText = data.releaseDate?.estimatedAge || data.analysis?.overview || 'No specific age found.';
