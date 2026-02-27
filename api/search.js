@@ -56,6 +56,13 @@ Provide a detailed analysis in this EXACT JSON format (no extra text, just valid
       "details": "full decoding breakdown"        
     }
   },
+  "adjusterNotes": {
+    "likeKindRationale": "why the recommended replacements are like-kind/quality",
+    "availabilitySummary": "current availability / lead time summary",
+    "warrantySummary": "warranty coverage snapshot for recommended replacements",
+    "discontinuedImpact": "how discontinuation affects pricing/availability",
+    "serialDecodingSummary": "high-level summary of serial/date code logic if applicable"
+  },
   "releaseDate": {
     "productionEra": "production date range, e.g. late 1990s through approximately 2019",
     "discontinuation": "when/why discontinued, or Currently in production if still made",
@@ -88,6 +95,7 @@ Provide a detailed analysis in this EXACT JSON format (no extra text, just valid
     "manual": "N/A",
     "recalls": "recall info or None found",       
     "failures": "common issues or None",
+    "symptoms": "common user-reported symptoms or None",
     "legal": "legal issues or None",
     "errorCodes": [
       {"code": "E1 or F01", "description": "brief description of what this error means"}

@@ -109,6 +109,14 @@ async function performSearch() {
         updateText('r-acv-formula', v.acvFormula);
         updateText('r-acv-note', v.acvNote);
 
+        // Adjuster Notes
+        const notes = data.adjusterNotes || {};
+        updateText('r-like-kind', notes.likeKindRationale);
+        updateText('r-availability', notes.availabilitySummary);
+        updateText('r-warranty', notes.warrantySummary);
+        updateText('r-discontinued-impact', notes.discontinuedImpact);
+        updateText('r-serial-decoding', notes.serialDecodingSummary);
+
         // Store for recalculation
         const ageNum = rd.ageNumeric || 0;
         acvData = {
@@ -142,6 +150,7 @@ async function performSearch() {
         }
         updateText('r-recalls', tech.recalls);
         updateText('r-failures', tech.failures);
+        updateText('r-symptoms', tech.symptoms);
         updateText('r-legal', tech.legal);
 
         // Error Codes
