@@ -122,7 +122,7 @@ async function performSearch() {
         // Section 2: Replacement Table
         const tbody = document.getElementById('table-body');
         if (tbody && data.table) {
-            tbody.innerHTML = data.table.slice(0, 7).map(row => `
+            tbody.innerHTML = data.table.map(row => `
                 <tr>
                     <td>${row.label || ''}</td>
                     <td>${row.original || ''}</td>

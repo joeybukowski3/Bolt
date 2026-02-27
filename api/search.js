@@ -32,56 +32,75 @@ export default async function handler(req, res) {
          },
          "howItWorks": "Brief operation explanation"
        }`
-    : `You are a product research assistant for insurance claims adjusters. Research: ${query}
-       Return ONLY a valid JSON object. No markdown, no backticks.
-       JSON format:
+    : `You are a product research assistant for insurance claims adjusters. Research the following item: ${query}
+
+Provide a detailed analysis in this EXACT JSON format (no extra text, just valid JSON):
+
 {
   "analysis": {
     "entered": "${query}",
-    "quickSummary": "category label",      
+    "quickSummary": "short category label under 8 words",      
     "modelConfidence": "exact or estimated",      
-    "estimatedModel": "model identifier",
-    "overview": "2-3 sentence paragraph",       
-    "itemDescription": "physical description",
-    "keyDetails": "functional details",
-    "technicalSpecs": "Label: Value, Label: Value",
-    "materials": "primary materials",
-    "status": "availability",        
-    "msrp": "$0.00",
-    "msrpNumeric": 0,
-    "decodingMethod": { "available": true, "summary": "logic summary", "details": "breakdown" }
+    "estimatedModel": "the specific model you based your research on",
+    "overview": "2-3 sentence paragraph describing the item, its brand, and general context",       
+    "itemDescription": "concise physical/functional description",
+    "keyDetails": "key functional details, compatibility info, notable design features",
+    "technicalSpecs": "specific technical specifications like voltage, dimensions, capacity, ratings",
+    "materials": "primary materials used in construction",
+    "status": "availability status (e.g. Discontinued, Currently Available, Limited Stock)",        
+    "msrp": "original MSRP or estimated price range as a string",
+    "msrpNumeric": 899,
+    "decodingMethod": {
+      "available": true,
+      "summary": "short label like Serial number encodes year and factory",
+      "details": "full decoding breakdown"        
+    }
   },
   "releaseDate": {
-    "productionEra": "YYYY-YYYY",
-    "discontinuation": "info",
-    "estimatedAge": "X years",
-    "ageNumeric": 0,
-    "serviceLife": "context"
+    "productionEra": "production date range, e.g. late 1990s through approximately 2019",
+    "discontinuation": "when/why discontinued, or Currently in production if still made",
+    "estimatedAge": "specific age estimate with reasoning",
+    "ageNumeric": 5,
+    "serviceLife": "expected design life and current life stage"
   },
   "valuation": {
     "annualDepreciationPercent": 15,
-    "annualDepreciationDisplay": "15%",
-    "estimatedACV": "$0.00",
-    "acvFormula": "math",
-    "acvNote": "context"
+    "annualDepreciationDisplay": "15% or 3% - 5% for ranges",
+    "lifeExpectancyYears": 7,
+    "conditionFactor": 0.75,
+    "estimatedACV": "$487.23",
+    "acvFormula": "$899 × (1 - 0.15)^3 × 0.75 = $487.23",
+    "acvNote": "optional 1-2 sentence context about the valuation"
   },
   "table": [
-    {"label": "Model", "original": "orig", "brandMatch": "match", "option1": "opt1", "option2": "opt2"},
-    {"label": "Key Specs", "original": "orig", "brandMatch": "match", "option1": "opt1", "option2": "opt2"},
-    {"label": "Price (New)", "original": "orig", "brandMatch": "match", "option1": "opt1", "option2": "opt2"},
-    {"label": "Retailers", "original": "orig", "brandMatch": "match", "option1": "opt1", "option2": "opt2"}
+    {"label": "Model", "original": "exact model name/number of original", "brandMatch": "specific model name/number of same-brand replacement", "option1": "specific model name/number alt 1", "option2": "specific model name/number alt 2"},
+    {"label": "Recommended Replacement", "original": "original item name", "brandMatch": "best same-brand replacement", "option1": "best comparable replacement", "option2": "value alternative"},
+    {"label": "Key Specs", "original": "key specs of original", "brandMatch": "key specs", "option1": "key specs", "option2": "key specs"},
+    {"label": "Size / Capacity", "original": "size or capacity", "brandMatch": "size or capacity", "option1": "size or capacity", "option2": "size or capacity"},
+    {"label": "Feature Match", "original": "notable features", "brandMatch": "match notes", "option1": "match notes", "option2": "match notes"},
+    {"label": "Price (New)", "original": "original MSRP or current new price", "brandMatch": "current retail price", "option1": "current retail price", "option2": "current retail price"},
+    {"label": "Availability", "original": "status", "brandMatch": "availability/lead time", "option1": "availability/lead time", "option2": "availability/lead time"},
+    {"label": "Warranty", "original": "warranty info", "brandMatch": "warranty info", "option1": "warranty info", "option2": "warranty info"},
+    {"label": "Retailers", "original": "2-3 retailers that sell it new", "brandMatch": "2-3 retailers", "option1": "2-3 retailers", "option2": "2-3 retailers"},
+    {"label": "Notes", "original": "replacement notes", "brandMatch": "notes", "option1": "notes", "option2": "notes"}
   ],
   "technical": {
     "manual": "N/A",
-    "recalls": "info",
-    "failures": "info",
-    "legal": "info",
-    "errorCodes": [],
-    "errorCodesSource": null
+    "recalls": "recall info or None found",       
+    "failures": "common issues or None",
+    "legal": "legal issues or None",
+    "errorCodes": [
+      {"code": "E1 or F01", "description": "brief description of what this error means"}
+    ],
+    "errorCodesSource": {"title": "Manufacturer Error Code Reference", "url": "full URL to manufacturer error code page"}
   },
-  "howItWorks": "explanation",
-  "diagnostics": []
-}`;
+  "howItWorks": "2-4 sentence plain-language explanation of how the product works",
+  "diagnostics": [
+    {"title": "descriptive link title", "url": "full URL to manufacturer repair/diagnostic page", "source": "manufacturer or site name"}
+  ]
+}
+
+IMPORTANT: Provide high detail for full reports.`;
 
   try {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
