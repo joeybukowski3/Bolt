@@ -5,12 +5,14 @@ export default async function handler(req, res) {
   const apiKey = process.env.GEMINI_API_KEY;
   const rawModel = process.env.GEMINI_MODEL || "gemini-1.5-flash-latest";
   const model = rawModel.startsWith("models/") ? rawModel.slice("models/".length) : rawModel;
-  const cacheEnabled = !!process.env.UPSTASH_REDIS_REST_URL && !!process.env.UPSTASH_REDIS_REST_TOKEN;
+  const redisUrl = process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL;
+  const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN;
+  const cacheEnabled = !!redisUrl && !!redisToken;
   const refresh = req.query.refresh === '1';
   const redis = cacheEnabled
     ? new Redis({
-        url: process.env.UPSTASH_REDIS_REST_URL,
-        token: process.env.UPSTASH_REDIS_REST_TOKEN
+        url: redisUrl,
+        token: redisToken
       })
     : null;
   
