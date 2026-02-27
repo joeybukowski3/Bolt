@@ -1,8 +1,12 @@
+import { kv } from "@vercel/kv";
+
 export default async function handler(req, res) {
   const { query, mode } = req.query;
   const apiKey = process.env.GEMINI_API_KEY;
   const rawModel = process.env.GEMINI_MODEL || "gemini-1.5-flash-latest";
   const model = rawModel.startsWith("models/") ? rawModel.slice("models/".length) : rawModel;
+  const kvEnabled = !!process.env.KV_REST_API_URL && !!process.env.KV_REST_API_TOKEN;
+  const refresh = req.query.refresh === '1';
   
   if (!apiKey) {
     console.error("Config error: GEMINI_API_KEY is missing.");
@@ -12,6 +16,22 @@ export default async function handler(req, res) {
   res.setHeader("x-gemini-model", model);
   
   const isAgeOnly = mode === 'age';
+  const normalizedQuery = String(query || '').trim().toLowerCase();
+  const cacheKey = `search:${isAgeOnly ? 'age' : 'research'}:${model}:${normalizedQuery}`;
+
+  if (kvEnabled && normalizedQuery && !refresh) {
+    try {
+      const cached = await kv.get(cacheKey);
+      if (cached) {
+        res.setHeader("x-cache", "HIT");
+        return res.status(200).json(cached);
+      }
+      res.setHeader("x-cache", "MISS");
+    } catch (err) {
+      console.error("KV cache read error:", err);
+      res.setHeader("x-cache", "ERROR");
+    }
+  }
   
   const prompt = isAgeOnly 
     ? `You are an expert in serial number decoding for insurance adjusters. 
@@ -162,7 +182,15 @@ IMPORTANT: For availabilitySummary, cite only major retailers and include 2-4 wh
     textResponse = textResponse.replace(/```json/g, '').replace(/```/g, '').trim();
     
     try {
-      res.status(200).json(JSON.parse(textResponse));
+      const parsed = JSON.parse(textResponse);
+      if (kvEnabled && normalizedQuery) {
+        try {
+          await kv.set(cacheKey, parsed, { ex: 21600 });
+        } catch (err) {
+          console.error("KV cache write error:", err);
+        }
+      }
+      res.status(200).json(parsed);
     } catch (parseErr) {
       console.error("Model JSON parse error:", parseErr);
       console.error("Model raw text:", textResponse);
