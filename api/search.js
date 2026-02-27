@@ -1,7 +1,8 @@
 export default async function handler(req, res) {
   const { query, mode } = req.query;
   const apiKey = process.env.GEMINI_API_KEY;
-  const model = process.env.GEMINI_MODEL || "gemini-1.5-flash-latest";
+  const rawModel = process.env.GEMINI_MODEL || "gemini-1.5-flash-latest";
+  const model = rawModel.startsWith("models/") ? rawModel.slice("models/".length) : rawModel;
   
   if (!apiKey) {
     console.error("Config error: GEMINI_API_KEY is missing.");
