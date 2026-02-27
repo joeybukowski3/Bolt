@@ -58,7 +58,7 @@ Provide a detailed analysis in this EXACT JSON format (no extra text, just valid
   },
   "adjusterNotes": {
     "likeKindRationale": "why the recommended replacements are like-kind/quality",
-    "availabilitySummary": "current availability / lead time summary",
+    "availabilitySummary": "current availability / lead time summary, including 2-4 major retailers where listed (e.g. Best Buy, Target, Home Depot, Lowe's, Walmart, Costco, Amazon, Apple, Samsung, LG, Sony)",
     "warrantySummary": "warranty coverage snapshot for recommended replacements",
     "discontinuedImpact": "how discontinuation affects pricing/availability",
     "serialDecodingSummary": "high-level summary of serial/date code logic if applicable"
@@ -108,7 +108,7 @@ Provide a detailed analysis in this EXACT JSON format (no extra text, just valid
   ]
 }
 
-IMPORTANT: Provide high detail for full reports.`;
+IMPORTANT: For availabilitySummary, cite only major retailers and include 2-4 where the item or replacements are listed.`;
 
   try {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
