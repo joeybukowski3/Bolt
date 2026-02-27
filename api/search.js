@@ -1,10 +1,14 @@
 export default async function handler(req, res) {
   const { query, mode } = req.query;
   const apiKey = process.env.GEMINI_API_KEY;
+  const model = process.env.GEMINI_MODEL || "gemini-1.5-flash-latest";
   
   if (!apiKey) {
+    console.error("Config error: GEMINI_API_KEY is missing.");
     return res.status(500).json({ error: "API Key missing in Vercel settings." });
   }
+
+  res.setHeader("x-gemini-model", model);
   
   const isAgeOnly = mode === 'age';
   
@@ -79,8 +83,9 @@ export default async function handler(req, res) {
 }`;
 
   try {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
     
+    console.error("Gemini request model:", model);
     const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -93,8 +98,31 @@ export default async function handler(req, res) {
       })
     });
 
-    const data = await response.json();
-    if (data.error) return res.status(500).json({ error: data.error.message });
+    let data;
+    let rawText = '';
+    try {
+      rawText = await response.text();
+      data = rawText ? JSON.parse(rawText) : null;
+    } catch (parseErr) {
+      console.error("Gemini response parse error:", parseErr);
+      console.error("Gemini raw response:", rawText);
+      return res.status(500).json({
+        error: "Upstream response parse error.",
+        upstreamStatus: response.status
+      });
+    }
+
+    if (!response.ok || data?.error) {
+      console.error("Gemini upstream error:", {
+        status: response.status,
+        statusText: response.statusText,
+        error: data?.error
+      });
+      return res.status(500).json({
+        error: data?.error?.message || "Upstream error",
+        upstreamStatus: response.status
+      });
+    }
     
     if (!data.candidates || !data.candidates[0]) {
       return res.status(500).json({ error: "No response from AI engine." });
@@ -105,7 +133,16 @@ export default async function handler(req, res) {
     // Clean markdown if present
     textResponse = textResponse.replace(/```json/g, '').replace(/```/g, '').trim();
     
-    res.status(200).json(JSON.parse(textResponse));
+    try {
+      res.status(200).json(JSON.parse(textResponse));
+    } catch (parseErr) {
+      console.error("Model JSON parse error:", parseErr);
+      console.error("Model raw text:", textResponse);
+      res.status(500).json({
+        error: "Model returned invalid JSON.",
+        upstreamStatus: response.status
+      });
+    }
   } catch (error) {
     console.error("Server Error:", error);
     res.status(500).json({ error: "Search Engine Error: " + error.message });
