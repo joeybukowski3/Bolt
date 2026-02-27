@@ -39,6 +39,23 @@ function recalcACV() {
     if (qvAcvEl) qvAcvEl.innerText = '$' + newACV.toFixed(2);
 }
 
+function inferAgeFromText(estimatedAge, productionEra) {
+    const currentYear = new Date().getFullYear();
+    const extractYears = (text) => {
+        if (!text) return [];
+        const matches = String(text).match(/\b(19|20)\d{2}\b/g);
+        return matches ? matches.map(m => parseInt(m, 10)) : [];
+    };
+    const years = [
+        ...extractYears(estimatedAge),
+        ...extractYears(productionEra)
+    ].filter(y => y <= currentYear);
+    if (!years.length) return null;
+    const latestYear = Math.max(...years);
+    const age = Math.max(0, currentYear - latestYear);
+    return age;
+}
+
 async function performSearch() {
     const queryEl = document.getElementById('query');
     if (!queryEl) return;
@@ -92,7 +109,17 @@ async function performSearch() {
         // Release Date & Age
         updateText('r-production-era', rd.productionEra || 'Unknown');
         updateText('r-discontinuation', rd.discontinuation || a.status);
-        updateText('r-estimated-age', rd.estimatedAge || a.age || 'Unknown');
+        const inferredAge = inferAgeFromText(rd.estimatedAge, rd.productionEra);
+        const estAgeText = rd.estimatedAge || a.age || '';
+        if (!estAgeText || /^0\s*years?\b/i.test(estAgeText)) {
+            if (typeof inferredAge === 'number' && inferredAge > 0) {
+                updateText('r-estimated-age', `${inferredAge} years`);
+            } else {
+                updateText('r-estimated-age', 'Unknown');
+            }
+        } else {
+            updateText('r-estimated-age', estAgeText);
+        }
         updateText('r-service-life', rd.serviceLife);
 
         // Advisory Banner
@@ -118,7 +145,10 @@ async function performSearch() {
         updateText('r-serial-decoding', notes.serialDecodingSummary);
 
         // Store for recalculation
-        const ageNum = rd.ageNumeric || 0;
+        let ageNum = rd.ageNumeric || 0;
+        if ((!ageNum || ageNum < 1) && typeof inferredAge === 'number' && inferredAge > 0) {
+            ageNum = inferredAge;
+        }
         acvData = {
             msrp: a.msrpNumeric || parseFloat(String(a.msrp || '0').replace(/[^0-9.]/g, '')) || 0,
             rate: v.annualDepreciationPercent || 10,
