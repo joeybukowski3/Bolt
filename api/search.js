@@ -42,6 +42,99 @@ function hasStaleRumorSignals(parsed, currentYear) {
   return staleYearMention && rumorLang;
 }
 
+function hasRumorOrUnreleasedLanguage(text) {
+  return /rumor|rumoured|rumored|unreleased|unannounced|not yet released|pre-release|anticipated/i.test(
+    String(text || "")
+  );
+}
+
+function toTitleCaseStatus(status) {
+  const normalized = normalizeCurrentStatus(status);
+  return normalized === "Currently Available" ? "Currently Available" : normalized;
+}
+
+function alignFieldsWithVerifiedStatus(parsed, verified, todayIso, query) {
+  if (!parsed || !verified) return parsed;
+  parsed.analysis = parsed.analysis || {};
+  parsed.adjusterNotes = parsed.adjusterNotes || {};
+  parsed.releaseDate = parsed.releaseDate || {};
+  const normalizedStatus = toTitleCaseStatus(verified.currentStatus);
+  const releaseDate = String(verified.releaseDate || "").trim();
+  const releaseYear = /^\d{4}-\d{2}-\d{2}$/.test(releaseDate) ? parseInt(releaseDate.slice(0, 4), 10) : null;
+  const currentYear = new Date(todayIso).getUTCFullYear();
+
+  parsed.analysis.status = normalizedStatus;
+  parsed.analysis.estimatedModel = parsed.analysis.estimatedModel || query;
+
+  if (normalizedStatus === "Currently Available" || normalizedStatus === "Available for Preorder") {
+    // Force consistency when verification indicates market availability.
+    const fieldsToClean = [
+      "quickSummary",
+      "overview",
+      "itemDescription",
+      "keyDetails",
+      "technicalSpecs"
+    ];
+    for (const field of fieldsToClean) {
+      if (hasRumorOrUnreleasedLanguage(parsed.analysis[field])) {
+        parsed.analysis[field] = stripRumorLanguage(parsed.analysis[field])
+          .replace(/unreleased|unannounced|not yet released|pre-release/gi, "")
+          .replace(/\s{2,}/g, " ")
+          .trim();
+      }
+    }
+
+    if (hasRumorOrUnreleasedLanguage(parsed.analysis.estimatedModel)) {
+      parsed.analysis.estimatedModel = query;
+    }
+
+    parsed.adjusterNotes.availabilitySummary =
+      verified.statusSummary ||
+      `Verified as ${normalizedStatus.toLowerCase()} as of ${todayIso}.`;
+
+    if (releaseYear) {
+      parsed.releaseDate.productionEra = `${releaseYear} to present`;
+      parsed.releaseDate.discontinuation = "Currently in production";
+      const age = Math.max(0, currentYear - releaseYear);
+      parsed.releaseDate.estimatedAge = `${age} year${age === 1 ? "" : "s"} (based on ${releaseDate} release date)`;
+      parsed.releaseDate.ageNumeric = age;
+    } else {
+      parsed.releaseDate.productionEra = `In production as of ${todayIso}`;
+      parsed.releaseDate.discontinuation = "Currently in production";
+    }
+
+    if (hasRumorOrUnreleasedLanguage(parsed.adjusterNotes.discontinuedImpact)) {
+      parsed.adjusterNotes.discontinuedImpact = `No discontinuation announced as of ${todayIso}.`;
+    }
+    if (hasRumorOrUnreleasedLanguage(parsed.adjusterNotes.serialDecodingSummary)) {
+      parsed.adjusterNotes.serialDecodingSummary =
+        "Serial/date decoding details vary by production batch; verify with manufacturer references for specific units.";
+    }
+
+    if (Array.isArray(parsed.table)) {
+      parsed.table = parsed.table.map((row) => {
+        if (!row || !row.label) return row;
+        if (row.label === "Availability") {
+          return {
+            ...row,
+            original: normalizedStatus,
+            brandMatch: row.brandMatch && hasRumorOrUnreleasedLanguage(row.brandMatch) ? normalizedStatus : row.brandMatch
+          };
+        }
+        if (row.label === "Notes" && hasRumorOrUnreleasedLanguage(row.original)) {
+          return {
+            ...row,
+            original: `Status verified as ${normalizedStatus.toLowerCase()} as of ${todayIso}.`
+          };
+        }
+        return row;
+      });
+    }
+  }
+
+  return parsed;
+}
+
 export default async function handler(req, res) {
   const { query, mode } = req.query;
   const apiKey = process.env.GEMINI_API_KEY;
@@ -367,7 +460,8 @@ Rules:
           parsed.releaseDate = parsed.releaseDate || {};
           parsed.verification = verified;
           parsed.analysis.status = normalizedStatus;
-          parsed.adjusterNotes.availabilitySummary = verified.statusSummary || parsed.adjusterNotes.availabilitySummary;
+          parsed.adjusterNotes.availabilitySummary =
+            verified.statusSummary || parsed.adjusterNotes.availabilitySummary;
           if (
             normalizedStatus !== "Not Officially Released" &&
             /rumored|rumoured|unreleased|unannounced/i.test(String(parsed.analysis.estimatedModel || ""))
@@ -376,6 +470,7 @@ Rules:
           }
           parsed.analysis.overview = stripRumorLanguage(parsed.analysis.overview);
           parsed.analysis.itemDescription = stripRumorLanguage(parsed.analysis.itemDescription);
+          alignFieldsWithVerifiedStatus(parsed, verified, todayIso, query);
         } else if (hasStaleRumorSignals(parsed, currentYear)) {
           parsed.analysis = parsed.analysis || {};
           parsed.adjusterNotes = parsed.adjusterNotes || {};
