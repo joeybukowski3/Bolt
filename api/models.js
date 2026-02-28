@@ -1,5 +1,5 @@
 export default async function handler(req, res) {
-  const apiKey = process.env.GEMINI_API_KEY;
+  const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || process.env.GEMINI_KEY;
   const apiVersion = process.env.GEMINI_API_VERSION || "v1beta";
 
   if (!apiKey) {

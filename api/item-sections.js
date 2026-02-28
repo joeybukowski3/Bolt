@@ -100,7 +100,7 @@ export default async function handler(req, res) {
   const query = String(req.query?.query || "").trim();
   const section = String(req.query?.section || "").trim();
   const refresh = req.query?.refresh === "1";
-  const apiKey = process.env.GEMINI_API_KEY;
+  const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || process.env.GEMINI_KEY;
   const rawModel = process.env.GEMINI_MODEL || "gemini-1.5-flash-latest";
   const model = rawModel.startsWith("models/") ? rawModel.slice("models/".length) : rawModel;
   const todayIso = new Date().toISOString().slice(0, 10);
