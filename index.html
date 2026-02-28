@@ -86,13 +86,22 @@
         .search-btn { background: var(--accent); color: #000; border: none; padding: 1rem 2rem; font-size: 0.95rem; font-weight: 700; font-family: inherit; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: background 0.2s; white-space: nowrap; }
         .search-btn:hover { background: var(--accent-hover); }
 
-        /* ── Stats Bar ── */
-        .stats-bar { display: flex; justify-content: center; gap: 1.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
-        .stat-item { display: flex; align-items: center; gap: 0.75rem; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 0.75rem 1.25rem; }
-        .stat-icon { color: var(--accent); font-size: 1.1rem; }
-        .stat-text { display: flex; flex-direction: column; }
-        .stat-label { font-size: 0.6rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted-dark); }
-        .stat-value { font-size: 0.9rem; font-weight: 700; color: var(--text-white); }
+        /* ── Hero tagline + description ── */
+        .hero-tagline { font-size: 0.88rem; font-weight: 400; color: var(--text-light); text-align: center; margin-bottom: 1.1rem; letter-spacing: 0.01em; }
+        .hero-desc { max-width: 640px; margin: 0 auto 1.5rem; font-size: 0.84rem; color: var(--text-muted-dark); text-align: center; line-height: 1.75; }
+
+        /* ── Coverage badges (replaces stats bar) ── */
+        .coverage-bar { display: flex; justify-content: center; gap: 0.6rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+        .coverage-badge { display: inline-flex; align-items: center; gap: 0.4rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.09); border-radius: 999px; padding: 0.35rem 0.9rem; font-size: 0.78rem; color: var(--text-light); white-space: nowrap; }
+
+        /* ── How-to row ── */
+        .how-to-row { display: grid; grid-template-columns: 1fr 1fr 1fr; margin-bottom: 1.5rem; border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; overflow: hidden; }
+        .how-to-step { padding: 0.875rem 1.1rem; background: rgba(255,255,255,0.03); display: flex; flex-direction: column; gap: 0.2rem; border-right: 1px solid rgba(255,255,255,0.07); }
+        .how-to-step:last-child { border-right: none; }
+        .how-to-step-num { font-size: 0.58rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); }
+        .how-to-step-title { font-size: 0.8rem; font-weight: 700; color: var(--text-white); }
+        .how-to-step-desc { font-size: 0.74rem; color: var(--text-light); line-height: 1.5; }
+        @media (max-width: 600px) { .how-to-row { grid-template-columns: 1fr; } .how-to-step { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.07); } .how-to-step:last-child { border-bottom: none; } }
 
         /* ── Mascot loader ── */
         @keyframes runDogLoader { 0% { left: -80px; } 100% { left: calc(100% + 80px); } }
@@ -364,14 +373,33 @@
                 </svg></div></div>
                 <span id="loader-text" class="loader-text">Consulting live market data and technical records...</span>
             </div>
+            <p class="hero-tagline">Instant product research. Age verification. Replacement analysis.</p>
+            <p class="hero-desc">Bolt researches appliances, electronics, HVAC systems, water heaters, and more — returning detailed product information including age, current market value, and replacement options. Search by brand, model number, or product type to generate an instant research report.</p>
             <div class="search-container">
-                <input type="text" id="query" class="search-input" placeholder="Search any product...">
+                <input type="text" id="query" class="search-input" placeholder="Search by model number, brand, or product type — e.g. LG C3 65 TV, Whirlpool WTW5000DW, water heater">
                 <button id="btn" class="search-btn">&#128269; Search</button>
             </div>
-            <div class="stats-bar">
-                <div class="stat-item"><span class="stat-icon">&#9889;</span><div class="stat-text"><span class="stat-label">Real-Time Data</span><span class="stat-value">Instant</span></div></div>
-                <div class="stat-item"><span class="stat-icon">&#128737;</span><div class="stat-text"><span class="stat-label">Verified Sources</span><span class="stat-value">100+</span></div></div>
-                <div class="stat-item"><span class="stat-icon">&#128200;</span><div class="stat-text"><span class="stat-label">Products Tracked</span><span class="stat-value">10M+</span></div></div>
+            <div class="coverage-bar">
+                <span class="coverage-badge">&#128268; Appliances &amp; Electronics</span>
+                <span class="coverage-badge">&#127777;&#65039; HVAC &amp; Water Heaters</span>
+                <span class="coverage-badge">&#128203; Age &middot; Value &middot; Replacements</span>
+            </div>
+            <div class="how-to-row">
+                <div class="how-to-step">
+                    <span class="how-to-step-num">Step 1</span>
+                    <span class="how-to-step-title">&#128269; Enter a product</span>
+                    <span class="how-to-step-desc">Type a model number, brand name, or item description</span>
+                </div>
+                <div class="how-to-step">
+                    <span class="how-to-step-num">Step 2</span>
+                    <span class="how-to-step-title">&#9889; Get your report</span>
+                    <span class="how-to-step-desc">Instant results covering age, value, and specs</span>
+                </div>
+                <div class="how-to-step">
+                    <span class="how-to-step-num">Step 3</span>
+                    <span class="how-to-step-title">&#128202; Compare &amp; decide</span>
+                    <span class="how-to-step-desc">View replacement options and technical details</span>
+                </div>
             </div>
         </div>
 
@@ -585,14 +613,14 @@
 
                         <!-- Methodology Footer -->
                         <footer class="no-print" style="text-align: center; padding: 2rem 0; opacity: 0.6; font-size: 0.75rem;">
-                            <p>Estimates generated via Bolt Research Intelligence Engine. Verify critical figures before use.</p>
+                            <p>Results are generated for informational purposes. Always verify critical data independently.</p>
                         </footer>
 
                     </div><!-- /detailed-view -->
 
                     <!-- Site Footer -->
                     <div class="footer no-print">
-                        <p class="footer-tagline">Built for fast, accurate product research and age verification.</p>
+                        <p class="footer-tagline">Product research and reference tool covering appliances, electronics, HVAC, and water heaters.</p>
                         <div class="footer-links">
                             <a href="/methodology">Methodology</a>
                             <span class="footer-sep">|</span>
