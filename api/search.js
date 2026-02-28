@@ -1,329 +1,378 @@
 import {
-  PHASE1_API_VERSION,
   cacheGet,
   cacheSet,
   callGeminiJson,
-  cleanRetailerNames,
   getCacheClient,
   normalizeQuery
 } from "./_shared.js";
 
-const REQUIRED_ROWS = [
-  "Model",
-  "Recommended Replacement",
-  "Size/Capacity",
-  "Price",
-  "Availability",
-  "Retailers",
-  "Notes"
+const FAST_API_VERSION = "2026-02-28-fast-v1";
+const DETAIL_API_VERSION = "2026-02-28-detail-v1";
+
+const ALLOWED_TIERS = ["Entry Level", "Mid-Grade", "Upper Mid-Grade", "Premium", "Luxury / Designer"];
+const ALLOWED_CATEGORIES = [
+  "tv", "refrigerator", "washer", "dryer", "dishwasher",
+  "hvac", "water_heater", "computer", "small_appliance", "general"
 ];
 
-const CATEGORY_DYNAMIC_ROWS = {
-  tv: ["Resolution Class", "Display Tech", "Refresh Tier", "HDR Tier"],
-  refrigerator: ["Door Config", "Ice/Dispenser", "Counter-Depth", "Capacity Class"],
-  washer: ["Load Type", "Capacity", "Cycles/Steam"],
-  dishwasher: ["Noise Tier (dBA)", "Cycles", "Drying System"],
-  "water heater": ["Fuel Type", "Capacity", "Recovery/BTU", "Venting Type"],
-  hvac: ["SEER/Efficiency Tier", "Tonnage/BTU", "Stages", "Heat Type"]
-};
-
-const SIZE_REQUIRED_CATEGORIES = ["tv", "refrigerator", "washer", "water heater", "hvac"];
-
-function pickCategoryKey(category) {
-  const c = String(category || "").toLowerCase();
-  if (c.includes("tv") || c.includes("television")) return "tv";
-  if (c.includes("refrigerator") || c.includes("fridge")) return "refrigerator";
-  if (c.includes("washer") || c.includes("washing")) return "washer";
-  if (c.includes("dishwasher")) return "dishwasher";
-  if (c.includes("water heater")) return "water heater";
-  if (c.includes("hvac") || c.includes("air conditioner") || c.includes("furnace")) return "hvac";
-  return "";
+function cleanStr(v) {
+  const s = String(v ?? "").trim();
+  return s || null;
 }
 
-function defaultPhase1(query) {
-  return {
-    query: String(query || ""),
-    result_type: "generic_category",
-    confidence: "low",
-    detected: {
-      brand: null,
-      category: null,
-      model: null,
-      size_or_capacity: null
-    },
-    assumptions_used: [],
-    snapshot: {
-      item_description:
-        "Could not generate a complete report for this query. Try adding brand, model, and size details.",
-      comparable_factors: [
-        "Product category and intended use",
-        "Core performance requirements",
-        "Size or capacity match",
-        "Installation and compatibility constraints"
-      ]
-    },
-    release_age: {
-      production_era: null,
-      estimated_age_years: null,
-      age_note: "Add a specific model to generate a reliable age estimate."
-    },
-    availability_status: null,
-    replacement_table: {
-      columns: ["Original Item", "Brand Match", "Option 1", "Option 2"],
-      required_rows: [...REQUIRED_ROWS],
-      dynamic_rows: [],
-      cells: {}
-    },
-    how_it_works:
-      "This tool compares item class, fit, and performance characteristics to build replacement guidance.",
-    common_failures: [
-      "Wear-related component degradation",
-      "Power or control board instability",
-      "Sensor drift or calibration issues",
-      "Mechanical fatigue in moving assemblies",
-      "Thermal stress or airflow restrictions"
-    ],
-    troubleshooting: {
-      steps: [
-        "Confirm input power and basic safety cutoffs.",
-        "Verify visible connections, filters, and vents.",
-        "Run manufacturer self-checks if available."
-      ],
-      repair_links: []
-    },
-    refinement_prompts: ["Add brand and model number", "Add size or capacity", "Add a full model label"],
-    pricing: {
-      eligible: false,
-      reason: "Refine query to a specific model with size or capacity before generating informational pricing.",
-      original_msrp: null,
-      typical_new_price: null,
-      depreciation_rate_percent: null,
-      base_years: null
-    }
-  };
-}
+// ── Prompts ─────────────────────────────────────────────────────────────────
 
-function cleanText(value) {
-  const text = String(value || "").trim();
-  return text || null;
-}
-
-function detectResultTypeFromData(out) {
-  const hasModel = !!out.detected.model;
-  const hasBrand = !!out.detected.brand;
-  const hasCategory = !!out.detected.category;
-  if (hasModel) return "specific_model";
-  if (hasBrand && hasCategory) return "brand_category";
-  return "generic_category";
-}
-
-function valuationEligible(out) {
-  if (out.result_type !== "specific_model") return false;
-  if (out.confidence === "low") return false;
-  if (!out.detected.model) return false;
-  const categoryKey = pickCategoryKey(out.detected.category);
-  if (SIZE_REQUIRED_CATEGORIES.includes(categoryKey) && !out.detected.size_or_capacity) return false;
-  return true;
-}
-
-function sanitizeTable(out) {
-  const table = out.replacement_table || {};
-  table.columns = ["Original Item", "Brand Match", "Option 1", "Option 2"];
-  table.required_rows = [...REQUIRED_ROWS];
-  const categoryKey = pickCategoryKey(out.detected.category);
-  const dynamicRows = CATEGORY_DYNAMIC_ROWS[categoryKey] || [];
-  table.dynamic_rows = dynamicRows.slice(0, 4);
-  const finalRows = [...REQUIRED_ROWS, ...table.dynamic_rows];
-  const cells = {};
-
-  for (const row of finalRows) {
-    const rawRow = table.cells?.[row] || {};
-    cells[row] = {
-      "Original Item": cleanText(rawRow["Original Item"]) || "N/A",
-      "Brand Match": cleanText(rawRow["Brand Match"]) || "N/A",
-      "Option 1": cleanText(rawRow["Option 1"]) || "N/A",
-      "Option 2": cleanText(rawRow["Option 2"]) || "N/A"
-    };
-  }
-
-  const retailerRows = cleanRetailerNames(cells.Retailers["Brand Match"]);
-  const retailerText = retailerRows.join(" | ");
-  cells.Retailers["Original Item"] = retailerText;
-  cells.Retailers["Brand Match"] = retailerText;
-  cells.Retailers["Option 1"] = retailerText;
-  cells.Retailers["Option 2"] = retailerText;
-
-  if (out.result_type !== "specific_model") {
-    cells.Price["Original Item"] = "Refine query for model-specific pricing";
-    cells.Price["Brand Match"] = "Not shown for this query type";
-    cells.Price["Option 1"] = "Not shown for this query type";
-    cells.Price["Option 2"] = "Not shown for this query type";
-  }
-
-  table.cells = cells;
-  out.replacement_table = table;
-}
-
-function sanitizePhase1Payload(payload, query) {
-  const fallback = defaultPhase1(query);
-  const source = payload && typeof payload === "object" ? payload : {};
-  const out = { ...fallback };
-  out.query = String(source.query || query || "");
-  out.confidence = ["high", "medium", "low"].includes(source.confidence) ? source.confidence : "low";
-  out.detected = {
-    brand: cleanText(source.detected?.brand),
-    category: cleanText(source.detected?.category),
-    model: cleanText(source.detected?.model),
-    size_or_capacity: cleanText(source.detected?.size_or_capacity)
-  };
-  out.result_type = ["specific_model", "brand_category", "generic_category"].includes(source.result_type)
-    ? source.result_type
-    : detectResultTypeFromData(out);
-  out.assumptions_used = Array.isArray(source.assumptions_used)
-    ? source.assumptions_used.map((x) => String(x)).slice(0, 8)
-    : [];
-  out.snapshot = {
-    item_description:
-      cleanText(source.snapshot?.item_description) || fallback.snapshot.item_description,
-    comparable_factors: Array.isArray(source.snapshot?.comparable_factors)
-      ? source.snapshot.comparable_factors.map((x) => String(x)).slice(0, 8)
-      : fallback.snapshot.comparable_factors
-  };
-  out.release_age = {
-    production_era: cleanText(source.release_age?.production_era),
-    estimated_age_years:
-      typeof source.release_age?.estimated_age_years === "number"
-        ? source.release_age.estimated_age_years
-        : null,
-    age_note: cleanText(source.release_age?.age_note)
-  };
-  out.availability_status = ["in_production", "discontinued_limited_new", "fully_discontinued"].includes(
-    source.availability_status
-  )
-    ? source.availability_status
-    : null;
-  out.how_it_works = cleanText(source.how_it_works) || fallback.how_it_works;
-  out.common_failures = Array.isArray(source.common_failures)
-    ? source.common_failures.map((x) => String(x)).slice(0, 8)
-    : fallback.common_failures;
-  out.troubleshooting = {
-    steps: Array.isArray(source.troubleshooting?.steps)
-      ? source.troubleshooting.steps.map((x) => String(x)).slice(0, 6)
-      : fallback.troubleshooting.steps,
-    repair_links: Array.isArray(source.troubleshooting?.repair_links)
-      ? source.troubleshooting.repair_links
-          .map((x) => ({
-            label: String(x?.label || "").trim(),
-            url: String(x?.url || "").trim()
-          }))
-          .filter((x) => x.label && /^https?:\/\//i.test(x.url))
-          .slice(0, 8)
-      : []
-  };
-  out.refinement_prompts = Array.isArray(source.refinement_prompts)
-    ? source.refinement_prompts.map((x) => String(x)).slice(0, 8)
-    : fallback.refinement_prompts;
-  out.replacement_table = source.replacement_table || fallback.replacement_table;
-  sanitizeTable(out);
-
-  const eligible = valuationEligible(out);
-  const pricing = source.pricing && typeof source.pricing === "object" ? source.pricing : {};
-  out.pricing = {
-    eligible,
-    reason: eligible
-      ? null
-      : "Refine query to a specific model with confirmed size or capacity for informational pricing.",
-    original_msrp: eligible ? cleanText(pricing.original_msrp) : null,
-    typical_new_price: eligible ? cleanText(pricing.typical_new_price) : null,
-    depreciation_rate_percent:
-      eligible && typeof pricing.depreciation_rate_percent === "number"
-        ? pricing.depreciation_rate_percent
-        : null,
-    base_years: eligible && typeof pricing.base_years === "number" ? pricing.base_years : null
-  };
-
-  if (!eligible) {
-    out.release_age.estimated_age_years = null;
-    out.release_age.age_note =
-      out.release_age.age_note ||
-      "Add exact model and size/capacity details to unlock age and informational pricing estimates.";
-  }
-
-  if (out.result_type === "generic_category") {
-    out.pricing.eligible = false;
-    out.pricing.reason = "Broad category query. Add brand and model for pricing or replacement estimates.";
-  }
-
-  return out;
-}
-
-function getPhase1Prompt(query, todayIso) {
-  return `You are an informational product lookup assistant.
+function getResearchFastPrompt(query, todayIso) {
+  return `You are an informational product research assistant used by product research professionals.
 Date: ${todayIso}
 Query: ${query}
 
-Return JSON only. No markdown.
-Use concise, technical, replacement-focused language.
-Never include legal or settlement language.
+Return JSON only. No markdown. No insurance, claims, settlement, or legal language.
+Use concise, technical, property-assessment prose. No marketing language.
 
 Required schema:
 {
-  "query": string,
-  "result_type": "specific_model" | "brand_category" | "generic_category",
-  "confidence": "high" | "medium" | "low",
-  "detected": {
-    "brand": string|null,
-    "category": string|null,
-    "model": string|null,
-    "size_or_capacity": string|null
+  "searchTier": 1,
+  "analysis": {
+    "entered": "string",
+    "modelConfidence": "exact or estimated",
+    "estimatedModel": "string or null",
+    "quickSummary": "string",
+    "tier": "Entry Level or Mid-Grade or Upper Mid-Grade or Premium or Luxury / Designer",
+    "category": "tv or refrigerator or washer or dryer or dishwasher or hvac or water_heater or computer or small_appliance or general",
+    "itemDescription": "string",
+    "keyDetails": "string",
+    "launchMsrp": "string or null",
+    "launchMsrpNumeric": 0,
+    "currentMarketPrice": "string or null",
+    "currentMarketPriceNote": "string or null",
+    "status": "string"
   },
-  "assumptions_used": string[],
-  "snapshot": {
-    "item_description": string,
-    "comparable_factors": string[]
+  "releaseDate": {
+    "productionEra": "string or null",
+    "discontinuation": "string or null",
+    "estimatedAge": "string or null",
+    "ageNumeric": 0
   },
-  "release_age": {
-    "production_era": string|null,
-    "estimated_age_years": number|null,
-    "age_note": string|null
+  "availability": "string",
+  "refineTip": "string or null"
+}
+
+searchTier values:
+- 1 = general term only (e.g. "water heater", "TV") — no brand or model identified
+- 2 = brand + category (e.g. "LG TV", "Samsung refrigerator") — no specific model
+- 3 = specific model identified (e.g. "LG OLED65C3PUA", "Whirlpool WTW5000DW")
+
+Rules:
+- itemDescription: 2-4 sentences of professional property-assessment prose. No marketing language.
+- keyDetails: comma-separated replacement-relevant specs only.
+- For searchTier 1 or 2: launchMsrp, launchMsrpNumeric, currentMarketPrice must be null.
+- For searchTier 1 or 2: provide a refineTip explaining what to add to get a full report.
+- For searchTier 3: populate all fields including pricing and ageNumeric.
+- estimatedAge sentence example: "First manufactured in January 2019. As of today this item is approximately 5 years old."
+- ageNumeric: integer years estimated from production era.
+- availability must be exactly one of:
+  "Currently available new from manufacturer and major retailers"
+  "Production discontinued — units may still be available from retailers while supplies last"
+  "Fully discontinued — no longer available new from any major source"`;
+}
+
+function getResearchDetailPrompt(query, todayIso) {
+  return `You are an informational product research assistant used by product research professionals.
+Date: ${todayIso}
+Query: ${query}
+
+Return JSON only. No markdown. No insurance, claims, settlement, or legal language.
+
+Required schema:
+{
+  "searchTier": 3,
+  "itemNotes": {
+    "lkqEvaluation": {
+      "tier": "string",
+      "mustMatchSpecs": ["string"],
+      "acceptableVariation": ["string"]
+    },
+    "availabilityDetail": "string"
   },
-  "availability_status": "in_production" | "discontinued_limited_new" | "fully_discontinued" | null,
-  "replacement_table": {
-    "columns": ["Original Item","Brand Match","Option 1","Option 2"],
-    "required_rows": ["Model","Recommended Replacement","Size/Capacity","Price","Availability","Retailers","Notes"],
-    "dynamic_rows": string[],
-    "cells": {
-      "<rowName>": {
-        "Original Item": string,
-        "Brand Match": string,
-        "Option 1": string,
-        "Option 2": string
-      }
-    }
-  },
-  "how_it_works": string,
-  "common_failures": string[],
+  "table": [
+    {"label": "Model", "original": "string", "brandMatch": "string", "option1": "string", "option2": "string"},
+    {"label": "Recommended Replacement", "original": "string", "brandMatch": "string", "option1": "string", "option2": "string"},
+    {"label": "Size / Capacity", "original": "string", "brandMatch": "string", "option1": "string", "option2": "string"},
+    {"label": "Price (New)", "original": "string", "brandMatch": "string", "option1": "string", "option2": "string"},
+    {"label": "Availability", "original": "string", "brandMatch": "string", "option1": "string", "option2": "string"},
+    {"label": "Retailers", "original": "Best Buy,Walmart", "brandMatch": "Best Buy,Walmart", "option1": "Best Buy,Walmart", "option2": "Best Buy,Walmart"},
+    {"label": "Notes", "original": "string", "brandMatch": "string", "option1": "string", "option2": "string"}
+  ],
+  "dynamicRows": [
+    {"label": "string", "original": "string", "brandMatch": "string", "option1": "string", "option2": "string"}
+  ],
+  "howItWorks": "string",
+  "recalls": [
+    {"title": "string", "description": "string", "date": "string", "url": "https://..."}
+  ],
+  "recallsNone": false,
+  "errorCodes": [
+    {"code": "string", "meaning": "string", "likelyCause": "string"}
+  ],
+  "errorCodesApplicable": true,
+  "failures": [
+    {"component": "string", "whyItFails": "string", "symptoms": "string"}
+  ],
+  "manual": {"title": "string or null", "url": "https://... or null"},
+  "manufacturerPage": {"url": "https://... or null", "label": "string or null"},
   "troubleshooting": {
-    "steps": string[],
-    "repair_links": [{"label": string, "url": string}]
+    "steps": ["string"],
+    "repairResources": [{"name": "string", "url": "https://..."}]
   },
-  "refinement_prompts": string[],
-  "pricing": {
-    "original_msrp": string|null,
-    "typical_new_price": string|null,
-    "depreciation_rate_percent": number|null,
-    "base_years": number|null
-  }
+  "technicalSpecs": "string",
+  "materials": "string",
+  "serviceLife": "string"
 }
 
 Rules:
-- For generic_category: no pricing values; include refinement prompts.
-- For brand_category: no valuation/depreciation numbers.
-- Keep item_description to 2-4 sentences.
-- comparable_factors must be 4-8 short bullets.
-- common_failures must be 5-8 short bullets.
-- Only use major national retailers in Retailers row: Best Buy, Home Depot, Lowe's, Manufacturer, AJ Madison, B&H, Walmart, Target.
-- If exact product page is uncertain, use retailer names only.`;
+- table: include all 7 required rows in the exact order shown.
+- Retailers row values: comma-separated list from: Best Buy, Home Depot, Lowe's, Manufacturer, AJ Madison, B&H, Walmart, Target.
+- dynamicRows: 0-4 category-specific rows (TVs: Resolution, Display Technology, Refresh Rate, HDR; appliances: Load Type, Capacity, etc.).
+- howItWorks: 3 sentences — what it does, how it works mechanically, why specs matter for replacement.
+- recalls: only verified CPSC, government, or manufacturer-initiated recalls. If recallsNone is true, recalls must be [].
+- errorCodes: only if applicable. If errorCodesApplicable is false, errorCodes must be [].
+- failures: 3-6 common failure modes.
+- manual.url and manufacturerPage.url: https:// URL if known, null if uncertain.
+- troubleshooting: 3-6 actionable steps. repairResources: include RepairClinic, AppliancePartsPros, SearsPartsDirect where applicable.
+- technicalSpecs: full comma-separated spec list.
+- serviceLife: estimated useful life range (e.g. "8-12 years").`;
+}
+
+// ── Sanitizers ───────────────────────────────────────────────────────────────
+
+function sanitizeFastPayload(payload, query) {
+  const src = payload && typeof payload === "object" ? payload : {};
+  const analysis = src.analysis && typeof src.analysis === "object" ? src.analysis : {};
+  const releaseDate = src.releaseDate && typeof src.releaseDate === "object" ? src.releaseDate : {};
+
+  const searchTier = [1, 2, 3].includes(Number(src.searchTier)) ? Number(src.searchTier) : 1;
+  const tier = ALLOWED_TIERS.includes(analysis.tier) ? analysis.tier : "Entry Level";
+  const category = ALLOWED_CATEGORIES.includes(analysis.category) ? analysis.category : "general";
+  const launchMsrpNumeric = typeof analysis.launchMsrpNumeric === "number" ? analysis.launchMsrpNumeric : null;
+  const ageNumeric =
+    typeof releaseDate.ageNumeric === "number" ? Math.max(0, Math.round(releaseDate.ageNumeric)) : null;
+
+  return {
+    searchTier,
+    analysis: {
+      entered: cleanStr(analysis.entered) || query,
+      modelConfidence: ["exact", "estimated"].includes(analysis.modelConfidence)
+        ? analysis.modelConfidence
+        : "estimated",
+      estimatedModel: cleanStr(analysis.estimatedModel),
+      quickSummary: cleanStr(analysis.quickSummary) || query,
+      tier,
+      category,
+      itemDescription: cleanStr(analysis.itemDescription) || "No description available.",
+      keyDetails: cleanStr(analysis.keyDetails) || "",
+      launchMsrp: searchTier === 3 ? cleanStr(analysis.launchMsrp) : null,
+      launchMsrpNumeric: searchTier === 3 ? launchMsrpNumeric : null,
+      currentMarketPrice: searchTier === 3 ? cleanStr(analysis.currentMarketPrice) : null,
+      currentMarketPriceNote: searchTier === 3 ? cleanStr(analysis.currentMarketPriceNote) : null,
+      status: cleanStr(analysis.status) || "Unknown"
+    },
+    releaseDate: {
+      productionEra: cleanStr(releaseDate.productionEra),
+      discontinuation: cleanStr(releaseDate.discontinuation),
+      estimatedAge: cleanStr(releaseDate.estimatedAge),
+      ageNumeric: searchTier === 3 ? ageNumeric : null
+    },
+    availability: cleanStr(src.availability) || "Status unknown",
+    refineTip:
+      searchTier < 3 ? cleanStr(src.refineTip) || "Add a specific model number for a full report." : null
+  };
+}
+
+function sanitizeDetailPayload(payload, query) {
+  const src = payload && typeof payload === "object" ? payload : {};
+  const itemNotes = src.itemNotes && typeof src.itemNotes === "object" ? src.itemNotes : {};
+  const lkqEval =
+    itemNotes.lkqEvaluation && typeof itemNotes.lkqEvaluation === "object" ? itemNotes.lkqEvaluation : {};
+  const ts = src.troubleshooting && typeof src.troubleshooting === "object" ? src.troubleshooting : {};
+  const manual = src.manual && typeof src.manual === "object" ? src.manual : {};
+  const mfrPage = src.manufacturerPage && typeof src.manufacturerPage === "object" ? src.manufacturerPage : {};
+
+  const table = Array.isArray(src.table)
+    ? src.table.map((row) => ({
+        label: cleanStr(row?.label) || "",
+        original: cleanStr(row?.original) || "N/A",
+        brandMatch: cleanStr(row?.brandMatch) || "N/A",
+        option1: cleanStr(row?.option1) || "N/A",
+        option2: cleanStr(row?.option2) || "N/A"
+      }))
+    : [];
+
+  const dynamicRows = Array.isArray(src.dynamicRows)
+    ? src.dynamicRows.slice(0, 4).map((row) => ({
+        label: cleanStr(row?.label) || "",
+        original: cleanStr(row?.original) || "N/A",
+        brandMatch: cleanStr(row?.brandMatch) || "N/A",
+        option1: cleanStr(row?.option1) || "N/A",
+        option2: cleanStr(row?.option2) || "N/A"
+      }))
+    : [];
+
+  const recalls = Array.isArray(src.recalls)
+    ? src.recalls
+        .map((r) => ({
+          title: cleanStr(r?.title) || "",
+          description: cleanStr(r?.description) || "",
+          date: cleanStr(r?.date) || "",
+          url: typeof r?.url === "string" && /^https?:\/\//i.test(r.url) ? r.url : null
+        }))
+        .filter((r) => r.title)
+    : [];
+
+  const errorCodes = Array.isArray(src.errorCodes)
+    ? src.errorCodes
+        .map((e) => ({
+          code: cleanStr(e?.code) || "",
+          meaning: cleanStr(e?.meaning) || "",
+          likelyCause: cleanStr(e?.likelyCause) || ""
+        }))
+        .filter((e) => e.code)
+    : [];
+
+  const failures = Array.isArray(src.failures)
+    ? src.failures
+        .slice(0, 6)
+        .map((f) => ({
+          component: cleanStr(f?.component) || "",
+          whyItFails: cleanStr(f?.whyItFails) || "",
+          symptoms: cleanStr(f?.symptoms) || ""
+        }))
+        .filter((f) => f.component)
+    : [];
+
+  const steps = Array.isArray(ts.steps)
+    ? ts.steps.map((s) => cleanStr(s)).filter(Boolean).slice(0, 6)
+    : [];
+
+  const repairResources = Array.isArray(ts.repairResources)
+    ? ts.repairResources
+        .map((r) => ({
+          name: cleanStr(r?.name) || "",
+          url: typeof r?.url === "string" && /^https?:\/\//i.test(r.url) ? r.url : null
+        }))
+        .filter((r) => r.name && r.url)
+    : [];
+
+  const manualUrl =
+    typeof manual.url === "string" && /^https?:\/\//i.test(manual.url) ? manual.url : null;
+  const mfrUrl =
+    typeof mfrPage.url === "string" && /^https?:\/\//i.test(mfrPage.url) ? mfrPage.url : null;
+
+  return {
+    searchTier: [1, 2, 3].includes(Number(src.searchTier)) ? Number(src.searchTier) : 1,
+    itemNotes: {
+      lkqEvaluation: {
+        tier: cleanStr(lkqEval.tier) || "",
+        mustMatchSpecs: Array.isArray(lkqEval.mustMatchSpecs)
+          ? lkqEval.mustMatchSpecs.map((s) => cleanStr(s)).filter(Boolean)
+          : [],
+        acceptableVariation: Array.isArray(lkqEval.acceptableVariation)
+          ? lkqEval.acceptableVariation.map((s) => cleanStr(s)).filter(Boolean)
+          : []
+      },
+      availabilityDetail: cleanStr(itemNotes.availabilityDetail) || ""
+    },
+    table,
+    dynamicRows,
+    howItWorks: cleanStr(src.howItWorks) || "No description available.",
+    recalls,
+    recallsNone: src.recallsNone === true || recalls.length === 0,
+    errorCodes,
+    errorCodesApplicable: src.errorCodesApplicable !== false,
+    failures,
+    manual: { title: cleanStr(manual.title), url: manualUrl },
+    manufacturerPage: { url: mfrUrl, label: cleanStr(mfrPage.label) },
+    troubleshooting: { steps, repairResources },
+    technicalSpecs: cleanStr(src.technicalSpecs) || "",
+    materials: cleanStr(src.materials) || "",
+    serviceLife: cleanStr(src.serviceLife) || ""
+  };
+}
+
+// ── Mode runners ─────────────────────────────────────────────────────────────
+
+async function runFastMode(query, apiKey, model, refresh, cacheClient, todayIso) {
+  const normalizedQuery = normalizeQuery(query);
+  const cacheKey = `search:v3:fast:${model}:${todayIso}:${normalizedQuery}`;
+
+  if (!refresh) {
+    const cached = await cacheGet(cacheClient, cacheKey);
+    if (cached) return { data: cached, cached: true };
+  }
+
+  const prompt = getResearchFastPrompt(query, todayIso);
+  let result = await callGeminiJson({ apiKey, model, prompt, withSearchTool: true, temperature: 0.1 });
+
+  if (
+    result.response.status === 400 &&
+    /tool|google_search/i.test(String(result.payload?.error?.message || ""))
+  ) {
+    result = await callGeminiJson({ apiKey, model, prompt, withSearchTool: false, temperature: 0.1 });
+  }
+
+  if (!result.response.ok) {
+    return { error: result.payload?.error?.message || "Fast mode failed.", status: result.response.status };
+  }
+
+  const text = result.payload?.candidates?.[0]?.content?.parts?.[0]?.text;
+  let parsed = null;
+  if (text) {
+    try {
+      parsed = JSON.parse(text.replace(/```json|```/g, "").trim());
+    } catch (_) {}
+  }
+
+  const finalData = sanitizeFastPayload(parsed, query);
+  finalData.meta = { mode: "research-fast", version: FAST_API_VERSION, as_of: todayIso };
+  await cacheSet(cacheClient, cacheKey, finalData, 900);
+  return { data: finalData, cached: false };
+}
+
+async function runDetailMode(query, apiKey, model, refresh, cacheClient, todayIso) {
+  const normalizedQuery = normalizeQuery(query);
+  const cacheKey = `search:v3:detail:${model}:${todayIso}:${normalizedQuery}`;
+
+  if (!refresh) {
+    const cached = await cacheGet(cacheClient, cacheKey);
+    if (cached) return { data: cached, cached: true };
+  }
+
+  const prompt = getResearchDetailPrompt(query, todayIso);
+  let result = await callGeminiJson({ apiKey, model, prompt, withSearchTool: true, temperature: 0.1 });
+
+  if (
+    result.response.status === 400 &&
+    /tool|google_search/i.test(String(result.payload?.error?.message || ""))
+  ) {
+    result = await callGeminiJson({ apiKey, model, prompt, withSearchTool: false, temperature: 0.1 });
+  }
+
+  if (!result.response.ok) {
+    return { error: result.payload?.error?.message || "Detail mode failed.", status: result.response.status };
+  }
+
+  const text = result.payload?.candidates?.[0]?.content?.parts?.[0]?.text;
+  let parsed = null;
+  if (text) {
+    try {
+      parsed = JSON.parse(text.replace(/```json|```/g, "").trim());
+    } catch (_) {}
+  }
+
+  const finalData = sanitizeDetailPayload(parsed, query);
+  finalData.meta = { mode: "research-detail", version: DETAIL_API_VERSION, as_of: todayIso };
+  await cacheSet(cacheClient, cacheKey, finalData, 900);
+  return { data: finalData, cached: false };
 }
 
 async function runAgeMode(query, apiKey, model) {
@@ -355,39 +404,33 @@ Return JSON only:
     temperature: 0.1
   });
   if (!response.ok) {
-    return {
-      error: payload?.error?.message || `Upstream error ${response.status}`,
-      status: 500
-    };
+    return { error: payload?.error?.message || `Upstream error ${response.status}`, status: 500 };
   }
   const text = payload?.candidates?.[0]?.content?.parts?.[0]?.text;
   const parsed = text ? JSON.parse(text.replace(/```json|```/g, "").trim()) : null;
   if (!parsed) {
-    return {
-      error: `Could not parse response: ${rawText.slice(0, 120)}`,
-      status: 500
-    };
+    return { error: `Could not parse response: ${rawText.slice(0, 120)}`, status: 500 };
   }
   return { data: parsed, status: 200 };
 }
 
+// ── Handler ──────────────────────────────────────────────────────────────────
+
 export default async function handler(req, res) {
   const query = String(req.query?.query || "").trim();
-  const mode = String(req.query?.mode || "research");
+  const mode = String(req.query?.mode || "research-fast");
   const refresh = req.query?.refresh === "1";
-  const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || process.env.GEMINI_KEY;
+  const apiKey = process.env.GEMINI_API_KEY;
   const rawModel = process.env.GEMINI_MODEL || "gemini-1.5-flash-latest";
   const model = rawModel.startsWith("models/") ? rawModel.slice("models/".length) : rawModel;
+  const todayIso = new Date().toISOString().slice(0, 10);
 
-  if (!apiKey) {
-    return res.status(500).json({ error: "API Key missing in Vercel settings." });
-  }
-  if (!query) {
-    return res.status(400).json({ error: "Missing query parameter." });
-  }
+  if (!apiKey) return res.status(500).json({ error: "API Key missing in Vercel settings." });
+  if (!query) return res.status(400).json({ error: "Missing query parameter." });
 
   res.setHeader("x-gemini-model", model);
 
+  // Age mode — unchanged for item-age.html compatibility
   if (mode === "age") {
     const ageResult = await runAgeMode(query, apiKey, model);
     if (ageResult.error) return res.status(ageResult.status).json({ error: ageResult.error });
@@ -395,91 +438,46 @@ export default async function handler(req, res) {
   }
 
   const cacheClient = getCacheClient();
-  const normalizedQuery = normalizeQuery(query);
-  const cacheKey = `item:phase1:v1:${model}:${normalizedQuery}`;
-  res.setHeader("x-phase1-version", PHASE1_API_VERSION);
 
-  if (!refresh) {
-    const cached = await cacheGet(cacheClient, cacheKey);
-    if (cached) {
-      res.setHeader("x-cache", "HIT");
-      return res.status(200).json(cached);
+  // Detail mode
+  if (mode === "research-detail") {
+    try {
+      const result = await runDetailMode(query, apiKey, model, refresh, cacheClient, todayIso);
+      if (result.error) {
+        const fb = sanitizeDetailPayload(null, query);
+        fb.error = result.error;
+        fb.meta = { mode: "research-detail", version: DETAIL_API_VERSION, as_of: todayIso, degraded: true };
+        return res.status(200).json(fb);
+      }
+      res.setHeader("x-cache", result.cached ? "HIT" : "MISS");
+      res.setHeader("x-detail-version", DETAIL_API_VERSION);
+      return res.status(200).json(result.data);
+    } catch (err) {
+      console.error("Detail mode error:", err);
+      const fb = sanitizeDetailPayload(null, query);
+      fb.error = "Could not generate detail report.";
+      fb.meta = { mode: "research-detail", version: DETAIL_API_VERSION, as_of: todayIso, degraded: true };
+      return res.status(200).json(fb);
     }
   }
-  res.setHeader("x-cache", "MISS");
 
+  // Fast mode (also handles mode=research for backward compat)
   try {
-    const todayIso = new Date().toISOString().slice(0, 10);
-    const prompt = getPhase1Prompt(query, todayIso);
-    let result = await callGeminiJson({
-      apiKey,
-      model,
-      prompt,
-      withSearchTool: true,
-      temperature: 0.1
-    });
-
-    if (
-      result.response.status === 400 &&
-      /tool|google_search/i.test(String(result.payload?.error?.message || ""))
-    ) {
-      result = await callGeminiJson({
-        apiKey,
-        model,
-        prompt,
-        withSearchTool: false,
-        temperature: 0.1
-      });
+    const result = await runFastMode(query, apiKey, model, refresh, cacheClient, todayIso);
+    if (result.error) {
+      const fb = sanitizeFastPayload(null, query);
+      fb.error = result.error;
+      fb.meta = { mode: "research-fast", version: FAST_API_VERSION, as_of: todayIso, degraded: true };
+      return res.status(200).json(fb);
     }
-
-    if (!result.response.ok) {
-      const soft = defaultPhase1(query);
-      soft.error = result.payload?.error?.message || "Upstream error";
-      soft.meta = {
-        phase: "phase1",
-        version: PHASE1_API_VERSION,
-        as_of: todayIso,
-        degraded: true
-      };
-      return res.status(200).json(soft);
-    }
-
-    const text = result.payload?.candidates?.[0]?.content?.parts?.[0]?.text;
-    let parsed = null;
-    if (text) {
-      try {
-        parsed = JSON.parse(text.replace(/```json|```/g, "").trim());
-      } catch (_err) {
-        parsed = null;
-      }
-    }
-    if (!parsed || typeof parsed !== "object") {
-      return res.status(200).json({
-        ...defaultPhase1(query),
-        error: "Could not generate report, please refine query."
-      });
-    }
-
-    const finalData = sanitizePhase1Payload(parsed, query);
-    finalData.meta = {
-      phase: "phase1",
-      version: PHASE1_API_VERSION,
-      as_of: todayIso
-    };
-
-    const ttl = finalData.result_type === "specific_model" ? 7 * 24 * 60 * 60 : 30 * 24 * 60 * 60;
-    await cacheSet(cacheClient, cacheKey, finalData, ttl);
-    return res.status(200).json(finalData);
-  } catch (error) {
-    console.error("Search Engine Error:", error);
-    const soft = defaultPhase1(query);
-    soft.error = "Could not generate report, please refine query.";
-    soft.meta = {
-      phase: "phase1",
-      version: PHASE1_API_VERSION,
-      as_of: new Date().toISOString().slice(0, 10),
-      degraded: true
-    };
-    return res.status(200).json(soft);
+    res.setHeader("x-cache", result.cached ? "HIT" : "MISS");
+    res.setHeader("x-fast-version", FAST_API_VERSION);
+    return res.status(200).json(result.data);
+  } catch (err) {
+    console.error("Fast mode error:", err);
+    const fb = sanitizeFastPayload(null, query);
+    fb.error = "Could not generate report, please refine query.";
+    fb.meta = { mode: "research-fast", version: FAST_API_VERSION, as_of: todayIso, degraded: true };
+    return res.status(200).json(fb);
   }
 }
