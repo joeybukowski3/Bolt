@@ -1,4 +1,46 @@
 import { Redis } from "@upstash/redis";
+const SEARCH_API_VERSION = "2026-02-28-status-guard-v3";
+
+function normalizeCurrentStatus(status) {
+  const s = String(status || "").toLowerCase();
+  if (s.includes("discontinued")) return "Discontinued";
+  if (s.includes("preorder") || s.includes("pre-order")) return "Available for Preorder";
+  if (s.includes("available") || s.includes("released") || s.includes("in production")) return "Currently Available";
+  if (s.includes("announced")) return "Announced, Not Yet Released";
+  if (s.includes("unreleased") || s.includes("rumor") || s.includes("rumoured") || s.includes("unannounced")) return "Not Officially Released";
+  return status || "Unknown";
+}
+
+function stripRumorLanguage(text) {
+  if (!text) return text;
+  return String(text)
+    .replace(/\b(rumored|rumoured|widely anticipated|officially unannounced)\b/gi, "")
+    .replace(/\s{2,}/g, " ")
+    .trim();
+}
+
+function extractYears(text) {
+  if (!text) return [];
+  const matches = String(text).match(/\b(19|20)\d{2}\b/g);
+  return matches ? matches.map((m) => parseInt(m, 10)) : [];
+}
+
+function hasStaleRumorSignals(parsed, currentYear) {
+  const fields = [
+    parsed?.analysis?.status,
+    parsed?.analysis?.overview,
+    parsed?.analysis?.itemDescription,
+    parsed?.analysis?.estimatedModel,
+    parsed?.adjusterNotes?.availabilitySummary,
+    parsed?.releaseDate?.productionEra,
+    parsed?.releaseDate?.discontinuation
+  ]
+    .filter(Boolean)
+    .join(" ");
+  const staleYearMention = extractYears(fields).some((y) => y < currentYear);
+  const rumorLang = /rumor|rumoured|rumored|unreleased|unannounced|anticipated/i.test(fields);
+  return staleYearMention && rumorLang;
+}
 
 export default async function handler(req, res) {
   const { query, mode } = req.query;
@@ -22,10 +64,12 @@ export default async function handler(req, res) {
   }
 
   res.setHeader("x-gemini-model", model);
+  res.setHeader("x-search-api-version", SEARCH_API_VERSION);
   
   const isAgeOnly = mode === 'age';
   const normalizedQuery = String(query || '').trim().toLowerCase();
-  const cacheKey = `search:${isAgeOnly ? 'age' : 'research'}:${model}:${normalizedQuery}`;
+  const todayIso = new Date().toISOString().slice(0, 10);
+  const cacheKey = `search:v2:${isAgeOnly ? 'age' : 'research'}:${model}:${todayIso}:${normalizedQuery}`;
 
   if (cacheEnabled && normalizedQuery && !refresh) {
     try {
@@ -42,7 +86,8 @@ export default async function handler(req, res) {
   }
   
   const prompt = isAgeOnly 
-    ? `You are an expert in serial number decoding for insurance adjusters. 
+    ? `You are an expert in serial number decoding for insurance adjusters.
+       Today is ${todayIso}. Use up-to-date web-grounded information when dates are relevant.
        Research: ${query}. 
        Return ONLY a valid JSON object. No markdown, no backticks.
        JSON format:
@@ -60,7 +105,11 @@ export default async function handler(req, res) {
          },
          "howItWorks": "Brief operation explanation"
        }`
-    : `You are a product research assistant for insurance claims adjusters. Research the following item: ${query}
+    : `You are a product research assistant for insurance claims adjusters.
+Today is ${todayIso}. Use up-to-date, web-grounded facts for release timing, current availability, pricing, and retailer listings.
+If older sources conflict with newer sources, prioritize newer dated sources.
+Never present past rumored dates as current facts.
+Research the following item: ${query}
 
 Provide a detailed analysis in this EXACT JSON format (no extra text, just valid JSON):
 
@@ -140,27 +189,141 @@ IMPORTANT: For availabilitySummary, cite only major retailers and include 2-4 wh
 
   try {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-    
-    console.error("Gemini request model:", model);
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: { 
-          responseMimeType: "application/json",
-          temperature: 0.1 
-        }
-      })
-    });
+    const baseBody = {
+      contents: [{ parts: [{ text: prompt }] }],
+      generationConfig: {
+        responseMimeType: "application/json",
+        temperature: 0.1
+      }
+    };
 
-    let data;
-    let rawText = '';
-    try {
-      rawText = await response.text();
-      data = rawText ? JSON.parse(rawText) : null;
-    } catch (parseErr) {
-      console.error("Gemini response parse error:", parseErr);
+    const sendGeminiRequest = async (withSearchTool) => {
+      const body = withSearchTool ? { ...baseBody, tools: [{ google_search: {} }] } : baseBody;
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+
+      let data;
+      let rawText = '';
+      try {
+        rawText = await response.text();
+        data = rawText ? JSON.parse(rawText) : null;
+      } catch (parseErr) {
+        return {
+          response,
+          data: null,
+          parseError: parseErr,
+          rawText
+        };
+      }
+
+      return { response, data, parseError: null, rawText };
+    };
+
+    const sendCustomGeminiRequest = async (body) => {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      });
+
+      let data;
+      let rawText = "";
+      try {
+        rawText = await response.text();
+        data = rawText ? JSON.parse(rawText) : null;
+      } catch (parseErr) {
+        return { response, data: null, parseError: parseErr, rawText };
+      }
+
+      return { response, data, parseError: null, rawText };
+    };
+
+    const verifyCurrentStatus = async () => {
+      const verificationPrompt = `You are validating product market status with up-to-date web data.
+Today is ${todayIso}.
+Item: ${query}
+
+Use web search and determine CURRENT status as of today. Prefer official manufacturer sources and major retailers/news.
+Return ONLY JSON:
+{
+  "asOfDate": "${todayIso}",
+  "currentStatus": "Currently Available | Available for Preorder | Announced, Not Yet Released | Discontinued | Unknown",
+  "statusSummary": "1-2 sentences with absolute dates (Month D, YYYY where possible)",
+  "releaseDate": "YYYY-MM-DD or unknown",
+  "sources": [
+    {"title": "source title", "url": "https://...", "publishedDate": "YYYY-MM-DD or unknown"}
+  ]
+}
+Rules:
+- Do not use rumor language as final status if there is newer official information.
+- If sources conflict, prioritize newer dated sources.
+- Include 2-4 sources.`;
+
+      const verificationBaseBody = {
+        contents: [{ parts: [{ text: verificationPrompt }] }],
+        generationConfig: {
+          responseMimeType: "application/json",
+          temperature: 0.0
+        }
+      };
+      const attempts = [
+        { ...verificationBaseBody, tools: [{ google_search: {} }] },
+        { ...verificationBaseBody, tools: [{ google_search_retrieval: {} }] },
+        verificationBaseBody
+      ];
+
+      for (const attemptBody of attempts) {
+        const { response, data, parseError, rawText } = await sendCustomGeminiRequest(attemptBody);
+        if (parseError) {
+          console.error("Verification parse error:", parseError);
+          continue;
+        }
+        if (!response.ok || data?.error) {
+          const msg = String(data?.error?.message || "");
+          if (
+            response.status === 400 &&
+            /google_search|google_search_retrieval|tool/i.test(msg)
+          ) {
+            continue;
+          }
+          console.error("Verification upstream error:", {
+            status: response.status,
+            error: data?.error || rawText
+          });
+          continue;
+        }
+
+        const verificationText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (!verificationText) continue;
+        try {
+          const parsed = JSON.parse(
+            String(verificationText).replace(/```json/g, "").replace(/```/g, "").trim()
+          );
+          if (parsed && parsed.currentStatus) return parsed;
+        } catch (err) {
+          console.error("Verification model JSON parse error:", err);
+        }
+      }
+      return null;
+    };
+
+    console.error("Gemini request model:", model);
+    let { response, data, parseError, rawText } = await sendGeminiRequest(true);
+
+    if (
+      response.status === 400 &&
+      data?.error?.message &&
+      /google_search|tools?/i.test(String(data.error.message))
+    ) {
+      console.error("Gemini model does not support google_search tool. Retrying without tool.");
+      ({ response, data, parseError, rawText } = await sendGeminiRequest(false));
+    }
+
+    if (parseError) {
+      console.error("Gemini response parse error:", parseError);
       console.error("Gemini raw response:", rawText);
       return res.status(500).json({
         error: "Upstream response parse error.",
@@ -191,9 +354,52 @@ IMPORTANT: For availabilitySummary, cite only major retailers and include 2-4 wh
     
     try {
       const parsed = JSON.parse(textResponse);
+      parsed.meta = parsed.meta || {};
+      parsed.meta.searchApiVersion = SEARCH_API_VERSION;
+      parsed.meta.asOfDate = todayIso;
+      if (!isAgeOnly) {
+        const currentYear = new Date(todayIso).getUTCFullYear();
+        const verified = await verifyCurrentStatus();
+        if (verified) {
+          const normalizedStatus = normalizeCurrentStatus(verified.currentStatus);
+          parsed.analysis = parsed.analysis || {};
+          parsed.adjusterNotes = parsed.adjusterNotes || {};
+          parsed.releaseDate = parsed.releaseDate || {};
+          parsed.verification = verified;
+          parsed.analysis.status = normalizedStatus;
+          parsed.adjusterNotes.availabilitySummary = verified.statusSummary || parsed.adjusterNotes.availabilitySummary;
+          if (
+            normalizedStatus !== "Not Officially Released" &&
+            /rumored|rumoured|unreleased|unannounced/i.test(String(parsed.analysis.estimatedModel || ""))
+          ) {
+            parsed.analysis.estimatedModel = query;
+          }
+          parsed.analysis.overview = stripRumorLanguage(parsed.analysis.overview);
+          parsed.analysis.itemDescription = stripRumorLanguage(parsed.analysis.itemDescription);
+        } else if (hasStaleRumorSignals(parsed, currentYear)) {
+          parsed.analysis = parsed.analysis || {};
+          parsed.adjusterNotes = parsed.adjusterNotes || {};
+          parsed.releaseDate = parsed.releaseDate || {};
+          parsed.verification = {
+            asOfDate: todayIso,
+            currentStatus: "Unknown",
+            statusSummary: `Unable to confirm current market status with live sources as of ${todayIso}. Prior rumored timelines were suppressed to avoid stale output.`,
+            releaseDate: "unknown",
+            sources: []
+          };
+          parsed.analysis.status = "Status Unverified (Live Check Needed)";
+          parsed.adjusterNotes.availabilitySummary = `Live verification could not confirm current status as of ${todayIso}. Re-run with refresh or verify on manufacturer and major retailer pages.`;
+          parsed.releaseDate.productionEra = `Unknown as of ${todayIso}`;
+          parsed.releaseDate.discontinuation = `Unknown as of ${todayIso}`;
+          parsed.releaseDate.estimatedAge = `Unknown as of ${todayIso}`;
+          parsed.releaseDate.ageNumeric = null;
+          parsed.analysis.overview = stripRumorLanguage(parsed.analysis.overview);
+          parsed.analysis.itemDescription = stripRumorLanguage(parsed.analysis.itemDescription);
+        }
+      }
       if (cacheEnabled && normalizedQuery) {
         try {
-          await redis.set(cacheKey, parsed, { ex: 21600 });
+          await redis.set(cacheKey, parsed, { ex: 900 });
         } catch (err) {
           console.error("Redis cache write error:", err);
         }
