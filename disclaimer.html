@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bolt - Disclaimer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="shared.css">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg-primary: #0f1629;
+            --bg-secondary: #161d35;
+            --bg-card: #ffffff;
+            --bg-card-alt: #f8fafc;
+            --bg-input: rgba(255,255,255,0.06);
+            --border-color: #e2e8f0;
+            --border-accent: rgba(234,179,8,0.4);
+            --text-dark: #1e293b;
+            --text-mid: #475569;
+            --text-light: #94a3b8;
+            --text-white: #f1f5f9;
+            --text-muted-dark: #64748b;
+            --accent: #eab308;
+            --accent-hover: #facc15;
+            --accent-dim: rgba(234,179,8,0.1);
+            --accent-dim-dark: rgba(234,179,8,0.15);
+            --blue: #3b82f6;
+            --blue-light: #dbeafe;
+            --red: #ef4444;
+            --red-light: #fef2f2;
+            --green: #22c55e;
+            --green-light: #f0fdf4;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-white);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .circuit-bg {
+            position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none;
+        }
+        .circuit-bg::before {
+            content: ''; position: absolute; inset: 0;
+            background:
+                linear-gradient(90deg, transparent 49.5%, rgba(234,179,8,0.04) 49.5%, rgba(234,179,8,0.04) 50.5%, transparent 50.5%),
+                linear-gradient(0deg, transparent 49.5%, rgba(234,179,8,0.04) 49.5%, rgba(234,179,8,0.04) 50.5%, transparent 50.5%);
+            background-size: 60px 60px;
+        }
+        .circuit-bg::after {
+            content: ''; position: absolute; inset: 0;
+            background: radial-gradient(ellipse at 50% 0%, rgba(234,179,8,0.06) 0%, transparent 60%),
+                        radial-gradient(ellipse at 50% 100%, rgba(59,130,246,0.04) 0%, transparent 60%);
+        }
+        .lightning-bolts { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+        .bolt-shape { position: absolute; font-size: 15rem; opacity: 0.03; color: var(--accent); font-weight: 800; transform: rotate(-12deg); user-select: none; }
+        .bolt-shape:nth-child(1) { top: 10%; left: 5%; }
+        .bolt-shape:nth-child(2) { top: 15%; left: 30%; font-size: 20rem; }
+        .bolt-shape:nth-child(3) { top: 8%; right: 25%; font-size: 18rem; transform: rotate(8deg); }
+        .bolt-shape:nth-child(4) { top: 12%; right: 5%; }
+
+        .app-container { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 0 1.5rem; }
+
+        /* Navigation */
+        .nav { display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 0; }
+        .nav-left { display: flex; align-items: center; gap: 0.75rem; }
+        .nav-brand { display: flex; align-items: center; gap: 0.3rem; font-size: 1.3rem; font-weight: 800; color: var(--text-white); text-decoration: none; white-space: nowrap; }
+        .nav-brand .bolt-icon { color: var(--accent); }
+        .nav-links { display: flex; align-items: center; gap: 0.5rem; }
+        .nav-link { color: var(--text-light); text-decoration: none; font-size: 0.875rem; font-weight: 500; padding: 0.5rem 1rem; border-radius: 8px; transition: all 0.2s; white-space: nowrap; }
+        .nav-link:hover { color: var(--text-white); background: rgba(255,255,255,0.06); }
+        .nav-link.active { background: var(--accent); color: #000; font-weight: 600; }
+        .nav-link.active:hover { background: var(--accent-hover); }
+
+        /* Content Zone */
+        .content-zone { background: #ffffff; border-radius: 24px 24px 0 0; margin: 2rem -1.5rem 0; padding: 3rem 2rem 4rem; min-height: 60vh; }
+        .content-inner { max-width: 720px; margin: 0 auto; }
+
+        @media (max-width: 640px) {
+            .nav { flex-direction: column; gap: 0.5rem; align-items: flex-start; }
+            .nav-left { flex-wrap: wrap; }
+            .nav-links { gap: 0.25rem; }
+            .nav-link { padding: 0.4rem 0.6rem; font-size: 0.75rem; }
+            .content-zone { padding: 2rem 1rem 3rem; border-radius: 16px 16px 0 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="circuit-bg"></div>
+    <div class="lightning-bolts">
+        <div class="bolt-shape">&#9889;</div>
+        <div class="bolt-shape">&#9889;</div>
+        <div class="bolt-shape">&#9889;</div>
+        <div class="bolt-shape">&#9889;</div>
+    </div>
+
+    <div class="app-container">
+        <nav class="nav">
+            <div class="nav-left">
+                <a class="nav-brand" href="index.html">Bolt <span class="bolt-icon">&#9889;</span></a>
+            </div>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Item Lookup</a>
+                <a href="item-age.html" class="nav-link">How Old is my Item?</a>
+            </div>
+        </nav>
+
+        <div class="content-zone">
+            <div class="content-inner">
+
+                <div class="static-card">
+                    <div class="static-card-header">
+                        <h2>&#9888; Disclaimer</h2>
+                        <p>Accuracy limitations and user responsibilities.</p>
+                    </div>
+                    <div class="static-card-body">
+                        <div class="disclaimer-block">
+                            <strong>For informational purposes only.</strong> Results produced by this tool are intended to assist in the research and estimation of manufacture dates and product valuations. They do not constitute a certified appraisal, legal determination, or professional opinion and should not be relied upon as the sole basis for any financial, legal, or insurance decision.
+                        </div>
+
+                        <div class="static-section">
+                            <h3>Accuracy Limitations</h3>
+                            <p>Serial number formats vary by brand, product line, and production era. Many manufacturers reuse year codes on repeating cycles of 10 to 30 years, meaning a single serial number may correspond to multiple possible manufacture years. While we flag these cases and assign a confidence level, we cannot guarantee the result will always match the actual manufacture date of the specific unit.</p>
+                            <p>Our database is maintained to the best of our ability but may not reflect every serial format variation, regional manufacturing difference, or mid-cycle format change introduced by a manufacturer.</p>
+                        </div>
+
+                        <div class="static-section">
+                            <h3>AI-Assisted Results</h3>
+                            <p>The Item Lookup feature uses an AI language model to estimate product age, valuation, and replacement options when no serial number is available. AI-generated results are estimates based on general product knowledge and publicly available information. They are more likely to contain errors than direct serial number decodes and should be treated as a starting point for further research, not a definitive answer.</p>
+                        </div>
+
+                        <div class="static-section">
+                            <h3>User Responsibility</h3>
+                            <p>Users are solely responsible for verifying all results before using them in any formal context. For insurance claims, legal proceedings, or other situations requiring a defensible determination, we strongly recommend corroborating any result with supporting documentation such as purchase receipts, installation records, or manufacturer verification.</p>
+                        </div>
+
+                        <div class="static-section">
+                            <h3>No Warranties</h3>
+                            <p>This tool is provided "as is" without warranties of any kind, express or implied. We make no representations regarding the accuracy, completeness, or fitness of the information provided. Use of this tool is at your own risk.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="footer">
+                    <p class="footer-tagline">Built for fast, accurate insurance product research and age verification.</p>
+                    <div class="footer-links">
+                        <a href="/methodology">Methodology</a>
+                        <span class="footer-sep">|</span>
+                        <a href="/disclaimer">Disclaimer</a>
+                        <span class="footer-sep">|</span>
+                        <a href="/contact">Contact</a>
+                        <span class="footer-sep">|</span>
+                        <a href="/privacy-policy">Privacy Policy</a>
+                    </div>
+                    <p>&copy; 2026 Bolt. Always verify results for accuracy.</p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,200 @@
+/* Bolt — Shared Design System */
+/* Loaded before each page's inline <style> so inline overrides win for existing pages */
+
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@600;700&display=swap');
+
+/* ─ New design-system variables (complement existing page vars; inline <style> overrides any conflicts) ─ */
+:root {
+  --primary:       #3182ce;
+  --bg-main:       #f8fafc;
+  --card-bg:       #ffffff;
+  --text-main:     #173756;
+  --text-muted:    #64748b;
+  --text-mid:      #475569;
+  --text-light:    #94a3b8;
+  --text-dark:     #173756;
+  --text-white:    #ffffff;
+  --border:        #e2e8f0;
+  --card-border:   #e2e8f0;
+  --bg2:           #eef2f7;
+  --accent:        #3182ce;
+  --accent2:       #1a202c;
+  --accent-glow:   rgba(37, 99, 235, 0.15);
+  --green:         #22c55e;
+  --amber:         #f59e0b;
+  --red:           #ef4444;
+  --radius:        16px;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--bg-main);
+  color: var(--text-main);
+  margin: 0;
+  padding: 0;
+}
+
+/* ─ Static info-page card ─ */
+.static-card {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 180, 216, 0.06);
+  overflow: hidden;
+  margin-top: 1.5rem;
+}
+
+.static-card-header {
+  background: linear-gradient(135deg, #0d2847 0%, #1a3a5c 100%);
+  padding: 1.5rem 2rem;
+}
+
+.static-card-header h1,
+.static-card-header h2 {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0;
+}
+
+.static-card-header p {
+  font-size: 0.88rem;
+  color: rgba(232, 237, 245, 0.7);
+  margin-top: 0.3rem;
+}
+
+.static-card-body {
+  padding: 2rem;
+  color: var(--text-dark);
+}
+
+.static-section {
+  margin-bottom: 1.75rem;
+}
+
+.static-section h2,
+.static-section h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin-bottom: 0.6rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.static-section p {
+  font-size: 0.9rem;
+  color: var(--text-mid);
+  line-height: 1.75;
+  margin-bottom: 0.6rem;
+}
+
+.static-section ul {
+  margin: 0.4rem 0 0.6rem 1.35rem;
+}
+
+.static-section li {
+  font-size: 0.9rem;
+  color: var(--text-mid);
+  line-height: 1.7;
+  margin-bottom: 0.25rem;
+}
+
+.static-section strong {
+  color: var(--text-dark);
+  font-weight: 600;
+}
+
+/* ─ Disclaimer callout block ─ */
+.disclaimer-block {
+  background: #fffbeb;
+  border-left: 4px solid #f59e0b;
+  border-radius: 0 10px 10px 0;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+  color: var(--text-mid);
+  line-height: 1.7;
+}
+
+.disclaimer-block strong {
+  color: var(--text-dark);
+}
+
+/* ─ Notice / info box ─ */
+.notice-box {
+  background: #f0f9ff;
+  border-left: 4px solid #2563eb;
+  border-radius: 0 10px 10px 0;
+  padding: 1.1rem 1.25rem;
+  margin: 1rem 0 1.5rem;
+}
+
+.notice-box-title {
+  font-weight: 700;
+  color: #1d4ed8;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.notice-box p,
+.notice-box li {
+  color: #1e3a5f;
+  font-size: 0.88rem;
+  line-height: 1.65;
+}
+
+/* ─ Footer ─ */
+.footer {
+  margin-top: 2rem;
+  padding: 1.5rem 2rem;
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  text-align: center;
+}
+
+.footer-tagline {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.4rem 0.75rem;
+  margin-bottom: 0.6rem;
+}
+
+.footer-links a {
+  font-size: 0.8rem;
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.footer-links a:hover {
+  text-decoration: underline;
+}
+
+.footer-sep {
+  color: var(--text-light);
+  font-size: 0.8rem;
+}
+
+.footer p {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin: 0.2rem 0;
+}
+
+/* ─ Mobile ─ */
+@media (max-width: 768px) {
+  .static-card-body  { padding: 1.5rem; }
+  .static-card-header { padding: 1.1rem 1.5rem; }
+}
+
+@media (max-width: 600px) {
+  .static-card-body  { padding: 1rem 0.875rem; }
+  .static-card-header { padding: 0.875rem 1rem; }
+}
