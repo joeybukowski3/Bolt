@@ -17,7 +17,7 @@
             --bg-card-alt: #f8fafc;
             --bg-input: rgba(255,255,255,0.06);
             --border-color: #e2e8f0;
-            --border-accent: rgba(234,179,8,0.4);        
+            --border-accent: rgba(234,179,8,0.4);
             --text-dark: #1e293b;
             --text-mid: #475569;
             --text-light: #94a3b8;
@@ -26,7 +26,7 @@
             --accent: #eab308;
             --accent-hover: #facc15;
             --accent-dim: rgba(234,179,8,0.1);
-            --accent-dim-dark: rgba(234,179,8,0.15);     
+            --accent-dim-dark: rgba(234,179,8,0.15);
             --blue: #3b82f6;
             --blue-light: #dbeafe;
             --red: #ef4444;
@@ -47,27 +47,27 @@
             position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none;
         }
         .circuit-bg::before {
-            content: ''; position: absolute; inset: 0;   
+            content: ''; position: absolute; inset: 0;
             background:
                 linear-gradient(90deg, transparent 49.5%, rgba(234,179,8,0.04) 49.5%, rgba(234,179,8,0.04) 50.5%, transparent 50.5%),
                 linear-gradient(0deg, transparent 49.5%, rgba(234,179,8,0.04) 49.5%, rgba(234,179,8,0.04) 50.5%, transparent 50.5%);
             background-size: 60px 60px;
         }
         .circuit-bg::after {
-            content: ''; position: absolute; inset: 0;   
+            content: ''; position: absolute; inset: 0;
             background: radial-gradient(ellipse at 50% 0%, rgba(234,179,8,0.06) 0%, transparent 60%),
                         radial-gradient(ellipse at 50% 100%, rgba(59,130,246,0.04) 0%, transparent 60%);
         }
-        .lightning-bolts { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }       
+        .lightning-bolts { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
         .bolt-shape { position: absolute; font-size: 15rem; opacity: 0.03; color: var(--accent); font-weight: 800; transform: rotate(-12deg); user-select: none; }
-        .bolt-shape:nth-child(1) { top: 10%; left: 5%; } 
+        .bolt-shape:nth-child(1) { top: 10%; left: 5%; }
         .bolt-shape:nth-child(2) { top: 15%; left: 30%; font-size: 20rem; }
         .bolt-shape:nth-child(3) { top: 8%; right: 25%; font-size: 18rem; transform: rotate(8deg); }
         .bolt-shape:nth-child(4) { top: 12%; right: 5%; }
 
-        .app-container { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 0 1.5rem; }  
+        .app-container { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 0 1.5rem; }
 
-        /* â”€â”€ Navigation â”€â”€ */
+        /* ── Navigation ── */
         .nav { display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 0; }
         .nav-left { display: flex; align-items: center; gap: 0.75rem; }
         .nav-brand { display: flex; align-items: center; gap: 0.3rem; font-size: 1.3rem; font-weight: 800; color: var(--text-white); text-decoration: none; white-space: nowrap; }
@@ -77,72 +77,105 @@
         .nav-link.active { background: var(--accent); color: #000; font-weight: 600; }
         .nav-link.active:hover { background: var(--accent-hover); }
 
-        /* â”€â”€ Hero â”€â”€ */
+        /* ── Hero ── */
         .hero { text-align: center; padding: 2.5rem 0 2rem; }
-        .search-container { max-width: 700px; margin: 0 auto 2rem; display: flex; background: var(--bg-input); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; overflow: hidden; transition: border-color 0.3s; }    
+        .search-container { max-width: 700px; margin: 0 auto 2rem; display: flex; background: var(--bg-input); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; overflow: hidden; transition: border-color 0.3s; }
         .search-container:focus-within { border-color: rgba(234,179,8,0.4); box-shadow: 0 0 0 3px rgba(234,179,8,0.1); }
         .search-input { flex: 1; background: transparent; border: none; outline: none; padding: 1rem 1.5rem; font-size: 1rem; color: var(--text-white); font-family: inherit; }
         .search-input::placeholder { color: var(--text-muted-dark); }
         .search-btn { background: var(--accent); color: #000; border: none; padding: 1rem 2rem; font-size: 0.95rem; font-weight: 700; font-family: inherit; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: background 0.2s; white-space: nowrap; }
         .search-btn:hover { background: var(--accent-hover); }
 
-        /* â”€â”€ Stats Bar â”€â”€ */
-        .stats-bar { display: flex; justify-content: center; gap: 1.5rem; margin-bottom: 1rem; flex-wrap: wrap; } 
+        /* ── Stats Bar ── */
+        .stats-bar { display: flex; justify-content: center; gap: 1.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
         .stat-item { display: flex; align-items: center; gap: 0.75rem; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 0.75rem 1.25rem; }
         .stat-icon { color: var(--accent); font-size: 1.1rem; }
         .stat-text { display: flex; flex-direction: column; }
         .stat-label { font-size: 0.6rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted-dark); }
         .stat-value { font-size: 0.9rem; font-weight: 700; color: var(--text-white); }
 
-        /* â”€â”€ Mascot loader â”€â”€ */
+        /* ── Mascot loader ── */
         @keyframes runDogLoader { 0% { left: -80px; } 100% { left: calc(100% + 80px); } }
         @keyframes pulse-glow { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
         @keyframes cape-flutter { 0%, 100% { transform: rotate(-15deg) skewX(0deg); } 50% { transform: rotate(-25deg) skewX(-5deg); } }
         .mascot-area { text-align: center; min-height: 5.5rem; margin-bottom: 0.75rem; }
         #loader-track { width: 400px; max-width: 90vw; overflow: hidden; margin: 0 auto 0.5rem; position: relative; height: 4.5rem; }
         #loader-dog { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 60px; height: 60px; }
-        #loader-dog.running { left: -80px; transform: none; animation: runDogLoader 2.8s linear infinite; }       
+        #loader-dog.running { left: -80px; transform: none; animation: runDogLoader 2.8s linear infinite; }
         #loader-dog.running .dog-cape { animation: cape-flutter 0.4s ease-in-out infinite; }
         .loader-text { color: var(--text-light); font-style: italic; font-size: 0.9rem; display: none; }
         .loader-text.visible { display: block; animation: pulse-glow 2s ease-in-out infinite; }
 
-        /* â”€â”€ Results zone â”€â”€ */
+        /* ── Results zone ── */
         .results-zone { background: #f1f5f9; border-radius: 24px 24px 0 0; margin: 0 -1.5rem; padding: 2rem 1.5rem 3rem; min-height: 60vh; }
         .results-inner { max-width: 1100px; margin: 0 auto; }
-        .results-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .results-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem; }
+        .results-label-group { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
         .results-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-muted-dark); }
         .results-header-actions { display: flex; align-items: center; gap: 0.5rem; }
         .print-btn, .view-toggle-btn, .copy-btn { background: white; color: var(--text-mid); border: 1px solid var(--border-color); padding: 0.4rem 1rem; border-radius: 8px; font-size: 0.75rem; font-weight: 600; font-family: inherit; cursor: pointer; transition: all 0.2s; }
         .print-btn:hover, .view-toggle-btn:hover, .copy-btn:hover { background: #f8fafc; border-color: var(--accent); color: var(--text-dark); }
         .view-toggle-btn.active { background: var(--accent); color: #000; border-color: var(--accent); }
 
-        /* â”€â”€ Cards â”€â”€ */
+        /* ── Tier Badge ── */
+        .tier-badge { display:inline-flex; align-items:center; padding:0.25rem 0.75rem; border-radius:999px; font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; }
+        .tier-entry   { background:#e2e8f0; color:#475569; }
+        .tier-mid     { background:#dbeafe; color:#1d4ed8; }
+        .tier-upper   { background:#dcfce7; color:#15803d; }
+        .tier-premium { background:#fef3c7; color:#92400e; }
+        .tier-luxury  { background:#1a202c; color:#eab308; }
+
+        /* ── Skeleton shimmer ── */
+        @keyframes skeleton-shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+        .skeleton-line { height:0.9rem; border-radius:6px; background:linear-gradient(90deg,#e2e8f0 25%,#f1f5f9 50%,#e2e8f0 75%); background-size:200% 100%; animation:skeleton-shimmer 1.4s infinite; margin-bottom:0.5rem; }
+        .skeleton-line.short { width:40%; }
+        .skeleton-line.med { width:70%; }
+        .skeleton-line.full { width:100%; }
+        .section-spinner { display:flex; align-items:center; gap:0.5rem; color:var(--text-muted-dark); font-size:0.8rem; font-style:italic; padding:0.75rem 0; }
+        .section-spinner::before { content:''; width:14px; height:14px; border:2px solid var(--border-color); border-top-color:var(--accent); border-radius:50%; animation:spin 0.8s linear infinite; flex-shrink:0; }
+        @keyframes spin { to { transform:rotate(360deg); } }
+
+        /* ── MSRP two-value display ── */
+        .msrp-pair { display:flex; flex-direction:column; gap:0.2rem; }
+        .msrp-label { font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-muted-dark); }
+        .msrp-value { font-size:0.88rem; color:var(--text-dark); font-weight:600; }
+        .msrp-note  { font-size:0.75rem; color:var(--text-muted-dark); font-style:italic; }
+
+        /* ── ACV step breakdown ── */
+        .acv-steps { font-size:0.82rem; color:var(--text-muted-dark); font-family:monospace; background:var(--bg-card-alt); padding:0.6rem 0.75rem; border-radius:8px; margin-top:0.5rem; line-height:1.8; white-space:pre-line; }
+
+        /* ── Refine tip ── */
+        .refine-tip { background:#f0f9ff; border:1px solid #bae6fd; border-radius:10px; padding:0.875rem 1rem; margin-top:1rem; font-size:0.85rem; color:#0c4a6e; }
+        .refine-tip strong { font-weight:700; }
+        .chip-btn { margin-right:0.4rem; margin-top:0.4rem; border-radius:999px; }
+
+        /* ── Cards ── */
         .card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 1.25rem 1.5rem; margin-bottom: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02); }
-        .card-title { font-size: 0.95rem; font-weight: 700; color: var(--text-dark); margin-bottom: 0.85rem; padding-bottom: 0.6rem; border-bottom: 2px solid var(--accent-dim); display: flex; align-items: center; gap: 0.5rem; } 
+        .card-title { font-size: 0.95rem; font-weight: 700; color: var(--text-dark); margin-bottom: 0.85rem; padding-bottom: 0.6rem; border-bottom: 2px solid var(--accent-dim); display: flex; align-items: center; gap: 0.5rem; }
         .card-title .title-icon { color: var(--accent); font-size: 1.1rem; }
         .card-title .title-number { background: var(--accent); color: #000; width: 22px; height: 22px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 800; }
         .card-accent-stripe { height: 3px; background: linear-gradient(90deg, var(--accent), var(--blue), var(--accent)); border-radius: 3px; margin-bottom: 0.85rem; opacity: 0.6; }
 
-        /* â”€â”€ Report text styles (matching screenshot) â”€â”€ */
-        .report-overview { font-size: 0.85rem; color: var(--text-mid); line-height: 1.7; margin-bottom: 1rem; }   
+        /* ── Report text styles ── */
+        .report-overview { font-size: 0.85rem; color: var(--text-mid); line-height: 1.7; margin-bottom: 1rem; }
         .report-list { list-style: none; padding: 0; margin: 0; }
         .report-list li { padding: 0.4rem 0; font-size: 0.85rem; color: var(--text-mid); line-height: 1.6; border-bottom: 1px solid #f1f5f9; display: flex; align-items: baseline; gap: 0.5rem; }
         .report-list li:last-child { border-bottom: none; }
-        .report-list li::before { content: '\2022'; color: var(--accent); font-weight: 700; flex-shrink: 0; }     
+        .report-list li::before { content: '\2022'; color: var(--accent); font-weight: 700; flex-shrink: 0; }
         .report-list .label { font-weight: 700; color: var(--text-dark); white-space: nowrap; }
-        .report-list .label::after { content: ':'; }     
+        .report-list .label::after { content: ':'; }
 
         .section-subtitle { font-size: 0.88rem; font-weight: 700; color: var(--text-dark); margin: 1.25rem 0 0.6rem; padding-bottom: 0.3rem; border-bottom: 1px solid var(--border-color); }
 
-        /* â”€â”€ Quick View â”€â”€ */
+        /* ── Quick View ── */
         .quick-view-strip { display: flex; flex-wrap: wrap; gap: 0.75rem; }
         .quick-view-item { background: var(--bg-card); border: 1px solid var(--border-color); border-left: 4px solid var(--accent); border-radius: 10px; padding: 0.75rem 1rem; flex: 1 1 160px; min-width: 140px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
         .quick-view-label { font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted-dark); margin-bottom: 0.2rem; }
         .quick-view-value { font-size: 0.9rem; font-weight: 600; color: var(--text-dark); }
         .quick-view-value.acv-highlight { color: var(--green); font-weight: 700; }
 
-        /* â”€â”€ Estimation Banner â”€â”€ */
-        .estimation-banner { background: #fef9c3; border: 1px solid #fde68a; border-left: 4px solid #f59e0b; border-radius: 10px; padding: 0.75rem 1rem; margin-bottom: 1rem; color: #92400e; font-size: 0.82rem; line-height: 1.5; display: flex; align-items: flex-start; gap: 0.5rem; }   
+        /* ── Estimation Banner ── */
+        .estimation-banner { background: #fef9c3; border: 1px solid #fde68a; border-left: 4px solid #f59e0b; border-radius: 10px; padding: 0.75rem 1rem; margin-bottom: 1rem; color: #92400e; font-size: 0.82rem; line-height: 1.5; display: flex; align-items: flex-start; gap: 0.5rem; }
         .estimation-banner .banner-icon { font-size: 1.1rem; flex-shrink: 0; }
 
         /* Advisory Banner */
@@ -153,62 +186,97 @@
         .advisory-tips { margin-top: 0.5rem; padding-left: 1rem; font-size: 0.75rem; color: #b45309; }
         .advisory-tips li { margin-bottom: 0.2rem; }
 
-        /* â”€â”€ Valuation interactive â”€â”€ */        
+        /* ── Valuation interactive ── */
         .acv-value { color: var(--green); font-weight: 700; font-size: 1rem; }
         .acv-formula { font-style: italic; color: var(--text-muted-dark); font-size: 0.78rem; }
-        .acv-note { font-size: 0.82rem; color: var(--text-mid); margin-top: 0.5rem; line-height: 1.5; font-style: italic; }
-        .age-input-row { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.25rem; }
+        .age-input-row { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem; }
         .age-input { width: 60px; padding: 0.3rem 0.5rem; border: 1px solid var(--border-color); border-radius: 6px; font-size: 0.85rem; font-family: inherit; text-align: center; color: var(--text-dark); }
-        .age-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-dim); } 
+        .age-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-dim); }
         .age-label { font-size: 0.8rem; color: var(--text-muted-dark); }
         .recalc-btn { background: var(--accent); color: #000; border: none; padding: 0.3rem 0.75rem; border-radius: 6px; font-size: 0.75rem; font-weight: 700; font-family: inherit; cursor: pointer; transition: background 0.2s; }
         .recalc-btn:hover { background: var(--accent-hover); }
 
-        /* â”€â”€ Technical grid â”€â”€ */
+        /* ── Technical grid ── */
         .tech-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.6rem; }
-        .tech-grid.has-manual { margin-top: 0.6rem; }    
+        .tech-grid.has-manual { margin-top: 0.6rem; }
         .tech-item { padding: 0.65rem 0.75rem; background: var(--bg-card-alt); border-radius: 8px; border-left: 3px solid var(--border-color); }
         .tech-item.recall-item { border-left-color: var(--red); background: var(--red-light); }
         .tech-item.neutral-item { border-left-color: var(--text-light); }
         .tech-label { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.2rem; }
-        .tech-label.recall { color: var(--red); }        
+        .tech-label.recall { color: var(--red); }
         .tech-label.neutral { color: var(--text-muted-dark); }
         .tech-value { font-size: 0.78rem; color: var(--text-mid); line-height: 1.5; }
         .manual-link { display: inline-flex; align-items: center; gap: 0.4rem; background: var(--green-light); color: #15803d; padding: 0.45rem 1rem; border-radius: 999px; font-size: 0.7rem; font-weight: 700; text-decoration: none; border: 1px solid rgba(34,197,94,0.2); transition: all 0.2s; }
         .manual-link:hover { background: #dcfce7; border-color: rgba(34,197,94,0.4); }
 
-        /* â”€â”€ Error Codes â”€â”€ */
-        .error-codes-section { margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--border-color); }
-        .error-codes-title { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-dark); margin-bottom: 0.5rem; }    
+        /* ── Error Codes ── */
         .error-codes-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
         .error-codes-table th { background: var(--bg-card-alt); color: var(--text-muted-dark); font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; padding: 0.4rem 0.6rem; text-align: left; border-bottom: 1px solid var(--border-color); }
         .error-codes-table td { padding: 0.4rem 0.6rem; border-bottom: 1px solid #f1f5f9; color: var(--text-mid); }
         .error-codes-table td:first-child { font-weight: 700; color: var(--red); white-space: nowrap; width: 80px; }
+        .error-codes-table td:nth-child(2) { width: 30%; }
         .error-codes-table tr:last-child td { border-bottom: none; }
-        .error-codes-link { display: inline-flex; align-items: center; gap: 0.3rem; color: var(--blue); font-size: 0.75rem; font-weight: 600; text-decoration: none; margin-top: 0.5rem; }
-        .error-codes-link:hover { text-decoration: underline; }
 
-        /* â”€â”€ Table (compact) â”€â”€ */
+        /* Replacement guidance card */
+        .lkq-block { background: var(--bg-card-alt); border-radius: 10px; padding: 0.85rem 1rem; margin-bottom: 0.85rem; }
+        .lkq-title { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted-dark); margin-bottom: 0.5rem; }
+        .lkq-spec-list { list-style: none; padding: 0; margin: 0; }
+        .lkq-spec-list li { font-size: 0.82rem; color: var(--text-mid); padding: 0.2rem 0; display: flex; align-items: baseline; gap: 0.4rem; }
+        .lkq-spec-list li::before { content: '✓'; color: var(--green); font-weight: 700; flex-shrink: 0; }
+        .lkq-spec-list.variation li::before { content: '~'; color: var(--blue); }
+
+        /* ── Failures list ── */
+        .failures-list { list-style: none; padding: 0; }
+        .failures-list li { padding: 0.6rem 0; border-bottom: 1px solid #f1f5f9; font-size: 0.82rem; }
+        .failures-list li:last-child { border-bottom: none; }
+        .failures-component { font-weight: 700; color: var(--text-dark); font-size: 0.82rem; }
+        .failures-detail { color: var(--text-mid); margin-top: 0.15rem; }
+        .failures-symptoms { color: var(--text-muted-dark); font-size: 0.78rem; font-style: italic; margin-top: 0.1rem; }
+
+        /* ── Troubleshooting ── */
+        .troubleshoot-steps { list-style: none; padding: 0; counter-reset: step; }
+        .troubleshoot-steps li { counter-increment: step; padding: 0.5rem 0 0.5rem 2rem; border-bottom: 1px solid #f1f5f9; font-size: 0.82rem; color: var(--text-mid); position: relative; }
+        .troubleshoot-steps li:last-child { border-bottom: none; }
+        .troubleshoot-steps li::before { content: counter(step); position: absolute; left: 0; top: 0.5rem; background: var(--accent); color: #000; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 800; }
+        .repair-resources { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.75rem; }
+        .repair-link { display: inline-flex; align-items: center; gap: 0.3rem; background: var(--blue-light); color: #1d4ed8; padding: 0.35rem 0.75rem; border-radius: 999px; font-size: 0.72rem; font-weight: 700; text-decoration: none; border: 1px solid rgba(59,130,246,0.2); transition: all 0.2s; }
+        .repair-link:hover { background: #bfdbfe; }
+
+        /* ── Recalls list ── */
+        .recalls-list { list-style: none; padding: 0; }
+        .recalls-list li { padding: 0.6rem 0; border-bottom: 1px solid #f1f5f9; font-size: 0.82rem; }
+        .recalls-list li:last-child { border-bottom: none; }
+        .recall-title { font-weight: 700; color: var(--red); display: flex; align-items: center; gap: 0.4rem; }
+        .recall-date { font-size: 0.72rem; color: var(--text-muted-dark); }
+        .recall-desc { color: var(--text-mid); margin-top: 0.2rem; }
+        .recall-link { color: var(--blue); text-decoration: none; font-size: 0.78rem; font-weight: 600; }
+        .recall-link:hover { text-decoration: underline; }
+
+        /* ── Manufacturer / Manual links ── */
+        .mfr-links { display: flex; flex-direction: column; gap: 0.5rem; }
+        .mfr-link-item { display: flex; align-items: center; gap: 0.75rem; background: var(--bg-card-alt); border-radius: 8px; padding: 0.65rem 0.9rem; }
+        .mfr-link-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted-dark); min-width: 90px; }
+        .mfr-link-a { color: var(--blue); text-decoration: none; font-size: 0.82rem; font-weight: 600; }
+        .mfr-link-a:hover { text-decoration: underline; }
+
+        /* ── Table (replacement) ── */
         .data-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
         .data-table th { background: var(--bg-card-alt); color: var(--text-muted-dark); font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; padding: 0.55rem 0.65rem; text-align: left; border-bottom: 2px solid var(--border-color); }
         .data-table th.highlight { color: var(--accent); }
         .data-table td { padding: 0.55rem 0.65rem; border-bottom: 1px solid #f1f5f9; color: var(--text-mid); line-height: 1.4; }
         .data-table tr:last-child td { border-bottom: none; }
-        .data-table tr:hover td { background: #fefce8; } 
+        .data-table tr:hover td { background: #fefce8; }
         .data-table td:first-child { font-weight: 600; color: var(--text-dark); background: var(--bg-card-alt); white-space: nowrap; }
         .data-table td.brand-match { color: #92400e; font-weight: 600; background: #fef9c3; }
+        .retailer-links a { color: var(--blue); text-decoration: none; font-weight: 600; font-size: 0.78rem; }
+        .retailer-links a:not(:last-child)::after { content: ' · '; color: var(--text-muted-dark); font-weight: 400; }
+        .retailer-links a:hover { text-decoration: underline; }
 
-        /* â”€â”€ How It Works â”€â”€ */
+        /* ── How It Works ── */
         .how-it-works-text { font-size: 0.85rem; color: var(--text-mid); line-height: 1.7; }
 
-        /* â”€â”€ Diagnostics List â”€â”€ */
-        .diagnostics-list { list-style: none; padding: 0; }
-        .diagnostics-list li { padding: 0.5rem 0; border-bottom: 1px solid #f1f5f9; font-size: 0.82rem; }
-        .diagnostics-list li:last-child { border-bottom: none; }
-        .diagnostics-list a { color: var(--blue); text-decoration: none; font-weight: 600; }
-        .diagnostics-list a:hover { text-decoration: underline; }
-        .diagnostics-list .diag-source { color: var(--text-muted-dark); }
-        .diagnostics-empty { color: var(--text-muted-dark); font-style: italic; font-size: 0.82rem; }
+        /* ── None found state ── */
+        .none-found { color: var(--text-muted-dark); font-style: italic; font-size: 0.82rem; padding: 0.5rem 0; }
 
         .hidden { display: none !important; }
 
@@ -222,23 +290,25 @@
         .collapse-btn { width: 100%; padding: 0.75rem; background: #f1f5f9; border: none; border-radius: 8px; color: var(--text-mid); font-size: 0.8rem; font-weight: 700; cursor: pointer; margin-top: 1rem; transition: background 0.2s; }
         .collapse-btn:hover { background: #e2e8f0; }
 
-        /* â”€â”€ Print â”€â”€ */
+        /* ── Print ── */
         @media print {
-            .no-print { display: none !important; }      
+            .no-print { display: none !important; }
             body { background: white !important; color: #000 !important; }
             .circuit-bg, .lightning-bolts { display: none !important; }
             .results-zone { background: white !important; margin: 0 !important; padding: 0 !important; }
             .card { box-shadow: none !important; border: 1px solid #ddd !important; }
+            .section-spinner, .skeleton-line, .refine-tip { display: none !important; }
+            .expanded-only { display: block !important; }
         }
 
-        /* â”€â”€ Responsive â”€â”€ */
+        /* ── Responsive ── */
         @media (max-width: 768px) { .tech-grid { grid-template-columns: 1fr; } }
         @media (max-width: 640px) {
             .nav { flex-direction: column; gap: 0.5rem; align-items: flex-start; }
             .nav-left { flex-wrap: wrap; }
             .hero { padding: 1.5rem 0 1rem; }
             .stats-bar { gap: 0.5rem; }
-            .stat-item { padding: 0.5rem 0.75rem; }      
+            .stat-item { padding: 0.5rem 0.75rem; }
             .nav-links { gap: 0.25rem; }
             .nav-link { padding: 0.4rem 0.6rem; font-size: 0.75rem; }
             .card { padding: 1rem; }
@@ -268,7 +338,7 @@
             </div>
         </nav>
 
-        <div class="hero no-print" id="hero-section">    
+        <div class="hero no-print" id="hero-section">
             <div class="mascot-area">
                 <div id="loader-track"><div id="loader-dog"><svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg" width="60" height="60">
                     <g class="dog-cape">
@@ -278,9 +348,9 @@
                     <ellipse cx="30" cy="38" rx="14" ry="12" fill="white"/>
                     <circle cx="38" cy="22" r="12" fill="white"/>
                     <ellipse cx="30" cy="12" rx="4" ry="7" fill="white" transform="rotate(-15 30 12)"/>
-                    <ellipse cx="31" cy="13" rx="2.5" ry="5" fill="#fecaca" transform="rotate(-15 31 13)"/>       
+                    <ellipse cx="31" cy="13" rx="2.5" ry="5" fill="#fecaca" transform="rotate(-15 31 13)"/>
                     <ellipse cx="46" cy="14" rx="4" ry="7" fill="white" transform="rotate(15 46 14)"/>
-                    <ellipse cx="45" cy="15" rx="2.5" ry="5" fill="#fecaca" transform="rotate(15 45 15)"/>        
+                    <ellipse cx="45" cy="15" rx="2.5" ry="5" fill="#fecaca" transform="rotate(15 45 15)"/>
                     <circle cx="34" cy="20" r="2.5" fill="#1e293b"/>
                     <circle cx="42" cy="20" r="2.5" fill="#1e293b"/>
                     <circle cx="35" cy="19" r="0.8" fill="white"/>
@@ -311,11 +381,14 @@
                 <div class="results-inner">
 
                     <div class="results-header no-print">
-                        <span class="results-label">Research Report</span>
+                        <div class="results-label-group">
+                            <span class="results-label">Research Report</span>
+                            <span id="tier-badge" class="tier-badge hidden"></span>
+                        </div>
                         <div class="results-header-actions">
                             <button id="view-toggle" class="view-toggle-btn active">Compact View</button>
-                            <button id="copy-btn" class="copy-btn">📋 Copy Summary</button>
-                            <button class="print-btn" id="print-btn">📠 Print to PDF</button>
+                            <button id="copy-btn" class="copy-btn">&#128203; Copy Summary</button>
+                            <button class="print-btn" id="print-btn">&#128424; Print to PDF</button>
                         </div>
                     </div>
 
@@ -324,18 +397,23 @@
                         <span id="estimation-text"></span>
                     </div>
 
+                    <!-- Refine Tip (tier 1 & 2) -->
+                    <div id="refine-tip" class="refine-tip hidden">
+                        <strong>&#128161; Refine your search:</strong> <span id="refine-tip-text"></span>
+                    </div>
+
                     <!-- Quick View -->
-                    <div id="quick-view" class="hidden"> 
-                        <div class="quick-view-strip">   
+                    <div id="quick-view" class="hidden">
+                        <div class="quick-view-strip">
                             <div class="quick-view-item"><div class="quick-view-label">Category</div><div class="quick-view-value" id="qv-category"></div></div>
                             <div class="quick-view-item"><div class="quick-view-label">Status</div><div class="quick-view-value" id="qv-status"></div></div>
                             <div class="quick-view-item"><div class="quick-view-label">Age</div><div class="quick-view-value" id="qv-age"></div></div>
-                            <div class="quick-view-item"><div class="quick-view-label">MSRP</div><div class="quick-view-value" id="qv-msrp"></div></div>
-                            <div class="quick-view-item"><div class="quick-view-label">Est. ACV</div><div class="quick-view-value acv-highlight" id="qv-acv"></div></div>  
+                            <div class="quick-view-item"><div class="quick-view-label">Launch MSRP</div><div class="quick-view-value" id="qv-msrp"></div></div>
+                            <div class="quick-view-item"><div class="quick-view-label">Est. ACV</div><div class="quick-view-value acv-highlight" id="qv-acv"></div></div>
                         </div>
                     </div>
 
-                    <!-- Detailed View (default) -->     
+                    <!-- Detailed View -->
                     <div id="detailed-view">
 
                         <!-- Section 1: Current Item Analysis -->
@@ -343,20 +421,22 @@
                             <div class="card-title"><span class="title-number">1</span> Current Item Analysis <span class="title-icon">&#9889;</span></div>
                             <div class="card-accent-stripe"></div>
                             <p class="report-overview" id="r-overview"></p>
-                            <ul class="report-list" id="major-specs-list">     
+                            <ul class="report-list" id="major-specs-list">
+                                <li><span class="label">Search Query</span> <span id="r-search-query"></span></li>
+                                <li><span class="label">Assumptions Used</span> <span id="r-assumptions"></span></li>
                                 <li><span class="label">Item Description</span> <span id="r-item-desc"></span></li>
-                                <li><span class="label">Key Details</span> <span id="r-key-details"></span></li>  
+                                <li><span class="label">Comparable Factors</span> <span id="r-key-details"></span></li>
                                 <li class="compact-hidden"><span class="label">Technical Specs</span> <span id="r-tech-specs"></span></li>
-                                <li class="compact-hidden"><span class="label">Materials</span> <span id="r-materials"></span></li>      
+                                <li class="compact-hidden"><span class="label">Materials</span> <span id="r-materials"></span></li>
                             </ul>
-                            
-                            <div id="full-specs-container" class="expanded-only" style="margin-top: 0.5rem;">
+
+                            <div id="full-specs-container" style="margin-top: 0.5rem; display:none;">
                                 <ul class="report-list" id="extended-specs-list"></ul>
                             </div>
-                            <button id="toggle-specs" class="collapse-btn no-print">Show full technical specifications</button>
+                            <button id="toggle-specs" class="collapse-btn no-print">Show Full Technical Specifications</button>
 
                             <div class="section-subtitle">Release Date &amp; Age</div>
-                            <ul class="report-list">     
+                            <ul class="report-list">
                                 <li><span class="label">Production Era</span> <span id="r-production-era"></span></li>
                                 <li class="compact-hidden"><span class="label">Discontinuation</span> <span id="r-discontinuation"></span></li>
                                 <li><span class="label">Estimated Age</span> <span id="r-estimated-age"></span></li>
@@ -376,42 +456,58 @@
                                     </ul>
                                 </div>
                             </div>
+                            <div id="refinement-chips" class="no-print" style="margin-top:0.5rem;"></div>
 
-                            <div class="section-subtitle">Valuation &amp; Depreciation</div>
-                            <ul class="report-list">     
-                                <li><span class="label">Original MSRP</span> <span id="r-msrp"></span></li>       
-                                <li class="compact-hidden"><span class="label">Annual Depreciation</span> <span id="r-depreciation-display"></span></li>
-                                <li>
+                            <div class="section-subtitle" id="valuation-subtitle">Pricing &amp; Depreciation (Informational)</div>
+                            <ul class="report-list" id="valuation-list">
+                                <li id="msrp-row">
+                                    <span class="label">MSRP</span>
+                                    <span>
+                                        <div class="msrp-pair">
+                                            <span class="msrp-label">Launch MSRP</span>
+                                            <span class="msrp-value" id="r-launch-msrp"></span>
+                                            <span class="msrp-label" style="margin-top:0.4rem">Current Market Price</span>
+                                            <span class="msrp-value" id="r-market-price"></span>
+                                            <span class="msrp-note" id="r-market-price-note"></span>
+                                        </div>
+                                    </span>
+                                </li>
+                                <li id="acv-row">
                                     <span class="label">ACV Calculation</span>
                                     <span>
                                         <span class="acv-value" id="r-acv"></span>
                                         <span class="acv-formula" id="r-acv-formula" style="display:block; margin-top:0.2rem;"></span>
-                                        <span class="acv-note" id="r-acv-note"></span>
+                                        <div class="acv-steps" id="r-acv-steps" style="display:none;"></div>
                                         <div class="age-input-row">
                                             <span class="age-label">Adjust age:</span>
                                             <input type="number" id="acv-age-input" class="age-input" min="0" max="100" value="0">
                                             <span class="age-label">years</span>
-                                            <button class="recalc-btn" id="recalc-btn">Recalculate</button>       
+                                            <button class="recalc-btn" id="recalc-btn">Recalculate</button>
+                                            <button class="recalc-btn" id="generate-valuation-btn">Generate Price Estimate</button>
                                         </div>
+                                        <span class="acv-note" id="r-acv-note"></span>
                                     </span>
                                 </li>
                             </ul>
-
-                            <div class="section-subtitle">Adjuster Notes</div>
-                            <ul class="report-list">
-                                <li><span class="label">Like-Kind Rationale</span> <span id="r-like-kind"></span></li>
-                                <li><span class="label">Availability / Lead Time</span> <span id="r-availability"></span></li>
-                                <li><span class="label">Warranty Snapshot</span> <span id="r-warranty"></span></li>
-                                <li class="compact-hidden"><span class="label">Discontinued Impact</span> <span id="r-discontinued-impact"></span></li>
-                                <li class="compact-hidden"><span class="label">Serial/Date Code Summary</span> <span id="r-serial-decoding"></span></li>
-                            </ul>
                         </div>
 
-                        <!-- Section 2: Replacement Options -->
-                        <div class="card" style="overflow-x: auto;">
-                            <div class="card-title"><span class="title-number">2</span> Current Replacement Options <span class="title-icon">&#128260;</span></div>        
+                        <!-- Section 2: Item Notes -->
+                        <div class="card" id="card-item-notes">
+                            <div class="card-title"><span class="title-number">2</span> Item Notes <span class="title-icon">&#128203;</span></div>
                             <div class="card-accent-stripe"></div>
-                            <table class="data-table">   
+                            <div id="item-notes-content">
+                                <div class="skeleton-line med"></div>
+                                <div class="skeleton-line full"></div>
+                                <div class="skeleton-line short"></div>
+                            </div>
+                        </div>
+
+                        <!-- Section 3: Replacement Options -->
+                        <div class="card" id="card-table" style="overflow-x: auto;">
+                            <div class="card-title"><span class="title-number">3</span> Current Replacement Options <span class="title-icon">&#128260;</span></div>
+                            <div class="card-accent-stripe"></div>
+                            <div id="table-loading" class="section-spinner">Loading replacement options...</div>
+                            <table id="r-table" class="data-table hidden">
                                 <thead><tr>
                                     <th>Feature</th><th>Original Item</th><th class="highlight">Brand Match</th><th>Option 1</th><th>Option 2</th>
                                 </tr></thead>
@@ -421,45 +517,82 @@
 
                         <!-- Expanded Only Sections -->
                         <div class="expanded-only">
-                            <!-- Section 3: Technical Info -->
-                            <div class="card">
-                                <div class="card-title"><span class="title-number">3</span> Relevant Technical Information <span class="title-icon">&#128295;</span></div>     
+
+                            <!-- Section 4: How It Works -->
+                            <div class="card" id="card-how-it-works">
+                            <div class="card-title"><span class="title-number">4</span> How it works <span class="title-icon">&#128161;</span></div>
                                 <div class="card-accent-stripe"></div>
-                                <div id="manual-box" style="margin-bottom: 0.5rem;"></div>
-                                <div class="tech-grid has-manual">
-                                    <div class="tech-item recall-item"><div class="tech-label recall">Recall Notices</div><div class="tech-value" id="r-recalls"></div></div>  
-                                    <div class="tech-item neutral-item"><div class="tech-label neutral">Failure Patterns</div><div class="tech-value" id="r-failures"></div></div>
-                                    <div class="tech-item neutral-item"><div class="tech-label neutral">Common Symptoms</div><div class="tech-value" id="r-symptoms"></div></div>
-                                    <div class="tech-item neutral-item"><div class="tech-label neutral">Legal / Class Action</div><div class="tech-value" id="r-legal"></div></div>
+                                <div id="how-it-works-content">
+                                    <div class="section-spinner">Loading...</div>
                                 </div>
-                                <div id="error-codes-container"></div>
                             </div>
 
-                            <!-- Section 4: How It Works --> 
-                            <div class="card">
-                                <div class="card-title"><span class="title-number">4</span> How It Works <span class="title-icon">&#128161;</span></div>
+                            <!-- Section 5: Recalls -->
+                            <div class="card" id="card-recalls">
+                            <div class="card-title"><span class="title-number">5</span> Recall Notices or Class Action <span class="title-icon">&#9888;</span></div>
                                 <div class="card-accent-stripe"></div>
-                                <div class="how-it-works-text" id="r-how-it-works"></div>
+                                <div id="recalls-content">
+                                    <div class="section-spinner">Loading...</div>
+                                </div>
                             </div>
 
-                            <!-- Section 5: Diagnostics -->  
-                            <div class="card">
-                                <div class="card-title"><span class="title-number">5</span> Diagnostics &amp; Repair Resources <span class="title-icon">&#128736;</span></div> 
+                            <!-- Section 6: Error Codes -->
+                            <div class="card" id="card-error-codes">
+                                <div class="card-title"><span class="title-number">6</span> Error Codes <span class="title-icon">&#128308;</span></div>
                                 <div class="card-accent-stripe"></div>
-                                <div id="r-diagnostics"></div>
+                                <div id="error-codes-content">
+                                    <div class="section-spinner">Loading...</div>
+                                </div>
                             </div>
-                        </div>
 
-                        <!-- Methodology Footer (Old Style) -->
+                            <!-- Section 7: Common Failures -->
+                            <div class="card" id="card-failures">
+                                <div class="card-title"><span class="title-number">7</span> Common Failures <span class="title-icon">&#128295;</span></div>
+                                <div class="card-accent-stripe"></div>
+                                <div id="failures-content">
+                                    <div class="section-spinner">Loading...</div>
+                                </div>
+                            </div>
+
+                            <!-- Section 8: Owner's Manual -->
+                            <div class="card" id="card-manual">
+                                <div class="card-title"><span class="title-number">8</span> Owner&apos;s Manual <span class="title-icon">&#128196;</span></div>
+                                <div class="card-accent-stripe"></div>
+                                <div id="manual-content">
+                                    <div class="section-spinner">Loading...</div>
+                                </div>
+                            </div>
+
+                            <!-- Section 9: Manufacturer Page -->
+                            <div class="card" id="card-manufacturer-page">
+                                <div class="card-title"><span class="title-number">9</span> Manufacturer&apos;s Item Page <span class="title-icon">&#128279;</span></div>
+                                <div class="card-accent-stripe"></div>
+                                <div id="manufacturer-page-content">
+                                    <div class="section-spinner">Loading...</div>
+                                </div>
+                            </div>
+
+                            <!-- Section 10: Troubleshooting -->
+                            <div class="card" id="card-troubleshooting">
+                                <div class="card-title"><span class="title-number">10</span> Troubleshooting and Repair <span class="title-icon">&#128736;</span></div>
+                                <div class="card-accent-stripe"></div>
+                                <div id="troubleshooting-content">
+                                    <div class="section-spinner">Loading...</div>
+                                </div>
+                            </div>
+
+                        </div><!-- /expanded-only -->
+
+                        <!-- Methodology Footer -->
                         <footer class="no-print" style="text-align: center; padding: 2rem 0; opacity: 0.6; font-size: 0.75rem;">
-                            <p>Estimates generated via Bolt Claims Intelligence Engine. Disclosure: verify critical figures at point of settlement.</p>
+                            <p>Estimates generated via Bolt Research Intelligence Engine. Verify critical figures before use.</p>
                         </footer>
 
                     </div><!-- /detailed-view -->
 
                     <!-- Site Footer -->
                     <div class="footer no-print">
-                        <p class="footer-tagline">Built for fast, accurate insurance product research and age verification.</p>
+                        <p class="footer-tagline">Built for fast, accurate product research and age verification.</p>
                         <div class="footer-links">
                             <a href="/methodology">Methodology</a>
                             <span class="footer-sep">|</span>
