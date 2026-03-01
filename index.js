@@ -441,6 +441,22 @@ function renderDetail(data) {
     }
   }
 
+  // Extract per-column model names from the "Model" row so retailer links
+  // search for the actual replacement item, not the original query.
+  const modelRow = (data.table || []).find((r) => (r.label || "").toLowerCase() === "model");
+  const colSearch = isTiered
+    ? {
+        entryLevel: modelRow?.entryLevel || query,
+        midGrade:   modelRow?.midGrade   || query,
+        premium:    modelRow?.premium    || query
+      }
+    : {
+        original:   modelRow?.original   || query,
+        brandMatch: modelRow?.brandMatch || query,
+        option1:    modelRow?.option1    || query,
+        option2:    modelRow?.option2    || query
+      };
+
   const tableLoading = byId("table-loading");
   const tableEl = byId("r-table");
   const tbody = byId("table-body");
@@ -451,9 +467,9 @@ function renderDetail(data) {
         tbody.innerHTML = allRows
           .map((row) => {
             const isRetailers = (row.label || "").toLowerCase().includes("retailer");
-            const elCell = isRetailers ? buildRetailerLinks(row.entryLevel, query) : escapeHtml(row.entryLevel || "N/A");
-            const mgCell = isRetailers ? buildRetailerLinks(row.midGrade, query) : escapeHtml(row.midGrade || "N/A");
-            const prCell = isRetailers ? buildRetailerLinks(row.premium, query) : escapeHtml(row.premium || "N/A");
+            const elCell = isRetailers ? buildRetailerLinks(row.entryLevel, colSearch.entryLevel) : escapeHtml(row.entryLevel || "N/A");
+            const mgCell = isRetailers ? buildRetailerLinks(row.midGrade,   colSearch.midGrade)   : escapeHtml(row.midGrade   || "N/A");
+            const prCell = isRetailers ? buildRetailerLinks(row.premium,    colSearch.premium)    : escapeHtml(row.premium    || "N/A");
             return `<tr>
               <td>${escapeHtml(row.label || "")}</td>
               <td>${elCell}</td>
@@ -466,10 +482,10 @@ function renderDetail(data) {
         tbody.innerHTML = allRows
           .map((row) => {
             const isRetailers = (row.label || "").toLowerCase().includes("retailer");
-            const origCell = isRetailers ? buildRetailerLinks(row.original, query) : escapeHtml(row.original || "N/A");
-            const bmCell = isRetailers ? buildRetailerLinks(row.brandMatch, query) : escapeHtml(row.brandMatch || "N/A");
-            const o1Cell = isRetailers ? buildRetailerLinks(row.option1, query) : escapeHtml(row.option1 || "N/A");
-            const o2Cell = isRetailers ? buildRetailerLinks(row.option2, query) : escapeHtml(row.option2 || "N/A");
+            const origCell = isRetailers ? buildRetailerLinks(row.original,   colSearch.original)   : escapeHtml(row.original   || "N/A");
+            const bmCell   = isRetailers ? buildRetailerLinks(row.brandMatch, colSearch.brandMatch) : escapeHtml(row.brandMatch || "N/A");
+            const o1Cell   = isRetailers ? buildRetailerLinks(row.option1,    colSearch.option1)    : escapeHtml(row.option1    || "N/A");
+            const o2Cell   = isRetailers ? buildRetailerLinks(row.option2,    colSearch.option2)    : escapeHtml(row.option2    || "N/A");
             return `<tr>
               <td>${escapeHtml(row.label || "")}</td>
               <td>${origCell}</td>
@@ -533,9 +549,9 @@ function renderDetail(data) {
         qsTbody.innerHTML = topRows
           .map((row) => {
             const isRetailers = (row.label || "").toLowerCase().includes("retailer");
-            const elCell = isRetailers ? buildRetailerLinks(row.entryLevel, query) : escapeHtml(row.entryLevel || "N/A");
-            const mgCell = isRetailers ? buildRetailerLinks(row.midGrade, query) : escapeHtml(row.midGrade || "N/A");
-            const prCell = isRetailers ? buildRetailerLinks(row.premium, query) : escapeHtml(row.premium || "N/A");
+            const elCell = isRetailers ? buildRetailerLinks(row.entryLevel, colSearch.entryLevel) : escapeHtml(row.entryLevel || "N/A");
+            const mgCell = isRetailers ? buildRetailerLinks(row.midGrade,   colSearch.midGrade)   : escapeHtml(row.midGrade   || "N/A");
+            const prCell = isRetailers ? buildRetailerLinks(row.premium,    colSearch.premium)    : escapeHtml(row.premium    || "N/A");
             return `<tr>
               <td>${escapeHtml(row.label || "")}</td>
               <td>${elCell}</td>
@@ -548,9 +564,9 @@ function renderDetail(data) {
         qsTbody.innerHTML = topRows
           .map((row) => {
             const isRetailers = (row.label || "").toLowerCase().includes("retailer");
-            const origCell = isRetailers ? buildRetailerLinks(row.original, query) : escapeHtml(row.original || "N/A");
-            const bmCell = isRetailers ? buildRetailerLinks(row.brandMatch, query) : escapeHtml(row.brandMatch || "N/A");
-            const o1Cell = isRetailers ? buildRetailerLinks(row.option1, query) : escapeHtml(row.option1 || "N/A");
+            const origCell = isRetailers ? buildRetailerLinks(row.original,   colSearch.original)   : escapeHtml(row.original   || "N/A");
+            const bmCell   = isRetailers ? buildRetailerLinks(row.brandMatch, colSearch.brandMatch) : escapeHtml(row.brandMatch || "N/A");
+            const o1Cell   = isRetailers ? buildRetailerLinks(row.option1,    colSearch.option1)    : escapeHtml(row.option1    || "N/A");
             return `<tr>
               <td>${escapeHtml(row.label || "")}</td>
               <td>${origCell}</td>
