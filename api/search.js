@@ -6,8 +6,8 @@ import {
   normalizeQuery
 } from "./_shared.js";
 
-const FAST_API_VERSION = "2026-02-28-fast-v1";
-const DETAIL_API_VERSION = "2026-02-28-detail-v1";
+const FAST_API_VERSION = "2026-03-01-fast-v3";
+const DETAIL_API_VERSION = "2026-03-01-detail-v3";
 
 const ALLOWED_TIERS = ["Entry Level", "Mid-Grade", "Upper Mid-Grade", "Premium", "Luxury / Designer"];
 const ALLOWED_CATEGORIES = [
@@ -24,8 +24,17 @@ function cleanStr(v) {
 
 function getResearchFastPrompt(query, todayIso) {
   return `You are an informational product research assistant used by product research professionals.
-Date: ${todayIso}
+Today's date: ${todayIso}
 Query: ${query}
+
+CRITICAL — REAL-TIME ACCURACY REQUIRED:
+Your training data has a cutoff and may be outdated. Today is ${todayIso}.
+You MUST use the google_search tool before answering to verify:
+1. Whether the product has been released (products announced before your cutoff may now be available)
+2. Current availability status as of ${todayIso}
+3. Current retail pricing
+4. Whether a newer successor model has launched since your training cutoff
+Do NOT state a product is "upcoming", "not yet released", or "announced" based on training data alone — search to confirm the current status first. If search results confirm it is now available, report it as available.
 
 Return JSON only. No markdown. No insurance, claims, settlement, or legal language.
 Use concise, technical, property-assessment prose. No marketing language.
@@ -58,10 +67,11 @@ Required schema:
   "refineTip": "string or null"
 }
 
-searchTier values:
-- 1 = general term only (e.g. "water heater", "TV") — no brand or model identified
-- 2 = brand + category (e.g. "LG TV", "Samsung refrigerator") — no specific model
-- 3 = specific model identified (e.g. "LG OLED65C3PUA", "Whirlpool WTW5000DW")
+searchTier classification (CRITICAL — assign exactly one):
+- 1 = general term only, no brand, no model (e.g. "water heater", "TV", "refrigerator", "washing machine")
+- 2 = product category with no brand or model (e.g. "side by side refrigerator", "front load washer", "65 inch TV")
+- 3 = brand + product name or line, but NO alphanumeric model number (e.g. "LG TV", "Samsung refrigerator", "Asus Vivobook 15", "LG Front Load Washer", "Whirlpool top load washer")
+- 4 = specific product with alphanumeric model number (e.g. "LG OLED65C3PUA", "Whirlpool WTW5000DW", "Samsung QN65QN90BAFXZA")
 
 Rules:
 - itemDescription: 2-4 sentences of professional property-assessment prose. No marketing language.
@@ -77,11 +87,11 @@ Rules:
   Computer/Laptop → Processor, RAM, Storage, Display Size, GPU
   Small Appliance → Wattage/Capacity, Speed Settings, Primary Function, Smart Features
   General → Category, Brand, Key Dimensions, Primary Function, Power/Capacity Rating
-- For searchTier 1 or 2: launchMsrp, launchMsrpNumeric, currentMarketPrice must be null. topSpecs may be general category specs.
-- For searchTier 1 or 2: provide a refineTip explaining what to add to get a full report.
-- For searchTier 3: populate all fields including pricing and ageNumeric.
+- For searchTier 1 or 2: launchMsrp, launchMsrpNumeric, currentMarketPrice must be null. Provide a refineTip explaining what to add to get a full report.
+- For searchTier 3 (brand + product line): populate launchMsrp as a typical price RANGE for this product line (e.g. "$799–$1,299"), launchMsrpNumeric as the midpoint, currentMarketPrice as current typical range. Provide a refineTip.
+- For searchTier 4 (specific model): populate all fields including exact pricing and ageNumeric.
 - estimatedAge sentence example: "First manufactured in January 2019. As of today this item is approximately 5 years old."
-- ageNumeric: integer years estimated from production era.
+- ageNumeric: integer years estimated from production era. Null for tiers 1 and 2.
 - availability must be exactly one of:
   "Currently available new from manufacturer and major retailers"
   "Production discontinued — units may still be available from retailers while supplies last"
@@ -90,14 +100,37 @@ Rules:
 
 function getResearchDetailPrompt(query, todayIso) {
   return `You are an informational product research assistant used by product research professionals.
-Date: ${todayIso}
+Today's date: ${todayIso}
 Query: ${query}
+
+CRITICAL — REAL-TIME ACCURACY REQUIRED:
+Your training data has a cutoff and may be outdated. Today is ${todayIso}.
+You MUST use the google_search tool before answering to verify:
+1. Current release status of the searched product — if it was "upcoming" in your training data, search to confirm if it has launched by ${todayIso}
+2. The CURRENT production model from the same brand for the "Brand Match" column — not the model that was current during your training, but the model available NEW as of ${todayIso}
+3. Current retail availability and pricing for all replacement options
+4. Any recalls or safety notices issued since your training cutoff
+Do NOT list a product as "upcoming" or "not yet released" based on training data alone. Search and verify first.
 
 Return JSON only. No markdown. No insurance, claims, settlement, or legal language.
 
+First, classify the query:
+- searchTier 4: specific model with alphanumeric model number (e.g. "LG OLED65C3PUA")
+- searchTier 3: brand + product name or line, no model number (e.g. "LG OLED TV", "Asus Vivobook 15", "LG Front Load Washer")
+- searchTier 2: category only, no brand (e.g. "side by side refrigerator", "front load washer", "65 inch TV")
+- searchTier 1: general term only (e.g. "TV", "washer")
+
+Based on searchTier, use the correct tableMode:
+- searchTier 4: tableMode = "standard"  (5-column: Original Item, Brand Match, Option 1, Option 2)
+- searchTier 3: tableMode = "product-line"  (5-column: same structure, but Original = the product line baseline)
+- searchTier 2 or 1: tableMode = "tiered"  (3-column: Entry Level, Mid-Grade, Premium)
+
 Required schema:
 {
-  "searchTier": 3,
+  "searchTier": 4,
+  "tableMode": "standard or product-line or tiered",
+  "tableNote": "string or null",
+  "narrowYourResults": "string or null",
   "itemNotes": {
     "lkqEvaluation": {
       "tier": "string",
@@ -106,18 +139,8 @@ Required schema:
     },
     "availabilityDetail": "string"
   },
-  "table": [
-    {"label": "Model", "original": "string", "brandMatch": "string", "option1": "string", "option2": "string"},
-    {"label": "Recommended Replacement", "original": "string", "brandMatch": "string", "option1": "string", "option2": "string"},
-    {"label": "Size / Capacity", "original": "string", "brandMatch": "string", "option1": "string", "option2": "string"},
-    {"label": "Price (New)", "original": "string", "brandMatch": "string", "option1": "string", "option2": "string"},
-    {"label": "Availability", "original": "string", "brandMatch": "string", "option1": "string", "option2": "string"},
-    {"label": "Retailers", "original": "Best Buy,Walmart", "brandMatch": "Best Buy,Walmart", "option1": "Best Buy,Walmart", "option2": "Best Buy,Walmart"},
-    {"label": "Notes", "original": "string", "brandMatch": "string", "option1": "string", "option2": "string"}
-  ],
-  "dynamicRows": [
-    {"label": "string", "original": "string", "brandMatch": "string", "option1": "string", "option2": "string"}
-  ],
+  "table": [],
+  "dynamicRows": [],
   "howItWorks": "string",
   "recalls": [
     {"title": "string", "description": "string", "date": "string", "url": "https://..."}
@@ -141,17 +164,54 @@ Required schema:
   "serviceLife": "string"
 }
 
-Rules:
-- table: include all 7 required rows in the exact order shown.
-- Replacement column rules (critical):
-  - "Original Item": data for the item being researched.
-  - "Brand Match": The CURRENT production successor from the same brand. If searching for an older model (e.g., LG C3), Brand Match must be the current production model (e.g., LG C5) — NOT the searched model or any other discontinued model. Must be currently available new.
-  - "Option 1" and "Option 2": Currently available new items at the same tier, from different brands than the original and each other. Do NOT include discontinued, refurbished, used, or open-box items under any column.
-  - If the brand no longer makes this product category, note that clearly in the Notes cell for Brand Match and suggest the closest current equivalent.
-  - "Price (New)": Current retail prices for new items only. Do not include used, refurbished, or open-box pricing.
-- Notes row: For Brand Match, explain the generational context (e.g., "Current production successor to the [original model] — [key generational improvement]"). For Option 1 and Option 2, briefly note the key difference vs. Brand Match.
-- Retailers row values: comma-separated list from: Best Buy, Home Depot, Lowe's, Manufacturer, AJ Madison, B&H, Walmart, Target.
-- dynamicRows: 0-4 category-specific rows (TVs: Resolution, Display Technology, Refresh Rate, HDR; appliances: Load Type, Capacity, etc.).
+--- TABLE FORMAT BY MODE ---
+
+If tableMode = "standard" or "product-line":
+table must contain these 7 rows in order:
+[
+  {"label": "Model", "original": "string", "brandMatch": "string", "option1": "string", "option2": "string"},
+  {"label": "Recommended Replacement", "original": "string", "brandMatch": "string", "option1": "string", "option2": "string"},
+  {"label": "Size / Capacity", "original": "string", "brandMatch": "string", "option1": "string", "option2": "string"},
+  {"label": "Price (New)", "original": "string", "brandMatch": "string", "option1": "string", "option2": "string"},
+  {"label": "Availability", "original": "string", "brandMatch": "string", "option1": "string", "option2": "string"},
+  {"label": "Retailers", "original": "Best Buy,Walmart", "brandMatch": "Best Buy,Walmart", "option1": "Best Buy,Walmart", "option2": "Best Buy,Walmart"},
+  {"label": "Notes", "original": "string", "brandMatch": "string", "option1": "string", "option2": "string"}
+]
+dynamicRows: 0-4 additional rows using the same {label, original, brandMatch, option1, option2} format.
+
+Column rules for standard/product-line:
+- "Original Item": the specific model searched (standard) or the product line baseline model (product-line).
+- "Brand Match": The CURRENT production successor from the same brand — must be currently available new. For product-line, use the latest generation model.
+- "Option 1" / "Option 2": Currently available new items from different brands. Do NOT list discontinued, refurbished, or used items.
+- tableNote for product-line: "No specific model number was provided. Replacement options are based on the [Brand] [Product Line] product line, using the most recent production model as the baseline."
+- Notes row: For Brand Match, explain generational context. For options, note key difference vs. Brand Match.
+
+If tableMode = "tiered":
+table must contain these rows in order:
+[
+  {"label": "Model", "entryLevel": "string", "midGrade": "string", "premium": "string"},
+  {"label": "Price Range (New)", "entryLevel": "string", "midGrade": "string", "premium": "string"},
+  {"label": "Size / Capacity", "entryLevel": "string", "midGrade": "string", "premium": "string"},
+  {"label": "Availability", "entryLevel": "string", "midGrade": "string", "premium": "string"},
+  {"label": "Retailers", "entryLevel": "Best Buy,Walmart", "midGrade": "Best Buy,Walmart", "premium": "Best Buy,Walmart"},
+  {"label": "Notes", "entryLevel": "string", "midGrade": "string", "premium": "string"}
+]
+dynamicRows: 3-5 rows using {label, entryLevel, midGrade, premium} for differentiating specs (e.g. for TVs: Display Technology, Resolution, Refresh Rate; for appliances: Load Type, Capacity, Key Features).
+Each tier must reference a real, currently available product. Use actual model names.
+tableNote for tiered: "Your search did not include a specific brand or model. The following table compares representative options across three price tiers."
+
+--- narrowYourResults ---
+Provide narrowYourResults only for searchTier 1, 2, or 3 (not 4). This is a short paragraph (2-3 sentences) suggesting what to add to get a more specific report. Be category-specific:
+- Refrigerators: suggest brand, configuration (side-by-side, French door, top/bottom freezer), and cubic footage.
+- TVs: suggest brand, screen size (in inches), and display technology (OLED, QLED, LED).
+- Laptops/Computers: suggest brand, intended use (gaming, business, home), and budget range.
+- Washers/Dryers: suggest brand, load type (front-load, top-load), and capacity (cu ft).
+- HVAC: suggest system type (central, mini-split, window unit), BTU/tonnage, and brand.
+- Water Heaters: suggest fuel type (gas, electric, heat pump), tank size, and brand.
+- General: suggest brand, model name, or model number for the most accurate report.
+
+--- Other rules ---
+- itemNotes: only relevant for searchTier 3 and 4. For tiers 1-2, use empty values.
 - howItWorks: 3 sentences — what it does, how it works mechanically, why specs matter for replacement.
 - recalls: only verified CPSC, government, or manufacturer-initiated recalls. If recallsNone is true, recalls must be [].
 - errorCodes: only if applicable. If errorCodesApplicable is false, errorCodes must be [].
@@ -169,7 +229,7 @@ function sanitizeFastPayload(payload, query) {
   const analysis = src.analysis && typeof src.analysis === "object" ? src.analysis : {};
   const releaseDate = src.releaseDate && typeof src.releaseDate === "object" ? src.releaseDate : {};
 
-  const searchTier = [1, 2, 3].includes(Number(src.searchTier)) ? Number(src.searchTier) : 1;
+  const searchTier = [1, 2, 3, 4].includes(Number(src.searchTier)) ? Number(src.searchTier) : 1;
   const tier = ALLOWED_TIERS.includes(analysis.tier) ? analysis.tier : "Entry Level";
   const category = ALLOWED_CATEGORIES.includes(analysis.category) ? analysis.category : "general";
   const launchMsrpNumeric = typeof analysis.launchMsrpNumeric === "number" ? analysis.launchMsrpNumeric : null;
@@ -197,21 +257,21 @@ function sanitizeFastPayload(payload, query) {
             }))
             .filter((s) => s.label && s.value)
         : [],
-      launchMsrp: searchTier === 3 ? cleanStr(analysis.launchMsrp) : null,
-      launchMsrpNumeric: searchTier === 3 ? launchMsrpNumeric : null,
-      currentMarketPrice: searchTier === 3 ? cleanStr(analysis.currentMarketPrice) : null,
-      currentMarketPriceNote: searchTier === 3 ? cleanStr(analysis.currentMarketPriceNote) : null,
+      launchMsrp: searchTier >= 3 ? cleanStr(analysis.launchMsrp) : null,
+      launchMsrpNumeric: searchTier >= 3 ? launchMsrpNumeric : null,
+      currentMarketPrice: searchTier >= 3 ? cleanStr(analysis.currentMarketPrice) : null,
+      currentMarketPriceNote: searchTier >= 3 ? cleanStr(analysis.currentMarketPriceNote) : null,
       status: cleanStr(analysis.status) || "Unknown"
     },
     releaseDate: {
       productionEra: cleanStr(releaseDate.productionEra),
       discontinuation: cleanStr(releaseDate.discontinuation),
       estimatedAge: cleanStr(releaseDate.estimatedAge),
-      ageNumeric: searchTier === 3 ? ageNumeric : null
+      ageNumeric: searchTier >= 3 ? ageNumeric : null
     },
     availability: cleanStr(src.availability) || "Status unknown",
     refineTip:
-      searchTier < 3 ? cleanStr(src.refineTip) || "Add a specific model number for a full report." : null
+      searchTier < 4 ? cleanStr(src.refineTip) || "Add a specific model number for a full report." : null
   };
 }
 
@@ -224,24 +284,51 @@ function sanitizeDetailPayload(payload, query) {
   const manual = src.manual && typeof src.manual === "object" ? src.manual : {};
   const mfrPage = src.manufacturerPage && typeof src.manufacturerPage === "object" ? src.manufacturerPage : {};
 
+  const tableMode = ["standard", "product-line", "tiered"].includes(src.tableMode)
+    ? src.tableMode
+    : "standard";
+  const isTiered = tableMode === "tiered";
+
   const table = Array.isArray(src.table)
-    ? src.table.map((row) => ({
-        label: cleanStr(row?.label) || "",
-        original: cleanStr(row?.original) || "N/A",
-        brandMatch: cleanStr(row?.brandMatch) || "N/A",
-        option1: cleanStr(row?.option1) || "N/A",
-        option2: cleanStr(row?.option2) || "N/A"
-      }))
+    ? src.table.map((row) => {
+        const base = { label: cleanStr(row?.label) || "" };
+        if (isTiered) {
+          return {
+            ...base,
+            entryLevel: cleanStr(row?.entryLevel) || "N/A",
+            midGrade: cleanStr(row?.midGrade) || "N/A",
+            premium: cleanStr(row?.premium) || "N/A"
+          };
+        }
+        return {
+          ...base,
+          original: cleanStr(row?.original) || "N/A",
+          brandMatch: cleanStr(row?.brandMatch) || "N/A",
+          option1: cleanStr(row?.option1) || "N/A",
+          option2: cleanStr(row?.option2) || "N/A"
+        };
+      })
     : [];
 
   const dynamicRows = Array.isArray(src.dynamicRows)
-    ? src.dynamicRows.slice(0, 4).map((row) => ({
-        label: cleanStr(row?.label) || "",
-        original: cleanStr(row?.original) || "N/A",
-        brandMatch: cleanStr(row?.brandMatch) || "N/A",
-        option1: cleanStr(row?.option1) || "N/A",
-        option2: cleanStr(row?.option2) || "N/A"
-      }))
+    ? src.dynamicRows.slice(0, 5).map((row) => {
+        const base = { label: cleanStr(row?.label) || "" };
+        if (isTiered) {
+          return {
+            ...base,
+            entryLevel: cleanStr(row?.entryLevel) || "N/A",
+            midGrade: cleanStr(row?.midGrade) || "N/A",
+            premium: cleanStr(row?.premium) || "N/A"
+          };
+        }
+        return {
+          ...base,
+          original: cleanStr(row?.original) || "N/A",
+          brandMatch: cleanStr(row?.brandMatch) || "N/A",
+          option1: cleanStr(row?.option1) || "N/A",
+          option2: cleanStr(row?.option2) || "N/A"
+        };
+      })
     : [];
 
   const recalls = Array.isArray(src.recalls)
@@ -295,7 +382,10 @@ function sanitizeDetailPayload(payload, query) {
     typeof mfrPage.url === "string" && /^https?:\/\//i.test(mfrPage.url) ? mfrPage.url : null;
 
   return {
-    searchTier: [1, 2, 3].includes(Number(src.searchTier)) ? Number(src.searchTier) : 1,
+    searchTier: [1, 2, 3, 4].includes(Number(src.searchTier)) ? Number(src.searchTier) : 1,
+    tableMode,
+    tableNote: cleanStr(src.tableNote) || null,
+    narrowYourResults: cleanStr(src.narrowYourResults) || null,
     itemNotes: {
       lkqEvaluation: {
         tier: cleanStr(lkqEval.tier) || "",
@@ -329,7 +419,7 @@ function sanitizeDetailPayload(payload, query) {
 
 async function runFastMode(query, apiKey, model, refresh, cacheClient, todayIso) {
   const normalizedQuery = normalizeQuery(query);
-  const cacheKey = `search:v3:fast:${model}:${todayIso}:${normalizedQuery}`;
+  const cacheKey = `search:v4:fast:${model}:${todayIso}:${normalizedQuery}`;
 
   if (!refresh) {
     const cached = await cacheGet(cacheClient, cacheKey);
@@ -366,7 +456,7 @@ async function runFastMode(query, apiKey, model, refresh, cacheClient, todayIso)
 
 async function runDetailMode(query, apiKey, model, refresh, cacheClient, todayIso) {
   const normalizedQuery = normalizeQuery(query);
-  const cacheKey = `search:v3:detail:${model}:${todayIso}:${normalizedQuery}`;
+  const cacheKey = `search:v4:detail:${model}:${todayIso}:${normalizedQuery}`;
 
   if (!refresh) {
     const cached = await cacheGet(cacheClient, cacheKey);

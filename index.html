@@ -281,6 +281,24 @@
         .collapse-btn { width: 100%; padding: 0.75rem; background: #f1f5f9; border: none; border-radius: 8px; color: var(--text-mid); font-size: 0.8rem; font-weight: 700; cursor: pointer; margin-top: 1rem; transition: background 0.2s; }
         .collapse-btn:hover { background: #e2e8f0; }
 
+        /* ── Table note ── */
+        .table-note { background:#fffbeb; border:1px solid #fde68a; border-radius:8px; padding:0.65rem 0.9rem; margin-bottom:0.75rem; font-size:0.8rem; color:#92400e; }
+        .table-note strong { font-weight:700; }
+
+        /* ── Narrow Your Results ── */
+        .narrow-results { background:#f0f9ff; border:1px solid #bae6fd; border-radius:10px; padding:0.875rem 1rem; margin-top:1.25rem; }
+        .narrow-results-header { display:flex; align-items:center; gap:0.5rem; font-size:0.82rem; font-weight:700; color:#0c4a6e; margin-bottom:0.4rem; }
+        .narrow-results p { font-size:0.82rem; color:#0c4a6e; line-height:1.6; margin:0; }
+
+        /* ── Tiered table columns ── */
+        .tier-col-badge { display:inline-block; padding:0.15rem 0.5rem; border-radius:999px; font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.04em; margin-bottom:0.15rem; }
+        .tier-col-entry  { background:#e2e8f0; color:#475569; }
+        .tier-col-mid    { background:#dbeafe; color:#1d4ed8; }
+        .tier-col-premium{ background:#fef3c7; color:#92400e; }
+        .data-table th.tier-entry-col { background:#f1f5f9; }
+        .data-table th.tier-mid-col   { background:#eff6ff; }
+        .data-table th.tier-premium-col { background:#fffbeb; }
+
         /* ── Print ── */
         @media print {
             .no-print { display: none !important; }
@@ -441,9 +459,10 @@
                         <div class="card" id="qs-table-card" style="overflow-x:auto;">
                             <div class="card-title">Replacement Options</div>
                             <div class="card-accent-stripe"></div>
+                            <div id="qs-table-note" class="table-note hidden"></div>
                             <div id="qs-table-loading" class="section-spinner">Loading replacement options...</div>
                             <table id="qs-table" class="data-table hidden">
-                                <thead><tr>
+                                <thead id="qs-table-head"><tr id="qs-table-head-row">
                                     <th>Feature</th><th>Original Item</th><th class="highlight">Brand Match</th><th>Option 1</th>
                                 </tr></thead>
                                 <tbody id="qs-table-body"></tbody>
@@ -557,13 +576,18 @@
                         <div class="card" id="card-table" style="overflow-x: auto;">
                             <div class="card-title"><span class="title-number">6</span> Current Replacement Options <span class="title-icon">&#128260;</span></div>
                             <div class="card-accent-stripe"></div>
+                            <div id="table-note" class="table-note hidden"></div>
                             <div id="table-loading" class="section-spinner">Loading replacement options...</div>
                             <table id="r-table" class="data-table hidden">
-                                <thead><tr>
+                                <thead id="table-head"><tr id="table-head-row">
                                     <th>Feature</th><th>Original Item</th><th class="highlight">Brand Match</th><th>Option 1</th><th>Option 2</th>
                                 </tr></thead>
                                 <tbody id="table-body"></tbody>
                             </table>
+                            <div id="narrow-results" class="narrow-results hidden">
+                                <div class="narrow-results-header">&#128269; Narrow Your Results</div>
+                                <p id="narrow-results-tip"></p>
+                            </div>
                         </div>
 
                         <!-- Section 7: Recall Notices -->

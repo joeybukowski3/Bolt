@@ -231,9 +231,9 @@ function renderFast(data) {
   setText("r-discontinuation", releaseDate.discontinuation || analysis.status || "Unknown");
   setText("r-service-life", ""); // filled by renderDetail
 
-  // Advisory banner (show for tier 1/2 — less specific query)
+  // Advisory banner (show for tier 1/2/3 — less than specific model)
   const ageAdvisory = byId("age-advisory");
-  if (ageAdvisory) show(ageAdvisory, searchTier < 3);
+  if (ageAdvisory) show(ageAdvisory, searchTier < 4);
 
   // Clear refinement chips
   const chipsEl = byId("refinement-chips");
@@ -243,7 +243,7 @@ function renderFast(data) {
   const refineTip = byId("refine-tip");
   const refineTipText = byId("refine-tip-text");
   if (refineTip && refineTipText) {
-    if (searchTier < 3 && data.refineTip) {
+    if (searchTier < 4 && data.refineTip) {
       refineTipText.textContent = data.refineTip;
       refineTip.classList.remove("hidden");
     } else {
@@ -264,6 +264,10 @@ function renderFast(data) {
   }
 
   // Tiered card visibility
+  // Tier 1: general term — hide valuation, item notes, table
+  // Tier 2: category only — hide valuation, item notes; show table (tiered mode)
+  // Tier 3: brand + product line — show valuation, item notes, table
+  // Tier 4: specific model — show everything
   const cardValuation = byId("card-valuation");
   const cardItemNotes = byId("card-item-notes");
   const cardTable = byId("card-table");
@@ -283,15 +287,17 @@ function renderFast(data) {
     show(qsMarketRow, false);
     show(qsAcvRow, false);
   } else if (searchTier === 2) {
+    // Category only — show the tiered comparison table, but no valuation/item notes
     show(cardValuation, false);
-    show(cardItemNotes, true);
-    show(cardTable, false);
-    show(qsLkqCard, true);
-    show(qsTableCard, false);
+    show(cardItemNotes, false);
+    show(cardTable, true);
+    show(qsLkqCard, false);
+    show(qsTableCard, true);
     show(qsMsrpRow, false);
     show(qsMarketRow, false);
     show(qsAcvRow, false);
   } else {
+    // Tier 3 (brand+product line) and Tier 4 (specific model) — full report
     show(cardValuation, true);
     show(cardItemNotes, true);
     show(cardTable, true);
@@ -302,8 +308,8 @@ function renderFast(data) {
     show(qsAcvRow, true);
   }
 
-  // Section 4: MSRP + ACV (tier 3 only)
-  if (searchTier === 3) {
+  // Section 4: MSRP + ACV (tier 3+ only)
+  if (searchTier >= 3) {
     const msrp = analysis.launchMsrpNumeric || 0;
     const age = releaseDate.ageNumeric || 0;
 
@@ -407,54 +413,153 @@ function renderDetail(data) {
   }
 
   // ─ Full replacement table (Section 6) ─
+  const tableMode = data.tableMode || "standard";
+  const isTiered = tableMode === "tiered";
+
+  // Table note
+  const tableNoteEl = byId("table-note");
+  if (tableNoteEl) {
+    if (data.tableNote) {
+      tableNoteEl.innerHTML = `<strong>Note:</strong> ${escapeHtml(data.tableNote)}`;
+      tableNoteEl.classList.remove("hidden");
+    } else {
+      tableNoteEl.classList.add("hidden");
+    }
+  }
+
+  // Update table header based on tableMode
+  const tableHeadRow = byId("table-head-row");
+  if (tableHeadRow) {
+    if (isTiered) {
+      tableHeadRow.innerHTML = `
+        <th>Feature</th>
+        <th class="tier-entry-col"><span class="tier-col-badge tier-col-entry">Entry Level</span></th>
+        <th class="tier-mid-col"><span class="tier-col-badge tier-col-mid">Mid-Grade</span></th>
+        <th class="tier-premium-col"><span class="tier-col-badge tier-col-premium">Premium</span></th>`;
+    } else {
+      tableHeadRow.innerHTML = `<th>Feature</th><th>Original Item</th><th class="highlight">Brand Match</th><th>Option 1</th><th>Option 2</th>`;
+    }
+  }
+
   const tableLoading = byId("table-loading");
   const tableEl = byId("r-table");
   const tbody = byId("table-body");
   if (tbody && tableLoading && tableEl) {
     const allRows = [...(data.table || []), ...(data.dynamicRows || [])];
     if (allRows.length) {
-      tbody.innerHTML = allRows
-        .map((row) => {
-          const isRetailers = (row.label || "").toLowerCase().includes("retailer");
-          const origCell = isRetailers ? buildRetailerLinks(row.original, query) : escapeHtml(row.original || "N/A");
-          const bmCell = isRetailers ? buildRetailerLinks(row.brandMatch, query) : escapeHtml(row.brandMatch || "N/A");
-          const o1Cell = isRetailers ? buildRetailerLinks(row.option1, query) : escapeHtml(row.option1 || "N/A");
-          const o2Cell = isRetailers ? buildRetailerLinks(row.option2, query) : escapeHtml(row.option2 || "N/A");
-          return `<tr>
-            <td>${escapeHtml(row.label || "")}</td>
-            <td>${origCell}</td>
-            <td class="brand-match">${bmCell}</td>
-            <td>${o1Cell}</td>
-            <td>${o2Cell}</td>
-          </tr>`;
-        })
-        .join("");
+      if (isTiered) {
+        tbody.innerHTML = allRows
+          .map((row) => {
+            const isRetailers = (row.label || "").toLowerCase().includes("retailer");
+            const elCell = isRetailers ? buildRetailerLinks(row.entryLevel, query) : escapeHtml(row.entryLevel || "N/A");
+            const mgCell = isRetailers ? buildRetailerLinks(row.midGrade, query) : escapeHtml(row.midGrade || "N/A");
+            const prCell = isRetailers ? buildRetailerLinks(row.premium, query) : escapeHtml(row.premium || "N/A");
+            return `<tr>
+              <td>${escapeHtml(row.label || "")}</td>
+              <td>${elCell}</td>
+              <td>${mgCell}</td>
+              <td>${prCell}</td>
+            </tr>`;
+          })
+          .join("");
+      } else {
+        tbody.innerHTML = allRows
+          .map((row) => {
+            const isRetailers = (row.label || "").toLowerCase().includes("retailer");
+            const origCell = isRetailers ? buildRetailerLinks(row.original, query) : escapeHtml(row.original || "N/A");
+            const bmCell = isRetailers ? buildRetailerLinks(row.brandMatch, query) : escapeHtml(row.brandMatch || "N/A");
+            const o1Cell = isRetailers ? buildRetailerLinks(row.option1, query) : escapeHtml(row.option1 || "N/A");
+            const o2Cell = isRetailers ? buildRetailerLinks(row.option2, query) : escapeHtml(row.option2 || "N/A");
+            return `<tr>
+              <td>${escapeHtml(row.label || "")}</td>
+              <td>${origCell}</td>
+              <td class="brand-match">${bmCell}</td>
+              <td>${o1Cell}</td>
+              <td>${o2Cell}</td>
+            </tr>`;
+          })
+          .join("");
+      }
       tableLoading.classList.add("hidden");
       tableEl.classList.remove("hidden");
     }
   }
 
-  // ─ Quick snapshot mini table (first 5 fixed rows, Brand Match + Option 1 only) ─
+  // Narrow Your Results box
+  const narrowResultsEl = byId("narrow-results");
+  const narrowResultsTip = byId("narrow-results-tip");
+  if (narrowResultsEl && narrowResultsTip) {
+    if (data.narrowYourResults) {
+      narrowResultsTip.textContent = data.narrowYourResults;
+      narrowResultsEl.classList.remove("hidden");
+    } else {
+      narrowResultsEl.classList.add("hidden");
+    }
+  }
+
+  // ─ Quick snapshot mini table ─
+  // Update QS table header too
+  const qsTableHeadRow = byId("qs-table-head-row");
+  if (qsTableHeadRow) {
+    if (isTiered) {
+      qsTableHeadRow.innerHTML = `
+        <th>Feature</th>
+        <th><span class="tier-col-badge tier-col-entry">Entry</span></th>
+        <th><span class="tier-col-badge tier-col-mid">Mid</span></th>
+        <th><span class="tier-col-badge tier-col-premium">Premium</span></th>`;
+    } else {
+      qsTableHeadRow.innerHTML = `<th>Feature</th><th>Original Item</th><th class="highlight">Brand Match</th><th>Option 1</th>`;
+    }
+  }
+
+  // QS table note
+  const qsTableNoteEl = byId("qs-table-note");
+  if (qsTableNoteEl) {
+    if (data.tableNote) {
+      qsTableNoteEl.innerHTML = `<strong>Note:</strong> ${escapeHtml(data.tableNote)}`;
+      qsTableNoteEl.classList.remove("hidden");
+    } else {
+      qsTableNoteEl.classList.add("hidden");
+    }
+  }
+
   const qsTableLoading = byId("qs-table-loading");
   const qsTableEl = byId("qs-table");
   const qsTbody = byId("qs-table-body");
   if (qsTbody && qsTableLoading && qsTableEl) {
     const topRows = (data.table || []).slice(0, 5);
     if (topRows.length) {
-      qsTbody.innerHTML = topRows
-        .map((row) => {
-          const isRetailers = (row.label || "").toLowerCase().includes("retailer");
-          const origCell = isRetailers ? buildRetailerLinks(row.original, query) : escapeHtml(row.original || "N/A");
-          const bmCell = isRetailers ? buildRetailerLinks(row.brandMatch, query) : escapeHtml(row.brandMatch || "N/A");
-          const o1Cell = isRetailers ? buildRetailerLinks(row.option1, query) : escapeHtml(row.option1 || "N/A");
-          return `<tr>
-            <td>${escapeHtml(row.label || "")}</td>
-            <td>${origCell}</td>
-            <td class="brand-match">${bmCell}</td>
-            <td>${o1Cell}</td>
-          </tr>`;
-        })
-        .join("");
+      if (isTiered) {
+        qsTbody.innerHTML = topRows
+          .map((row) => {
+            const isRetailers = (row.label || "").toLowerCase().includes("retailer");
+            const elCell = isRetailers ? buildRetailerLinks(row.entryLevel, query) : escapeHtml(row.entryLevel || "N/A");
+            const mgCell = isRetailers ? buildRetailerLinks(row.midGrade, query) : escapeHtml(row.midGrade || "N/A");
+            const prCell = isRetailers ? buildRetailerLinks(row.premium, query) : escapeHtml(row.premium || "N/A");
+            return `<tr>
+              <td>${escapeHtml(row.label || "")}</td>
+              <td>${elCell}</td>
+              <td>${mgCell}</td>
+              <td>${prCell}</td>
+            </tr>`;
+          })
+          .join("");
+      } else {
+        qsTbody.innerHTML = topRows
+          .map((row) => {
+            const isRetailers = (row.label || "").toLowerCase().includes("retailer");
+            const origCell = isRetailers ? buildRetailerLinks(row.original, query) : escapeHtml(row.original || "N/A");
+            const bmCell = isRetailers ? buildRetailerLinks(row.brandMatch, query) : escapeHtml(row.brandMatch || "N/A");
+            const o1Cell = isRetailers ? buildRetailerLinks(row.option1, query) : escapeHtml(row.option1 || "N/A");
+            return `<tr>
+              <td>${escapeHtml(row.label || "")}</td>
+              <td>${origCell}</td>
+              <td class="brand-match">${bmCell}</td>
+              <td>${o1Cell}</td>
+            </tr>`;
+          })
+          .join("");
+      }
       qsTableLoading.classList.add("hidden");
       qsTableEl.classList.remove("hidden");
     }
@@ -650,7 +755,7 @@ async function performSearch() {
   if (!query) return;
 
   // Check sessionStorage cache first
-  const cacheKey = `bolt_v3_${query.toLowerCase()}`;
+  const cacheKey = `bolt_v4_${query.toLowerCase()}`;
   try {
     const cached = sessionStorage.getItem(cacheKey);
     if (cached) {
@@ -711,6 +816,20 @@ async function performSearch() {
   const qsTableEl = byId("qs-table");
   if (qsTableLoading) qsTableLoading.classList.remove("hidden");
   if (qsTableEl) qsTableEl.classList.add("hidden");
+
+  // Reset table note, narrow results, and QS table note
+  const tableNoteEl = byId("table-note");
+  if (tableNoteEl) tableNoteEl.classList.add("hidden");
+  const narrowResultsEl = byId("narrow-results");
+  if (narrowResultsEl) narrowResultsEl.classList.add("hidden");
+  const qsTableNoteEl = byId("qs-table-note");
+  if (qsTableNoteEl) qsTableNoteEl.classList.add("hidden");
+
+  // Reset table headers to standard layout
+  const tableHeadRow = byId("table-head-row");
+  if (tableHeadRow) tableHeadRow.innerHTML = `<th>Feature</th><th>Original Item</th><th class="highlight">Brand Match</th><th>Option 1</th><th>Option 2</th>`;
+  const qsTableHeadRow = byId("qs-table-head-row");
+  if (qsTableHeadRow) qsTableHeadRow.innerHTML = `<th>Feature</th><th>Original Item</th><th class="highlight">Brand Match</th><th>Option 1</th>`;
 
   // Hide full specs toggle until detail loads
   const toggleSpecsBtn = byId("toggle-specs");
