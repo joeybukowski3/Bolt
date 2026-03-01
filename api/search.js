@@ -41,7 +41,7 @@ Required schema:
     "tier": "Entry Level or Mid-Grade or Upper Mid-Grade or Premium or Luxury / Designer",
     "category": "tv or refrigerator or washer or dryer or dishwasher or hvac or water_heater or computer or small_appliance or general",
     "itemDescription": "string",
-    "keyDetails": "string",
+    "topSpecs": [{"label": "string", "value": "string"}],
     "launchMsrp": "string or null",
     "launchMsrpNumeric": 0,
     "currentMarketPrice": "string or null",
@@ -65,8 +65,19 @@ searchTier values:
 
 Rules:
 - itemDescription: 2-4 sentences of professional property-assessment prose. No marketing language.
-- keyDetails: comma-separated replacement-relevant specs only.
-- For searchTier 1 or 2: launchMsrp, launchMsrpNumeric, currentMarketPrice must be null.
+- topSpecs: Array of 4-5 most value-relevant specs for the category. Maximum 5 items.
+  Use category-appropriate labels and concise values:
+  TV → Screen Size, Display Technology, Resolution, Refresh Rate, Smart Platform
+  Refrigerator → Total Capacity, Configuration, Ice Maker, Smart Features, Energy Rating
+  Washer → Capacity, Load Type, Cycle Count, Steam, Smart Features
+  Dryer → Capacity, Fuel Type, Cycle Count, Steam, Smart Features
+  Dishwasher → Place Settings, Wash Programs, Drying Method, Noise Level (dBA), Smart Features
+  HVAC → BTU/Tonnage, SEER Rating, System Type, Zoning, Smart/WiFi
+  Water Heater → Tank Capacity, Fuel Type, First Hour Rating, UEF Rating, Smart Features
+  Computer/Laptop → Processor, RAM, Storage, Display Size, GPU
+  Small Appliance → Wattage/Capacity, Speed Settings, Primary Function, Smart Features
+  General → Category, Brand, Key Dimensions, Primary Function, Power/Capacity Rating
+- For searchTier 1 or 2: launchMsrp, launchMsrpNumeric, currentMarketPrice must be null. topSpecs may be general category specs.
 - For searchTier 1 or 2: provide a refineTip explaining what to add to get a full report.
 - For searchTier 3: populate all fields including pricing and ageNumeric.
 - estimatedAge sentence example: "First manufactured in January 2019. As of today this item is approximately 5 years old."
@@ -132,6 +143,13 @@ Required schema:
 
 Rules:
 - table: include all 7 required rows in the exact order shown.
+- Replacement column rules (critical):
+  - "Original Item": data for the item being researched.
+  - "Brand Match": The CURRENT production successor from the same brand. If searching for an older model (e.g., LG C3), Brand Match must be the current production model (e.g., LG C5) — NOT the searched model or any other discontinued model. Must be currently available new.
+  - "Option 1" and "Option 2": Currently available new items at the same tier, from different brands than the original and each other. Do NOT include discontinued, refurbished, used, or open-box items under any column.
+  - If the brand no longer makes this product category, note that clearly in the Notes cell for Brand Match and suggest the closest current equivalent.
+  - "Price (New)": Current retail prices for new items only. Do not include used, refurbished, or open-box pricing.
+- Notes row: For Brand Match, explain the generational context (e.g., "Current production successor to the [original model] — [key generational improvement]"). For Option 1 and Option 2, briefly note the key difference vs. Brand Match.
 - Retailers row values: comma-separated list from: Best Buy, Home Depot, Lowe's, Manufacturer, AJ Madison, B&H, Walmart, Target.
 - dynamicRows: 0-4 category-specific rows (TVs: Resolution, Display Technology, Refresh Rate, HDR; appliances: Load Type, Capacity, etc.).
 - howItWorks: 3 sentences — what it does, how it works mechanically, why specs matter for replacement.
@@ -170,7 +188,15 @@ function sanitizeFastPayload(payload, query) {
       tier,
       category,
       itemDescription: cleanStr(analysis.itemDescription) || "No description available.",
-      keyDetails: cleanStr(analysis.keyDetails) || "",
+      topSpecs: Array.isArray(analysis.topSpecs)
+        ? analysis.topSpecs
+            .slice(0, 5)
+            .map((s) => ({
+              label: cleanStr(s?.label) || "",
+              value: cleanStr(s?.value) || ""
+            }))
+            .filter((s) => s.label && s.value)
+        : [],
       launchMsrp: searchTier === 3 ? cleanStr(analysis.launchMsrp) : null,
       launchMsrpNumeric: searchTier === 3 ? launchMsrpNumeric : null,
       currentMarketPrice: searchTier === 3 ? cleanStr(analysis.currentMarketPrice) : null,

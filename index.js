@@ -1,4 +1,4 @@
-let currentMode = "compact";
+let viewMode = "full"; // "quick" | "full"
 let fastData = null;
 let detailData = null;
 let currentCategory = "general";
@@ -35,7 +35,6 @@ const RETAILER_URLS = {
   "Manufacturer":(q) => `https://www.google.com/search?q=${encodeURIComponent(q + " official site")}`
 };
 
-// Category-based retailer filters (sets of allowed retailers)
 const ELECTRONICS_ONLY = new Set(["Best Buy", "Walmart", "Target", "B&H", "Manufacturer"]);
 const HVAC_ONLY = new Set(["Home Depot", "Lowe's", "AJ Madison", "Manufacturer", "Walmart"]);
 
@@ -43,7 +42,7 @@ function getRetailerFilter(category) {
   const cat = (category || "general").toLowerCase();
   if (cat === "tv" || cat === "computer" || cat === "laptop") return ELECTRONICS_ONLY;
   if (cat === "hvac" || cat === "water_heater") return HVAC_ONLY;
-  return null; // null = no filter, show all
+  return null;
 }
 
 // ── DOM helpers ──────────────────────────────────────────────────────────────
@@ -112,7 +111,6 @@ function renderACVDisplay(msrp, age, category) {
   const result = calcACV(msrp, age, category);
   const acvStr = fmtDollars(result.acv);
   setText("r-acv", acvStr);
-  setText("qv-acv", acvStr);
   setText(
     "r-acv-formula",
     `ACV = MSRP × (1 − rate)^years × 0.75, floor at ${(result.sched.floor * 100).toFixed(0)}%`,
@@ -123,24 +121,26 @@ function renderACVDisplay(msrp, age, category) {
     stepsEl.textContent = buildACVSteps(msrp, age, result);
     stepsEl.style.display = "block";
   }
+  // Update quick snapshot ACV too
+  setText("qs-acv", acvStr);
 }
 
-// ── View toggle ──────────────────────────────────────────────────────────────
+// ── View mode toggle ─────────────────────────────────────────────────────────
 
-function toggleView() {
-  const toggleBtn = byId("view-toggle");
-  if (!toggleBtn) return;
-  if (currentMode === "compact") {
-    currentMode = "expanded";
-    document.body.classList.add("is-expanded");
-    toggleBtn.textContent = "Expanded View";
-    toggleBtn.classList.remove("active");
-  } else {
-    currentMode = "compact";
-    document.body.classList.remove("is-expanded");
-    toggleBtn.textContent = "Compact View";
-    toggleBtn.classList.add("active");
-  }
+function setViewMode(mode) {
+  viewMode = mode;
+  try { sessionStorage.setItem("bolt_view_mode", mode); } catch (_) {}
+
+  const isQuick = mode === "quick";
+  const quickSnapshot = byId("quick-snapshot");
+  const detailedView = byId("detailed-view");
+  const btnQuick = byId("btn-quick-view");
+  const btnFull = byId("btn-full-view");
+
+  if (quickSnapshot) quickSnapshot.classList.toggle("hidden", !isQuick);
+  if (detailedView) detailedView.classList.toggle("hidden", isQuick);
+  if (btnQuick) btnQuick.classList.toggle("active", isQuick);
+  if (btnFull) btnFull.classList.toggle("active", !isQuick);
 }
 
 // ── Recalculate ACV (from age input, no API call) ────────────────────────────
@@ -174,6 +174,21 @@ function buildRetailerLinks(retailerCsv, searchQuery) {
     : '<span class="none-found">No retailer links available</span>';
 }
 
+// ── Spec pill renderer ───────────────────────────────────────────────────────
+
+function renderSpecPills(containerId, topSpecs) {
+  const el = byId(containerId);
+  if (!el) return;
+  if (!Array.isArray(topSpecs) || !topSpecs.length) {
+    el.innerHTML = "";
+    return;
+  }
+  el.innerHTML = topSpecs
+    .slice(0, 5)
+    .map((s) => `<span class="quick-spec-pill"><strong>${escapeHtml(s.label || "")}:</strong> ${escapeHtml(s.value || "")}</span>`)
+    .join("");
+}
+
 // ── renderFast ───────────────────────────────────────────────────────────────
 
 function renderFast(data) {
@@ -185,7 +200,7 @@ function renderFast(data) {
   const searchTier = Number(data.searchTier) || 1;
   currentCategory = analysis.category || "general";
 
-  // Tier badge
+  // Tier badge (results header)
   const tierMap = {
     "Entry Level":       "tier-entry",
     "Mid-Grade":         "tier-mid",
@@ -205,11 +220,20 @@ function renderFast(data) {
   setText("r-search-query", analysis.entered || "");
   setText("r-assumptions", analysis.modelConfidence ? `Model confidence: ${analysis.modelConfidence}` : "N/A");
   setText("r-item-desc", analysis.itemDescription);
-  setText("r-key-details", analysis.keyDetails || "");
+
+  // Top specs pills (Section 1)
+  const topSpecs = Array.isArray(analysis.topSpecs) ? analysis.topSpecs : [];
+  renderSpecPills("r-top-specs-pills", topSpecs);
+
+  // Section 3: Release Date & Age
   setText("r-production-era", releaseDate.productionEra || "Unknown");
   setText("r-estimated-age", releaseDate.estimatedAge || "Not available");
   setText("r-discontinuation", releaseDate.discontinuation || analysis.status || "Unknown");
-  setText("r-service-life", "");
+  setText("r-service-life", ""); // filled by renderDetail
+
+  // Advisory banner (show for tier 1/2 — less specific query)
+  const ageAdvisory = byId("age-advisory");
+  if (ageAdvisory) show(ageAdvisory, searchTier < 3);
 
   // Clear refinement chips
   const chipsEl = byId("refinement-chips");
@@ -239,56 +263,46 @@ function renderFast(data) {
     }
   }
 
-  // Advisory (show for tier 1/2)
-  const ageAdvisory = byId("age-advisory");
-  if (ageAdvisory) show(ageAdvisory, searchTier < 3);
-
-  // Hide Generate Price Estimate button — ACV is automatic now
-  const genBtn = byId("generate-valuation-btn");
-  if (genBtn) genBtn.style.display = "none";
-
-  // Hide "Show Full Technical Specifications" — specs come from detail
-  const specsBtn = byId("toggle-specs");
-  if (specsBtn) specsBtn.style.display = "none";
-  const fullSpecs = byId("full-specs-container");
-  if (fullSpecs) fullSpecs.style.display = "none";
-
-  // Tiered visibility
-  const quickView = byId("quick-view");
+  // Tiered card visibility
+  const cardValuation = byId("card-valuation");
   const cardItemNotes = byId("card-item-notes");
   const cardTable = byId("card-table");
-  const msrpRow = byId("msrp-row");
-  const acvRow = byId("acv-row");
-  const valuationSubtitle = byId("valuation-subtitle");
-  const valuationList = byId("valuation-list");
+  const qsLkqCard = byId("qs-lkq-card");
+  const qsTableCard = byId("qs-table-card");
+  const qsMsrpRow = byId("qs-msrp-row");
+  const qsMarketRow = byId("qs-market-row");
+  const qsAcvRow = byId("qs-acv-row");
 
   if (searchTier === 1) {
-    show(quickView, false);
+    show(cardValuation, false);
     show(cardItemNotes, false);
     show(cardTable, false);
-    show(msrpRow, false);
-    show(acvRow, false);
-    show(valuationSubtitle, false);
-    show(valuationList, false);
+    show(qsLkqCard, false);
+    show(qsTableCard, false);
+    show(qsMsrpRow, false);
+    show(qsMarketRow, false);
+    show(qsAcvRow, false);
   } else if (searchTier === 2) {
-    show(quickView, false);
+    show(cardValuation, false);
     show(cardItemNotes, true);
     show(cardTable, false);
-    show(msrpRow, false);
-    show(acvRow, false);
-    show(valuationSubtitle, false);
-    show(valuationList, false);
+    show(qsLkqCard, true);
+    show(qsTableCard, false);
+    show(qsMsrpRow, false);
+    show(qsMarketRow, false);
+    show(qsAcvRow, false);
   } else {
-    show(quickView, true);
+    show(cardValuation, true);
     show(cardItemNotes, true);
     show(cardTable, true);
-    show(msrpRow, true);
-    show(acvRow, true);
-    show(valuationSubtitle, true);
-    show(valuationList, true);
+    show(qsLkqCard, true);
+    show(qsTableCard, true);
+    show(qsMsrpRow, true);
+    show(qsMarketRow, true);
+    show(qsAcvRow, true);
   }
 
-  // MSRP + ACV (tier 3 only)
+  // Section 4: MSRP + ACV (tier 3 only)
   if (searchTier === 3) {
     const msrp = analysis.launchMsrpNumeric || 0;
     const age = releaseDate.ageNumeric || 0;
@@ -298,10 +312,9 @@ function renderFast(data) {
     const noteEl = byId("r-market-price-note");
     if (noteEl) noteEl.textContent = analysis.currentMarketPriceNote || "";
 
-    setText("qv-category", analysis.quickSummary || analysis.category || "");
-    setText("qv-status", analysis.status || data.availability || "");
-    setText("qv-age", age > 0 ? `~${age} years` : (releaseDate.estimatedAge || "Not available"));
-    setText("qv-msrp", analysis.launchMsrp || "Not available");
+    // Quick snapshot MSRP
+    setText("qs-msrp", analysis.launchMsrp || "Not available");
+    setText("qs-market-price", analysis.currentMarketPrice || "Not available");
 
     if (msrp > 0) {
       acvData = { msrp, age };
@@ -312,7 +325,7 @@ function renderFast(data) {
       if (recalcBtn) recalcBtn.disabled = false;
     } else {
       setText("r-acv", "Not available (no MSRP data)");
-      setText("qv-acv", "N/A");
+      setText("qs-acv", "N/A");
       setText("r-acv-formula", "", "");
       const acvStepsEl = byId("r-acv-steps");
       if (acvStepsEl) acvStepsEl.style.display = "none";
@@ -321,20 +334,30 @@ function renderFast(data) {
     }
   } else {
     setText("r-acv", "");
-    setText("qv-acv", "");
+    setText("qs-acv", "");
   }
 
-  // Show results, reset to compact mode
+  // Quick snapshot — fast data
+  setText("qs-summary", analysis.quickSummary || analysis.entered || "");
+  setText("qs-description", analysis.itemDescription || "");
+  setText("qs-age", releaseDate.estimatedAge || "Not available");
+  setText("qs-availability", data.availability || "Unknown");
+  renderSpecPills("qs-spec-pills", topSpecs);
+
+  // Quick snapshot tier badge
+  const qsTierBadge = byId("qs-tier-badge");
+  if (qsTierBadge && analysis.tier) {
+    qsTierBadge.textContent = analysis.tier;
+    qsTierBadge.className = `tier-badge ${tierMap[analysis.tier] || "tier-entry"}`;
+  }
+
+  // Show results
   const results = byId("results");
   if (results) results.classList.remove("hidden");
 
-  currentMode = "compact";
-  document.body.classList.remove("is-expanded");
-  const viewBtn = byId("view-toggle");
-  if (viewBtn) {
-    viewBtn.textContent = "Compact View";
-    viewBtn.classList.add("active");
-  }
+  // Apply saved view mode
+  const savedMode = (() => { try { return sessionStorage.getItem("bolt_view_mode") || "full"; } catch (_) { return "full"; } })();
+  setViewMode(savedMode);
 }
 
 // ── renderDetail ─────────────────────────────────────────────────────────────
@@ -345,7 +368,7 @@ function renderDetail(data) {
 
   const query = (fastData?.analysis?.entered || "").trim();
 
-  // ─ Item Notes card ─
+  // ─ Item Notes card (Section 5) ─
   const itemNotesContent = byId("item-notes-content");
   if (itemNotesContent) {
     const lkq = data.itemNotes?.lkqEvaluation || {};
@@ -373,7 +396,17 @@ function renderDetail(data) {
     `;
   }
 
-  // ─ Replacement table ─
+  // ─ Quick snapshot LKQ (max 3 bullets) ─
+  const qsLkqContent = byId("qs-lkq-content");
+  if (qsLkqContent) {
+    const lkq = data.itemNotes?.lkqEvaluation || {};
+    const mustMatch = Array.isArray(lkq.mustMatchSpecs) ? lkq.mustMatchSpecs.slice(0, 3) : [];
+    qsLkqContent.innerHTML = mustMatch.length
+      ? `<ul class="lkq-spec-list">${mustMatch.map((s) => `<li>${escapeHtml(s)}</li>`).join("")}</ul>`
+      : `<p class="none-found">No LKQ specs specified.</p>`;
+  }
+
+  // ─ Full replacement table (Section 6) ─
   const tableLoading = byId("table-loading");
   const tableEl = byId("r-table");
   const tbody = byId("table-body");
@@ -401,18 +434,62 @@ function renderDetail(data) {
     }
   }
 
-  // ─ Technical specs + materials + service life ─
-  setText("r-tech-specs", data.technicalSpecs || "");
-  setText("r-materials", data.materials || "");
+  // ─ Quick snapshot mini table (first 5 fixed rows, Brand Match + Option 1 only) ─
+  const qsTableLoading = byId("qs-table-loading");
+  const qsTableEl = byId("qs-table");
+  const qsTbody = byId("qs-table-body");
+  if (qsTbody && qsTableLoading && qsTableEl) {
+    const topRows = (data.table || []).slice(0, 5);
+    if (topRows.length) {
+      qsTbody.innerHTML = topRows
+        .map((row) => {
+          const isRetailers = (row.label || "").toLowerCase().includes("retailer");
+          const origCell = isRetailers ? buildRetailerLinks(row.original, query) : escapeHtml(row.original || "N/A");
+          const bmCell = isRetailers ? buildRetailerLinks(row.brandMatch, query) : escapeHtml(row.brandMatch || "N/A");
+          const o1Cell = isRetailers ? buildRetailerLinks(row.option1, query) : escapeHtml(row.option1 || "N/A");
+          return `<tr>
+            <td>${escapeHtml(row.label || "")}</td>
+            <td>${origCell}</td>
+            <td class="brand-match">${bmCell}</td>
+            <td>${o1Cell}</td>
+          </tr>`;
+        })
+        .join("");
+      qsTableLoading.classList.add("hidden");
+      qsTableEl.classList.remove("hidden");
+    }
+  }
+
+  // ─ Full technical specs expandable ─
+  const techSpecs = data.technicalSpecs || "";
+  if (techSpecs) {
+    const toggleSpecsBtn = byId("toggle-specs");
+    const fullSpecsContainer = byId("full-specs-container");
+    const extendedList = byId("extended-specs-list");
+    if (toggleSpecsBtn && fullSpecsContainer && extendedList) {
+      const specs = techSpecs.split(",").map((s) => s.trim()).filter(Boolean);
+      let items = specs.map((s) => `<li>${escapeHtml(s)}</li>`).join("");
+      if (data.materials) items += `<li><strong>Materials:</strong> ${escapeHtml(data.materials)}</li>`;
+      extendedList.innerHTML = items;
+      toggleSpecsBtn.style.display = "";
+      toggleSpecsBtn.onclick = function () {
+        const isOpen = fullSpecsContainer.style.display !== "none";
+        fullSpecsContainer.style.display = isOpen ? "none" : "block";
+        this.textContent = isOpen ? "Show Full Technical Specifications" : "Hide Full Technical Specifications";
+      };
+    }
+  }
+
+  // ─ Service life (Section 3) ─
   setText("r-service-life", data.serviceLife || "");
 
-  // ─ How It Works ─
+  // ─ How It Works (Section 2) ─
   const howContent = byId("how-it-works-content");
   if (howContent) {
     howContent.innerHTML = `<p class="how-it-works-text">${escapeHtml(data.howItWorks || "No description available.")}</p>`;
   }
 
-  // ─ Recalls ─
+  // ─ Recalls (Section 7) ─
   const recallsContent = byId("recalls-content");
   if (recallsContent) {
     const recalls = Array.isArray(data.recalls) ? data.recalls : [];
@@ -432,7 +509,7 @@ function renderDetail(data) {
     }
   }
 
-  // ─ Error Codes ─
+  // ─ Error Codes (Section 8) ─
   const errorCodesContent = byId("error-codes-content");
   if (errorCodesContent) {
     const codes = Array.isArray(data.errorCodes) ? data.errorCodes : [];
@@ -455,7 +532,7 @@ function renderDetail(data) {
     }
   }
 
-  // ─ Common Failures ─
+  // ─ Common Reported Failures (Section 9) ─
   const failuresContent = byId("failures-content");
   if (failuresContent) {
     const failures = Array.isArray(data.failures) ? data.failures : [];
@@ -474,7 +551,7 @@ function renderDetail(data) {
     }
   }
 
-  // ─ Owner's Manual (Section 8) ─
+  // ─ Owner's Manual + Manufacturer Page combined (Section 10) ─
   const manualContent = byId("manual-content");
   if (manualContent) {
     if (data.manual?.url) {
@@ -490,7 +567,6 @@ function renderDetail(data) {
     }
   }
 
-  // ─ Manufacturer Page (Section 9) ─
   const mfrPageContent = byId("manufacturer-page-content");
   if (mfrPageContent) {
     if (data.manufacturerPage?.url) {
@@ -506,7 +582,7 @@ function renderDetail(data) {
     }
   }
 
-  // ─ Troubleshooting (Section 10) ─
+  // ─ Troubleshooting (Section 11) ─
   const troubleshootingContent = byId("troubleshooting-content");
   if (troubleshootingContent) {
     const steps = Array.isArray(data.troubleshooting?.steps) ? data.troubleshooting.steps : [];
@@ -597,34 +673,50 @@ async function performSearch() {
 
   // Reset detail sections to skeleton/spinner state
   const spinnerSections = [
-    "item-notes-content",
     "how-it-works-content",
     "recalls-content",
     "error-codes-content",
     "failures-content",
-    "manual-content",
-    "manufacturer-page-content",
     "troubleshooting-content"
   ];
   spinnerSections.forEach((id) => {
     const el = byId(id);
+    if (el) el.innerHTML = `<div class="section-spinner">Loading...</div>`;
+  });
+
+  const skeletonSections = ["item-notes-content", "qs-lkq-content"];
+  skeletonSections.forEach((id) => {
+    const el = byId(id);
     if (el) {
-      if (id === "item-notes-content") {
-        el.innerHTML = `
-          <div class="skeleton-line med"></div>
-          <div class="skeleton-line full"></div>
-          <div class="skeleton-line short"></div>`;
-      } else {
-        el.innerHTML = `<div class="section-spinner">Loading...</div>`;
-      }
+      el.innerHTML = `
+        <div class="skeleton-line med"></div>
+        <div class="skeleton-line full"></div>
+        <div class="skeleton-line short"></div>`;
     }
   });
 
-  // Reset table to spinner
+  // Manual + mfr page spinner
+  const manualContent = byId("manual-content");
+  if (manualContent) manualContent.innerHTML = `<div class="section-spinner">Loading...</div>`;
+  const mfrPageContent = byId("manufacturer-page-content");
+  if (mfrPageContent) mfrPageContent.innerHTML = "";
+
+  // Reset tables to spinner
   const tableLoading = byId("table-loading");
   const tableEl = byId("r-table");
   if (tableLoading) tableLoading.classList.remove("hidden");
   if (tableEl) tableEl.classList.add("hidden");
+
+  const qsTableLoading = byId("qs-table-loading");
+  const qsTableEl = byId("qs-table");
+  if (qsTableLoading) qsTableLoading.classList.remove("hidden");
+  if (qsTableEl) qsTableEl.classList.add("hidden");
+
+  // Hide full specs toggle until detail loads
+  const toggleSpecsBtn = byId("toggle-specs");
+  if (toggleSpecsBtn) toggleSpecsBtn.style.display = "none";
+  const fullSpecsContainer = byId("full-specs-container");
+  if (fullSpecsContainer) fullSpecsContainer.style.display = "none";
 
   fastData = null;
   detailData = null;
@@ -678,7 +770,8 @@ async function performSearch() {
 document.addEventListener("DOMContentLoaded", () => {
   const searchBtn = byId("btn");
   const queryInput = byId("query");
-  const toggleBtn = byId("view-toggle");
+  const btnQuickView = byId("btn-quick-view");
+  const btnFullView = byId("btn-full-view");
   const copyBtn = byId("copy-btn");
   const printBtn = byId("print-btn");
   const recalcBtn = byId("recalc-btn");
@@ -689,7 +782,8 @@ document.addEventListener("DOMContentLoaded", () => {
       if (event.key === "Enter") performSearch();
     });
   }
-  if (toggleBtn) toggleBtn.addEventListener("click", toggleView);
+  if (btnQuickView) btnQuickView.addEventListener("click", () => setViewMode("quick"));
+  if (btnFullView) btnFullView.addEventListener("click", () => setViewMode("full"));
   if (copyBtn) copyBtn.addEventListener("click", copySummary);
   if (printBtn) printBtn.addEventListener("click", () => window.print());
   if (recalcBtn) recalcBtn.addEventListener("click", recalcACV);
