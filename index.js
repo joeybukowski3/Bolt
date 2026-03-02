@@ -771,7 +771,7 @@ async function performSearch() {
   if (!query) return;
 
   // Check sessionStorage cache first
-  const cacheKey = `bolt_v4_${query.toLowerCase()}`;
+  const cacheKey = `bolt_v5_${query.toLowerCase()}`;
   try {
     const cached = sessionStorage.getItem(cacheKey);
     if (cached) {

@@ -6,8 +6,8 @@ import {
   normalizeQuery
 } from "./_shared.js";
 
-const FAST_API_VERSION = "2026-03-01-fast-v3";
-const DETAIL_API_VERSION = "2026-03-01-detail-v3";
+const FAST_API_VERSION = "2026-03-02-fast-v4";
+const DETAIL_API_VERSION = "2026-03-02-detail-v4";
 
 const ALLOWED_TIERS = ["Entry Level", "Mid-Grade", "Upper Mid-Grade", "Premium", "Luxury / Designer"];
 const ALLOWED_CATEGORIES = [
@@ -419,7 +419,7 @@ function sanitizeDetailPayload(payload, query) {
 
 async function runFastMode(query, apiKey, model, refresh, cacheClient, todayIso) {
   const normalizedQuery = normalizeQuery(query);
-  const cacheKey = `search:v4:fast:${model}:${todayIso}:${normalizedQuery}`;
+  const cacheKey = `search:v5:fast:${model}:${todayIso}:${normalizedQuery}`;
 
   if (!refresh) {
     const cached = await cacheGet(cacheClient, cacheKey);
@@ -456,7 +456,7 @@ async function runFastMode(query, apiKey, model, refresh, cacheClient, todayIso)
 
 async function runDetailMode(query, apiKey, model, refresh, cacheClient, todayIso) {
   const normalizedQuery = normalizeQuery(query);
-  const cacheKey = `search:v4:detail:${model}:${todayIso}:${normalizedQuery}`;
+  const cacheKey = `search:v5:detail:${model}:${todayIso}:${normalizedQuery}`;
 
   if (!refresh) {
     const cached = await cacheGet(cacheClient, cacheKey);

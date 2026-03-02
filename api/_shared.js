@@ -103,7 +103,12 @@ export async function callGeminiJson({
   const body = {
     contents: [{ parts: [{ text: prompt }] }],
     generationConfig: {
-      responseMimeType: "application/json",
+      // responseMimeType "application/json" conflicts with the google_search
+      // grounding tool — when both are set, Gemini skips the live search step
+      // and generates from training data only. When withSearchTool is true we
+      // omit the MIME type and let Gemini produce JSON inside a code fence,
+      // which stripMarkdownCodeFences + tryParseJson already handles.
+      ...(withSearchTool ? {} : { responseMimeType: "application/json" }),
       temperature
     }
   };
