@@ -294,6 +294,13 @@ function renderFast(data) {
   const searchTier = Number(data.searchTier) || 1;
   currentCategory = analysis.category || "general";
 
+  // Model number hint (shown when full model not provided)
+  const modelHint = byId("model-number-hint");
+  if (modelHint) {
+    const showHint = searchTier < 3 || analysis.modelConfidence === "estimated";
+    modelHint.classList.toggle("hidden", !showHint);
+  }
+
   // Tier badge (results header)
   const tierMap = {
     "Entry Level":       "tier-entry",
@@ -1133,6 +1140,17 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
   }
+
+  // ── Panel bottom navigation (jump to other tabs) ─────────────────────────
+  document.querySelectorAll(".panel-nav-btn[data-tab]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const tabId = btn.dataset.tab;
+      const tabBtn = byId(tabId);
+      if (!tabBtn || tabBtn.classList.contains("hidden")) return;
+      setActiveTab(tabId);
+      byId("results")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  });
 
   // ── Homepage: hamburger menu ──────────────────────────────────────────────
   byId("brt-hamburger")?.addEventListener("click", () => {
