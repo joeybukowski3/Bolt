@@ -1,4 +1,4 @@
-let viewMode = "full"; // "quick" | "full"
+let activeTab = "tab-overview";
 let fastData = null;
 let detailData = null;
 let currentCategory = "general";
@@ -121,26 +121,42 @@ function renderACVDisplay(msrp, age, category) {
     stepsEl.textContent = buildACVSteps(msrp, age, result);
     stepsEl.style.display = "block";
   }
-  // Update quick snapshot ACV too
-  setText("qs-acv", acvStr);
+  // Update metrics strip ACV
+  setText("m-acv", acvStr);
 }
 
-// ── View mode toggle ─────────────────────────────────────────────────────────
+// ── Tab navigation ────────────────────────────────────────────────────────────
 
-function setViewMode(mode) {
-  viewMode = mode;
-  try { sessionStorage.setItem("bolt_view_mode", mode); } catch (_) {}
+const TAB_IDS = ["tab-overview", "tab-replacements", "tab-diagnostics", "tab-technical", "tab-notes"];
 
-  const isQuick = mode === "quick";
-  const quickSnapshot = byId("quick-snapshot");
-  const detailedView = byId("detailed-view");
-  const btnQuick = byId("btn-quick-view");
-  const btnFull = byId("btn-full-view");
+function setActiveTab(tabId) {
+  if (!TAB_IDS.includes(tabId)) return;
+  activeTab = tabId;
 
-  if (quickSnapshot) quickSnapshot.classList.toggle("hidden", !isQuick);
-  if (detailedView) detailedView.classList.toggle("hidden", isQuick);
-  if (btnQuick) btnQuick.classList.toggle("active", isQuick);
-  if (btnFull) btnFull.classList.toggle("active", !isQuick);
+  TAB_IDS.forEach((id) => {
+    const btn = byId(id);
+    const panel = byId(id.replace("tab-", "panel-"));
+    if (btn) {
+      btn.classList.toggle("active", id === tabId);
+      btn.setAttribute("aria-selected", id === tabId ? "true" : "false");
+    }
+    if (panel) panel.classList.toggle("active", id === tabId);
+  });
+}
+
+function initTabs() {
+  TAB_IDS.forEach((id) => {
+    const btn = byId(id);
+    if (!btn) return;
+    btn.addEventListener("click", () => setActiveTab(id));
+    btn.addEventListener("keydown", (e) => {
+      const idx = TAB_IDS.indexOf(id);
+      if (e.key === "ArrowRight") { e.preventDefault(); setActiveTab(TAB_IDS[(idx + 1) % TAB_IDS.length]); byId(TAB_IDS[(idx + 1) % TAB_IDS.length])?.focus(); }
+      if (e.key === "ArrowLeft")  { e.preventDefault(); setActiveTab(TAB_IDS[(idx - 1 + TAB_IDS.length) % TAB_IDS.length]); byId(TAB_IDS[(idx - 1 + TAB_IDS.length) % TAB_IDS.length])?.focus(); }
+      if (e.key === "Home") { e.preventDefault(); setActiveTab(TAB_IDS[0]); byId(TAB_IDS[0])?.focus(); }
+      if (e.key === "End")  { e.preventDefault(); setActiveTab(TAB_IDS[TAB_IDS.length - 1]); byId(TAB_IDS[TAB_IDS.length - 1])?.focus(); }
+    });
+  });
 }
 
 // ── Recalculate ACV (from age input, no API call) ────────────────────────────
@@ -264,48 +280,30 @@ function renderFast(data) {
   }
 
   // Tiered card visibility
-  // Tier 1: general term — hide valuation, item notes, table
-  // Tier 2: category only — hide valuation, item notes; show table (tiered mode)
-  // Tier 3: brand + product line — show valuation, item notes, table
-  // Tier 4: specific model — show everything
+  // Tier 1: general term — hide valuation, item notes; tab-replacements tab shows empty state
+  // Tier 2: category only — hide valuation, item notes; show replacement table (tiered mode)
+  // Tier 3+: full report
   const cardValuation = byId("card-valuation");
   const cardItemNotes = byId("card-item-notes");
-  const cardTable = byId("card-table");
-  const qsLkqCard = byId("qs-lkq-card");
-  const qsTableCard = byId("qs-table-card");
-  const qsMsrpRow = byId("qs-msrp-row");
-  const qsMarketRow = byId("qs-market-row");
-  const qsAcvRow = byId("qs-acv-row");
 
-  if (searchTier === 1) {
+  if (searchTier <= 1) {
     show(cardValuation, false);
     show(cardItemNotes, false);
-    show(cardTable, false);
-    show(qsLkqCard, false);
-    show(qsTableCard, false);
-    show(qsMsrpRow, false);
-    show(qsMarketRow, false);
-    show(qsAcvRow, false);
   } else if (searchTier === 2) {
-    // Category only — show the tiered comparison table, but no valuation/item notes
     show(cardValuation, false);
     show(cardItemNotes, false);
-    show(cardTable, true);
-    show(qsLkqCard, false);
-    show(qsTableCard, true);
-    show(qsMsrpRow, false);
-    show(qsMarketRow, false);
-    show(qsAcvRow, false);
   } else {
-    // Tier 3 (brand+product line) and Tier 4 (specific model) — full report
     show(cardValuation, true);
     show(cardItemNotes, true);
-    show(cardTable, true);
-    show(qsLkqCard, true);
-    show(qsTableCard, true);
-    show(qsMsrpRow, true);
-    show(qsMarketRow, true);
-    show(qsAcvRow, true);
+  }
+
+  // Metrics strip — age and availability always, MSRP/ACV only for tier 3+
+  const ageShort = (releaseDate.estimatedAge || "").split(".")[0] || "—";
+  setText("m-age", ageShort);
+  setText("m-availability", data.availability || "—");
+  if (searchTier < 3) {
+    setText("m-msrp", "—");
+    setText("m-acv", "—");
   }
 
   // Section 4: MSRP + ACV (tier 3+ only)
@@ -318,20 +316,16 @@ function renderFast(data) {
     const noteEl = byId("r-market-price-note");
     if (noteEl) noteEl.textContent = analysis.currentMarketPriceNote || "";
 
-    // Quick snapshot MSRP
-    setText("qs-msrp", analysis.launchMsrp || "Not available");
-    setText("qs-market-price", analysis.currentMarketPrice || "Not available");
-
     if (msrp > 0) {
       acvData = { msrp, age };
       const ageInput = byId("acv-age-input");
       if (ageInput) ageInput.value = String(age);
+      setText("m-msrp", analysis.launchMsrp || "—");
       renderACVDisplay(msrp, age, currentCategory);
       const recalcBtn = byId("recalc-btn");
       if (recalcBtn) recalcBtn.disabled = false;
     } else {
       setText("r-acv", "Not available (no MSRP data)");
-      setText("qs-acv", "N/A");
       setText("r-acv-formula", "", "");
       const acvStepsEl = byId("r-acv-steps");
       if (acvStepsEl) acvStepsEl.style.display = "none";
@@ -340,21 +334,6 @@ function renderFast(data) {
     }
   } else {
     setText("r-acv", "");
-    setText("qs-acv", "");
-  }
-
-  // Quick snapshot — fast data
-  setText("qs-summary", analysis.quickSummary || analysis.entered || "");
-  setText("qs-description", analysis.itemDescription || "");
-  setText("qs-age", releaseDate.estimatedAge || "Not available");
-  setText("qs-availability", data.availability || "Unknown");
-  renderSpecPills("qs-spec-pills", topSpecs);
-
-  // Quick snapshot tier badge
-  const qsTierBadge = byId("qs-tier-badge");
-  if (qsTierBadge && analysis.tier) {
-    qsTierBadge.textContent = analysis.tier;
-    qsTierBadge.className = `tier-badge ${tierMap[analysis.tier] || "tier-entry"}`;
   }
 
   // ── Variations (Section 1) ──────────────────────────────────────────────────
@@ -389,13 +368,10 @@ function renderFast(data) {
     }
   }
 
-  // Show results
+  // Show results, reset to overview tab
   const results = byId("results");
   if (results) results.classList.remove("hidden");
-
-  // Apply saved view mode
-  const savedMode = (() => { try { return sessionStorage.getItem("bolt_view_mode") || "full"; } catch (_) { return "full"; } })();
-  setViewMode(savedMode);
+  setActiveTab("tab-overview");
 }
 
 // ── renderDetail ─────────────────────────────────────────────────────────────
@@ -434,17 +410,7 @@ function renderDetail(data) {
     `;
   }
 
-  // ─ Quick snapshot LKQ (max 3 bullets) ─
-  const qsLkqContent = byId("qs-lkq-content");
-  if (qsLkqContent) {
-    const lkq = data.itemNotes?.lkqEvaluation || {};
-    const mustMatch = Array.isArray(lkq.mustMatchSpecs) ? lkq.mustMatchSpecs.slice(0, 3) : [];
-    qsLkqContent.innerHTML = mustMatch.length
-      ? `<ul class="lkq-spec-list">${mustMatch.map((s) => `<li>${escapeHtml(s)}</li>`).join("")}</ul>`
-      : `<p class="none-found">No LKQ specs specified.</p>`;
-  }
-
-  // ─ Full replacement table (Section 6) ─
+  // ─ Replacement table ─
   const tableMode = data.tableMode || "standard";
   const isTiered = tableMode === "tiered";
 
@@ -545,92 +511,22 @@ function renderDetail(data) {
     }
   }
 
-  // ─ Quick snapshot mini table ─
-  // Update QS table header too
-  const qsTableHeadRow = byId("qs-table-head-row");
-  if (qsTableHeadRow) {
-    if (isTiered) {
-      qsTableHeadRow.innerHTML = `
-        <th>Feature</th>
-        <th><span class="tier-col-badge tier-col-entry">Entry</span></th>
-        <th><span class="tier-col-badge tier-col-mid">Mid</span></th>
-        <th><span class="tier-col-badge tier-col-premium">Premium</span></th>`;
-    } else {
-      qsTableHeadRow.innerHTML = `<th>Feature</th><th>Original Item</th><th class="highlight">Brand Match</th><th>Option 1</th>`;
+  // ─ Technical Details panel ─
+  const techPanelContent = byId("tech-panel-content");
+  if (techPanelContent) {
+    const techSpecs = data.technicalSpecs || "";
+    const specs = techSpecs.split(",").map((s) => s.trim()).filter(Boolean);
+    let techHtml = "";
+    if (specs.length) {
+      techHtml += `<ul class="report-list">${specs.map((s) => `<li>${escapeHtml(s)}</li>`).join("")}</ul>`;
     }
-  }
-
-  // QS table note
-  const qsTableNoteEl = byId("qs-table-note");
-  if (qsTableNoteEl) {
-    if (data.tableNote) {
-      qsTableNoteEl.innerHTML = `<strong>Note:</strong> ${escapeHtml(data.tableNote)}`;
-      qsTableNoteEl.classList.remove("hidden");
-    } else {
-      qsTableNoteEl.classList.add("hidden");
+    if (data.materials) {
+      techHtml += `<div class="section-subtitle">Materials</div><p class="report-overview">${escapeHtml(data.materials)}</p>`;
     }
-  }
-
-  const qsTableLoading = byId("qs-table-loading");
-  const qsTableEl = byId("qs-table");
-  const qsTbody = byId("qs-table-body");
-  if (qsTbody && qsTableLoading && qsTableEl) {
-    const topRows = (data.table || []).slice(0, 5);
-    if (topRows.length) {
-      if (isTiered) {
-        qsTbody.innerHTML = topRows
-          .map((row) => {
-            const isRetailers = (row.label || "").toLowerCase().includes("retailer");
-            const elCell = isRetailers ? buildRetailerLinks(row.entryLevel, colSearch.entryLevel) : escapeHtml(row.entryLevel || "N/A");
-            const mgCell = isRetailers ? buildRetailerLinks(row.midGrade,   colSearch.midGrade)   : escapeHtml(row.midGrade   || "N/A");
-            const prCell = isRetailers ? buildRetailerLinks(row.premium,    colSearch.premium)    : escapeHtml(row.premium    || "N/A");
-            return `<tr>
-              <td>${escapeHtml(row.label || "")}</td>
-              <td>${elCell}</td>
-              <td>${mgCell}</td>
-              <td>${prCell}</td>
-            </tr>`;
-          })
-          .join("");
-      } else {
-        qsTbody.innerHTML = topRows
-          .map((row) => {
-            const isRetailers = (row.label || "").toLowerCase().includes("retailer");
-            const origCell = isRetailers ? buildRetailerLinks(row.original,   colSearch.original)   : escapeHtml(row.original   || "N/A");
-            const bmCell   = isRetailers ? buildRetailerLinks(row.brandMatch, colSearch.brandMatch) : escapeHtml(row.brandMatch || "N/A");
-            const o1Cell   = isRetailers ? buildRetailerLinks(row.option1,    colSearch.option1)    : escapeHtml(row.option1    || "N/A");
-            return `<tr>
-              <td>${escapeHtml(row.label || "")}</td>
-              <td>${origCell}</td>
-              <td class="brand-match">${bmCell}</td>
-              <td>${o1Cell}</td>
-            </tr>`;
-          })
-          .join("");
-      }
-      qsTableLoading.classList.add("hidden");
-      qsTableEl.classList.remove("hidden");
+    if (data.serviceLife) {
+      techHtml += `<div class="section-subtitle">Service Life</div><p class="report-overview">${escapeHtml(data.serviceLife)}</p>`;
     }
-  }
-
-  // ─ Full technical specs expandable ─
-  const techSpecs = data.technicalSpecs || "";
-  if (techSpecs) {
-    const toggleSpecsBtn = byId("toggle-specs");
-    const fullSpecsContainer = byId("full-specs-container");
-    const extendedList = byId("extended-specs-list");
-    if (toggleSpecsBtn && fullSpecsContainer && extendedList) {
-      const specs = techSpecs.split(",").map((s) => s.trim()).filter(Boolean);
-      let items = specs.map((s) => `<li>${escapeHtml(s)}</li>`).join("");
-      if (data.materials) items += `<li><strong>Materials:</strong> ${escapeHtml(data.materials)}</li>`;
-      extendedList.innerHTML = items;
-      toggleSpecsBtn.style.display = "";
-      toggleSpecsBtn.onclick = function () {
-        const isOpen = fullSpecsContainer.style.display !== "none";
-        fullSpecsContainer.style.display = isOpen ? "none" : "block";
-        this.textContent = isOpen ? "Show Full Technical Specifications" : "Hide Full Technical Specifications";
-      };
-    }
+    techPanelContent.innerHTML = techHtml || `<p class="none-found">No technical specifications available.</p>`;
   }
 
   // ─ Service life (Section 3) ─
@@ -837,7 +733,7 @@ async function performSearch() {
     if (el) el.innerHTML = `<div class="section-spinner">Loading...</div>`;
   });
 
-  const skeletonSections = ["item-notes-content", "qs-lkq-content"];
+  const skeletonSections = ["item-notes-content"];
   skeletonSections.forEach((id) => {
     const el = byId(id);
     if (el) {
@@ -854,16 +750,11 @@ async function performSearch() {
   const mfrPageContent = byId("manufacturer-page-content");
   if (mfrPageContent) mfrPageContent.innerHTML = "";
 
-  // Reset tables to spinner
+  // Reset table to spinner
   const tableLoading = byId("table-loading");
   const tableEl = byId("r-table");
   if (tableLoading) tableLoading.classList.remove("hidden");
   if (tableEl) tableEl.classList.add("hidden");
-
-  const qsTableLoading = byId("qs-table-loading");
-  const qsTableEl = byId("qs-table");
-  if (qsTableLoading) qsTableLoading.classList.remove("hidden");
-  if (qsTableEl) qsTableEl.classList.add("hidden");
 
   // Reset variations
   const variationsSectionReset = byId("r-variations");
@@ -871,25 +762,25 @@ async function performSearch() {
   const variationChipsReset = byId("r-variation-chips");
   if (variationChipsReset) variationChipsReset.innerHTML = "";
 
-  // Reset table note, narrow results, and QS table note
+  // Reset table note, narrow results
   const tableNoteEl = byId("table-note");
   if (tableNoteEl) tableNoteEl.classList.add("hidden");
   const narrowResultsEl = byId("narrow-results");
   if (narrowResultsEl) narrowResultsEl.classList.add("hidden");
-  const qsTableNoteEl = byId("qs-table-note");
-  if (qsTableNoteEl) qsTableNoteEl.classList.add("hidden");
 
-  // Reset table headers to standard layout
+  // Reset table header to standard layout
   const tableHeadRow = byId("table-head-row");
   if (tableHeadRow) tableHeadRow.innerHTML = `<th>Feature</th><th>Original Item</th><th class="highlight">Brand Match</th><th>Option 1</th><th>Option 2</th>`;
-  const qsTableHeadRow = byId("qs-table-head-row");
-  if (qsTableHeadRow) qsTableHeadRow.innerHTML = `<th>Feature</th><th>Original Item</th><th class="highlight">Brand Match</th><th>Option 1</th>`;
 
-  // Hide full specs toggle until detail loads
-  const toggleSpecsBtn = byId("toggle-specs");
-  if (toggleSpecsBtn) toggleSpecsBtn.style.display = "none";
-  const fullSpecsContainer = byId("full-specs-container");
-  if (fullSpecsContainer) fullSpecsContainer.style.display = "none";
+  // Reset technical panel
+  const techPanelContent = byId("tech-panel-content");
+  if (techPanelContent) techPanelContent.innerHTML = `<div class="section-spinner">Loading...</div>`;
+
+  // Reset metrics strip
+  setText("m-age", "—");
+  setText("m-msrp", "—");
+  setText("m-acv", "—");
+  setText("m-availability", "—");
 
   fastData = null;
   detailData = null;
@@ -943,8 +834,6 @@ async function performSearch() {
 document.addEventListener("DOMContentLoaded", () => {
   const searchBtn = byId("btn");
   const queryInput = byId("query");
-  const btnQuickView = byId("btn-quick-view");
-  const btnFullView = byId("btn-full-view");
   const copyBtn = byId("copy-btn");
   const printBtn = byId("print-btn");
   const recalcBtn = byId("recalc-btn");
@@ -955,9 +844,8 @@ document.addEventListener("DOMContentLoaded", () => {
       if (event.key === "Enter") performSearch();
     });
   }
-  if (btnQuickView) btnQuickView.addEventListener("click", () => setViewMode("quick"));
-  if (btnFullView) btnFullView.addEventListener("click", () => setViewMode("full"));
   if (copyBtn) copyBtn.addEventListener("click", copySummary);
   if (printBtn) printBtn.addEventListener("click", () => window.print());
   if (recalcBtn) recalcBtn.addEventListener("click", recalcACV);
+  initTabs();
 });
