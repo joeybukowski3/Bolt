@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bolt - Item Research Assistant</title>
+    <title>Bolt — Item Research Tool</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="shared.css">
@@ -37,99 +37,23 @@
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: var(--bg-primary);
+            background: #0a0e1a;
             color: var(--text-white);
             min-height: 100vh;
             line-height: 1.6;
         }
 
-        .circuit-bg {
-            position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none;
-        }
-        .circuit-bg::before {
-            content: ''; position: absolute; inset: 0;
-            background:
-                linear-gradient(90deg, transparent 49.5%, rgba(234,179,8,0.04) 49.5%, rgba(234,179,8,0.04) 50.5%, transparent 50.5%),
-                linear-gradient(0deg, transparent 49.5%, rgba(234,179,8,0.04) 49.5%, rgba(234,179,8,0.04) 50.5%, transparent 50.5%);
-            background-size: 60px 60px;
-        }
-        .circuit-bg::after {
-            content: ''; position: absolute; inset: 0;
-            background: radial-gradient(ellipse at 50% 0%, rgba(234,179,8,0.06) 0%, transparent 60%),
-                        radial-gradient(ellipse at 50% 100%, rgba(59,130,246,0.04) 0%, transparent 60%);
-        }
-        .lightning-bolts { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
-        .bolt-shape { position: absolute; font-size: 15rem; opacity: 0.03; color: var(--accent); font-weight: 800; transform: rotate(-12deg); user-select: none; }
-        .bolt-shape:nth-child(1) { top: 10%; left: 5%; }
-        .bolt-shape:nth-child(2) { top: 15%; left: 30%; font-size: 20rem; }
-        .bolt-shape:nth-child(3) { top: 8%; right: 25%; font-size: 18rem; transform: rotate(8deg); }
-        .bolt-shape:nth-child(4) { top: 12%; right: 5%; }
-
-        .app-container { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 0 1.5rem; }
-
-        /* ── Navigation ── */
-        .nav { display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 0; }
-        .nav-left { display: flex; align-items: center; gap: 0.75rem; }
-        .nav-brand { display: flex; align-items: center; gap: 0.3rem; font-size: 1.3rem; font-weight: 800; color: var(--text-white); text-decoration: none; white-space: nowrap; }
-        .nav-tagline { font-size: 0.72rem; color: rgba(255,255,255,0.58); font-weight: 400; padding-left: 0.5rem; border-left: 1px solid rgba(255,255,255,0.18); line-height: 1.3; }
-        @media (max-width: 640px) { .nav-tagline { display: none; } }
-        .nav-links { display: flex; align-items: center; gap: 0.5rem; }
-        .nav-link { color: rgba(255,255,255,0.75); text-decoration: none; font-size: 0.875rem; font-weight: 500; padding: 0.5rem 1rem; border-radius: 8px; transition: all 0.2s; cursor: pointer; white-space: nowrap; }
-        .nav-link:hover { color: var(--text-white); background: rgba(255,255,255,0.08); }
-        .nav-link.active { background: var(--accent); color: #000; font-weight: 600; }
-        .nav-link.active:hover { background: var(--accent-hover); }
-
-        /* ── Hero ── */
-        .hero { text-align: center; padding: 2.5rem 0 2rem; }
-        .search-container { max-width: 700px; margin: 0 auto 2rem; display: flex; background: var(--bg-input); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; overflow: hidden; transition: border-color 0.3s; }
-        .search-container:focus-within { border-color: rgba(234,179,8,0.4); box-shadow: 0 0 0 3px rgba(234,179,8,0.1); }
-        .search-input { flex: 1; background: transparent; border: none; outline: none; padding: 1rem 1.5rem; font-size: 1rem; color: var(--text-white); font-family: inherit; }
-        .search-input::placeholder { color: var(--text-muted-dark); }
-        .search-btn { background: var(--accent); color: #000; border: none; padding: 1rem 2rem; font-size: 0.95rem; font-weight: 700; font-family: inherit; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: background 0.2s; white-space: nowrap; }
-        .search-btn:hover { background: var(--accent-hover); }
-
-        /* ── Hero tagline + description ── */
-        .hero-tagline { font-size: 0.88rem; font-weight: 400; color: rgba(255,255,255,0.78); text-align: center; margin-bottom: 1.1rem; letter-spacing: 0.01em; }
-        .hero-desc { max-width: 640px; margin: 0 auto 1.5rem; font-size: 0.84rem; color: var(--text-muted-dark); text-align: center; line-height: 1.75; }
-
-        /* ── Coverage badges ── */
-        .coverage-bar { display: flex; justify-content: center; gap: 0.6rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
-        .coverage-badge { display: inline-flex; align-items: center; gap: 0.4rem; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.15); border-radius: 999px; padding: 0.35rem 0.9rem; font-size: 0.78rem; color: rgba(255,255,255,0.80); white-space: nowrap; }
-
-        /* ── Search flow strip ── */
-        .search-flow { display: flex; align-items: center; justify-content: center; gap: 0.45rem; margin-bottom: 1.4rem; flex-wrap: wrap; }
-        .search-flow-step { display: inline-flex; align-items: center; gap: 0.3rem; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.15); border-radius: 999px; padding: 0.3rem 0.85rem; font-size: 0.74rem; font-weight: 600; color: rgba(255,255,255,0.85); white-space: nowrap; }
-        .search-flow-arrow { color: rgba(255,255,255,0.45); font-size: 0.7rem; flex-shrink: 0; }
-        @media (max-width: 480px) { .search-flow { gap: 0.3rem; } .search-flow-step { font-size: 0.7rem; padding: 0.25rem 0.65rem; } }
-
-        /* ── Search example hint ── */
-        .search-examples { max-width: 620px; margin: 0.55rem auto 0; text-align: center; font-size: 0.76rem; color: rgba(255,255,255,0.38); line-height: 1.65; padding: 0 1rem; }
-        .search-examples em { font-style: normal; color: rgba(255,255,255,0.58); }
-
-        /* ── Section filters ── */
-        .section-filters { max-width: 700px; margin: 0.85rem auto 0; display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
-        .section-filters-label { font-size: 0.66rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: rgba(255,255,255,0.55); white-space: nowrap; flex-shrink: 0; }
-        .section-filter-list { display: flex; flex-wrap: wrap; gap: 0.35rem; }
-        .section-filter-chip { display: inline-flex; align-items: center; gap: 0.35rem; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.16); border-radius: 999px; padding: 0.28rem 0.65rem 0.28rem 0.45rem; cursor: pointer; font-size: 0.72rem; font-weight: 500; color: rgba(255,255,255,0.80); transition: background 0.15s, border-color 0.15s; user-select: none; }
-        .section-filter-chip:hover { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.28); }
-        .section-filter-chip.is-checked { background: var(--accent-dim-dark); border-color: rgba(234,179,8,0.45); color: var(--text-white); }
-        .section-filter-chip input[type="checkbox"] { width: 12px; height: 12px; accent-color: var(--accent); cursor: pointer; flex-shrink: 0; margin: 0; }
-        @media (max-width: 540px) { .section-filters { justify-content: center; } .section-filters-label { width: 100%; text-align: center; } }
-
-        /* ── How-to row ── */
-        .how-to-row { display: grid; grid-template-columns: 1fr 1fr 1fr; margin-bottom: 1.5rem; border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; overflow: hidden; }
-        .how-to-step { padding: 0.875rem 1.1rem; background: rgba(255,255,255,0.03); display: flex; flex-direction: column; gap: 0.2rem; border-right: 1px solid rgba(255,255,255,0.07); }
-        .how-to-step:last-child { border-right: none; }
-        .how-to-step-num { font-size: 0.58rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); }
-        .how-to-step-title { font-size: 0.8rem; font-weight: 700; color: var(--text-white); }
-        .how-to-step-desc { font-size: 0.74rem; color: rgba(255,255,255,0.78); line-height: 1.5; }
-        @media (max-width: 600px) { .how-to-row { grid-template-columns: 1fr; } .how-to-step { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.07); } .how-to-step:last-child { border-bottom: none; } }
+        /* ── Decorative BG (hero area only) ── */
+        .circuit-bg { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+        .circuit-bg::before { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent 49.5%, rgba(234,179,8,0.03) 49.5%, rgba(234,179,8,0.03) 50.5%, transparent 50.5%), linear-gradient(0deg, transparent 49.5%, rgba(234,179,8,0.03) 49.5%, rgba(234,179,8,0.03) 50.5%, transparent 50.5%); background-size: 60px 60px; }
+        .circuit-bg::after { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 0%, rgba(234,179,8,0.05) 0%, transparent 55%); }
 
         /* ── Mascot loader ── */
         @keyframes runDogLoader { 0% { left: -80px; } 100% { left: calc(100% + 80px); } }
         @keyframes pulse-glow { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
         @keyframes cape-flutter { 0%, 100% { transform: rotate(-15deg) skewX(0deg); } 50% { transform: rotate(-25deg) skewX(-5deg); } }
-        .mascot-area { text-align: center; min-height: 5.5rem; margin-bottom: 0.75rem; }
+        .mascot-area { text-align: center; margin-bottom: 0.75rem; display: none; }
+        .mascot-area.brt-loading { display: block; }
         #loader-track { width: 400px; max-width: 90vw; overflow: hidden; margin: 0 auto 0.5rem; position: relative; height: 4.5rem; }
         #loader-dog { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 60px; height: 60px; }
         #loader-dog.running { left: -80px; transform: none; animation: runDogLoader 2.8s linear infinite; }
@@ -137,8 +61,30 @@
         .loader-text { color: rgba(255,255,255,0.78); font-style: italic; font-size: 0.9rem; display: none; }
         .loader-text.visible { display: block; animation: pulse-glow 2s ease-in-out infinite; }
 
+        /* ── Section filters ── */
+        .section-filters { max-width: 700px; margin: 1rem auto 0; display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; justify-content: center; }
+        .section-filters-label { font-size: 0.66rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: rgba(255,255,255,0.55); white-space: nowrap; flex-shrink: 0; }
+        .section-filter-list { display: flex; flex-wrap: wrap; gap: 0.35rem; justify-content: center; }
+        .section-filter-chip { display: inline-flex; align-items: center; gap: 0.35rem; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.16); border-radius: 999px; padding: 0.28rem 0.65rem 0.28rem 0.45rem; cursor: pointer; font-size: 0.72rem; font-weight: 500; color: rgba(255,255,255,0.80); transition: background 0.15s, border-color 0.15s; user-select: none; }
+        .section-filter-chip:hover { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.28); }
+        .section-filter-chip.is-checked { background: var(--accent-dim-dark); border-color: rgba(234,179,8,0.45); color: var(--text-white); }
+        .section-filter-chip input[type="checkbox"] { width: 12px; height: 12px; accent-color: var(--accent); cursor: pointer; flex-shrink: 0; margin: 0; }
+
+        /* ── Search examples dropdown ── */
+        .search-examples-dropdown { max-width: 700px; margin: 0.65rem auto 0; text-align: center; }
+        .search-examples-toggle { background: none; border: none; cursor: pointer; font-family: inherit; font-size: 0.74rem; color: rgba(255,255,255,0.55); padding: 0.25rem 0.5rem; border-radius: 6px; display: inline-flex; align-items: center; gap: 0.35rem; transition: color 0.15s; }
+        .search-examples-toggle:hover { color: rgba(255,255,255,0.85); }
+        .examples-chevron { display: inline-block; transition: transform 0.2s; font-size: 0.6rem; }
+        .examples-chevron.open { transform: rotate(180deg); }
+        .search-examples-list { display: none; list-style: none; padding: 0; margin: 0.4rem auto 0; max-width: 480px; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; overflow: hidden; text-align: left; }
+        .search-examples-list.open { display: block; }
+        .search-examples-list li button { width: 100%; text-align: left; background: none; border: none; border-bottom: 1px solid rgba(255,255,255,0.09); padding: 0.55rem 1rem; font-family: inherit; font-size: 0.8rem; color: rgba(255,255,255,0.85); cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: background 0.15s; }
+        .search-examples-list li:last-child button { border-bottom: none; }
+        .search-examples-list li button::before { content: '→'; color: var(--accent); font-size: 0.7rem; flex-shrink: 0; }
+        .search-examples-list li button:hover { background: rgba(255,255,255,0.09); color: var(--text-white); }
+
         /* ── Results zone ── */
-        .results-zone { background: #f1f5f9; border-radius: 24px 24px 0 0; margin: 0 -1.5rem; padding: 2rem 1.5rem 3rem; min-height: 60vh; }
+        .results-zone { background: #f1f5f9; border-radius: 24px 24px 0 0; padding: 2rem 2rem 3rem; min-height: 60vh; }
         .results-inner { max-width: 1100px; margin: 0 auto; }
         .results-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem; }
         .results-label-group { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
@@ -173,19 +119,6 @@
         .metric-value { font-size: 0.95rem; font-weight: 700; color: var(--text-dark); line-height: 1.2; }
         .metric-value.acv { color: var(--green); }
         .metric-sub { font-size: 0.68rem; color: var(--text-muted-dark); }
-
-        /* ── Search examples dropdown ── */
-        .search-examples-dropdown { max-width: 700px; margin: 0.5rem auto 0; text-align: center; }
-        .search-examples-toggle { background: none; border: none; cursor: pointer; font-family: inherit; font-size: 0.74rem; color: rgba(255,255,255,0.65); padding: 0.25rem 0.5rem; border-radius: 6px; display: inline-flex; align-items: center; gap: 0.35rem; transition: color 0.15s; }
-        .search-examples-toggle:hover { color: rgba(255,255,255,0.92); }
-        .examples-chevron { display: inline-block; transition: transform 0.2s; font-size: 0.6rem; }
-        .examples-chevron.open { transform: rotate(180deg); }
-        .search-examples-list { display: none; list-style: none; padding: 0; margin: 0.4rem auto 0; max-width: 480px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; text-align: left; }
-        .search-examples-list.open { display: block; }
-        .search-examples-list li button { width: 100%; text-align: left; background: none; border: none; border-bottom: 1px solid rgba(255,255,255,0.09); padding: 0.55rem 1rem; font-family: inherit; font-size: 0.8rem; color: rgba(255,255,255,0.85); cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: background 0.15s; }
-        .search-examples-list li:last-child button { border-bottom: none; }
-        .search-examples-list li button::before { content: '→'; color: var(--accent); font-size: 0.7rem; flex-shrink: 0; }
-        .search-examples-list li button:hover { background: rgba(255,255,255,0.09); color: var(--text-white); }
 
         /* ── Summary Modal ── */
         .summary-modal { position: fixed; inset: 0; z-index: 1000; background: #f1f5f9; overflow-y: auto; display: flex; flex-direction: column; }
@@ -272,7 +205,6 @@
         .report-list li::before { content: '\2022'; color: var(--accent); font-weight: 700; flex-shrink: 0; }
         .report-list .label { font-weight: 700; color: var(--text-dark); white-space: nowrap; }
         .report-list .label::after { content: ':'; }
-
         .section-subtitle { font-size: 0.88rem; font-weight: 700; color: var(--text-dark); margin: 1.25rem 0 0.6rem; padding-bottom: 0.3rem; border-bottom: 1px solid var(--border-color); }
 
         /* ── Estimation Banner ── */
@@ -360,7 +292,7 @@
         .retailer-links a:not(:last-child)::after { content: ' · '; color: var(--text-muted-dark); font-weight: 400; }
         .retailer-links a:hover { text-decoration: underline; }
 
-        /* ── How It Works ── */
+        /* ── How It Works card ── */
         .how-it-works-text { font-size: 0.85rem; color: var(--text-mid); line-height: 1.7; }
 
         /* ── None found state ── */
@@ -399,12 +331,148 @@
         .data-table th.tier-mid-col   { background:#eff6ff; }
         .data-table th.tier-premium-col { background:#fffbeb; }
 
+        /* ═══════════════════════════════════════════════════════════════
+           HOMEPAGE / MARKETING SECTIONS
+        ═══════════════════════════════════════════════════════════════ */
+
+        /* ── Nav ── */
+        .brt-nav { background: #0d1220; border-bottom: 1px solid #1e2a45; padding: 14px 48px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+        .brt-nav-left { display: flex; align-items: center; gap: 12px; }
+        .brt-nav-logo { font-size: 20px; font-weight: 800; color: #fff; white-space: nowrap; }
+        .brt-bolt-color { color: #f59e0b; }
+        .brt-nav-tagline { font-size: 11px; font-weight: 400; color: #94a3b8; letter-spacing: 1.2px; text-transform: uppercase; border-left: 1px solid #2d3f60; padding-left: 12px; line-height: 1.3; }
+        .brt-nav-links-wrap { display: flex; gap: 28px; align-items: center; }
+        .brt-nav-link { color: rgba(255,255,255,0.75); text-decoration: none; font-size: 14px; font-weight: 500; transition: color 0.15s; }
+        .brt-nav-link:hover { color: #fff; }
+        .brt-nav-cta { background: #f59e0b; color: #000; border: none; padding: 9px 22px; border-radius: 7px; font-weight: 700; font-size: 14px; font-family: inherit; cursor: pointer; transition: background 0.15s; white-space: nowrap; }
+        .brt-nav-cta:hover { background: #fbbf24; }
+        /* Hamburger */
+        .brt-hamburger { display: none; background: none; border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; padding: 6px 10px; cursor: pointer; flex-direction: column; gap: 4px; }
+        .brt-hamburger span { display: block; width: 18px; height: 2px; background: rgba(255,255,255,0.8); border-radius: 2px; transition: all 0.2s; }
+
+        /* ── Hero ── */
+        .brt-hero { background: linear-gradient(135deg, #0d1220 0%, #0f1e3a 50%, #0d1220 100%); padding: 80px 48px 70px; text-align: center; border-bottom: 1px solid #1e2a45; position: relative; z-index: 1; }
+        .brt-hero-inner { max-width: 780px; margin: 0 auto; }
+        .brt-hero-badge { display: inline-block; background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.3); color: #f59e0b; font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; padding: 6px 16px; border-radius: 20px; margin-bottom: 22px; }
+        .brt-hero-h1 { font-size: 48px; font-weight: 800; line-height: 1.15; color: #fff; margin-bottom: 18px; letter-spacing: -0.5px; }
+        .brt-hero-h1 span { color: #f59e0b; }
+        .brt-hero-p { font-size: 17px; color: rgba(255,255,255,0.72); max-width: 620px; margin: 0 auto 36px; line-height: 1.7; }
+
+        /* ── Hero search bar ── */
+        .brt-search-wrapper { max-width: 660px; margin: 0 auto 16px; position: relative; }
+        .brt-search-bar { width: 100%; padding: 18px 150px 18px 22px; background: rgba(255,255,255,0.07); border: 1.5px solid #2d3f60; border-radius: 12px; font-size: 15px; color: #fff; font-family: inherit; outline: none; transition: border-color 0.2s; }
+        .brt-search-bar::placeholder { color: rgba(255,255,255,0.38); }
+        .brt-search-bar:focus { border-color: #f59e0b; box-shadow: 0 0 0 3px rgba(245,158,11,0.12); }
+        .brt-search-btn { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); background: #f59e0b; color: #000; border: none; padding: 11px 22px; border-radius: 8px; font-weight: 700; font-size: 14px; font-family: inherit; cursor: pointer; transition: background 0.15s; white-space: nowrap; }
+        .brt-search-btn:hover { background: #fbbf24; }
+
+        /* ── Example pills ── */
+        .brt-example-pills { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 10px; }
+        .brt-example-pill { background: rgba(255,255,255,0.06); border: 1px solid #2d3f60; color: rgba(255,255,255,0.78); font-size: 12px; padding: 5px 14px; border-radius: 20px; cursor: pointer; font-family: inherit; transition: border-color 0.15s, color 0.15s; }
+        .brt-example-pill:hover { border-color: #f59e0b; color: #f59e0b; }
+
+        /* ── Search hint ── */
+        .brt-search-hint { font-size: 11px; color: rgba(255,255,255,0.42); margin-bottom: 0; }
+
+        /* ── Trust Strip ── */
+        .brt-trust-strip { background: #0d1220; border-bottom: 1px solid #1e2a45; padding: 16px 48px; display: flex; justify-content: center; gap: 40px; align-items: center; flex-wrap: wrap; }
+        .brt-trust-item { display: flex; align-items: center; gap: 8px; color: #94a3b8; font-size: 13px; font-weight: 500; }
+        .brt-trust-item strong { color: #cbd5e1; }
+
+        /* ── Shared section wrapper ── */
+        .brt-section { padding: 72px 48px; max-width: 1200px; margin: 0 auto; }
+        .brt-section-label { text-transform: uppercase; letter-spacing: 2px; font-size: 11px; font-weight: 700; color: #f59e0b; margin-bottom: 10px; }
+        .brt-section-title { font-size: 32px; font-weight: 800; color: #fff; margin-bottom: 12px; letter-spacing: -0.3px; }
+        .brt-section-sub { font-size: 15px; color: #94a3b8; max-width: 540px; line-height: 1.7; margin-bottom: 44px; }
+        .brt-divider { border: none; border-top: 1px solid #1e2a45; }
+
+        /* ── Coverage grid ── */
+        .brt-categories-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+        .brt-cat-card { background: #111827; border: 1px solid #1e2a45; border-radius: 12px; padding: 22px 18px; text-align: center; transition: border-color 0.2s; }
+        .brt-cat-card:hover { border-color: #f59e0b; }
+        .brt-cat-card .brt-cat-emoji { font-size: 30px; margin-bottom: 10px; display: block; }
+        .brt-cat-card h3 { font-size: 13px; font-weight: 700; color: #e2e8f0; margin-bottom: 5px; }
+        .brt-cat-card p { font-size: 12px; color: #94a3b8; line-height: 1.5; }
+
+        /* ── Sample report section ── */
+        .brt-sample-section { background: #0d1220; border-top: 1px solid #1e2a45; border-bottom: 1px solid #1e2a45; padding: 72px 48px; }
+        .brt-sample-inner { max-width: 1200px; margin: 0 auto; }
+        .brt-sample-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; }
+
+        /* Highlight list (left column) */
+        .brt-report-highlights { display: flex; flex-direction: column; gap: 12px; margin-bottom: 28px; }
+        .brt-highlight-item { display: flex; align-items: flex-start; gap: 12px; background: rgba(245,158,11,0.05); border: 1px solid rgba(245,158,11,0.15); border-radius: 8px; padding: 13px 15px; }
+        .brt-highlight-icon { font-size: 19px; flex-shrink: 0; }
+        .brt-highlight-text h4 { font-size: 13px; font-weight: 700; color: #e2e8f0; margin-bottom: 3px; }
+        .brt-highlight-text p { font-size: 12px; color: #94a3b8; line-height: 1.5; }
+
+        /* Report card mockup (right column) */
+        .brt-sample-label { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #94a3b8; margin-bottom: 8px; }
+        .brt-report-card { background: #111827; border: 1px solid #2d3f60; border-radius: 16px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.4); }
+        .brt-report-header { background: linear-gradient(90deg, #0f1e3a, #1a2d50); padding: 18px 22px; border-bottom: 1px solid #2d3f60; display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+        .brt-report-header-text h4 { font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 3px; }
+        .brt-report-header-text .brt-sub { font-size: 11px; color: #94a3b8; }
+        .brt-report-badge { background: #f59e0b; color: #000; font-size: 10px; font-weight: 700; padding: 3px 10px; border-radius: 10px; white-space: nowrap; flex-shrink: 0; }
+        .brt-stat-row { display: grid; grid-template-columns: repeat(4, 1fr); border-bottom: 1px solid #1e2a45; }
+        .brt-stat { padding: 14px; border-right: 1px solid #1e2a45; text-align: center; }
+        .brt-stat:last-child { border-right: none; }
+        .brt-stat .brt-slabel { font-size: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
+        .brt-stat .brt-svalue { font-size: 17px; font-weight: 800; color: #f59e0b; }
+        .brt-stat .brt-ssub { font-size: 10px; color: #94a3b8; margin-top: 2px; }
+        .brt-report-rows { padding: 18px 22px; }
+        .brt-report-row { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-bottom: 1px solid #1a2235; font-size: 13px; }
+        .brt-report-row:last-child { border-bottom: none; }
+        .brt-report-row .brt-rname { color: #94a3b8; }
+        .brt-rstatus { font-size: 11px; padding: 2px 10px; border-radius: 10px; font-weight: 600; }
+        .brt-status-green { background: rgba(34,197,94,0.12); color: #4ade80; }
+        .brt-status-yellow { background: rgba(245,158,11,0.12); color: #f59e0b; }
+        .brt-status-blue { background: rgba(59,130,246,0.12); color: #60a5fa; }
+        .brt-report-footer { background: #0d1220; padding: 12px 22px; display: flex; justify-content: space-between; align-items: center; }
+        .brt-report-footer span { font-size: 11px; color: #94a3b8; }
+        .brt-pdf-btn { font-size: 11px; background: #1e2a45; color: #94a3b8; padding: 5px 12px; border-radius: 6px; font-weight: 600; border: none; cursor: default; }
+
+        /* ── How It Works ── */
+        .brt-how-section { padding: 72px 48px; max-width: 1200px; margin: 0 auto; }
+        .brt-how-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+        .brt-how-card { background: #111827; border: 1px solid #1e2a45; border-radius: 12px; padding: 30px 26px; }
+        .brt-how-num { font-size: 11px; font-weight: 700; color: #f59e0b; letter-spacing: 1px; margin-bottom: 14px; text-transform: uppercase; }
+        .brt-how-icon { font-size: 26px; margin-bottom: 12px; display: block; }
+        .brt-how-card h3 { font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 9px; }
+        .brt-how-card p { font-size: 13px; color: #94a3b8; line-height: 1.7; }
+
+        /* ── Report Breakdown ── */
+        .brt-breakdown-section { background: #0d1220; border-top: 1px solid #1e2a45; border-bottom: 1px solid #1e2a45; padding: 72px 48px; }
+        .brt-breakdown-inner { max-width: 1200px; margin: 0 auto; }
+        .brt-breakdown-sub { font-size: 15px; color: #94a3b8; max-width: 540px; line-height: 1.7; margin-bottom: 36px; }
+        .brt-breakdown-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+        .brt-breakdown-card { background: #111827; border: 1px solid #1e2a45; border-radius: 10px; padding: 18px; display: flex; gap: 13px; align-items: flex-start; transition: border-color 0.2s; }
+        .brt-breakdown-card:hover { border-color: #2d3f60; }
+        .brt-breakdown-icon { font-size: 20px; flex-shrink: 0; }
+        .brt-breakdown-text h4 { font-size: 13px; font-weight: 700; color: #e2e8f0; margin-bottom: 4px; }
+        .brt-breakdown-text p { font-size: 12px; color: #94a3b8; line-height: 1.5; }
+
+        /* ── Bottom CTA ── */
+        .brt-cta-section { text-align: center; padding: 80px 48px; max-width: 720px; margin: 0 auto; }
+        .brt-cta-section h2 { font-size: 34px; font-weight: 800; color: #fff; margin-bottom: 14px; letter-spacing: -0.3px; }
+        .brt-cta-section p { font-size: 16px; color: #94a3b8; margin-bottom: 32px; line-height: 1.7; }
+        .brt-cta-search-wrap { position: relative; max-width: 580px; margin: 0 auto; }
+        .brt-cta-search-wrap .brt-search-bar { padding-right: 140px; }
+
+        /* ── Footer ── */
+        .brt-footer-new { background: #0a0e1a; border-top: 1px solid #1e2a45; padding: 22px 48px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+        .brt-footer-new p { font-size: 12px; color: #64748b; }
+        .brt-footer-links { display: flex; gap: 20px; flex-wrap: wrap; }
+        .brt-footer-links a { font-size: 12px; color: #64748b; text-decoration: none; transition: color 0.15s; }
+        .brt-footer-links a:hover { color: #94a3b8; }
+
+        /* ── Hide homepage sections when results are visible ── */
+        #results:not(.hidden) ~ #homepage-sections { display: none; }
+
         /* ── Print ── */
         @media print {
             .no-print { display: none !important; }
             body { background: white !important; color: #000 !important; }
-            .circuit-bg, .lightning-bolts { display: none !important; }
-            .results-zone { background: white !important; margin: 0 !important; padding: 0 !important; }
+            .results-zone { background: white !important; padding: 0 !important; }
             .card { box-shadow: none !important; border: 1px solid #ddd !important; }
             .section-spinner, .skeleton-line, .refine-tip { display: none !important; }
             .tab-bar { display: none !important; }
@@ -413,78 +481,133 @@
             .metrics-strip { display: none !important; }
         }
 
-        /* ── Responsive ── */
-        @media (max-width: 768px) { .tech-grid { grid-template-columns: 1fr; } }
+        /* ── Mobile responsive ── */
+        @media (max-width: 1024px) {
+            .brt-categories-grid { grid-template-columns: repeat(2, 1fr); }
+            .brt-breakdown-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 900px) {
+            .brt-sample-layout { grid-template-columns: 1fr; }
+            .brt-how-grid { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 768px) {
+            .brt-nav { padding: 12px 20px; }
+            .brt-hamburger { display: flex; }
+            .brt-nav-links-wrap { display: none; flex-direction: column; position: absolute; top: 100%; left: 0; right: 0; background: #0d1220; border-bottom: 1px solid #1e2a45; padding: 16px 20px; gap: 16px; z-index: 200; }
+            .brt-nav-links-wrap.open { display: flex; }
+            .brt-nav-tagline { display: none; }
+            .brt-hero { padding: 56px 20px 52px; }
+            .brt-hero-h1 { font-size: 34px; }
+            .brt-hero-p { font-size: 15px; }
+            .brt-search-bar { padding: 15px 130px 15px 16px; font-size: 14px; }
+            .brt-trust-strip { padding: 14px 20px; gap: 20px; }
+            .brt-section { padding: 52px 20px; }
+            .brt-sample-section { padding: 52px 20px; }
+            .brt-how-section { padding: 52px 20px; }
+            .brt-breakdown-section { padding: 52px 20px; }
+            .brt-cta-section { padding: 60px 20px; }
+            .brt-footer-new { padding: 20px; flex-direction: column; align-items: flex-start; }
+            .brt-categories-grid { grid-template-columns: 1fr 1fr; }
+            .brt-how-grid { grid-template-columns: 1fr; }
+            .brt-breakdown-grid { grid-template-columns: 1fr 1fr; }
+            .brt-cta-section h2 { font-size: 26px; }
+            .results-zone { padding: 1.5rem 1rem 2rem; border-radius: 16px 16px 0 0; }
+        }
+        @media (max-width: 480px) {
+            .brt-categories-grid { grid-template-columns: 1fr; }
+            .brt-breakdown-grid { grid-template-columns: 1fr; }
+            .brt-stat-row { grid-template-columns: repeat(2, 1fr); }
+            .brt-stat:nth-child(2) { border-right: none; }
+            .brt-stat:nth-child(3), .brt-stat:nth-child(4) { border-top: 1px solid #1e2a45; }
+            .section-filters { flex-direction: column; align-items: center; }
+        }
         @media (max-width: 640px) {
-            .nav { flex-direction: column; gap: 0.5rem; align-items: flex-start; }
-            .nav-left { flex-wrap: wrap; }
-            .hero { padding: 1.5rem 0 1rem; }
-            .nav-links { gap: 0.25rem; }
-            .nav-link { padding: 0.4rem 0.6rem; font-size: 0.75rem; }
-            .card { padding: 1rem; }
-            .results-zone { padding: 1.25rem 1rem 2rem; border-radius: 16px 16px 0 0; }
+            .brt-hero-h1 { font-size: 28px; }
+            .brt-example-pills { gap: 6px; }
+            .brt-example-pill { font-size: 11px; padding: 4px 11px; }
+            .metrics-strip { grid-template-columns: repeat(2, 1fr); }
         }
     </style>
 </head>
 <body>
     <div class="circuit-bg"></div>
-    <div class="lightning-bolts">
-        <div class="bolt-shape">&#9889;</div>
-        <div class="bolt-shape">&#9889;</div>
-        <div class="bolt-shape">&#9889;</div>
-        <div class="bolt-shape">&#9889;</div>
-    </div>
 
-    <div class="app-container">
-        <nav class="nav no-print">
-            <div class="nav-left">
-                <a class="nav-brand" href="index.html">Bolt <span class="bolt-icon">&#9889;</span></a>
-                <span class="nav-tagline">Smarter Item Research for Faster Claims</span>
-            </div>
-            <div class="nav-links">
-                <a href="index.html" class="nav-link active">Item Lookup</a>
-                <a href="item-age.html" class="nav-link">How Old is my Item?</a>
-            </div>
-        </nav>
+    <!-- ════════════════════════════════════════════════════════════
+         NAVIGATION
+    ════════════════════════════════════════════════════════════ -->
+    <nav class="brt-nav no-print">
+        <div class="brt-nav-left">
+            <div class="brt-nav-logo">Bolt <span class="brt-bolt-color">&#9889;</span></div>
+            <span class="brt-nav-tagline">Intuitive Data Aggregation</span>
+        </div>
+        <button class="brt-hamburger" id="brt-hamburger" aria-label="Toggle menu" aria-expanded="false">
+            <span></span><span></span><span></span>
+        </button>
+        <div class="brt-nav-links-wrap" id="brt-nav-links">
+            <a href="item-age.html" class="brt-nav-link">Serial Number Decoder</a>
+            <a href="/methodology" class="brt-nav-link">Methodology</a>
+            <button id="nav-cta-btn" class="brt-nav-cta">Start Searching</button>
+        </div>
+    </nav>
 
-        <div class="hero no-print" id="hero-section">
-            <div class="mascot-area">
-                <div id="loader-track"><div id="loader-dog"><svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg" width="60" height="60">
-                    <g class="dog-cape">
-                        <path d="M22 28 L8 46 L28 40 Z" fill="#dc2626" opacity="0.9"/>
-                        <path d="M24 30 L12 50 L30 42 Z" fill="#b91c1c" opacity="0.7"/>
-                    </g>
-                    <ellipse cx="30" cy="38" rx="14" ry="12" fill="white"/>
-                    <circle cx="38" cy="22" r="12" fill="white"/>
-                    <ellipse cx="30" cy="12" rx="4" ry="7" fill="white" transform="rotate(-15 30 12)"/>
-                    <ellipse cx="31" cy="13" rx="2.5" ry="5" fill="#fecaca" transform="rotate(-15 31 13)"/>
-                    <ellipse cx="46" cy="14" rx="4" ry="7" fill="white" transform="rotate(15 46 14)"/>
-                    <ellipse cx="45" cy="15" rx="2.5" ry="5" fill="#fecaca" transform="rotate(15 45 15)"/>
-                    <circle cx="34" cy="20" r="2.5" fill="#1e293b"/>
-                    <circle cx="42" cy="20" r="2.5" fill="#1e293b"/>
-                    <circle cx="35" cy="19" r="0.8" fill="white"/>
-                    <circle cx="43" cy="19" r="0.8" fill="white"/>
-                    <ellipse cx="39" cy="25" rx="2" ry="1.5" fill="#1e293b"/>
-                    <path d="M37 27 Q39 30 41 27" stroke="#1e293b" fill="none" stroke-width="0.8"/>
-                    <polygon points="28,32 31,36 29,36 32,42 27,37 30,37" fill="#eab308"/>
-                    <rect x="20" y="46" width="5" height="8" rx="2.5" fill="white"/>
-                    <rect x="35" y="46" width="5" height="8" rx="2.5" fill="white"/>
-                    <path d="M18 35 Q10 28 14 22" stroke="white" fill="none" stroke-width="3" stroke-linecap="round"/>
-                </svg></div></div>
+    <!-- ════════════════════════════════════════════════════════════
+         HERO SECTION
+    ════════════════════════════════════════════════════════════ -->
+    <div class="brt-hero no-print" id="hero-section">
+        <div class="brt-hero-inner">
+            <div class="brt-hero-badge">&#9889; Built for Property Research</div>
+            <h1 class="brt-hero-h1">The Research Tool That Answers Every <span>Product Question</span></h1>
+            <p class="brt-hero-p">From Federal Pacific electrical panels to the latest iPhone &mdash; instant, comprehensive reports on age, value, recalls, diagnostics, and replacements. Built for professionals who need answers fast.</p>
+
+            <!-- Main search bar (IDs preserved for JS) -->
+            <div class="brt-search-wrapper">
+                <input type="text" id="query" class="brt-search-bar" placeholder='Try "Generac 22kW generator" or "Federal Pacific panel"' autocomplete="off">
+                <button id="btn" class="brt-search-btn">&#9889; Search</button>
+            </div>
+
+            <!-- Mascot loader (shown only during search via JS) -->
+            <div class="mascot-area" id="mascot-wrapper">
+                <div id="loader-track">
+                    <div id="loader-dog">
+                        <svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg" width="60" height="60">
+                            <g class="dog-cape">
+                                <path d="M22 28 L8 46 L28 40 Z" fill="#dc2626" opacity="0.9"/>
+                                <path d="M24 30 L12 50 L30 42 Z" fill="#b91c1c" opacity="0.7"/>
+                            </g>
+                            <ellipse cx="30" cy="38" rx="14" ry="12" fill="white"/>
+                            <circle cx="38" cy="22" r="12" fill="white"/>
+                            <ellipse cx="30" cy="12" rx="4" ry="7" fill="white" transform="rotate(-15 30 12)"/>
+                            <ellipse cx="31" cy="13" rx="2.5" ry="5" fill="#fecaca" transform="rotate(-15 31 13)"/>
+                            <ellipse cx="46" cy="14" rx="4" ry="7" fill="white" transform="rotate(15 46 14)"/>
+                            <ellipse cx="45" cy="15" rx="2.5" ry="5" fill="#fecaca" transform="rotate(15 45 15)"/>
+                            <circle cx="34" cy="20" r="2.5" fill="#1e293b"/>
+                            <circle cx="42" cy="20" r="2.5" fill="#1e293b"/>
+                            <circle cx="35" cy="19" r="0.8" fill="white"/>
+                            <circle cx="43" cy="19" r="0.8" fill="white"/>
+                            <ellipse cx="39" cy="25" rx="2" ry="1.5" fill="#1e293b"/>
+                            <path d="M37 27 Q39 30 41 27" stroke="#1e293b" fill="none" stroke-width="0.8"/>
+                            <polygon points="28,32 31,36 29,36 32,42 27,37 30,37" fill="#eab308"/>
+                            <rect x="20" y="46" width="5" height="8" rx="2.5" fill="white"/>
+                            <rect x="35" y="46" width="5" height="8" rx="2.5" fill="white"/>
+                            <path d="M18 35 Q10 28 14 22" stroke="white" fill="none" stroke-width="3" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                </div>
                 <span id="loader-text" class="loader-text">Consulting live market data and technical records...</span>
             </div>
-            <p class="hero-tagline">Instant product research. Age verification. Replacement analysis.</p>
-            <div class="search-flow">
-                <span class="search-flow-step">&#128269; Search Generic</span>
-                <span class="search-flow-arrow">&#8594;</span>
-                <span class="search-flow-step">&#127919; Search Specific</span>
-                <span class="search-flow-arrow">&#8594;</span>
-                <span class="search-flow-step">&#9889; Get Results</span>
+
+            <!-- Example pills (click to search) -->
+            <div class="brt-example-pills">
+                <span class="brt-example-pill" data-example='LG C3 65" TV'>LG C3 65&quot; TV</span>
+                <span class="brt-example-pill" data-example="Rheem 50-gal Water Heater">Rheem 50-gal Water Heater</span>
+                <span class="brt-example-pill" data-example="iPhone 17 Pro">iPhone 17 Pro</span>
+                <span class="brt-example-pill" data-example="Federal Pacific Panel">Federal Pacific Panel</span>
+                <span class="brt-example-pill" data-example="Carrier 5-ton AC">Carrier 5-ton AC</span>
+                <span class="brt-example-pill" data-example="SunPower Inverter">SunPower Inverter</span>
             </div>
-            <div class="search-container">
-                <input type="text" id="query" class="search-input" placeholder="Search by model number, brand, or product type — e.g. LG C3 65 TV, Whirlpool WTW5000DW, water heater">
-                <button id="btn" class="search-btn">&#128269; Search</button>
-            </div>
+            <div class="brt-search-hint">Works with brand names, model numbers, serial numbers, or general descriptions</div>
+
+            <!-- Section filters -->
             <div class="section-filters" role="group" aria-label="Report sections to include">
                 <span class="section-filters-label">Include in report:</span>
                 <div class="section-filter-list">
@@ -495,311 +618,409 @@
                     <label class="section-filter-chip is-checked"><input type="checkbox" id="sec-technical" checked> Technical Details</label>
                 </div>
             </div>
+
+            <!-- Search examples dropdown -->
             <div class="search-examples-dropdown">
                 <button class="search-examples-toggle" id="examples-toggle" aria-expanded="false" aria-controls="examples-list">
                     More Search Examples <span class="examples-chevron" id="examples-chevron">&#9660;</span>
                 </button>
                 <ul class="search-examples-list" id="examples-list" role="list">
                     <li><button type="button" data-example="Federal Pacific Electrical Panels">Federal Pacific Electrical Panels</button></li>
-                    <li><button type="button" data-example="LG 65&quot; C3 TV">LG 65&Prime; C3 TV</button></li>
+                    <li><button type="button" data-example='LG 65" C3 TV'>LG 65&Prime; C3 TV</button></li>
                     <li><button type="button" data-example="SunPower SPR-5200 Solar Inverter">SunPower SPR-5200 Solar Inverter</button></li>
                     <li><button type="button" data-example="Generac 20kW Generator">Generac 20kW Generator</button></li>
                 </ul>
             </div>
-            <div class="coverage-bar">
-                <span class="coverage-badge">&#128268; Appliances &amp; Electronics</span>
-                <span class="coverage-badge">&#127777;&#65039; HVAC &amp; Water Heaters</span>
-                <span class="coverage-badge">&#128203; Age &middot; Value &middot; Replacements</span>
-            </div>
-            <div class="how-to-row">
-                <div class="how-to-step">
-                    <span class="how-to-step-num">Step 1</span>
-                    <span class="how-to-step-title">&#128269; Enter a product</span>
-                    <span class="how-to-step-desc">Type a model number, brand name, or item description</span>
-                </div>
-                <div class="how-to-step">
-                    <span class="how-to-step-num">Step 2</span>
-                    <span class="how-to-step-title">&#9889; Get your report</span>
-                    <span class="how-to-step-desc">Instant results covering age, value, and specs</span>
-                </div>
-                <div class="how-to-step">
-                    <span class="how-to-step-num">Step 3</span>
-                    <span class="how-to-step-title">&#128202; Compare &amp; decide</span>
-                    <span class="how-to-step-desc">View replacement options and technical details</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Results -->
-        <div id="results" class="hidden">
-            <div class="results-zone">
-                <div class="results-inner">
-
-                    <div class="results-header no-print">
-                        <div class="results-label-group">
-                            <span class="results-label">Research Report</span>
-                            <span id="tier-badge" class="tier-badge hidden"></span>
-                        </div>
-                        <div class="results-header-actions">
-                            <button id="copy-btn" class="copy-btn">&#128203; Generate Customized Summary</button>
-                            <button class="print-btn" id="print-btn">&#128424; Print to PDF</button>
-                        </div>
-                    </div>
-                    <div class="tab-bar no-print" role="tablist" aria-label="Report sections">
-                        <button class="tab-btn active" role="tab" id="tab-overview" aria-selected="true" aria-controls="panel-overview">Overview</button>
-                        <button class="tab-btn" role="tab" id="tab-replacements" aria-selected="false" aria-controls="panel-replacements">Replacement Options</button>
-                        <button class="tab-btn" role="tab" id="tab-diagnostics" aria-selected="false" aria-controls="panel-diagnostics">Diagnostics &amp; Repair</button>
-                        <button class="tab-btn" role="tab" id="tab-technical" aria-selected="false" aria-controls="panel-technical">Technical Details</button>
-                    </div>
-
-                    <div id="estimation-banner" class="estimation-banner hidden">
-                        <span class="banner-icon">&#9888;</span>
-                        <span id="estimation-text"></span>
-                    </div>
-
-                    <!-- Refine Tip (tier 1 & 2) -->
-                    <div id="refine-tip" class="refine-tip hidden">
-                        <strong>&#128161; Refine your search:</strong> <span id="refine-tip-text"></span>
-                    </div>
-
-                    <!-- Tab Panels -->
-
-                    <!-- Overview Tab -->
-                    <div id="panel-overview" class="tab-panel active" role="tabpanel" aria-labelledby="tab-overview">
-
-                        <div class="metrics-strip">
-                            <div class="metric-card">
-                                <span class="metric-label">Age</span>
-                                <span class="metric-value" id="m-age">—</span>
-                            </div>
-                            <div class="metric-card">
-                                <span class="metric-label">Launch MSRP</span>
-                                <span class="metric-value" id="m-msrp">—</span>
-                            </div>
-                            <div class="metric-card">
-                                <span class="metric-label">Est. ACV</span>
-                                <span class="metric-value acv" id="m-acv">—</span>
-                            </div>
-                            <div class="metric-card">
-                                <span class="metric-label">Availability</span>
-                                <span class="metric-value" id="m-availability" style="font-size:0.78rem; line-height:1.3;">—</span>
-                            </div>
-                        </div>
-
-                        <!-- Section 1: Current Item Analysis -->
-                        <div class="card" id="card-analysis">
-                            <div class="card-title"><span class="title-number">1</span> Current Item Analysis <span class="title-icon">&#9889;</span></div>
-                            <div class="card-accent-stripe"></div>
-                            <p class="report-overview" id="r-overview"></p>
-                            <ul class="report-list">
-                                <li><span class="label">Search Query</span> <span id="r-search-query"></span></li>
-                                <li><span class="label">Assumptions Used</span> <span id="r-assumptions"></span></li>
-                                <li><span class="label">Item Description</span> <span id="r-item-desc"></span></li>
-                            </ul>
-                            <div class="section-subtitle">Key Specifications</div>
-                            <div class="quick-spec-pills" id="r-top-specs-pills"></div>
-                            <div id="refinement-chips" class="no-print" style="margin-top:0.5rem;"></div>
-                            <!-- Variations: populated by renderFast() -->
-                            <div id="r-variations" class="variations-section hidden no-print">
-                                <div class="variations-label">Variations</div>
-                                <div class="variation-chips" id="r-variation-chips"></div>
-                            </div>
-                        </div>
-
-                        <!-- Section 2: How It Works -->
-                        <div class="card" id="card-how-it-works">
-                            <div class="card-title"><span class="title-number">2</span> How It Works <span class="title-icon">&#128161;</span></div>
-                            <div class="card-accent-stripe"></div>
-                            <div id="how-it-works-content">
-                                <div class="section-spinner">Loading...</div>
-                            </div>
-                        </div>
-
-                        <!-- Section 3: Release Date & Age -->
-                        <div class="card" id="card-release-date">
-                            <div class="card-title"><span class="title-number">3</span> Release Date &amp; Age <span class="title-icon">&#128197;</span></div>
-                            <div class="card-accent-stripe"></div>
-                            <ul class="report-list">
-                                <li><span class="label">Production Era</span> <span id="r-production-era"></span></li>
-                                <li><span class="label">Discontinuation</span> <span id="r-discontinuation"></span></li>
-                                <li><span class="label">Estimated Age</span> <span id="r-estimated-age"></span></li>
-                                <li><span class="label">Service Life</span> <span id="r-service-life"></span></li>
-                            </ul>
-                            <div id="age-advisory" class="advisory-banner hidden">
-                                <div class="advisory-icon">&#9888;&#65039;</div>
-                                <div class="advisory-content">
-                                    <h4>Incomplete Query Advisory</h4>
-                                    <p>Estimated based on category norms. For higher precision, include brand + model or a serial number.</p>
-                                    <ul class="advisory-tips">
-                                        <li>Add specific brand and model number</li>
-                                        <li>Locate serial number on manufacturer label</li>
-                                        <li>Check rear label for serial format</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Section 4: Valuation & Depreciation -->
-                        <div class="card" id="card-valuation">
-                            <div class="card-title"><span class="title-number">4</span> Valuation &amp; Depreciation <span class="title-icon">&#128200;</span></div>
-                            <div class="card-accent-stripe"></div>
-                            <ul class="report-list" id="valuation-list">
-                                <li id="msrp-row">
-                                    <span class="label">MSRP</span>
-                                    <span>
-                                        <div class="msrp-pair">
-                                            <span class="msrp-label">Launch MSRP</span>
-                                            <span class="msrp-value" id="r-launch-msrp"></span>
-                                            <span class="msrp-label" style="margin-top:0.4rem">Current Market Price</span>
-                                            <span class="msrp-value" id="r-market-price"></span>
-                                            <span class="msrp-note" id="r-market-price-note"></span>
-                                        </div>
-                                    </span>
-                                </li>
-                                <li id="acv-row">
-                                    <span class="label">ACV Calculation</span>
-                                    <span>
-                                        <span class="acv-value" id="r-acv"></span>
-                                        <span class="acv-formula" id="r-acv-formula" style="display:block; margin-top:0.2rem;"></span>
-                                        <div class="acv-steps" id="r-acv-steps" style="display:none;"></div>
-                                        <div class="age-input-row">
-                                            <span class="age-label">Adjust age:</span>
-                                            <input type="number" id="acv-age-input" class="age-input" min="0" max="100" value="0">
-                                            <span class="age-label">years</span>
-                                            <button class="recalc-btn" id="recalc-btn">Recalculate</button>
-                                            <button class="recalc-btn" id="generate-valuation-btn" style="display:none;">Generate Price Estimate</button>
-                                        </div>
-                                        <span class="acv-note" id="r-acv-note"></span>
-                                    </span>
-                                </li>
-                            </ul>
-                        </div>
-
-                        <!-- Section 5: Item Notes -->
-                        <div class="card" id="card-item-notes">
-                            <div class="card-title"><span class="title-number">5</span> Item Notes <span class="title-icon">&#128203;</span></div>
-                            <div class="card-accent-stripe"></div>
-                            <div id="item-notes-content">
-                                <div class="skeleton-line med"></div>
-                                <div class="skeleton-line full"></div>
-                                <div class="skeleton-line short"></div>
-                            </div>
-                        </div>
-
-                    </div><!-- /panel-overview -->
-
-                    <!-- Replacement Options Tab -->
-                    <div id="panel-replacements" class="tab-panel" role="tabpanel" aria-labelledby="tab-replacements">
-
-                        <!-- Current Replacement Options -->
-                        <div class="card" id="card-table" style="overflow-x: auto;">
-                            <div class="card-title"><span class="title-number">6</span> Current Replacement Options <span class="title-icon">&#128260;</span></div>
-                            <div class="card-accent-stripe"></div>
-                            <div id="table-note" class="table-note hidden"></div>
-                            <div id="table-loading" class="section-spinner">Loading replacement options...</div>
-                            <table id="r-table" class="data-table hidden">
-                                <thead id="table-head"><tr id="table-head-row">
-                                    <th>Feature</th><th>Original Item</th><th class="highlight">Brand Match</th><th>Option 1</th><th>Option 2</th>
-                                </tr></thead>
-                                <tbody id="table-body"></tbody>
-                            </table>
-                            <div id="narrow-results" class="narrow-results hidden">
-                                <div class="narrow-results-header">&#128269; Narrow Your Results</div>
-                                <p id="narrow-results-tip"></p>
-                            </div>
-                        </div>
-
-                    </div><!-- /panel-replacements -->
-
-                    <!-- Diagnostics & Repair Tab -->
-                    <div id="panel-diagnostics" class="tab-panel" role="tabpanel" aria-labelledby="tab-diagnostics">
-
-                        <!-- #7: Owner's Manual & Manufacturer Page -->
-                        <div class="card" id="card-manual-mfr">
-                            <div class="card-title"><span class="title-number">7</span> Owner&apos;s Manual &amp; Manufacturer Page <span class="title-icon">&#128196;</span></div>
-                            <div class="card-accent-stripe"></div>
-                            <div id="manual-content">
-                                <div class="section-spinner">Loading...</div>
-                            </div>
-                            <div id="manufacturer-page-content" style="margin-top:0.5rem;"></div>
-                        </div>
-
-                        <!-- #8: Error Codes -->
-                        <div class="card" id="card-error-codes">
-                            <div class="card-title"><span class="title-number">8</span> Error Codes <span class="title-icon">&#128308;</span></div>
-                            <div class="card-accent-stripe"></div>
-                            <div id="error-codes-content">
-                                <div class="section-spinner">Loading...</div>
-                            </div>
-                        </div>
-
-                        <!-- #9: Common Reported Failures -->
-                        <div class="card" id="card-failures">
-                            <div class="card-title"><span class="title-number">9</span> Common Reported Failures <span class="title-icon">&#128295;</span></div>
-                            <div class="card-accent-stripe"></div>
-                            <div id="failures-content">
-                                <div class="section-spinner">Loading...</div>
-                            </div>
-                        </div>
-
-                        <!-- #10: Troubleshooting & Repair -->
-                        <div class="card" id="card-troubleshooting">
-                            <div class="card-title"><span class="title-number">10</span> Troubleshooting &amp; Repair <span class="title-icon">&#128736;</span></div>
-                            <div class="card-accent-stripe"></div>
-                            <div id="troubleshooting-content">
-                                <div class="section-spinner">Loading...</div>
-                            </div>
-                        </div>
-
-                        <!-- #11: Recall Notices -->
-                        <div class="card" id="card-recalls">
-                            <div class="card-title"><span class="title-number">11</span> Recall Notices or Class Action <span class="title-icon">&#9888;</span></div>
-                            <div class="card-accent-stripe"></div>
-                            <div id="recalls-content">
-                                <div class="section-spinner">Loading...</div>
-                            </div>
-                        </div>
-
-                    </div><!-- /panel-diagnostics -->
-
-                    <!-- Technical Details Tab -->
-                    <div id="panel-technical" class="tab-panel" role="tabpanel" aria-labelledby="tab-technical">
-                        <div class="card" id="card-technical">
-                            <div class="card-title">Technical Details <span class="title-icon">&#9881;</span></div>
-                            <div class="card-accent-stripe"></div>
-                            <div id="tech-panel-content">
-                                <div class="section-spinner">Loading...</div>
-                            </div>
-                        </div>
-                    </div><!-- /panel-technical -->
-
-
-                    <!-- Methodology Footer -->
-                    <footer class="no-print" style="text-align: center; padding: 2rem 0; opacity: 0.6; font-size: 0.75rem;">
-                        <p>Results are generated for informational purposes. Always verify critical data independently.</p>
-                    </footer>
-
-                    <!-- Site Footer -->
-                    <div class="footer no-print">
-                        <p class="footer-tagline">Product research and reference tool covering appliances, electronics, HVAC, and water heaters.</p>
-                        <div class="footer-links">
-                            <a href="/methodology">Methodology</a>
-                            <span class="footer-sep">|</span>
-                            <a href="/disclaimer">Disclaimer</a>
-                            <span class="footer-sep">|</span>
-                            <a href="/contact">Contact</a>
-                            <span class="footer-sep">|</span>
-                            <a href="/privacy-policy">Privacy Policy</a>
-                        </div>
-                        <p>&copy; 2026 Bolt. Always verify results for accuracy.</p>
-                    </div>
-
-                </div>
-            </div>
         </div>
     </div>
 
-    <!-- Generate Customized Summary Modal -->
+    <!-- ════════════════════════════════════════════════════════════
+         RESULTS (hidden initially — sibling selector hides #homepage-sections when visible)
+    ════════════════════════════════════════════════════════════ -->
+    <div id="results" class="hidden">
+        <div class="results-zone">
+            <div class="results-inner">
+
+                <div class="results-header no-print">
+                    <div class="results-label-group">
+                        <span class="results-label">Research Report</span>
+                        <span id="tier-badge" class="tier-badge hidden"></span>
+                    </div>
+                    <div class="results-header-actions">
+                        <button id="copy-btn" class="copy-btn">&#128203; Generate Customized Summary</button>
+                        <button class="print-btn" id="print-btn">&#128424; Print to PDF</button>
+                    </div>
+                </div>
+                <div class="tab-bar no-print" role="tablist" aria-label="Report sections">
+                    <button class="tab-btn active" role="tab" id="tab-overview" aria-selected="true" aria-controls="panel-overview">Overview</button>
+                    <button class="tab-btn" role="tab" id="tab-replacements" aria-selected="false" aria-controls="panel-replacements">Replacement Options</button>
+                    <button class="tab-btn" role="tab" id="tab-diagnostics" aria-selected="false" aria-controls="panel-diagnostics">Diagnostics &amp; Repair</button>
+                    <button class="tab-btn" role="tab" id="tab-technical" aria-selected="false" aria-controls="panel-technical">Technical Details</button>
+                </div>
+
+                <div id="estimation-banner" class="estimation-banner hidden">
+                    <span class="banner-icon">&#9888;</span>
+                    <span id="estimation-text"></span>
+                </div>
+
+                <div id="refine-tip" class="refine-tip hidden">
+                    <strong>&#128161; Refine your search:</strong> <span id="refine-tip-text"></span>
+                </div>
+
+                <!-- Overview Tab -->
+                <div id="panel-overview" class="tab-panel active" role="tabpanel" aria-labelledby="tab-overview">
+                    <div class="metrics-strip">
+                        <div class="metric-card">
+                            <span class="metric-label">Age</span>
+                            <span class="metric-value" id="m-age">—</span>
+                        </div>
+                        <div class="metric-card">
+                            <span class="metric-label">Launch MSRP</span>
+                            <span class="metric-value" id="m-msrp">—</span>
+                        </div>
+                        <div class="metric-card">
+                            <span class="metric-label">Est. ACV</span>
+                            <span class="metric-value acv" id="m-acv">—</span>
+                        </div>
+                        <div class="metric-card">
+                            <span class="metric-label">Availability</span>
+                            <span class="metric-value" id="m-availability" style="font-size:0.78rem; line-height:1.3;">—</span>
+                        </div>
+                    </div>
+
+                    <div class="card" id="card-analysis">
+                        <div class="card-title"><span class="title-number">1</span> Current Item Analysis <span class="title-icon">&#9889;</span></div>
+                        <div class="card-accent-stripe"></div>
+                        <p class="report-overview" id="r-overview"></p>
+                        <ul class="report-list">
+                            <li><span class="label">Search Query</span> <span id="r-search-query"></span></li>
+                            <li><span class="label">Assumptions Used</span> <span id="r-assumptions"></span></li>
+                            <li><span class="label">Item Description</span> <span id="r-item-desc"></span></li>
+                        </ul>
+                        <div class="section-subtitle">Key Specifications</div>
+                        <div class="quick-spec-pills" id="r-top-specs-pills"></div>
+                        <div id="refinement-chips" class="no-print" style="margin-top:0.5rem;"></div>
+                        <div id="r-variations" class="variations-section hidden no-print">
+                            <div class="variations-label">Variations</div>
+                            <div class="variation-chips" id="r-variation-chips"></div>
+                        </div>
+                    </div>
+
+                    <div class="card" id="card-how-it-works">
+                        <div class="card-title"><span class="title-number">2</span> How It Works <span class="title-icon">&#128161;</span></div>
+                        <div class="card-accent-stripe"></div>
+                        <div id="how-it-works-content">
+                            <div class="section-spinner">Loading...</div>
+                        </div>
+                    </div>
+
+                    <div class="card" id="card-release-date">
+                        <div class="card-title"><span class="title-number">3</span> Release Date &amp; Age <span class="title-icon">&#128197;</span></div>
+                        <div class="card-accent-stripe"></div>
+                        <ul class="report-list">
+                            <li><span class="label">Production Era</span> <span id="r-production-era"></span></li>
+                            <li><span class="label">Discontinuation</span> <span id="r-discontinuation"></span></li>
+                            <li><span class="label">Estimated Age</span> <span id="r-estimated-age"></span></li>
+                            <li><span class="label">Service Life</span> <span id="r-service-life"></span></li>
+                        </ul>
+                        <div id="age-advisory" class="advisory-banner hidden">
+                            <div class="advisory-icon">&#9888;&#65039;</div>
+                            <div class="advisory-content">
+                                <h4>Incomplete Query Advisory</h4>
+                                <p>Estimated based on category norms. For higher precision, include brand + model or a serial number.</p>
+                                <ul class="advisory-tips">
+                                    <li>Add specific brand and model number</li>
+                                    <li>Locate serial number on manufacturer label</li>
+                                    <li>Check rear label for serial format</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card" id="card-valuation">
+                        <div class="card-title"><span class="title-number">4</span> Valuation &amp; Depreciation <span class="title-icon">&#128200;</span></div>
+                        <div class="card-accent-stripe"></div>
+                        <ul class="report-list" id="valuation-list">
+                            <li id="msrp-row">
+                                <span class="label">MSRP</span>
+                                <span>
+                                    <div class="msrp-pair">
+                                        <span class="msrp-label">Launch MSRP</span>
+                                        <span class="msrp-value" id="r-launch-msrp"></span>
+                                        <span class="msrp-label" style="margin-top:0.4rem">Current Market Price</span>
+                                        <span class="msrp-value" id="r-market-price"></span>
+                                        <span class="msrp-note" id="r-market-price-note"></span>
+                                    </div>
+                                </span>
+                            </li>
+                            <li id="acv-row">
+                                <span class="label">ACV Calculation</span>
+                                <span>
+                                    <span class="acv-value" id="r-acv"></span>
+                                    <span class="acv-formula" id="r-acv-formula" style="display:block; margin-top:0.2rem;"></span>
+                                    <div class="acv-steps" id="r-acv-steps" style="display:none;"></div>
+                                    <div class="age-input-row">
+                                        <span class="age-label">Adjust age:</span>
+                                        <input type="number" id="acv-age-input" class="age-input" min="0" max="100" value="0">
+                                        <span class="age-label">years</span>
+                                        <button class="recalc-btn" id="recalc-btn">Recalculate</button>
+                                        <button class="recalc-btn" id="generate-valuation-btn" style="display:none;">Generate Price Estimate</button>
+                                    </div>
+                                    <span class="acv-note" id="r-acv-note"></span>
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="card" id="card-item-notes">
+                        <div class="card-title"><span class="title-number">5</span> Item Notes <span class="title-icon">&#128203;</span></div>
+                        <div class="card-accent-stripe"></div>
+                        <div id="item-notes-content">
+                            <div class="skeleton-line med"></div>
+                            <div class="skeleton-line full"></div>
+                            <div class="skeleton-line short"></div>
+                        </div>
+                    </div>
+                </div><!-- /panel-overview -->
+
+                <!-- Replacement Options Tab -->
+                <div id="panel-replacements" class="tab-panel" role="tabpanel" aria-labelledby="tab-replacements">
+                    <div class="card" id="card-table" style="overflow-x: auto;">
+                        <div class="card-title"><span class="title-number">6</span> Current Replacement Options <span class="title-icon">&#128260;</span></div>
+                        <div class="card-accent-stripe"></div>
+                        <div id="table-note" class="table-note hidden"></div>
+                        <div id="table-loading" class="section-spinner">Loading replacement options...</div>
+                        <table id="r-table" class="data-table hidden">
+                            <thead id="table-head"><tr id="table-head-row">
+                                <th>Feature</th><th>Original Item</th><th class="highlight">Brand Match</th><th>Option 1</th><th>Option 2</th>
+                            </tr></thead>
+                            <tbody id="table-body"></tbody>
+                        </table>
+                        <div id="narrow-results" class="narrow-results hidden">
+                            <div class="narrow-results-header">&#128269; Narrow Your Results</div>
+                            <p id="narrow-results-tip"></p>
+                        </div>
+                    </div>
+                </div><!-- /panel-replacements -->
+
+                <!-- Diagnostics & Repair Tab -->
+                <div id="panel-diagnostics" class="tab-panel" role="tabpanel" aria-labelledby="tab-diagnostics">
+                    <div class="card" id="card-manual-mfr">
+                        <div class="card-title"><span class="title-number">7</span> Owner&apos;s Manual &amp; Manufacturer Page <span class="title-icon">&#128196;</span></div>
+                        <div class="card-accent-stripe"></div>
+                        <div id="manual-content"><div class="section-spinner">Loading...</div></div>
+                        <div id="manufacturer-page-content" style="margin-top:0.5rem;"></div>
+                    </div>
+                    <div class="card" id="card-error-codes">
+                        <div class="card-title"><span class="title-number">8</span> Error Codes <span class="title-icon">&#128308;</span></div>
+                        <div class="card-accent-stripe"></div>
+                        <div id="error-codes-content"><div class="section-spinner">Loading...</div></div>
+                    </div>
+                    <div class="card" id="card-failures">
+                        <div class="card-title"><span class="title-number">9</span> Common Reported Failures <span class="title-icon">&#128295;</span></div>
+                        <div class="card-accent-stripe"></div>
+                        <div id="failures-content"><div class="section-spinner">Loading...</div></div>
+                    </div>
+                    <div class="card" id="card-troubleshooting">
+                        <div class="card-title"><span class="title-number">10</span> Troubleshooting &amp; Repair <span class="title-icon">&#128736;</span></div>
+                        <div class="card-accent-stripe"></div>
+                        <div id="troubleshooting-content"><div class="section-spinner">Loading...</div></div>
+                    </div>
+                    <div class="card" id="card-recalls">
+                        <div class="card-title"><span class="title-number">11</span> Recall Notices or Class Action <span class="title-icon">&#9888;</span></div>
+                        <div class="card-accent-stripe"></div>
+                        <div id="recalls-content"><div class="section-spinner">Loading...</div></div>
+                    </div>
+                </div><!-- /panel-diagnostics -->
+
+                <!-- Technical Details Tab -->
+                <div id="panel-technical" class="tab-panel" role="tabpanel" aria-labelledby="tab-technical">
+                    <div class="card" id="card-technical">
+                        <div class="card-title">Technical Details <span class="title-icon">&#9881;</span></div>
+                        <div class="card-accent-stripe"></div>
+                        <div id="tech-panel-content"><div class="section-spinner">Loading...</div></div>
+                    </div>
+                </div><!-- /panel-technical -->
+
+                <footer class="no-print" style="text-align: center; padding: 2rem 0; opacity: 0.5; font-size: 0.75rem; color: var(--text-muted-dark);">
+                    <p>Results are generated for informational purposes. Always verify critical data independently.</p>
+                </footer>
+
+            </div>
+        </div>
+    </div><!-- /results -->
+
+    <!-- ════════════════════════════════════════════════════════════
+         HOMEPAGE MARKETING SECTIONS
+         Hidden automatically when #results is visible (CSS sibling selector)
+    ════════════════════════════════════════════════════════════ -->
+    <div id="homepage-sections">
+
+        <!-- Trust Strip -->
+        <div class="brt-trust-strip no-print">
+            <div class="brt-trust-item">&#127991; <strong>14+ Brands</strong>&nbsp;Decoded</div>
+            <div class="brt-trust-item">&#128225; <strong>Real-Time</strong>&nbsp;Market Data</div>
+            <div class="brt-trust-item">&#9888;&#65039; <strong>Recall &amp; Class Action</strong>&nbsp;Notices</div>
+            <div class="brt-trust-item">&#128202; <strong>ACV Calculations</strong>&nbsp;Built In</div>
+            <div class="brt-trust-item">&#128424; <strong>Instant PDF</strong>&nbsp;Reports</div>
+        </div>
+
+        <!-- Coverage Section -->
+        <section class="brt-section no-print">
+            <div class="brt-section-label">Coverage</div>
+            <h2 class="brt-section-title">Everything You Need to Research.<br>All in One Place.</h2>
+            <p class="brt-section-sub">Whether you're working on a kitchen appliance or evaluating a rooftop solar system, Bolt has you covered.</p>
+            <div class="brt-categories-grid">
+                <div class="brt-cat-card"><span class="brt-cat-emoji">&#128268;</span><h3>Appliances</h3><p>Washers, dryers, refrigerators, dishwashers, ranges, and more</p></div>
+                <div class="brt-cat-card"><span class="brt-cat-emoji">&#128241;</span><h3>Electronics &amp; Devices</h3><p>TVs, smartphones, laptops, tablets, audio equipment</p></div>
+                <div class="brt-cat-card"><span class="brt-cat-emoji">&#127777;&#65039;</span><h3>HVAC Systems</h3><p>Air conditioners, heat pumps, furnaces, air handlers</p></div>
+                <div class="brt-cat-card"><span class="brt-cat-emoji">&#128703;</span><h3>Water Heaters</h3><p>Tank and tankless, electric and gas, age decoded by serial</p></div>
+                <div class="brt-cat-card"><span class="brt-cat-emoji">&#9889;</span><h3>Generators</h3><p>Standby and portable, Generac, Kohler, Briggs &amp; more</p></div>
+                <div class="brt-cat-card"><span class="brt-cat-emoji">&#9728;&#65039;</span><h3>Solar Systems</h3><p>Inverters, solar panels, battery storage, charge controllers</p></div>
+                <div class="brt-cat-card"><span class="brt-cat-emoji">&#128267;</span><h3>Electrical Systems</h3><p>Federal Pacific, Zinsco, breaker panels, wiring, service equipment</p></div>
+                <div class="brt-cat-card"><span class="brt-cat-emoji">&#128269;</span><h3>Custom &amp; Specialty</h3><p>Pool equipment, smart home, commercial items, and more</p></div>
+            </div>
+        </section>
+
+        <hr class="brt-divider">
+
+        <!-- Sample Report Section -->
+        <div class="brt-sample-section no-print">
+            <div class="brt-sample-inner">
+                <div class="brt-sample-layout">
+                    <div>
+                        <div class="brt-section-label">Sample Report</div>
+                        <h2 class="brt-section-title">See Exactly What You Get — Before You Search</h2>
+                        <p class="brt-section-sub">Every search generates a structured, professional report with the data you need to research and document products with confidence.</p>
+                        <div class="brt-report-highlights">
+                            <div class="brt-highlight-item">
+                                <div class="brt-highlight-icon">&#128197;</div>
+                                <div class="brt-highlight-text"><h4>Age &amp; Production Era</h4><p>Manufacture date decoded from serial numbers. Production eras, discontinuation dates, and estimated remaining service life.</p></div>
+                            </div>
+                            <div class="brt-highlight-item">
+                                <div class="brt-highlight-icon">&#128176;</div>
+                                <div class="brt-highlight-text"><h4>Launch MSRP &amp; Current ACV</h4><p>Original retail price with real-time depreciation calculation. Adjustable ACV tool built into every report.</p></div>
+                            </div>
+                            <div class="brt-highlight-item">
+                                <div class="brt-highlight-icon">&#128260;</div>
+                                <div class="brt-highlight-text"><h4>Current Replacement Options</h4><p>Like-kind and quality replacements with live pricing. Side-by-side comparison table included.</p></div>
+                            </div>
+                            <div class="brt-highlight-item">
+                                <div class="brt-highlight-icon">&#9888;&#65039;</div>
+                                <div class="brt-highlight-text"><h4>Recalls &amp; Class Actions</h4><p>Active recall notices and class action lawsuits relevant to the specific item &mdash; critical for liability reporting.</p></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="brt-sample-label">Example Report Output</div>
+                        <div class="brt-report-card">
+                            <div class="brt-report-header">
+                                <div class="brt-report-header-text">
+                                    <div style="font-size:10px;color:#94a3b8;margin-bottom:3px;text-transform:uppercase;letter-spacing:1px;">Sample Report</div>
+                                    <h4>Generac 22kW Air-Cooled Standby Generator</h4>
+                                    <div class="brt-sub">Model 7043 &middot; Serial: 7043A2019123456</div>
+                                </div>
+                                <div class="brt-report-badge">&#9889; Complete</div>
+                            </div>
+                            <div class="brt-stat-row">
+                                <div class="brt-stat"><div class="brt-slabel">Item Age</div><div class="brt-svalue">5 yrs</div><div class="brt-ssub">Mfg. 2019</div></div>
+                                <div class="brt-stat"><div class="brt-slabel">Launch MSRP</div><div class="brt-svalue">$4,999</div><div class="brt-ssub">at release</div></div>
+                                <div class="brt-stat"><div class="brt-slabel">Est. ACV</div><div class="brt-svalue">$3,124</div><div class="brt-ssub">5-yr depreciation</div></div>
+                                <div class="brt-stat"><div class="brt-slabel">Availability</div><div class="brt-svalue" style="font-size:13px;margin-top:2px;">Active</div><div class="brt-ssub">In production</div></div>
+                            </div>
+                            <div class="brt-report-rows">
+                                <div class="brt-report-row"><span class="brt-rname">&#128197; Age &amp; Production Era</span><span class="brt-rstatus brt-status-green">Complete</span></div>
+                                <div class="brt-report-row"><span class="brt-rname">&#128176; Valuation &amp; ACV</span><span class="brt-rstatus brt-status-green">Complete</span></div>
+                                <div class="brt-report-row"><span class="brt-rname">&#128260; Replacement Options (3 found)</span><span class="brt-rstatus brt-status-green">Complete</span></div>
+                                <div class="brt-report-row"><span class="brt-rname">&#9888;&#65039; Recall Notices</span><span class="brt-rstatus brt-status-yellow">1 Active Notice</span></div>
+                                <div class="brt-report-row"><span class="brt-rname">&#128295; Common Failures &amp; Diagnostics</span><span class="brt-rstatus brt-status-green">Complete</span></div>
+                                <div class="brt-report-row"><span class="brt-rname">&#128736;&#65039; Troubleshooting &amp; Repair Data</span><span class="brt-rstatus brt-status-green">Complete</span></div>
+                                <div class="brt-report-row"><span class="brt-rname">&#128196; Owner's Manual Link</span><span class="brt-rstatus brt-status-blue">Linked</span></div>
+                                <div class="brt-report-row"><span class="brt-rname">&#10060; Error Code Database</span><span class="brt-rstatus brt-status-green">Complete</span></div>
+                            </div>
+                            <div class="brt-report-footer">
+                                <span>Generated in 4.2 seconds &middot; Bolt Research Team</span>
+                                <span class="brt-pdf-btn">&#128424; Export PDF</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- How It Works Section -->
+        <section class="brt-how-section no-print">
+            <div class="brt-section-label">Process</div>
+            <h2 class="brt-section-title">Research That Fits Your Workflow</h2>
+            <p class="brt-section-sub">Three steps. Seconds per search. Everything you need to write a report or document a product.</p>
+            <div class="brt-how-grid">
+                <div class="brt-how-card">
+                    <div class="brt-how-num">Step 01</div>
+                    <span class="brt-how-icon">&#128269;</span>
+                    <h3>Enter What You Know</h3>
+                    <p>Type a brand name, model number, serial number, or general description. Bolt handles everything from generic categories to hyper-specific model numbers.</p>
+                </div>
+                <div class="brt-how-card">
+                    <div class="brt-how-num">Step 02</div>
+                    <span class="brt-how-icon">&#9889;</span>
+                    <h3>Get Your Full Report</h3>
+                    <p>Within seconds, Bolt generates a structured report covering all key data points &mdash; age, value, recalls, replacements, and repair history.</p>
+                </div>
+                <div class="brt-how-card">
+                    <div class="brt-how-num">Step 03</div>
+                    <span class="brt-how-icon">&#128202;</span>
+                    <h3>Export &amp; Apply</h3>
+                    <p>Add your own notes, generate a customized summary, and export to PDF. Generate a formatted summary ready for any report or document.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Report Breakdown Section -->
+        <div class="brt-breakdown-section no-print">
+            <div class="brt-breakdown-inner">
+                <div class="brt-section-label">What's in every report</div>
+                <h2 class="brt-section-title">Built for Professionals. Not Generic Search.</h2>
+                <p class="brt-breakdown-sub">Every Bolt report includes the exact data points that matter for property research professionals &mdash; not generic product specs.</p>
+                <div class="brt-breakdown-grid">
+                    <div class="brt-breakdown-card"><div class="brt-breakdown-icon">&#128197;</div><div class="brt-breakdown-text"><h4>Manufacture Date &amp; Age</h4><p>Serial number decoded or estimated. Production eras, discontinuation, and service life.</p></div></div>
+                    <div class="brt-breakdown-card"><div class="brt-breakdown-icon">&#128176;</div><div class="brt-breakdown-text"><h4>Launch MSRP &amp; ACV</h4><p>Original retail price and real-time depreciation. Adjustable by year for accurate valuation.</p></div></div>
+                    <div class="brt-breakdown-card"><div class="brt-breakdown-icon">&#128260;</div><div class="brt-breakdown-text"><h4>Current Replacement Options</h4><p>Live-priced like-kind and quality alternatives with side-by-side feature comparison.</p></div></div>
+                    <div class="brt-breakdown-card"><div class="brt-breakdown-icon">&#9888;&#65039;</div><div class="brt-breakdown-text"><h4>Recall &amp; Class Action Notices</h4><p>Active safety recalls and relevant class actions tied to the specific item.</p></div></div>
+                    <div class="brt-breakdown-card"><div class="brt-breakdown-icon">&#128295;</div><div class="brt-breakdown-text"><h4>Common Failures &amp; Diagnostics</h4><p>Known failure patterns, reported defects, and diagnostic guidance by model.</p></div></div>
+                    <div class="brt-breakdown-card"><div class="brt-breakdown-icon">&#128736;&#65039;</div><div class="brt-breakdown-text"><h4>Troubleshooting &amp; Repair Data</h4><p>Repair pathways, error code databases, and repairability assessments.</p></div></div>
+                    <div class="brt-breakdown-card"><div class="brt-breakdown-icon">&#128196;</div><div class="brt-breakdown-text"><h4>Owner's Manual &amp; Manufacturer Docs</h4><p>Direct links to official documentation, spec sheets, and support pages.</p></div></div>
+                    <div class="brt-breakdown-card"><div class="brt-breakdown-icon">&#128203;</div><div class="brt-breakdown-text"><h4>Customizable Summary Export</h4><p>Add your own notes and generate a formatted summary ready for any report or file.</p></div></div>
+                    <div class="brt-breakdown-card"><div class="brt-breakdown-icon">&#128424;</div><div class="brt-breakdown-text"><h4>PDF Print-Ready Output</h4><p>Every report is formatted to print cleanly. Professional output in seconds, every time.</p></div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom CTA Section -->
+        <div class="brt-cta-section no-print">
+            <h2>Start Your First Search</h2>
+            <p>Join professionals who use Bolt to research items faster and write better reports &mdash; without the hours of manual lookup.</p>
+            <div class="brt-cta-search-wrap">
+                <input type="text" id="query-cta" class="brt-search-bar" placeholder="Enter a model, brand, or description..." autocomplete="off">
+                <button id="btn-cta" class="brt-search-btn">&#9889; Search</button>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="brt-footer-new no-print">
+            <p>&copy; 2026 Bolt Research Team &middot; Results for informational purposes. Always verify critical data independently.</p>
+            <div class="brt-footer-links">
+                <a href="/methodology">Methodology</a>
+                <a href="/disclaimer">Disclaimer</a>
+                <a href="/privacy-policy">Privacy Policy</a>
+                <a href="/contact">Contact</a>
+            </div>
+        </footer>
+
+    </div><!-- /homepage-sections -->
+
+    <!-- ════════════════════════════════════════════════════════════
+         SUMMARY MODAL (unchanged)
+    ════════════════════════════════════════════════════════════ -->
     <div id="summary-modal" class="summary-modal hidden" role="dialog" aria-modal="true" aria-labelledby="summary-modal-heading">
         <div class="summary-modal-bar">
             <span class="summary-modal-title" id="summary-modal-heading">&#128203; Generate Customized Summary</span>

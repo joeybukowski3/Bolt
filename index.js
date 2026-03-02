@@ -448,7 +448,10 @@ function renderFast(data) {
 
   // Show results, reset to overview tab
   const results = byId("results");
-  if (results) results.classList.remove("hidden");
+  if (results) {
+    results.classList.remove("hidden");
+    results.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
   setActiveTab("tab-overview");
 }
 
@@ -964,6 +967,7 @@ async function performSearch() {
   const loaderText = byId("loader-text");
   if (loaderDog) loaderDog.classList.add("running");
   if (loaderText) loaderText.classList.add("visible");
+  byId("mascot-wrapper")?.classList.add("brt-loading");
 
   // Reset detail sections to skeleton/spinner state
   const spinnerSections = [
@@ -1045,6 +1049,7 @@ async function performSearch() {
   fastPromise.then((fast) => {
     if (loaderDog) loaderDog.classList.remove("running");
     if (loaderText) loaderText.classList.remove("visible");
+    byId("mascot-wrapper")?.classList.remove("brt-loading");
     if (fast && typeof fast === "object") {
       renderFast(fast);
     } else {
@@ -1128,6 +1133,54 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
   }
+
+  // ── Homepage: hamburger menu ──────────────────────────────────────────────
+  byId("brt-hamburger")?.addEventListener("click", () => {
+    byId("brt-nav-links")?.classList.toggle("open");
+  });
+
+  // ── Homepage: nav CTA → scroll to and focus main search bar ──────────────
+  byId("nav-cta-btn")?.addEventListener("click", () => {
+    const input = byId("query");
+    if (input) {
+      input.scrollIntoView({ behavior: "smooth", block: "center" });
+      setTimeout(() => input.focus(), 350);
+    }
+  });
+
+  // ── Homepage: CTA search bar (bottom of page) ─────────────────────────────
+  const queryCta = byId("query-cta");
+  const btnCta = byId("btn-cta");
+  if (btnCta) {
+    btnCta.addEventListener("click", () => {
+      const v = queryCta?.value?.trim();
+      if (!v) return;
+      const mainInput = byId("query");
+      if (mainInput) mainInput.value = v;
+      performSearch();
+    });
+  }
+  if (queryCta) {
+    queryCta.addEventListener("keydown", (e) => {
+      if (e.key !== "Enter") return;
+      const v = queryCta.value.trim();
+      if (!v) return;
+      const mainInput = byId("query");
+      if (mainInput) mainInput.value = v;
+      performSearch();
+    });
+  }
+
+  // ── Homepage: example pills ───────────────────────────────────────────────
+  document.querySelectorAll(".brt-example-pill").forEach((pill) => {
+    pill.addEventListener("click", () => {
+      const q = pill.dataset.example;
+      if (!q) return;
+      const input = byId("query");
+      if (input) input.value = q;
+      performSearch();
+    });
+  });
 
   // Section filter checkboxes
   const filterMap = [
