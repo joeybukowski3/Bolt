@@ -94,6 +94,16 @@
         .coverage-bar { display: flex; justify-content: center; gap: 0.6rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
         .coverage-badge { display: inline-flex; align-items: center; gap: 0.4rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.09); border-radius: 999px; padding: 0.35rem 0.9rem; font-size: 0.78rem; color: var(--text-light); white-space: nowrap; }
 
+        /* ── Search flow strip ── */
+        .search-flow { display: flex; align-items: center; justify-content: center; gap: 0.45rem; margin-bottom: 1.4rem; flex-wrap: wrap; }
+        .search-flow-step { display: inline-flex; align-items: center; gap: 0.3rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 999px; padding: 0.3rem 0.85rem; font-size: 0.74rem; font-weight: 600; color: var(--text-light); white-space: nowrap; }
+        .search-flow-arrow { color: rgba(255,255,255,0.25); font-size: 0.7rem; flex-shrink: 0; }
+        @media (max-width: 480px) { .search-flow { gap: 0.3rem; } .search-flow-step { font-size: 0.7rem; padding: 0.25rem 0.65rem; } }
+
+        /* ── Search example hint ── */
+        .search-examples { max-width: 620px; margin: 0.55rem auto 0; text-align: center; font-size: 0.76rem; color: rgba(255,255,255,0.38); line-height: 1.65; padding: 0 1rem; }
+        .search-examples em { font-style: normal; color: rgba(255,255,255,0.58); }
+
         /* ── How-to row ── */
         .how-to-row { display: grid; grid-template-columns: 1fr 1fr 1fr; margin-bottom: 1.5rem; border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; overflow: hidden; }
         .how-to-step { padding: 0.875rem 1.1rem; background: rgba(255,255,255,0.03); display: flex; flex-direction: column; gap: 0.2rem; border-right: 1px solid rgba(255,255,255,0.07); }
@@ -381,11 +391,19 @@
                 <span id="loader-text" class="loader-text">Consulting live market data and technical records...</span>
             </div>
             <p class="hero-tagline">Instant product research. Age verification. Replacement analysis.</p>
-            <p class="hero-desc">Bolt researches appliances, electronics, HVAC systems, water heaters, and more — returning detailed product information including age, current market value, and replacement options. Search by brand, model number, or product type to generate an instant research report.</p>
+            <p class="hero-desc">Bolt researches appliances, electronics, HVAC systems, water heaters, and more — returning detailed product information including age, current market value, and replacement options.</p>
+            <div class="search-flow">
+                <span class="search-flow-step">&#128269; Search Generic</span>
+                <span class="search-flow-arrow">&#8594;</span>
+                <span class="search-flow-step">&#127919; Search Specific</span>
+                <span class="search-flow-arrow">&#8594;</span>
+                <span class="search-flow-step">&#9889; Get Results</span>
+            </div>
             <div class="search-container">
                 <input type="text" id="query" class="search-input" placeholder="Search by model number, brand, or product type — e.g. LG C3 65 TV, Whirlpool WTW5000DW, water heater">
                 <button id="btn" class="search-btn">&#128269; Search</button>
             </div>
+            <p class="search-examples">Try: <em>&ldquo;Federal Pacific Electrical Panels&rdquo;</em>, <em>&ldquo;LG 65&Prime; C3 TV&rdquo;</em>, or <em>&ldquo;SunPower SPR-5200&rdquo;</em></p>
             <div class="coverage-bar">
                 <span class="coverage-badge">&#128268; Appliances &amp; Electronics</span>
                 <span class="coverage-badge">&#127777;&#65039; HVAC &amp; Water Heaters</span>
