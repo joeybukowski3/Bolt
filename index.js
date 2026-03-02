@@ -4,6 +4,52 @@ let detailData = null;
 let currentCategory = "general";
 let acvData = { msrp: 0, age: 0 };
 
+// ── Section filter state ──────────────────────────────────────────────────────
+
+const selectedSections = {
+  howItWorks:   true,
+  itemNotes:    true,
+  replacements: true,
+  diagnostics:  true,
+  technical:    true
+};
+
+// Returns true if any "detail" section is selected (skip detail API call if all off)
+function needsDetailFetch() {
+  return selectedSections.howItWorks || selectedSections.itemNotes ||
+         selectedSections.replacements || selectedSections.diagnostics ||
+         selectedSections.technical;
+}
+
+// Show/hide cards and tab buttons based on selectedSections.
+// Safe to call before first search (results hidden — no-op).
+function updateSectionVisibility() {
+  const resultsEl = byId("results");
+  if (!resultsEl || resultsEl.classList.contains("hidden")) return;
+
+  // Cards inside the Overview panel
+  show("card-how-it-works", selectedSections.howItWorks);
+  show("card-item-notes",   selectedSections.itemNotes);
+
+  // Tab buttons + redirect if the active tab is being hidden
+  const tabMap = [
+    { tab: "tab-replacements", key: "replacements" },
+    { tab: "tab-diagnostics",  key: "diagnostics"  },
+    { tab: "tab-technical",    key: "technical"    }
+  ];
+  tabMap.forEach(({ tab, key }) => {
+    const btn = byId(tab);
+    if (!btn) return;
+    const on = selectedSections[key];
+    btn.classList.toggle("hidden", !on);
+    btn.setAttribute("aria-disabled", on ? "false" : "true");
+    if (!on && activeTab === tab) setActiveTab("tab-overview");
+  });
+
+  // If detail data is already loaded, re-render so newly-enabled sections populate
+  if (detailData) renderDetail(detailData);
+}
+
 // ── Depreciation schedules ───────────────────────────────────────────────────
 
 const CATEGORY_DEPRECIATION = {
@@ -144,17 +190,26 @@ function setActiveTab(tabId) {
   });
 }
 
+function getVisibleTabs() {
+  return TAB_IDS.filter((id) => {
+    const btn = byId(id);
+    return btn && !btn.classList.contains("hidden");
+  });
+}
+
 function initTabs() {
   TAB_IDS.forEach((id) => {
     const btn = byId(id);
     if (!btn) return;
     btn.addEventListener("click", () => setActiveTab(id));
     btn.addEventListener("keydown", (e) => {
-      const idx = TAB_IDS.indexOf(id);
-      if (e.key === "ArrowRight") { e.preventDefault(); setActiveTab(TAB_IDS[(idx + 1) % TAB_IDS.length]); byId(TAB_IDS[(idx + 1) % TAB_IDS.length])?.focus(); }
-      if (e.key === "ArrowLeft")  { e.preventDefault(); setActiveTab(TAB_IDS[(idx - 1 + TAB_IDS.length) % TAB_IDS.length]); byId(TAB_IDS[(idx - 1 + TAB_IDS.length) % TAB_IDS.length])?.focus(); }
-      if (e.key === "Home") { e.preventDefault(); setActiveTab(TAB_IDS[0]); byId(TAB_IDS[0])?.focus(); }
-      if (e.key === "End")  { e.preventDefault(); setActiveTab(TAB_IDS[TAB_IDS.length - 1]); byId(TAB_IDS[TAB_IDS.length - 1])?.focus(); }
+      const visible = getVisibleTabs();
+      const idx = visible.indexOf(id);
+      if (idx === -1) return;
+      if (e.key === "ArrowRight") { e.preventDefault(); const next = visible[(idx + 1) % visible.length]; setActiveTab(next); byId(next)?.focus(); }
+      if (e.key === "ArrowLeft")  { e.preventDefault(); const prev = visible[(idx - 1 + visible.length) % visible.length]; setActiveTab(prev); byId(prev)?.focus(); }
+      if (e.key === "Home") { e.preventDefault(); setActiveTab(visible[0]); byId(visible[0])?.focus(); }
+      if (e.key === "End")  { e.preventDefault(); setActiveTab(visible[visible.length - 1]); byId(visible[visible.length - 1])?.focus(); }
     });
   });
 }
@@ -382,8 +437,8 @@ function renderDetail(data) {
 
   const query = (fastData?.analysis?.entered || "").trim();
 
-  // ─ Item Notes card (Section 5) ─
-  const itemNotesContent = byId("item-notes-content");
+  // ─ Item Notes card ─
+  const itemNotesContent = selectedSections.itemNotes ? byId("item-notes-content") : null;
   if (itemNotesContent) {
     const lkq = data.itemNotes?.lkqEvaluation || {};
     const mustMatch = Array.isArray(lkq.mustMatchSpecs) ? lkq.mustMatchSpecs : [];
@@ -411,6 +466,11 @@ function renderDetail(data) {
   }
 
   // ─ Replacement table ─
+  if (!selectedSections.replacements) {
+    // Hide the table elements when section is off
+    const tl = byId("table-loading"); if (tl) tl.classList.add("hidden");
+    const te = byId("r-table"); if (te) te.classList.add("hidden");
+  } else {
   const tableMode = data.tableMode || "standard";
   const isTiered = tableMode === "tiered";
 
@@ -511,34 +571,43 @@ function renderDetail(data) {
     }
   }
 
+  } // end if (selectedSections.replacements)
+
   // ─ Technical Details panel ─
-  const techPanelContent = byId("tech-panel-content");
-  if (techPanelContent) {
-    const techSpecs = data.technicalSpecs || "";
-    const specs = techSpecs.split(",").map((s) => s.trim()).filter(Boolean);
-    let techHtml = "";
-    if (specs.length) {
-      techHtml += `<ul class="report-list">${specs.map((s) => `<li>${escapeHtml(s)}</li>`).join("")}</ul>`;
+  if (selectedSections.technical) {
+    const techPanelContent = byId("tech-panel-content");
+    if (techPanelContent) {
+      const techSpecs = data.technicalSpecs || "";
+      const specs = techSpecs.split(",").map((s) => s.trim()).filter(Boolean);
+      let techHtml = "";
+      if (specs.length) {
+        techHtml += `<ul class="report-list">${specs.map((s) => `<li>${escapeHtml(s)}</li>`).join("")}</ul>`;
+      }
+      if (data.materials) {
+        techHtml += `<div class="section-subtitle">Materials</div><p class="report-overview">${escapeHtml(data.materials)}</p>`;
+      }
+      if (data.serviceLife) {
+        techHtml += `<div class="section-subtitle">Service Life</div><p class="report-overview">${escapeHtml(data.serviceLife)}</p>`;
+      }
+      techPanelContent.innerHTML = techHtml || `<p class="none-found">No technical specifications available.</p>`;
     }
-    if (data.materials) {
-      techHtml += `<div class="section-subtitle">Materials</div><p class="report-overview">${escapeHtml(data.materials)}</p>`;
-    }
-    if (data.serviceLife) {
-      techHtml += `<div class="section-subtitle">Service Life</div><p class="report-overview">${escapeHtml(data.serviceLife)}</p>`;
-    }
-    techPanelContent.innerHTML = techHtml || `<p class="none-found">No technical specifications available.</p>`;
   }
 
-  // ─ Service life (Section 3) ─
+  // ─ Service life (always in Release Date card) ─
   setText("r-service-life", data.serviceLife || "");
 
-  // ─ How It Works (Section 2) ─
-  const howContent = byId("how-it-works-content");
-  if (howContent) {
-    howContent.innerHTML = `<p class="how-it-works-text">${escapeHtml(data.howItWorks || "No description available.")}</p>`;
+  // ─ How It Works ─
+  if (selectedSections.howItWorks) {
+    const howContent = byId("how-it-works-content");
+    if (howContent) {
+      howContent.innerHTML = `<p class="how-it-works-text">${escapeHtml(data.howItWorks || "No description available.")}</p>`;
+    }
   }
 
-  // ─ Recalls (Section 7) ─
+  // ─ Diagnostics group (Recalls, Error Codes, Failures, Manual, Troubleshooting) ─
+  if (!selectedSections.diagnostics) return; // skip rest
+
+  // ─ Recalls ─
   const recallsContent = byId("recalls-content");
   if (recallsContent) {
     const recalls = Array.isArray(data.recalls) ? data.recalls : [];
@@ -664,8 +733,6 @@ function copySummary() {
   if (!fastData) return;
   const a = fastData.analysis || {};
   const rd = fastData.releaseDate || {};
-  const recRow = detailData?.table?.find((r) => (r.label || "").toLowerCase().includes("recommended")) || {};
-  const retRow = detailData?.table?.find((r) => (r.label || "").toLowerCase().includes("retailer")) || {};
   const acvEl = byId("r-acv");
   const acvStr = acvEl ? acvEl.textContent.trim() : "N/A";
 
@@ -675,11 +742,17 @@ function copySummary() {
     `Model: ${a.estimatedModel || a.entered || ""}`,
     `Manufacture Date / Age: ${rd.estimatedAge || "N/A"}`,
     `Launch MSRP: ${a.launchMsrp || "N/A"} | Current Market: ${a.currentMarketPrice || "N/A"}`,
-    `Est. ACV: ${acvStr}`,
-    `LKQ Replacement: ${recRow.brandMatch || "N/A"}`,
-    `Available at: ${retRow.original || retRow.brandMatch || "N/A"}`,
-    "Source: boltresearchteam.com"
+    `Est. ACV: ${acvStr}`
   ];
+
+  if (selectedSections.replacements && detailData) {
+    const recRow = detailData.table?.find((r) => (r.label || "").toLowerCase().includes("recommended")) || {};
+    const retRow = detailData.table?.find((r) => (r.label || "").toLowerCase().includes("retailer")) || {};
+    if (recRow.brandMatch) lines.push(`LKQ Replacement: ${recRow.brandMatch}`);
+    if (retRow.original || retRow.brandMatch) lines.push(`Available at: ${retRow.original || retRow.brandMatch}`);
+  }
+
+  lines.push("Source: boltresearchteam.com");
 
   navigator.clipboard.writeText(lines.join("\n")).then(() => {
     const btn = byId("copy-btn");
@@ -785,14 +858,16 @@ async function performSearch() {
   fastData = null;
   detailData = null;
 
-  // Kick off both fetches simultaneously
+  // Kick off both fetches simultaneously (skip detail if all detail sections are off)
   const fastPromise = fetch(`/api/search?mode=research-fast&query=${encodeURIComponent(query)}`)
     .then((r) => r.json())
     .catch((err) => { console.error("Fast fetch error:", err); return null; });
 
-  const detailPromise = fetch(`/api/search?mode=research-detail&query=${encodeURIComponent(query)}`)
-    .then((r) => r.json())
-    .catch((err) => { console.error("Detail fetch error:", err); return null; });
+  const detailPromise = needsDetailFetch()
+    ? fetch(`/api/search?mode=research-detail&query=${encodeURIComponent(query)}`)
+        .then((r) => r.json())
+        .catch((err) => { console.error("Detail fetch error:", err); return null; })
+    : Promise.resolve(null);
 
   // Render fast when ready — stops the loader
   fastPromise.then((fast) => {
@@ -848,4 +923,23 @@ document.addEventListener("DOMContentLoaded", () => {
   if (printBtn) printBtn.addEventListener("click", () => window.print());
   if (recalcBtn) recalcBtn.addEventListener("click", recalcACV);
   initTabs();
+
+  // Section filter checkboxes
+  const filterMap = [
+    { id: "sec-how-it-works", key: "howItWorks"   },
+    { id: "sec-item-notes",   key: "itemNotes"    },
+    { id: "sec-replacements", key: "replacements" },
+    { id: "sec-diagnostics",  key: "diagnostics"  },
+    { id: "sec-technical",    key: "technical"    }
+  ];
+  filterMap.forEach(({ id, key }) => {
+    const checkbox = byId(id);
+    if (!checkbox) return;
+    const chip = checkbox.closest(".section-filter-chip");
+    checkbox.addEventListener("change", () => {
+      selectedSections[key] = checkbox.checked;
+      if (chip) chip.classList.toggle("is-checked", checkbox.checked);
+      updateSectionVisibility();
+    });
+  });
 });

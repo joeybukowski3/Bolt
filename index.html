@@ -106,6 +106,16 @@
         .search-examples { max-width: 620px; margin: 0.55rem auto 0; text-align: center; font-size: 0.76rem; color: rgba(255,255,255,0.38); line-height: 1.65; padding: 0 1rem; }
         .search-examples em { font-style: normal; color: rgba(255,255,255,0.58); }
 
+        /* ── Section filters ── */
+        .section-filters { max-width: 700px; margin: 0.85rem auto 0; display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
+        .section-filters-label { font-size: 0.66rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-muted-dark); white-space: nowrap; flex-shrink: 0; }
+        .section-filter-list { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+        .section-filter-chip { display: inline-flex; align-items: center; gap: 0.35rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 999px; padding: 0.28rem 0.65rem 0.28rem 0.45rem; cursor: pointer; font-size: 0.72rem; font-weight: 500; color: var(--text-light); transition: background 0.15s, border-color 0.15s; user-select: none; }
+        .section-filter-chip:hover { background: rgba(255,255,255,0.09); border-color: rgba(255,255,255,0.2); }
+        .section-filter-chip.is-checked { background: var(--accent-dim-dark); border-color: rgba(234,179,8,0.45); color: var(--text-white); }
+        .section-filter-chip input[type="checkbox"] { width: 12px; height: 12px; accent-color: var(--accent); cursor: pointer; flex-shrink: 0; margin: 0; }
+        @media (max-width: 540px) { .section-filters { justify-content: center; } .section-filters-label { width: 100%; text-align: center; } }
+
         /* ── How-to row ── */
         .how-to-row { display: grid; grid-template-columns: 1fr 1fr 1fr; margin-bottom: 1.5rem; border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; overflow: hidden; }
         .how-to-step { padding: 0.875rem 1.1rem; background: rgba(255,255,255,0.03); display: flex; flex-direction: column; gap: 0.2rem; border-right: 1px solid rgba(255,255,255,0.07); }
@@ -433,6 +443,16 @@
             <div class="search-container">
                 <input type="text" id="query" class="search-input" placeholder="Search by model number, brand, or product type — e.g. LG C3 65 TV, Whirlpool WTW5000DW, water heater">
                 <button id="btn" class="search-btn">&#128269; Search</button>
+            </div>
+            <div class="section-filters" role="group" aria-label="Report sections to include">
+                <span class="section-filters-label">Include in report:</span>
+                <div class="section-filter-list">
+                    <label class="section-filter-chip is-checked"><input type="checkbox" id="sec-how-it-works" checked> How It Works</label>
+                    <label class="section-filter-chip is-checked"><input type="checkbox" id="sec-item-notes" checked> Item Notes</label>
+                    <label class="section-filter-chip is-checked"><input type="checkbox" id="sec-replacements" checked> Replacement Options</label>
+                    <label class="section-filter-chip is-checked"><input type="checkbox" id="sec-diagnostics" checked> Diagnostics &amp; Repair</label>
+                    <label class="section-filter-chip is-checked"><input type="checkbox" id="sec-technical" checked> Technical Details</label>
+                </div>
             </div>
             <p class="search-examples">Try: <em>&ldquo;Federal Pacific Electrical Panels&rdquo;</em>, <em>&ldquo;LG 65&Prime; C3 TV&rdquo;</em>, or <em>&ldquo;SunPower SPR-5200&rdquo;</em></p>
             <div class="coverage-bar">
