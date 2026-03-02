@@ -357,6 +357,38 @@ function renderFast(data) {
     qsTierBadge.className = `tier-badge ${tierMap[analysis.tier] || "tier-entry"}`;
   }
 
+  // ── Variations (Section 1) ──────────────────────────────────────────────────
+  const variationsSection = byId("r-variations");
+  const variationChips = byId("r-variation-chips");
+  const variations = Array.isArray(data.variations) ? data.variations : [];
+  if (variationsSection && variationChips) {
+    if (variations.length) {
+      variationChips.innerHTML = variations
+        .map(
+          (v) =>
+            `<button class="variation-chip" data-vquery="${escapeHtml(v.query)}">
+              <span class="variation-chip-label">${escapeHtml(v.label)}</span>
+              ${v.note ? `<span class="variation-chip-note">${escapeHtml(v.note)}</span>` : ""}
+            </button>`
+        )
+        .join("");
+      // Wire click → set input + search
+      variationChips.querySelectorAll(".variation-chip").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const q = btn.dataset.vquery;
+          if (!q) return;
+          const input = byId("query");
+          if (input) input.value = q;
+          performSearch();
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        });
+      });
+      variationsSection.classList.remove("hidden");
+    } else {
+      variationsSection.classList.add("hidden");
+    }
+  }
+
   // Show results
   const results = byId("results");
   if (results) results.classList.remove("hidden");
@@ -771,7 +803,7 @@ async function performSearch() {
   if (!query) return;
 
   // Check sessionStorage cache first
-  const cacheKey = `bolt_v5_${query.toLowerCase()}`;
+  const cacheKey = `bolt_v6_${query.toLowerCase()}`;
   try {
     const cached = sessionStorage.getItem(cacheKey);
     if (cached) {
@@ -832,6 +864,12 @@ async function performSearch() {
   const qsTableEl = byId("qs-table");
   if (qsTableLoading) qsTableLoading.classList.remove("hidden");
   if (qsTableEl) qsTableEl.classList.add("hidden");
+
+  // Reset variations
+  const variationsSectionReset = byId("r-variations");
+  if (variationsSectionReset) variationsSectionReset.classList.add("hidden");
+  const variationChipsReset = byId("r-variation-chips");
+  if (variationChipsReset) variationChipsReset.innerHTML = "";
 
   // Reset table note, narrow results, and QS table note
   const tableNoteEl = byId("table-note");

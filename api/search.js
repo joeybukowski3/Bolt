@@ -6,7 +6,7 @@ import {
   normalizeQuery
 } from "./_shared.js";
 
-const FAST_API_VERSION = "2026-03-02-fast-v4";
+const FAST_API_VERSION = "2026-03-02-fast-v5";
 const DETAIL_API_VERSION = "2026-03-02-detail-v4";
 
 const ALLOWED_TIERS = ["Entry Level", "Mid-Grade", "Upper Mid-Grade", "Premium", "Luxury / Designer"];
@@ -64,7 +64,10 @@ Required schema:
     "ageNumeric": 0
   },
   "availability": "string",
-  "refineTip": "string or null"
+  "refineTip": "string or null",
+  "variations": [
+    {"label": "string", "query": "string", "note": "string or null"}
+  ]
 }
 
 searchTier classification (CRITICAL — assign exactly one):
@@ -95,7 +98,15 @@ Rules:
 - availability must be exactly one of:
   "Currently available new from manufacturer and major retailers"
   "Production discontinued — units may still be available from retailers while supplies last"
-  "Fully discontinued — no longer available new from any major source"`;
+  "Fully discontinued — no longer available new from any major source"
+- variations: array of 2–6 clickable product variations to help the user narrow their search. Rules:
+  - searchTier 1 (general term only): return []. Too broad for meaningful variants.
+  - searchTier 2 (category, no brand): return 3–5 representative attribute-based variants that highlight meaningful differences, e.g. for "front load washer" → [{label:"Standard Depth", query:"front load washer standard depth", note:"Fits standard 27-inch laundry alcoves"}, ...]. Use dimensions, capacity ranges, smart vs non-smart, fuel type, etc.
+  - searchTier 3 (brand + product line): return the most distinct sub-models or configurations, e.g. for "LG Front Load Washer" → [{label:"LG WM4000HWA 4.5 cu ft", query:"LG WM4000HWA", note:"Mid-range 4.5 cu ft, TurboWash"}, ...].
+  - searchTier 4 (specific model): return sibling models in the same family (different storage/capacity/display/tier). e.g. for "iPhone 17" → [{label:"iPhone 17 Pro", query:"iPhone 17 Pro", note:"Larger titanium build, pro camera system"}, {label:"iPhone 17 128GB", query:"iPhone 17 128GB", note:null}, ...].
+  - label: short display name (≤ 40 chars). query: the search string a user would type. note: 1 sentence max explaining the key difference (null if self-evident from the label).
+  - Only include variations that exist as real, currently-available or recently-produced products. Do not fabricate SKUs.
+  - Return [] if no meaningful variants exist or cannot be reliably identified.`;
 }
 
 function getResearchDetailPrompt(query, todayIso) {
@@ -271,7 +282,17 @@ function sanitizeFastPayload(payload, query) {
     },
     availability: cleanStr(src.availability) || "Status unknown",
     refineTip:
-      searchTier < 4 ? cleanStr(src.refineTip) || "Add a specific model number for a full report." : null
+      searchTier < 4 ? cleanStr(src.refineTip) || "Add a specific model number for a full report." : null,
+    variations: Array.isArray(src.variations)
+      ? src.variations
+          .slice(0, 6)
+          .map((v) => ({
+            label: cleanStr(v?.label) || "",
+            query: cleanStr(v?.query) || "",
+            note:  cleanStr(v?.note)  || null
+          }))
+          .filter((v) => v.label && v.query)
+      : []
   };
 }
 
@@ -419,7 +440,7 @@ function sanitizeDetailPayload(payload, query) {
 
 async function runFastMode(query, apiKey, model, refresh, cacheClient, todayIso) {
   const normalizedQuery = normalizeQuery(query);
-  const cacheKey = `search:v5:fast:${model}:${todayIso}:${normalizedQuery}`;
+  const cacheKey = `search:v6:fast:${model}:${todayIso}:${normalizedQuery}`;
 
   if (!refresh) {
     const cached = await cacheGet(cacheClient, cacheKey);

@@ -281,6 +281,16 @@
         .collapse-btn { width: 100%; padding: 0.75rem; background: #f1f5f9; border: none; border-radius: 8px; color: var(--text-mid); font-size: 0.8rem; font-weight: 700; cursor: pointer; margin-top: 1rem; transition: background 0.2s; }
         .collapse-btn:hover { background: #e2e8f0; }
 
+        /* ── Variations ── */
+        .variations-section { margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--border-color); }
+        .variations-label { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-muted-dark); margin-bottom: 0.5rem; }
+        .variation-chips { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+        .variation-chip { display: inline-flex; flex-direction: column; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.4rem 0.75rem; cursor: pointer; text-align: left; font-family: inherit; transition: border-color 0.15s, background 0.15s; }
+        .variation-chip:hover { border-color: var(--accent); background: var(--accent-dim); }
+        .variation-chip-label { font-size: 0.78rem; font-weight: 600; color: var(--blue); line-height: 1.3; }
+        .variation-chip-note { font-size: 0.68rem; color: var(--text-muted-dark); margin-top: 0.2rem; line-height: 1.4; max-width: 18rem; }
+        @media (max-width: 600px) { .variation-chip { width: 100%; } .variation-chip-note { max-width: 100%; } }
+
         /* ── Table note ── */
         .table-note { background:#fffbeb; border:1px solid #fde68a; border-radius:8px; padding:0.65rem 0.9rem; margin-bottom:0.75rem; font-size:0.8rem; color:#92400e; }
         .table-note strong { font-weight:700; }
@@ -490,6 +500,11 @@
                                 <ul class="report-list" id="extended-specs-list"></ul>
                             </div>
                             <div id="refinement-chips" class="no-print" style="margin-top:0.5rem;"></div>
+                            <!-- Variations: populated by renderFast() -->
+                            <div id="r-variations" class="variations-section hidden no-print">
+                                <div class="variations-label">Variations</div>
+                                <div class="variation-chips" id="r-variation-chips"></div>
+                            </div>
                         </div>
 
                         <!-- Section 2: How It Works -->
