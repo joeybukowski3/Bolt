@@ -173,7 +173,7 @@ function renderACVDisplay(msrp, age, category) {
 
 // ── Tab navigation ────────────────────────────────────────────────────────────
 
-const TAB_IDS = ["tab-overview", "tab-replacements", "tab-diagnostics", "tab-technical", "tab-notes"];
+const TAB_IDS = ["tab-overview", "tab-replacements", "tab-diagnostics", "tab-technical"];
 
 function setActiveTab(tabId) {
   if (!TAB_IDS.includes(tabId)) return;
@@ -226,23 +226,46 @@ function recalcACV() {
 
 // ── Retailer link builder ────────────────────────────────────────────────────
 
+function getFallbackRetailerNames(category) {
+  const cat = (category || "general").toLowerCase();
+  if (cat === "tv" || cat === "computer" || cat === "laptop" || cat === "electronics")
+    return ["Best Buy", "Walmart", "Target"];
+  if (cat === "hvac" || cat === "water_heater")
+    return ["Home Depot", "Lowe's", "AJ Madison"];
+  if (["washer","dryer","dishwasher","refrigerator","range"].includes(cat))
+    return ["Home Depot", "Lowe's", "AJ Madison", "Best Buy"];
+  if (cat === "small_appliance")
+    return ["Walmart", "Target", "Best Buy"];
+  return ["Best Buy", "Home Depot", "Walmart"];
+}
+
 function buildRetailerLinks(retailerCsv, searchQuery) {
-  if (!retailerCsv || retailerCsv === "N/A") {
-    return '<span class="none-found">No retailer info</span>';
-  }
   const filter = getRetailerFilter(currentCategory);
-  const names = retailerCsv.split(",").map((s) => s.trim()).filter(Boolean);
-  const links = names
-    .filter((name) => !filter || filter.has(name))
+
+  // Parse API-provided names; fallback to category defaults when empty/N/A
+  let names = (retailerCsv && retailerCsv !== "N/A")
+    ? retailerCsv.split(",").map((s) => s.trim()).filter(Boolean)
+    : [];
+  let filtered = names.filter((n) => !filter || filter.has(n));
+
+  // If still nothing, use category-appropriate fallbacks
+  if (!filtered.length) filtered = getFallbackRetailerNames(currentCategory);
+
+  const links = filtered
     .map((name) => {
       const urlFn = RETAILER_URLS[name];
       if (!urlFn) return null;
       return `<a href="${escapeHtml(urlFn(searchQuery))}" target="_blank" rel="noopener noreferrer">${escapeHtml(name)}</a>`;
     })
     .filter(Boolean);
-  return links.length
-    ? `<span class="retailer-links">${links.join("")}</span>`
-    : '<span class="none-found">No retailer links available</span>';
+
+  // Absolute last-resort: Google search link
+  if (!links.length) {
+    const googleUrl = `https://www.google.com/search?q=${encodeURIComponent(searchQuery)}`;
+    links.push(`<a href="${escapeHtml(googleUrl)}" target="_blank" rel="noopener noreferrer">Search Online</a>`);
+  }
+
+  return `<span class="retailer-links">${links.join("")}</span>`;
 }
 
 // ── Spec pill renderer ───────────────────────────────────────────────────────
@@ -581,7 +604,20 @@ function renderDetail(data) {
       const specs = techSpecs.split(",").map((s) => s.trim()).filter(Boolean);
       let techHtml = "";
       if (specs.length) {
-        techHtml += `<ul class="report-list">${specs.map((s) => `<li>${escapeHtml(s)}</li>`).join("")}</ul>`;
+        const PRIMARY_COUNT = 5;
+        const primary = specs.slice(0, PRIMARY_COUNT);
+        const extra = specs.slice(PRIMARY_COUNT);
+        techHtml += `<ul class="report-list">${primary.map((s) => `<li>${escapeHtml(s)}</li>`).join("")}</ul>`;
+        if (extra.length) {
+          const extraId = "tech-extra-specs";
+          techHtml += `
+            <div id="${extraId}" class="tech-extra-specs hidden">
+              <ul class="report-list">${extra.map((s) => `<li>${escapeHtml(s)}</li>`).join("")}</ul>
+            </div>
+            <button class="tech-expand-btn" id="tech-expand-btn" aria-expanded="false" aria-controls="${extraId}">
+              Full Technical Specifications (${extra.length} more) &#9660;
+            </button>`;
+        }
       }
       if (data.materials) {
         techHtml += `<div class="section-subtitle">Materials</div><p class="report-overview">${escapeHtml(data.materials)}</p>`;
@@ -590,6 +626,19 @@ function renderDetail(data) {
         techHtml += `<div class="section-subtitle">Service Life</div><p class="report-overview">${escapeHtml(data.serviceLife)}</p>`;
       }
       techPanelContent.innerHTML = techHtml || `<p class="none-found">No technical specifications available.</p>`;
+
+      // Wire expand toggle
+      const expandBtn = byId("tech-expand-btn");
+      const extraEl = byId("tech-extra-specs");
+      if (expandBtn && extraEl) {
+        expandBtn.addEventListener("click", () => {
+          const open = extraEl.classList.toggle("hidden");
+          expandBtn.setAttribute("aria-expanded", open ? "false" : "true");
+          expandBtn.innerHTML = open
+            ? `Full Technical Specifications (${extraEl.querySelectorAll("li").length} more) &#9660;`
+            : `Hide Additional Specifications &#9650;`;
+        });
+      }
     }
   }
 
@@ -727,39 +776,162 @@ function renderDetail(data) {
   }
 }
 
-// ── Copy summary ─────────────────────────────────────────────────────────────
+// ── Summary Modal ─────────────────────────────────────────────────────────────
 
-function copySummary() {
+let _summaryState = {};
+
+function openSummaryModal() {
   if (!fastData) return;
   const a = fastData.analysis || {};
   const rd = fastData.releaseDate || {};
   const acvEl = byId("r-acv");
-  const acvStr = acvEl ? acvEl.textContent.trim() : "N/A";
+  const acvStr = acvEl ? acvEl.textContent.trim() : "—";
 
-  const lines = [
-    "Bolt Research Report",
-    `Item: ${a.quickSummary || ""}`,
-    `Model: ${a.estimatedModel || a.entered || ""}`,
-    `Manufacture Date / Age: ${rd.estimatedAge || "N/A"}`,
-    `Launch MSRP: ${a.launchMsrp || "N/A"} | Current Market: ${a.currentMarketPrice || "N/A"}`,
-    `Est. ACV: ${acvStr}`
-  ];
+  const blocks = [];
 
-  if (selectedSections.replacements && detailData) {
-    const recRow = detailData.table?.find((r) => (r.label || "").toLowerCase().includes("recommended")) || {};
-    const retRow = detailData.table?.find((r) => (r.label || "").toLowerCase().includes("retailer")) || {};
-    if (recRow.brandMatch) lines.push(`LKQ Replacement: ${recRow.brandMatch}`);
-    if (retRow.original || retRow.brandMatch) lines.push(`Available at: ${retRow.original || retRow.brandMatch}`);
+  // Summary Metrics
+  blocks.push({
+    key: "metrics", title: "Summary Metrics",
+    text: [
+      `Item: ${a.quickSummary || a.entered || "—"}`,
+      `Model: ${a.estimatedModel || a.entered || "—"}`,
+      `Age: ${rd.estimatedAge || "—"}`,
+      `Launch MSRP: ${a.launchMsrp || "—"} | Current Market: ${a.currentMarketPrice || "—"}`,
+      `Est. ACV: ${acvStr}`,
+      `Availability: ${fastData.availability || "—"}`
+    ].join("\n")
+  });
+
+  // Current Item Analysis
+  if (a.itemDescription) {
+    blocks.push({
+      key: "analysis", title: "Current Item Analysis",
+      text: a.itemDescription + (a.keyDetails ? `\nKey specs: ${a.keyDetails}` : "")
+    });
   }
 
+  // Variations
+  const vars = Array.isArray(fastData.variations) ? fastData.variations : [];
+  if (vars.length) {
+    blocks.push({
+      key: "variations", title: "Variations",
+      text: vars.map((v) => `• ${v.label}${v.note ? ` — ${v.note}` : ""}`).join("\n")
+    });
+  }
+
+  // Replacement Options
+  if (detailData?.table?.length) {
+    const isTiered = detailData.tableMode === "tiered";
+    const rows = (detailData.table || []).slice(0, 7).map((r) =>
+      isTiered
+        ? `${r.label}: Entry: ${r.entryLevel || "—"} | Mid: ${r.midGrade || "—"} | Premium: ${r.premium || "—"}`
+        : `${r.label}: ${r.brandMatch || r.option1 || "—"}`
+    );
+    blocks.push({ key: "replacements", title: "Replacement Options", text: rows.join("\n") });
+  }
+
+  // Diagnostics & Repair
+  if (detailData) {
+    const lines = [];
+    const recalls = Array.isArray(detailData.recalls) ? detailData.recalls : [];
+    if (recalls.length) lines.push(`Recalls: ${recalls.map((r) => r.title).slice(0, 3).join("; ")}`);
+    else lines.push("Recalls: None found");
+    const codes = Array.isArray(detailData.errorCodes) ? detailData.errorCodes : [];
+    if (codes.length) lines.push(`Error codes: ${codes.map((c) => c.code).join(", ")}`);
+    if (lines.length) blocks.push({ key: "diagnostics", title: "Diagnostics & Repair", text: lines.join("\n") });
+  }
+
+  // Technical Details
+  if (detailData?.technicalSpecs) {
+    blocks.push({
+      key: "technical", title: "Technical Details",
+      text: detailData.technicalSpecs.split(",").slice(0, 10).map((s) => `• ${s.trim()}`).join("\n")
+    });
+  }
+
+  // Save state (all included by default)
+  _summaryState = {};
+  blocks.forEach((b) => { _summaryState[b.key] = { ...b, included: true }; });
+
+  // Render blocks
+  const container = byId("summary-sections");
+  if (container) {
+    container.innerHTML = blocks.map((b) => `
+      <div class="summary-section-block" id="ss-${b.key}">
+        <div class="summary-section-header">
+          <span class="summary-section-title">${b.title}</span>
+          <button class="summary-toggle-btn included" data-key="${b.key}" aria-pressed="true">&#10003; Included</button>
+        </div>
+        <div class="summary-section-preview">${escapeHtml(b.text)}</div>
+      </div>`).join("");
+
+    container.querySelectorAll(".summary-toggle-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const key = btn.dataset.key;
+        const state = _summaryState[key];
+        if (!state) return;
+        state.included = !state.included;
+        btn.classList.toggle("included", state.included);
+        btn.classList.toggle("excluded", !state.included);
+        btn.setAttribute("aria-pressed", state.included ? "true" : "false");
+        btn.innerHTML = state.included ? "&#10003; Included" : "&#10005; Excluded";
+        const block = byId(`ss-${key}`);
+        if (block) block.classList.toggle("excluded", !state.included);
+      });
+    });
+  }
+
+  // Clear notes
+  const notesEl = byId("summary-notes");
+  if (notesEl) notesEl.value = "";
+
+  // Show modal
+  const modal = byId("summary-modal");
+  if (modal) {
+    modal.classList.remove("hidden");
+    modal.scrollTop = 0;
+    document.body.style.overflow = "hidden";
+  }
+}
+
+function closeSummaryModal() {
+  const modal = byId("summary-modal");
+  if (modal) modal.classList.add("hidden");
+  document.body.style.overflow = "";
+}
+
+function generateSummary() {
+  const lines = ["Bolt Research Report", ""];
+  Object.values(_summaryState).forEach((block) => {
+    if (!block.included) return;
+    lines.push(`── ${block.title} ──`);
+    lines.push(block.text);
+    lines.push("");
+  });
+  const notes = byId("summary-notes")?.value?.trim() || "";
+  if (notes) {
+    lines.push("── Notes ──");
+    lines.push(notes);
+    lines.push("");
+  }
   lines.push("Source: boltresearchteam.com");
 
   navigator.clipboard.writeText(lines.join("\n")).then(() => {
-    const btn = byId("copy-btn");
-    if (!btn) return;
-    const old = btn.textContent;
-    btn.textContent = "Copied";
-    setTimeout(() => { btn.textContent = old; }, 1500);
+    const toast = byId("summary-toast");
+    if (toast) {
+      toast.classList.remove("hidden");
+      setTimeout(() => toast.classList.add("hidden"), 2500);
+    }
+  }).catch(() => {
+    // Fallback: select a temp textarea
+    const ta = document.createElement("textarea");
+    ta.value = lines.join("\n");
+    ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.appendChild(ta); ta.select();
+    document.execCommand("copy");
+    document.body.removeChild(ta);
+    const toast = byId("summary-toast");
+    if (toast) { toast.classList.remove("hidden"); setTimeout(() => toast.classList.add("hidden"), 2500); }
   });
 }
 
@@ -919,10 +1091,43 @@ document.addEventListener("DOMContentLoaded", () => {
       if (event.key === "Enter") performSearch();
     });
   }
-  if (copyBtn) copyBtn.addEventListener("click", copySummary);
+  if (copyBtn) copyBtn.addEventListener("click", openSummaryModal);
   if (printBtn) printBtn.addEventListener("click", () => window.print());
   if (recalcBtn) recalcBtn.addEventListener("click", recalcACV);
   initTabs();
+
+  // Summary modal buttons
+  byId("summary-modal-close")?.addEventListener("click", closeSummaryModal);
+  byId("generate-summary-top")?.addEventListener("click", generateSummary);
+  byId("generate-summary-bottom")?.addEventListener("click", generateSummary);
+
+  // Close modal on backdrop click (clicking outside the modal bar/body)
+  byId("summary-modal")?.addEventListener("click", (e) => {
+    if (e.target === byId("summary-modal")) closeSummaryModal();
+  });
+
+  // Search examples dropdown
+  const examplesToggle = byId("examples-toggle");
+  const examplesList = byId("examples-list");
+  const examplesChevron = byId("examples-chevron");
+  if (examplesToggle && examplesList) {
+    examplesToggle.addEventListener("click", () => {
+      const open = examplesList.classList.toggle("open");
+      examplesToggle.setAttribute("aria-expanded", open ? "true" : "false");
+      if (examplesChevron) examplesChevron.classList.toggle("open", open);
+    });
+    examplesList.querySelectorAll("button[data-example]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const q = btn.dataset.example;
+        const input = byId("query");
+        if (input) input.value = q;
+        examplesList.classList.remove("open");
+        examplesToggle.setAttribute("aria-expanded", "false");
+        if (examplesChevron) examplesChevron.classList.remove("open");
+        performSearch();
+      });
+    });
+  }
 
   // Section filter checkboxes
   const filterMap = [
