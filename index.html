@@ -275,6 +275,22 @@
         .repair-link { display: inline-flex; align-items: center; gap: 0.3rem; background: var(--blue-light); color: #1d4ed8; padding: 0.35rem 0.75rem; border-radius: 999px; font-size: 0.72rem; font-weight: 700; text-decoration: none; border: 1px solid rgba(59,130,246,0.2); transition: all 0.2s; }
         .repair-link:hover { background: #bfdbfe; }
 
+        /* ── Repair Parts ── */
+        .parts-list { list-style: none; padding: 0; }
+        .part-item { padding: 0.65rem 0; border-bottom: 1px solid #f1f5f9; }
+        .part-item:last-child { border-bottom: none; }
+        .part-name-link { font-weight: 700; font-size: 0.85rem; color: var(--blue); text-decoration: underline; }
+        .part-name-link:hover { color: #1d4ed8; }
+        .part-name-link::after { content: ' \2197'; font-size: 0.72em; font-weight: 400; opacity: 0.7; }
+        .part-number { font-size: 0.75rem; color: var(--text-muted-dark); margin-top: 0.2rem; }
+        .part-buy-links { display: flex; gap: 0.5rem; margin-top: 0.35rem; flex-wrap: wrap; }
+        .part-buy-link { display: inline-block; padding: 0.25rem 0.65rem; font-size: 0.72rem; font-weight: 600; text-decoration: none; border-radius: 999px; border: 1px solid rgba(59,130,246,0.25); background: var(--blue-light); color: #1d4ed8; transition: background 0.15s; }
+        .part-buy-link:hover { background: #bfdbfe; }
+        .parts-footer { margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--border-color); }
+        .parts-footer-link { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.8rem; font-weight: 700; color: var(--blue); text-decoration: none; }
+        .parts-footer-link:hover { text-decoration: underline; }
+        .parts-available-note { font-size: 0.78rem; color: #1d4ed8; background: var(--blue-light); border: 1px solid rgba(59,130,246,0.2); border-radius: 6px; padding: 0.35rem 0.7rem; margin-top: 0.5rem; display: inline-block; }
+
         /* ── Recalls list ── */
         .recalls-list { list-style: none; padding: 0; }
         .recalls-list li { padding: 0.6rem 0; border-bottom: 1px solid #f1f5f9; font-size: 0.82rem; }
@@ -713,6 +729,7 @@
                         <div class="card-title"><span class="title-number">1</span> Current Item Analysis <span class="title-icon">&#9889;</span></div>
                         <div class="card-accent-stripe"></div>
                         <p class="report-overview" id="r-overview"></p>
+                        <div id="parts-available-note" class="parts-available-note hidden">&#128270; Parts research available — see Diagnostics &amp; Repair section.</div>
                         <ul class="report-list">
                             <li><span class="label">Search Query</span> <span id="r-search-query"></span></li>
                             <li><span class="label">Assumptions Used</span> <span id="r-assumptions"></span></li>
@@ -864,6 +881,11 @@
                         <div class="card-title"><span class="title-number">9</span> Common Reported Failures <span class="title-icon">&#128295;</span></div>
                         <div class="card-accent-stripe"></div>
                         <div id="failures-content"><div class="section-spinner">Loading...</div></div>
+                    </div>
+                    <div class="card" id="card-parts">
+                        <div class="card-title">&#128270; Repair Parts <span class="title-icon">&#128269;</span></div>
+                        <div class="card-accent-stripe"></div>
+                        <div id="parts-content"><div class="section-spinner">Loading...</div></div>
                     </div>
                     <div class="card" id="card-troubleshooting">
                         <div class="card-title"><span class="title-number">10</span> Troubleshooting &amp; Repair <span class="title-icon">&#128736;</span></div>

@@ -919,6 +919,56 @@ function renderDetail(data) {
     }
   }
 
+  // ─ Repair Parts ─
+  const partsContent = byId("parts-content");
+  if (partsContent) {
+    const parts = Array.isArray(data.repairParts) ? data.repairParts : [];
+    const query  = (fastData?.analysis?.estimatedModel || fastData?.analysis?.entered || "").trim();
+    const ctxText = ((fastData?.analysis?.itemDescription || "") + " " + query).toLowerCase();
+    const cat = (currentCategory || "general").toLowerCase();
+
+    const isAppliance = ["refrigerator","washer","dryer","dishwasher","water_heater","small_appliance","hvac"].includes(cat);
+    const isHotTub    = ctxText.includes("hot tub") || ctxText.includes("hottub") || ctxText.includes("spa") || ctxText.includes("jacuzzi");
+    const isGenerac   = ctxText.includes("generac");
+
+    if (!parts.length) {
+      partsContent.innerHTML = query
+        ? `<p class="none-found">No parts data available for this item.</p>`
+        : `<p class="none-found">Enter a model number or item description to find repair parts.</p>`;
+    } else {
+      const listHtml = parts.map((part) => {
+        const googleUrl = `https://www.google.com/search?q=${encodeURIComponent((query + " " + part.name).trim())}`;
+        let html = `<li class="part-item"><a class="part-name-link" href="${escapeHtml(googleUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(part.name)}</a>`;
+        if (isAppliance && part.partNumber) {
+          const apUrl = `https://www.appliancepartspros.com/search?q=${encodeURIComponent(part.partNumber)}`;
+          const spUrl = `https://www.searspartsdirect.com/search#query=${encodeURIComponent(part.partNumber)}`;
+          html += `<div class="part-number">Part #: ${escapeHtml(part.partNumber)}</div>
+            <div class="part-buy-links">
+              <a class="part-buy-link" href="${escapeHtml(apUrl)}" target="_blank" rel="noopener noreferrer">AppliancePartsPros</a>
+              <a class="part-buy-link" href="${escapeHtml(spUrl)}" target="_blank" rel="noopener noreferrer">Sears Parts Direct</a>
+            </div>`;
+        }
+        return html + `</li>`;
+      }).join("");
+
+      let footerHtml = "";
+      if (isHotTub) {
+        footerHtml = `<div class="parts-footer"><a class="parts-footer-link" href="https://www.hottubsupplystore.com/search?q=${encodeURIComponent(query)}" target="_blank" rel="noopener noreferrer">&#128270; Search Hot Tub Supply Store for ${escapeHtml(query)} parts</a></div>`;
+      } else if (isGenerac) {
+        footerHtml = `<div class="parts-footer"><a class="parts-footer-link" href="https://www.generac.com/for-homeowners/product-support/serial-number-lookup" target="_blank" rel="noopener noreferrer">&#128270; Generac Serial Number Lookup</a></div>`;
+      } else {
+        const repairUrl = `https://www.google.com/search?q=${encodeURIComponent((query + " repair parts").trim())}`;
+        footerHtml = `<div class="parts-footer"><a class="parts-footer-link" href="${escapeHtml(repairUrl)}" target="_blank" rel="noopener noreferrer">&#128270; Find Repair Parts for ${escapeHtml(query)}</a></div>`;
+      }
+
+      partsContent.innerHTML = `<ul class="parts-list">${listHtml}</ul>${footerHtml}`;
+
+      // Surface note in the overview summary
+      const partsNote = byId("parts-available-note");
+      if (partsNote) partsNote.classList.remove("hidden");
+    }
+  }
+
   // ─ Owner's Manual + Manufacturer Page combined (Section 10) ─
   const manualContent = byId("manual-content");
   if (manualContent) {

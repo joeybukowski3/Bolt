@@ -164,6 +164,9 @@ Required schema:
   "failures": [
     {"component": "string", "whyItFails": "string", "symptoms": "string"}
   ],
+  "repairParts": [
+    {"name": "string", "partNumber": "string or null"}
+  ],
   "manual": {"title": "string or null", "url": "https://... or null"},
   "manufacturerPage": {"url": "https://... or null", "label": "string or null"},
   "troubleshooting": {
@@ -227,6 +230,7 @@ Provide narrowYourResults only for searchTier 1, 2, or 3 (not 4). This is a shor
 - recalls: only verified CPSC, government, or manufacturer-initiated recalls. If recallsNone is true, recalls must be [].
 - errorCodes: only if applicable. If errorCodesApplicable is false, errorCodes must be [].
 - failures: 3-6 common failure modes.
+- repairParts: list the most commonly failed/replaced parts for this specific item. For appliances at searchTier 4, list up to 5 parts and always attempt to include control board and motor or pump where applicable; include partNumber only if you can confidently identify it for this exact model — otherwise set partNumber to null. For hot tubs and generators, list up to 5 parts; always set partNumber to null. For all other categories, list 3-5 genuinely relevant parts; always set partNumber to null. Never guess or fabricate a part number. Scale to the item — do not force 5 parts if fewer are genuinely relevant.
 - manual.url and manufacturerPage.url: https:// URL if known, null if uncertain.
 - troubleshooting: 3-6 actionable steps. repairResources: include RepairClinic, AppliancePartsPros, SearsPartsDirect where applicable.
 - technicalSpecs: full comma-separated spec list.
@@ -384,6 +388,16 @@ function sanitizeDetailPayload(payload, query) {
         .filter((f) => f.component)
     : [];
 
+  const repairParts = Array.isArray(src.repairParts)
+    ? src.repairParts
+        .slice(0, 5)
+        .map((p) => ({
+          name: cleanStr(p?.name) || "",
+          partNumber: cleanStr(p?.partNumber) || null
+        }))
+        .filter((p) => p.name)
+    : [];
+
   const steps = Array.isArray(ts.steps)
     ? ts.steps.map((s) => cleanStr(s)).filter(Boolean).slice(0, 6)
     : [];
@@ -427,6 +441,7 @@ function sanitizeDetailPayload(payload, query) {
     errorCodes,
     errorCodesApplicable: src.errorCodesApplicable !== false,
     failures,
+    repairParts,
     manual: { title: cleanStr(manual.title), url: manualUrl },
     manufacturerPage: { url: mfrUrl, label: cleanStr(mfrPage.label) },
     troubleshooting: { steps, repairResources },
