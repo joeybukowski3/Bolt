@@ -507,11 +507,12 @@ function renderFast(data) {
   setText("r-discontinuation", releaseDate.discontinuation || analysis.status || "Unknown");
   setText("r-service-life", ""); // filled by renderDetail
 
-  // Reveal serial decode widget and reset for this new search
+  // Reveal serial decode widget only for brands supported by the decoder
   const snInputLi   = byId("sn-input-li");
   const snResultLi  = byId("sn-result-li");
   const snInputEl   = byId("sn-input");
-  if (snInputLi)  snInputLi.style.display  = "";
+  const snSupported = snContextBrand() !== null;
+  if (snInputLi)  snInputLi.style.display  = snSupported ? "" : "none";
   if (snResultLi) snResultLi.style.display = "none";
   if (snInputEl)  snInputEl.value          = "";
 
