@@ -11,7 +11,8 @@ const selectedSections = {
   itemNotes:    true,
   replacements: true,
   diagnostics:  true,
-  technical:    true
+  technical:    true,
+  valuation:    true
 };
 
 // ── Serial Number Decode ──────────────────────────────────────────────────────
@@ -198,6 +199,10 @@ function updateSectionVisibility() {
   // Cards inside the Overview panel
   show("card-how-it-works", selectedSections.howItWorks);
   show("card-item-notes",   selectedSections.itemNotes);
+  // Valuation only exists at tier 3+ — don't override tier-based hiding
+  if (fastData && Number(fastData.searchTier) >= 3) {
+    show("card-valuation", selectedSections.valuation);
+  }
 
   // Tab buttons + redirect if the active tab is being hidden
   const tabMap = [
@@ -562,7 +567,7 @@ function renderFast(data) {
     show(cardValuation, false);
     show(cardItemNotes, false);
   } else {
-    show(cardValuation, true);
+    show(cardValuation, selectedSections.valuation);
     show(cardItemNotes, true);
   }
 
@@ -1398,7 +1403,8 @@ document.addEventListener("DOMContentLoaded", () => {
     { id: "sec-item-notes",   key: "itemNotes"    },
     { id: "sec-replacements", key: "replacements" },
     { id: "sec-diagnostics",  key: "diagnostics"  },
-    { id: "sec-technical",    key: "technical"    }
+    { id: "sec-technical",    key: "technical"    },
+    { id: "sec-valuation",    key: "valuation"    }
   ];
   filterMap.forEach(({ id, key }) => {
     const checkbox = byId(id);
