@@ -148,6 +148,51 @@
         .repair-score-medium { color: #ca8a04; }
         .repair-score-low    { color: #dc2626; }
 
+        /* Content panel styles (Part 2) */
+        .fr-content { color: #1e293b; font-size: 0.875rem; line-height: 1.65; }
+        .fr-intro { margin-bottom: 0.9rem; color: #475569; }
+        .fr-subheading { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #64748b; margin: 1rem 0 0.45rem; }
+        .fr-component-list { list-style: disc; padding-left: 1.25rem; color: #475569; font-size: 0.84rem; }
+        .fr-component-list li { margin-bottom: 0.18rem; }
+
+        /* Failure cards */
+        .failure-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.8rem 1rem; margin-bottom: 0.6rem; }
+        .failure-obs { font-weight: 600; color: #1e293b; font-size: 0.84rem; margin-bottom: 0.35rem; }
+        .failure-meta-row { font-size: 0.775rem; color: #64748b; margin-bottom: 0.25rem; }
+        .failure-meta-row strong { color: #475569; }
+        .failure-score-row { font-size: 0.775rem; margin-bottom: 0.25rem; }
+        .failure-note { font-size: 0.775rem; color: #64748b; font-style: italic; border-top: 1px solid #f1f5f9; padding-top: 0.3rem; margin-top: 0.3rem; }
+
+        /* Testing steps */
+        .fr-test-steps { counter-reset: test-step; }
+        .fr-test-step { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.8rem 1rem 0.8rem 3rem; margin-bottom: 0.6rem; counter-increment: test-step; position: relative; }
+        .fr-test-step::before { content: counter(test-step); position: absolute; left: 0.8rem; top: 0.8rem; width: 1.4rem; height: 1.4rem; background: #1e293b; color: #fff; border-radius: 50%; font-size: 0.68rem; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+        .fr-test-name { font-weight: 700; font-size: 0.84rem; color: #1e293b; margin-bottom: 0.3rem; }
+        .fr-test-meta { font-size: 0.775rem; color: #64748b; margin-bottom: 0.25rem; }
+        .fr-test-meta strong { color: #475569; }
+        .fr-test-procedure { font-size: 0.8rem; color: #475569; margin-bottom: 0.25rem; }
+        .fr-test-normal { font-size: 0.775rem; color: #15803d; }
+        .fr-test-normal strong { color: #15803d; }
+        .fr-test-abnormal { font-size: 0.775rem; color: #dc2626; margin-top: 0.15rem; }
+        .fr-test-abnormal strong { color: #dc2626; }
+
+        /* Code & Considerations list */
+        .fr-code-list { list-style: none; padding: 0; }
+        .fr-code-item { border-left: 3px solid #eab308; background: #fffbeb; padding: 0.5rem 0.75rem; border-radius: 0 6px 6px 0; margin-bottom: 0.45rem; font-size: 0.8rem; color: #475569; }
+        .fr-code-item strong { color: #1e293b; display: block; margin-bottom: 0.08rem; font-size: 0.81rem; }
+
+        /* Brand warning cards (service panel) */
+        .brand-warn-card { border-left: 3px solid #ef4444; background: #fef2f2; padding: 0.6rem 0.8rem; border-radius: 0 6px 6px 0; margin-bottom: 0.45rem; font-size: 0.8rem; color: #475569; }
+        .brand-warn-card.caution { border-left-color: #f59e0b; background: #fffbeb; }
+        .brand-warn-name { font-weight: 700; color: #1e293b; font-size: 0.82rem; margin-bottom: 0.12rem; }
+
+        /* Wire type reference cards (home wiring) */
+        .wire-type-card { border-left: 3px solid #3b82f6; background: #eff6ff; padding: 0.6rem 0.8rem; border-radius: 0 6px 6px 0; margin-bottom: 0.45rem; font-size: 0.8rem; color: #475569; }
+        .wire-type-name { font-weight: 700; color: #1e293b; font-size: 0.82rem; margin-bottom: 0.12rem; }
+
+        /* Safety warning banner */
+        .fr-safety-warning { background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 0.6rem 0.85rem; margin-bottom: 0.7rem; font-size: 0.8rem; color: #991b1b; font-weight: 600; }
+
         @media (max-width: 640px) {
             .nav { flex-direction: column; gap: 0.5rem; align-items: flex-start; }
             .nav-left { flex-wrap: wrap; }
@@ -269,20 +314,19 @@
 
     <script>
     // ── Item catalogue ─────────────────────────────────────────────────────────
-    // To add an item: append an object to FR_ITEMS — no layout code changes needed.
     var FR_ITEMS = [
-        { id: 'refrigerator',   name: 'Refrigerator',                   emoji: '\u2744\ufe0f'  },
+        { id: 'refrigerator',   name: 'Refrigerator',                   emoji: '\u2744\ufe0f'      },
         { id: 'dishwasher',     name: 'Dishwasher',                     emoji: '\ud83c\udf7d\ufe0f' },
-        { id: 'gas-range',      name: 'Gas Range',                      emoji: '\ud83d\udd25'  },
-        { id: 'electric-range', name: 'Electric Range',                 emoji: '\u26a1'        },
+        { id: 'gas-range',      name: 'Gas Range',                      emoji: '\ud83d\udd25'       },
+        { id: 'electric-range', name: 'Electric Range',                 emoji: '\u26a1'             },
         { id: 'water-heater',   name: 'Water Heater',                   emoji: '\ud83c\udf21\ufe0f' },
-        { id: 'microwave',      name: 'Microwave',                      emoji: '\ud83d\udce1'  },
-        { id: 'hot-tub',        name: 'Hot Tub',                        emoji: '\u2668\ufe0f'  },
-        { id: 'well-pump',      name: 'Well Pump',                      emoji: '\ud83d\udca7'  },
-        { id: 'pool-heater',    name: 'Pool Heater',                    emoji: '\ud83c\udf0a'  },
-        { id: 'generator',      name: 'Generator',                      emoji: '\ud83d\udd0b'  },
-        { id: 'service-panel',  name: 'Electrical Service Panel',       emoji: '\ud83d\udd0c'  },
-        { id: 'home-wiring',    name: 'Electrical Home Wiring Systems', emoji: '\ud83c\udfe0'  }
+        { id: 'microwave',      name: 'Microwave',                      emoji: '\ud83d\udce1'       },
+        { id: 'hot-tub',        name: 'Hot Tub',                        emoji: '\u2668\ufe0f'       },
+        { id: 'well-pump',      name: 'Well Pump',                      emoji: '\ud83d\udca7'       },
+        { id: 'pool-heater',    name: 'Pool Heater',                    emoji: '\ud83c\udf0a'       },
+        { id: 'generator',      name: 'Generator',                      emoji: '\ud83d\udd0b'       },
+        { id: 'service-panel',  name: 'Electrical Service Panel',       emoji: '\ud83d\udd0c'       },
+        { id: 'home-wiring',    name: 'Electrical Home Wiring Systems', emoji: '\ud83c\udfe0'       }
     ];
 
     // ── Tab definitions ────────────────────────────────────────────────────────
@@ -294,14 +338,400 @@
     ];
 
     // ── Repairability score component ──────────────────────────────────────────
-    // Usage: repairScore('HIGH') | repairScore('MEDIUM') | repairScore('LOW')
-    // Returns colored HTML span — call this from Part 2 tab content.
     function repairScore(level) {
         var l = (level || '').toUpperCase();
         if (l === 'HIGH')   return '<span class="repair-score repair-score-high">HIGH</span>';
         if (l === 'MEDIUM') return '<span class="repair-score repair-score-medium">MEDIUM</span>';
         if (l === 'LOW')    return '<span class="repair-score repair-score-low">LOW</span>';
         return '<span class="repair-score repair-score-medium">' + l + '</span>';
+    }
+
+    // ── Item content data ──────────────────────────────────────────────────────
+    var FR_DATA = {
+
+      'refrigerator': {
+        intro: 'A refrigerator uses a sealed refrigerant circuit\u2014compressor, condenser coils, expansion device, and evaporator coils\u2014to transfer heat from inside the cabinet to outside. The compressor pressurizes refrigerant vapor; the condenser releases heat at the coils behind or below the unit; the expansion valve drops pressure and temperature; and the evaporator absorbs heat from inside the cabinet. A thermostat cycles the compressor on/off. Frost-free models add a defrost heater, defrost timer/control, and evaporator fan motor.',
+        components: ['Compressor (sealed system)', 'Condenser coils &amp; fan motor', 'Evaporator coils &amp; fan motor', 'Expansion valve / capillary tube', 'Thermostat / electronic control board', 'Defrost heater &amp; defrost thermostat (frost-free)', 'Door gaskets &amp; hinges', 'Ice maker &amp; water inlet valve (if equipped)', 'Drain pan &amp; drain tube'],
+        failures: [
+          { obs: 'Unit runs but does not cool', comp: 'Compressor or sealed refrigerant system', score: 'LOW', note: 'Sealed system repair requires EPA 608 certification and often costs 60\u201380% of replacement value on units over 7 years.' },
+          { obs: 'Frost/ice buildup on evaporator; warm freezer', comp: 'Defrost heater, defrost thermostat, or defrost control board', score: 'MEDIUM', note: 'Parts are broadly available; labor is moderate and requires interior panel removal.' },
+          { obs: 'Unit runs constantly; compartments warm', comp: 'Door gaskets or dirty condenser coils', score: 'HIGH', note: 'Gaskets are inexpensive and straightforward to replace. Coil cleaning is a routine maintenance item.' },
+          { obs: 'Ice maker not producing', comp: 'Water inlet valve or ice maker module', score: 'HIGH', note: 'Inlet valve is a common, low-cost part. Module replacement is straightforward on most major brands.' },
+          { obs: 'Loud noise during operation', comp: 'Evaporator fan motor or condenser fan motor', score: 'HIGH', note: 'Fan motors are commodity parts available for most major brands.' }
+        ],
+        tests: [
+          { name: 'Compartment Temperature Check', tool: 'Refrigerator thermometer', access: 'Center of each compartment', proc: 'Allow 24 hrs to stabilize; read both refrigerator and freezer compartments.', normal: 'Refrigerator 35\u201338\u00b0F; Freezer 0\u20135\u00b0F', abnormal: 'Warm temp indicates sealed system, fan, or defrost failure.' },
+          { name: 'Defrost Heater Continuity', tool: 'Multimeter', access: 'Remove back interior panel of freezer section (unit unplugged)', proc: 'Disconnect heater leads; test for continuity across heater terminals.', normal: 'Continuity present (resistance varies by heater wattage)', abnormal: 'Open circuit = failed heater. Replace before condemning the sealed system.' },
+          { name: 'Compressor Voltage Test', tool: 'Non-contact voltage tester or multimeter', access: 'Back of unit at compressor terminals', proc: 'Verify 120V reaching compressor during a run cycle.', normal: '115\u2013125V present at terminals during run', abnormal: 'No voltage = control board or thermostat issue. Voltage present with no start = compressor or start relay.' },
+          { name: 'Condenser Coil Inspection', tool: 'Flashlight', access: 'Remove bottom kick plate or rear panel', proc: 'Visual inspection for dust/lint accumulation on coil fins.', normal: 'Coils clear; no heavy debris visible', abnormal: 'Thick lint/dust coating reduces efficiency 15\u201320%. Clean coils before further diagnosis.' }
+        ],
+        codes: [
+          { label: 'GFCI protection:', text: ' Not required by NEC for dedicated refrigerator circuits in kitchens, but required on general countertop circuits within 6 ft of a sink.' },
+          { label: 'Dedicated circuit:', text: ' 15A or 20A dedicated circuit recommended; most modern units require 15A minimum.' },
+          { label: 'Clearances:', text: ' Minimum 1 in. rear and each side for ventilation; built-in models have specific clearance requirements per manufacturer.' },
+          { label: 'Age threshold:', text: ' Average lifespan 13\u201317 years. Units over 15 years with sealed system failure typically warrant replacement.' },
+          { label: 'Refrigerant:', text: ' R-134a (most pre-2021 units); R-600a (newer efficient models). Refrigerant type affects repair cost and technician certification requirements.' },
+          { label: 'Documentation:', text: ' Note model/serial, age, and nature of failure. Sealed system failures on older units typically support a replacement recommendation.' }
+        ]
+      },
+
+      'water-heater': {
+        intro: 'A storage water heater maintains a tank of hot water at a set temperature. Gas units use a burner below the tank ignited by pilot light or electronic ignition; combustion gases exhaust through a flue. Electric units use one or two immersion heating elements controlled by thermostats. A pressure-relief (T&amp;P) valve provides safety protection against overpressure. The anode rod\u2014typically magnesium or aluminum\u2014sacrificially corrodes to protect the tank from internal corrosion.',
+        components: ['Tank (glass-lined steel)', 'T&amp;P (temperature &amp; pressure) relief valve', 'Anode rod', 'Dip tube', 'Gas burner, thermocouple, and gas valve (gas units)', 'Upper and lower heating elements and thermostats (electric units)', 'Flue/draft hood (gas units)', 'Expansion tank (closed systems)'],
+        failures: [
+          { obs: 'No hot water', comp: 'Pilot light out, thermocouple (gas), or heating element (electric)', score: 'HIGH', note: 'Pilot relight and thermocouple replacement are low-cost repairs. Element replacement on electric units is straightforward.' },
+          { obs: 'Water not hot enough', comp: 'Thermostat or broken dip tube', score: 'HIGH', note: 'Thermostat adjustment or replacement is simple. A broken dip tube allows cold water mixing at the outlet\u2014inexpensive fix.' },
+          { obs: 'Leaking from tank body', comp: 'Tank (corrosion failure)', score: 'LOW', note: 'Tank body leaks indicate internal corrosion. No repair is viable; unit must be replaced.' },
+          { obs: 'T&amp;P valve dripping', comp: 'T&amp;P relief valve or system overpressure', score: 'MEDIUM', note: 'Valve replacement is low cost, but first investigate cause\u2014thermal expansion on a closed system often causes chronic T&amp;P dripping.' },
+          { obs: 'Rusty or discolored hot water', comp: 'Depleted anode rod or failing tank interior', score: 'MEDIUM', note: 'If caught early, anode replacement may extend tank life. Consistent rust often signals imminent tank failure.' },
+          { obs: 'Rumbling or popping noise', comp: 'Sediment accumulation on elements or burner floor', score: 'HIGH', note: 'Sediment flush is a maintenance item. Persistent noise on older tanks may indicate approaching end of life.' }
+        ],
+        tests: [
+          { name: 'T&P Valve Functional Test', tool: 'None (manual lift test)', access: 'T&amp;P discharge tube\u2014ensure tube is directed to drain', proc: 'Lift lever briefly to allow discharge; release\u2014valve should reseat and stop dripping.', normal: 'Valve opens freely and reseats cleanly with no drip', abnormal: 'Does not open (seized) = immediate safety hazard, replace. Continues dripping = failed valve or overpressure condition.' },
+          { name: 'Thermocouple Output Test (gas)', tool: 'Multimeter (millivolt setting)', access: 'Remove thermocouple from gas valve and pilot assembly', proc: 'Hold flame to thermocouple tip; measure millivolt output at free leads.', normal: '25\u201335 mV generated', abnormal: 'Under 20 mV = thermocouple is weak or failing; replace.' },
+          { name: 'Heating Element Resistance (electric)', tool: 'Multimeter (resistance)', access: 'Drain unit to element level; remove access panel (power off)', proc: 'Disconnect wires; measure resistance across element terminals.', normal: '10\u201330 \u03a9 depending on element wattage', abnormal: 'Open circuit (OL) = failed element; replace.' },
+          { name: 'Thermostat Continuity (electric)', tool: 'Multimeter (continuity)', access: 'Element access panel with power OFF', proc: 'With unit cold, test thermostat continuity\u2014it should call for heat.', normal: 'Continuity present when cold', abnormal: 'No continuity when cold = failed thermostat; replace.' },
+          { name: 'Tank Integrity Inspection', tool: 'Flashlight and visual inspection', access: 'Around base, connections, and tank body', proc: 'Inspect for rust staining, moisture, or active dripping at tank welds and fittings.', normal: 'Dry exterior; no rust streaking below connections', abnormal: 'Rust or moisture at tank body = imminent tank failure; replacement required.' }
+        ],
+        codes: [
+          { label: 'T&P valve:', text: ' Required; must discharge within 6 in. of floor or to a drain. Test annually. Discharge pipe must be same diameter as valve outlet.' },
+          { label: 'Seismic strapping:', text: ' Required in seismic zones (California, Pacific Northwest, others). Minimum two-strap installation.' },
+          { label: 'Expansion tank:', text: ' Required on closed systems (where a check valve or backflow preventer is present on the cold supply). Prevents chronic T&amp;P dripping from thermal expansion.' },
+          { label: 'Clearances:', text: ' Gas units require 18 in. above floor in a garage. Electric units have no floor clearance requirement by NEC.' },
+          { label: 'Age threshold:', text: ' Average lifespan 8\u201312 years. Tank leaks always warrant replacement regardless of age. Major component failures on units over 7\u20138 years warrant replacement evaluation.' },
+          { label: 'Permit:', text: ' Water heater replacement typically requires a permit; installation must meet current energy code efficiency ratings.' }
+        ]
+      },
+
+      'service-panel': {
+        intro: 'The service panel (load center) receives power from the utility at the meter and distributes it through branch circuits. The main breaker limits total amperage. Branch circuit breakers protect each circuit from overcurrent via thermal (sustained overload) and magnetic (sudden fault) trip mechanisms. The neutral bus bonds all neutral conductors; the grounding bus connects equipment grounds and bonds to neutral at the main panel only\u2014not at sub-panels.',
+        components: ['Main circuit breaker', 'Branch circuit breakers (single-pole 15A/20A; double-pole for 240V loads)', 'Neutral bus bar', 'Grounding bus bar', 'Service entrance conductors (from meter)', 'Bonding jumper (main panel only)', 'AFCI and GFCI breakers (code-required circuits)'],
+        hiwExtra: '<p class="fr-subheading">Problematic Panel Brands \u2014 Insurance &amp; Safety Reference</p>'
+          + '<div class="brand-warn-card"><div class="brand-warn-name">Federal Pacific Electric (FPE / Stab-Lok)</div>Manufactured 1950s\u20131980s. Stab-Lok breakers have documented failure-to-trip rates and are associated with residential fires. Many insurers decline or surcharge properties with FPE panels. Replacement is typically recommended.</div>'
+          + '<div class="brand-warn-card"><div class="brand-warn-name">Zinsco / GTE-Sylvania</div>Manufactured 1950s\u20131970s. Breakers may melt to bus bars, preventing thermal trip. Considered a fire hazard. Replacement recommended. Appearance: pastel-colored breaker handles, distinctive bus bar design.</div>'
+          + '<div class="brand-warn-card caution"><div class="brand-warn-name">Pushmatic (ITE / Siemens)</div>Manufactured 1950s\u20131970s. Push-button reset instead of toggle switch. Breakers become brittle with age and may fail to trip. Replacement parts are scarce. Many insurers flag these panels.</div>'
+          + '<div class="brand-warn-card caution"><div class="brand-warn-name">Split-Bus Panels</div>No single main breaker; require up to six separate hand movements to disconnect. Code-allowed until 1984. Not an inherent failure mode but a significant age and coverage indicator. Many insurers flag split-bus configurations.</div>',
+        failures: [
+          { obs: 'Breaker trips repeatedly on a specific circuit', comp: 'Overloaded circuit or failing branch breaker', score: 'HIGH', note: 'Verify circuit is not genuinely overloaded before replacing breaker. Breaker replacement is low cost and straightforward.' },
+          { obs: 'Breaker won\'t reset or trips immediately', comp: 'Failed breaker or wiring fault (ground fault)', score: 'HIGH', note: 'Test for a ground fault on the circuit first. Breaker replacement is low cost; wiring fault investigation adds labor.' },
+          { obs: 'Main breaker trips', comp: 'Main breaker or service overload', score: 'MEDIUM', note: 'Main breaker replacement requires utility shutoff or meter pull depending on jurisdiction. More involved than branch breaker work.' },
+          { obs: 'Burning smell or scorch marks inside panel', comp: 'Loose connection or arcing bus bar', score: 'LOW', note: 'Active arcing is a fire hazard. Requires immediate investigation by a licensed electrician. May indicate need for full panel replacement.' },
+          { obs: 'No power to circuits with breaker in ON position', comp: 'Bus bar connection failure or failed breaker', score: 'MEDIUM', note: 'Bus bar failure is uncommon but occurs in older panels and may require full panel replacement.' }
+        ],
+        tests: [
+          { name: 'Voltage at Panel (Main Lugs)', tool: 'Multimeter (AC voltage)', access: 'Inside panel\u2014WARNING: panel interior has live conductors even with main breaker off; only service while qualified', proc: 'Test L1\u2013L2 across main lugs; test each bus leg to neutral bar.', normal: 'L1\u2013L2 = 220\u2013240V; each leg to neutral = 110\u2013120V', abnormal: 'Single leg low or absent = utility issue or failed service conductor; contact utility.' },
+          { name: 'Thermal Inspection', tool: 'Thermal imaging camera or IR thermometer', access: 'Inside panel with cover removed (load energized)', proc: 'With panel under typical load, scan all breakers and bus connections for elevated temperature.', normal: 'Uniform temperature; breakers within 10\u00b0F of ambient', abnormal: 'Hot spot &gt;10\u00b0F above surrounding = loose connection or overloaded circuit; investigate immediately.' },
+          { name: 'AFCI/GFCI Breaker Self-Test', tool: 'Test button on breaker face', access: 'Panel face (no cover removal needed)', proc: 'Press TEST button on each AFCI or GFCI breaker.', normal: 'Breaker trips to middle (tripped) position; resets cleanly with toggle', abnormal: 'Fails to trip = defective breaker; replace.' },
+          { name: 'Ground-Neutral Bond Verification', tool: 'Multimeter (continuity)', access: 'Panel interior', proc: 'At main panel: verify neutral bar and ground bar are bonded. At sub-panels: verify neutral and ground are SEPARATE (isolated).', normal: 'Bond present at main panel; isolated neutral/ground at sub-panels', abnormal: 'Neutral-ground bond at a sub-panel = shock hazard and code violation.' },
+          { name: 'Breaker Continuity / Load Test', tool: 'Multimeter or clamp ammeter', access: 'Panel face and circuit outlets', proc: 'With breaker ON, verify voltage at circuit outlet. Under load, measure current draw vs. breaker rating.', normal: 'Voltage at outlet within 5% of panel voltage; current within breaker rating', abnormal: 'No voltage with breaker ON = failed breaker or open conductor.' }
+        ],
+        codes: [
+          { label: 'Panel amperage:', text: ' 100A minimum for new construction (NEC 230.79); 200A strongly recommended for modern residential loads. 60A panels are outdated and often uninsurable.' },
+          { label: 'AFCI requirements (NEC 2020):', text: ' Required on all 120V, 15A and 20A circuits in bedrooms, living rooms, kitchens, laundry, hallways, closets, garages, and unfinished basements.' },
+          { label: 'GFCI requirements:', text: ' Bathrooms, kitchens (within 6 ft of sink), garages, outdoors, crawlspaces, unfinished basements, near pools/spas, and rooftops.' },
+          { label: 'Working clearance:', text: ' 36 in. minimum clear space in front of panel (NEC 110.26). Blocked clearance is a code defect and safety concern.' },
+          { label: 'Circuit labeling:', text: ' All breakers must be legibly identified (NEC 408.4). Unlabeled panels require mapping before assessment.' },
+          { label: 'Sub-panel wiring:', text: ' 4-wire feed (hot-hot-neutral-ground) required to sub-panels under modern code. Legacy 3-wire sub-panel feeds lack a separate equipment ground.' },
+          { label: 'Age threshold:', text: ' Panels 25\u201330+ years warrant inspection. Panels with documented defective brands (FPE, Zinsco) warrant replacement regardless of age. Active arcing or burn marks = replacement.' }
+        ]
+      },
+
+      'home-wiring': {
+        intro: 'Residential wiring distributes electrical power from the service panel through branch circuits to outlets, switches, fixtures, and appliances. Modern wiring uses NM (Non-Metallic) sheathed cable or conduit with individual conductors. Each circuit has a hot (black/red), neutral (white), and ground (green/bare copper). The equipment ground provides a fault return path that trips the breaker; the neutral carries return current under normal operation. Wire gauge (AWG) determines current capacity\u2014lower gauge = larger wire = more capacity.',
+        components: ['NM-B cable (Romex) or conduit with individual conductors', 'Branch circuit conductors (hot, neutral, ground)', 'Outlet and switch boxes (plastic or metal)', 'Wire connectors (wire nuts, WAGO, or terminal blocks)', 'GFCI and AFCI receptacles and breakers', 'Junction box covers (all splices must be in accessible, covered boxes)'],
+        hiwExtra: '<p class="fr-subheading">Wiring Type Reference by Era</p>'
+          + '<div class="wire-type-card"><div class="wire-type-name">Modern NM-B Cable (1984\u2013present)</div>Thermoplastic insulation rated 90\u00b0C. Standard in new residential construction. Black and white conductors plus bare copper ground within plastic sheathing.</div>'
+          + '<div class="wire-type-card"><div class="wire-type-name">Aluminum Branch Wiring (1965\u20131973)</div>Silver-colored conductor; sheathing stamped AL or ALUMINUM. Used during copper shortage. Hazard is at connection points\u2014oxidation and thermal expansion cause loose connections and overheating at outlets and switches. Not in the wire runs themselves.</div>'
+          + '<div class="wire-type-card"><div class="wire-type-name">Two-Conductor NM (no ground, 1950s\u20131970s)</div>Only black and white conductors; no bare copper ground wire. Three-prong outlets installed without actual ground are common. Can be made code-compliant with GFCI protection per NEC 406.4(D).</div>'
+          + '<div class="wire-type-card"><div class="wire-type-name">Cloth/Rubber Insulated Wiring (1940s\u20131960s)</div>Rubber-insulated conductors wrapped in cloth braid. Insulation becomes brittle and cracks when disturbed. No ground conductor on older runs. Handle carefully during inspection.</div>'
+          + '<div class="wire-type-card"><div class="wire-type-name">Knob-and-Tube (pre-1940s)</div>Open conductors on ceramic knobs stapled to joists; passes through framing in ceramic tubes. No ground conductor. Cannot safely be buried in insulation (heat buildup risk). Many insurers decline coverage with active K&amp;T wiring.</div>',
+        failures: [
+          { obs: 'Single outlet dead; adjacent outlets on same circuit work', comp: 'Loose connection at outlet or upstream junction', score: 'HIGH', note: 'Backstab (push-in) connections are a primary cause. Replacing with screw-terminal connections is a reliable fix.' },
+          { obs: 'Intermittent lights or outlets on a circuit', comp: 'Loose connection at device, junction box, or panel', score: 'MEDIUM', note: 'Intermittent connections are a fire risk. All connections in the affected area should be inspected and tightened.' },
+          { obs: 'GFCI won\'t reset; trips immediately', comp: 'Failed GFCI device or ground fault present on circuit', score: 'HIGH', note: 'First verify no plugged-in load is causing the fault. Test GFCI device with known-good tester; replace if device has failed.' },
+          { obs: 'Aluminum wiring identified at outlets or switches', comp: 'Aluminum branch circuit conductors at connections', score: 'MEDIUM', note: 'CO/ALR-rated devices, COPALUM crimp connectors, or AlumiConn connectors required at all connection points. Standard CU-only devices on AL wiring is a code violation.' },
+          { obs: 'Knob-and-tube wiring identified', comp: 'Entire branch circuit system', score: 'LOW', note: 'K&amp;T cannot be insulated over; limits attic insulation options. Many insurers require remediation or decline coverage outright.' }
+        ],
+        tests: [
+          { name: 'Outlet Polarity &amp; Ground Test', tool: '3-light plug-in receptacle tester', access: 'Each outlet throughout the home', proc: 'Insert tester; read indicator light pattern.', normal: 'Correct wiring pattern (grounded, correct polarity)', abnormal: 'Open ground, open neutral, or reverse polarity\u2014each indicates a wiring problem requiring correction.' },
+          { name: 'GFCI Trip Test', tool: 'GFCI outlet tester with test button, or GFCI test button', access: 'GFCI outlets and GFCI breakers in bathrooms, kitchens, garages, outdoors', proc: 'Press TEST button; GFCI should trip and kill power to downstream outlets.', normal: 'Trips cleanly; power restored by pressing RESET', abnormal: 'Fails to trip = failed GFCI protection; replace device or breaker.' },
+          { name: 'Outlet Voltage Test', tool: 'Multimeter (AC voltage)', access: 'Outlet face', proc: 'Test hot slot (smaller) to neutral (larger); then hot to ground slot.', normal: 'Hot\u2013neutral = 115\u2013125V; hot\u2013ground = 115\u2013125V', abnormal: 'Low voltage (&lt;110V) suggests overloaded circuit. No ground reading with 3-prong outlet = missing or open ground.' },
+          { name: 'Aluminum Wiring Identification', tool: 'Visual inspection', access: 'Panel interior, accessible junction boxes, outlet boxes', proc: 'Examine conductor color and sheathing markings.', normal: 'Copper conductor (reddish-orange); sheathing not marked AL', abnormal: 'Silver-colored conductor or AL stamp = aluminum wiring; all connections require proper AL-rated treatment.' },
+          { name: 'Knob-and-Tube Identification', tool: 'Visual inspection (attic, basement, crawlspace)', access: 'Unfinished attic and basement framing', proc: 'Look for ceramic knobs stapled to joists and ceramic tubes through framing with open conductors; no sheathed cable.', normal: 'Sheathed NM cable throughout accessible areas', abnormal: 'Knob-and-tube present = document location and extent; flag for insurer and property owner.' }
+        ],
+        codes: [
+          { label: 'Wire gauge and overcurrent protection:', text: ' 14 AWG protected by 15A breaker; 12 AWG by 20A; 10 AWG by 30A (NEC 240.4). Mismatched gauge/breaker combinations are code violations.' },
+          { label: 'Aluminum wiring at connections:', text: ' All outlets and switches on aluminum circuits must use CO/ALR-rated devices, COPALUM crimp connectors, or AlumiConn connectors. Standard CU-only devices on AL wiring = code violation and fire risk.' },
+          { label: 'Knob-and-tube:', text: ' Cannot be insulated over per most jurisdictions. NEC permits existing K&amp;T not in contact with insulation, but many insurers decline properties with active K&amp;T.' },
+          { label: 'Junction boxes:', text: ' All wire connections must be inside accessible, covered junction boxes (NEC 314.29). Buried splices are a code violation and fire risk.' },
+          { label: 'Two-prong outlets (no ground):', text: ' Can be replaced with GFCI-protected 3-prong outlets per NEC 406.4(D)(2)\u2014must be labeled "No Equipment Ground." This is code-compliant but provides no equipment ground.' },
+          { label: 'AFCI protection:', text: ' Required on most 120V circuits in living areas (NEC 2014+). Older homes without AFCI protection are a coverage consideration on many policies.' },
+          { label: 'Documentation:', text: ' Note wiring type (NM, aluminum, K&amp;T, cloth), ground conductor presence, GFCI/AFCI coverage, and any evidence of amateur splicing or unprotected connections in junction boxes.' }
+        ]
+      },
+
+      'dishwasher': {
+        intro: 'A dishwasher fills with hot water, pumps it through spray arms to clean dishes, drains, and dries. The wash pump circulates water through upper and lower spray arms. A separate drain pump evacuates water after each fill. A heating element raises water temperature and assists drying. A control board (or older mechanical timer) sequences fill, wash, drain, and dry cycles. A float switch prevents overfill.',
+        components: ['Control board / mechanical timer', 'Wash pump motor', 'Drain pump', 'Water inlet valve', 'Heating element', 'Door latch and door switch', 'Float switch (overfill protection)', 'Spray arms and wash arm bearings', 'Detergent and rinse aid dispensers'],
+        failures: [
+          { obs: 'Poor cleaning; dishes come out dirty', comp: 'Clogged spray arm holes or wash pump', score: 'HIGH', note: 'Clogged spray arms are a maintenance item\u2014clean with a toothpick. Wash pump failure adds cost but is repairable on most brands.' },
+          { obs: 'Not draining; standing water after cycle', comp: 'Drain pump or kinked drain hose', score: 'HIGH', note: 'Drain pump is a common, inexpensive part. Check drain hose routing and the garbage disposal knockout plug before condemning the pump.' },
+          { obs: 'Won\'t fill or cycle doesn\'t start', comp: 'Water inlet valve or door latch/switch', score: 'HIGH', note: 'Confirm 120V reaches the valve coil before condemning it. Door switch failure prevents the cycle from starting.' },
+          { obs: 'Leaking at door', comp: 'Door gasket or door alignment', score: 'HIGH', note: 'Door gaskets are inexpensive and widely available. Ensure proper seating and check door alignment before replacing.' },
+          { obs: 'Control panel unresponsive or no power', comp: 'Control board or touchpad membrane', score: 'LOW', note: 'Control board replacement may approach 50% of unit value on older models. Evaluate age and replacement cost before proceeding.' }
+        ],
+        tests: [
+          { name: 'Drain Pump Resistance Test', tool: 'Multimeter', access: 'Remove kick panel; unplug unit', proc: 'Disconnect pump wires; test resistance across motor terminals.', normal: '10\u201320 \u03a9 typical', abnormal: 'Open circuit (OL) = failed drain pump motor.' },
+          { name: 'Water Inlet Valve Test', tool: 'Multimeter', access: 'Lower kick panel (unplug unit)', proc: 'Disconnect solenoid wires; test coil resistance.', normal: '200\u2013500 \u03a9 typical', abnormal: 'Open or shorted = replace valve. Also verify 120V present at valve terminals during fill cycle.' },
+          { name: 'Heating Element Resistance', tool: 'Multimeter', access: 'Under tub after removing lower spray arm', proc: 'Disconnect wires; test resistance across element.', normal: '10\u201330 \u03a9 depending on wattage', abnormal: 'Open circuit = failed element; affects hot water temperature and drying performance.' },
+          { name: 'Float Switch Test', tool: 'Multimeter (continuity)', access: 'Lower front interior of tub', proc: 'Manually lift float; test continuity of switch in both positions.', normal: 'Switch changes state (opens) when float rises', abnormal: 'Stuck open = unit won\'t fill. Stuck closed = overfill risk.' }
+        ],
+        codes: [
+          { label: 'Circuit:', text: ' Dedicated 15A or 20A circuit; NEC 2023 requires GFCI protection for dishwashers in dwelling units.' },
+          { label: 'Drain installation:', text: ' Drain hose must loop high under counter (high loop) or connect to an air gap fitting to prevent backflow from the sink drain.' },
+          { label: 'Age threshold:', text: ' Average lifespan 9\u201312 years. Control board failure on units over 8 years often warrants replacement evaluation rather than repair.' }
+        ]
+      },
+
+      'gas-range': {
+        intro: 'A gas range uses natural gas or LP propane burners for surface cooking and oven baking. Top burners ignite via electronic spark igniters triggered by the burner knob; each burner has its own gas valve and spark electrode. The oven uses a separate bake burner regulated by a temperature sensor (RTD) connected to an electronic control or directly to the gas valve. Many models have a separate broil burner above the oven cavity.',
+        components: ['Surface burner caps, heads, and grates', 'Electronic spark igniters and igniter switches', 'Surface gas valves', 'Oven gas valve', 'Oven temperature sensor (RTD)', 'Bake and broil burners', 'Control board / spark module', 'Convection fan motor (if equipped)', 'Door gasket and hinges'],
+        failures: [
+          { obs: 'Burner won\'t ignite; sparks but no flame', comp: 'Burner cap misalignment or dirty spark electrode', score: 'HIGH', note: 'Most often a maintenance issue\u2014clean or realign the cap. Electrode replacement is low cost if damaged.' },
+          { obs: 'Igniter sparks continuously without turning knob', comp: 'Igniter switch or control board', score: 'HIGH', note: 'Surface liquid intrusion is the most common cause. Allow 24 hrs to dry completely. If persistent, replace the affected igniter switch.' },
+          { obs: 'Oven not reaching set temperature', comp: 'Oven temperature sensor (RTD) or oven gas valve', score: 'HIGH', note: 'RTD sensor is an inexpensive, easy replacement. Test sensor resistance before condemning the gas valve.' },
+          { obs: 'Gas smell during or after use', comp: 'Gas valve, supply fitting, or regulator', score: 'MEDIUM', note: 'Suspected gas leak requires immediate shut-off of supply valve and a licensed gas technician. Not a DIY repair.' },
+          { obs: 'Oven won\'t ignite at all', comp: 'Hot surface igniter (bake igniter)', score: 'HIGH', note: 'Hot surface igniters are the single most common oven failure. Inexpensive part; straightforward replacement in most models.' }
+        ],
+        tests: [
+          { name: 'Oven Temperature Sensor (RTD) Resistance', tool: 'Multimeter (resistance)', access: 'Inside oven, rear wall sensor connections (unit unplugged)', proc: 'Disconnect sensor leads; measure resistance at room temperature.', normal: 'Approximately 1,000\u20131,100 \u03a9 at 70\u00b0F', abnormal: 'Open, shorted, or significantly outside spec = replace sensor.' },
+          { name: 'Hot Surface Igniter Test', tool: 'Multimeter (resistance) and clamp ammeter', access: 'Inside oven; remove bottom panel', proc: 'Disconnect igniter leads; measure resistance. Optionally, measure current draw in-circuit during preheat.', normal: '50\u2013400 \u03a9 (varies by brand); 3.2\u20133.6A draw in-circuit', abnormal: 'Open = failed igniter. Low amperage (&lt;3.2A) with dim glow = weak igniter that won\'t open gas valve.' },
+          { name: 'Surface Igniter Spark Test', tool: 'Visual observation', access: 'Turn burner knob to LITE position', proc: 'Observe which electrode sparks and the rate of sparking.', normal: '1\u20132 sparks per second at the correct burner', abnormal: 'No spark or sparking at the wrong burner = faulty igniter switch or cracked electrode.' },
+          { name: 'Manifold Gas Pressure', tool: 'Manometer (licensed technician)', access: 'Gas manifold test port', proc: 'Verify outlet pressure at rated specification with all burners off.', normal: 'Natural gas: 3.5\u2033 W.C.; LP: 10\u2033 W.C.', abnormal: 'Low pressure = regulator or supply line issue.' }
+        ],
+        codes: [
+          { label: 'Gas connection:', text: ' Flexible connector must be listed for gas appliance use; cannot be routed through walls, floors, or ceilings. Dedicated shut-off valve required within 6 ft of appliance.' },
+          { label: 'Anti-tip bracket:', text: ' Required by ANSI Z21.1 and most AHJs. Must be anchored to floor and engage the rear leveling leg of the range.' },
+          { label: 'Overhead clearances:', text: ' Minimum 30 in. from cooking surface to unprotected combustible overhead (or per manufacturer specification\u2014whichever is less).' },
+          { label: 'Ventilation:', text: ' Range hood or exhaust fan strongly recommended; required by IRC in new construction.' },
+          { label: 'Age threshold:', text: ' Average lifespan 13\u201317 years. Igniter and valve parts remain available for most major brands up to 15 years post-production.' }
+        ]
+      },
+
+      'electric-range': {
+        intro: 'An electric range uses resistance heating elements for surface cooking and oven functions. Coil surface elements plug into individual receptacles on the cooktop. Smooth-top (glass-ceramic) ranges use radiant, halogen, or induction elements mounted beneath a ceramic glass surface. The oven uses a bake element (bottom) and broil element (top) regulated by a temperature sensor (RTD) and either an electronic control board or a bimetal thermostat.',
+        components: ['Surface heating elements (coil or smooth-top radiant/induction)', 'Bake element (oven bottom)', 'Broil element (oven top)', 'Oven temperature sensor (RTD)', 'Electronic control board', 'Surface element switches or relay board', 'Door gasket, door switch, and door lock (self-clean models)', 'Terminal block (power supply connection)'],
+        failures: [
+          { obs: 'Surface element won\'t heat', comp: 'Element or element receptacle/switch', score: 'HIGH', note: 'Coil elements are commodity parts. Switch or relay board failure is common on older models; inspect for burning at receptacle block.' },
+          { obs: 'Oven not reaching temperature', comp: 'Bake element or temperature sensor (RTD)', score: 'HIGH', note: 'Bake elements often show visible breaks or surface blistering when failed. RTD sensor is inexpensive and easy to test.' },
+          { obs: 'Oven overshoots or undershoots temperature significantly', comp: 'Temperature sensor or control board', score: 'HIGH', note: 'Test RTD sensor resistance first (same procedure as gas range). Control board replacement may not be economical on older units.' },
+          { obs: 'Control panel fully unresponsive', comp: 'Control board or touchpad membrane', score: 'LOW', note: 'Touchpad and control board are often sold as an assembly. May approach 40\u201360% of unit replacement value on units over 8 years.' },
+          { obs: 'Glass cooktop cracked', comp: 'Glass-ceramic cooktop surface', score: 'MEDIUM', note: 'Replacement panels are available for many models but expensive. Evaluate panel cost vs. full unit replacement.' }
+        ],
+        tests: [
+          { name: 'Bake/Broil Element Resistance', tool: 'Multimeter', access: 'Inside oven (range unplugged)', proc: 'Disconnect element wires; test resistance across element terminals.', normal: 'Bake element: 20\u201340 \u03a9; Broil element: 15\u201330 \u03a9', abnormal: 'Open circuit (OL) = failed element. Visible cracks or burn marks confirm failure.' },
+          { name: 'Oven Temperature Sensor (RTD) Resistance', tool: 'Multimeter (resistance)', access: 'Inside oven, rear wall (range unplugged)', proc: 'Disconnect sensor leads; test resistance at room temperature.', normal: 'Approximately 1,080 \u03a9 at 70\u00b0F', abnormal: 'Open, shorted, or significantly outside spec = replace sensor.' },
+          { name: 'Surface Element (Coil) Resistance', tool: 'Multimeter', access: 'Lift element from receptacle', proc: 'Test resistance across element prong terminals.', normal: '10\u201360 \u03a9 depending on element size and wattage', abnormal: 'Open circuit = failed element; replace.' },
+          { name: 'Surface Receptacle Inspection', tool: 'Visual inspection and multimeter', access: 'Under cooktop or at element receptacle block (unplugged)', proc: 'Inspect for burn marks, pitting, or melting at receptacle terminals.', normal: 'Clean contacts, no discoloration', abnormal: 'Burned or pitted terminals = replace receptacle block before installing new element.' }
+        ],
+        codes: [
+          { label: 'Circuit requirement:', text: ' 50A, 240V 4-wire circuit (2 hots, neutral, ground) required for most ranges per modern code (post-1996 NEC).' },
+          { label: 'Legacy 3-wire connections:', text: ' Pre-1996 installations may have a 3-wire supply (no separate ground). NEC permits existing 3-wire connections to remain but requires 4-wire for new installations.' },
+          { label: 'Anti-tip bracket:', text: ' Required by ANSI and most AHJs\u2014same requirement as gas ranges. Must be installed and engaged.' },
+          { label: 'Overhead clearances:', text: ' 30 in. minimum from cooking surface to unprotected combustibles above (or per manufacturer specification).' },
+          { label: 'Age threshold:', text: ' Average lifespan 13\u201315 years. Glass cooktop cracks may or may not be covered under a property policy depending on cause-of-loss language.' }
+        ]
+      },
+
+      'microwave': {
+        intro: 'A microwave oven generates microwave radiation (2.45 GHz) using a magnetron tube powered by a high-voltage transformer and capacitor circuit. Microwave energy excites water molecules in food to produce heat. A stirrer fan or rotating turntable distributes energy evenly in the cavity. Over-the-range (OTR) models add a ventilation fan and lighting. Three door interlock switches are required by UL standard and disable the magnetron whenever the door is open.',
+        components: ['Magnetron', 'High-voltage transformer', 'High-voltage capacitor and diode', 'Control board', 'Door interlock switches (3 required)', 'Stirrer motor or turntable motor', 'Cooling fan motor', 'Touchpad / membrane switch assembly', 'Ventilation fan (OTR models)'],
+        hiwExtra: '<div class="fr-safety-warning">\u26a0\ufe0f High-Voltage Hazard: The high-voltage capacitor in a microwave retains a lethal charge (2,000V+) even when unplugged. Always discharge the capacitor using a resistor or insulated screwdriver before touching any internal components.</div>',
+        testWarning: '\u26a0\ufe0f Safety: Always discharge the high-voltage capacitor before performing any internal microwave service. Use a high-wattage resistor or insulated screwdriver across capacitor terminals. The capacitor retains lethal charge even when unplugged.',
+        failures: [
+          { obs: 'Runs but does not heat food', comp: 'Magnetron, high-voltage diode, or capacitor', score: 'LOW', note: 'Diode (~$5) and capacitor (~$20) should be tested first. Magnetron replacement typically exceeds 50% of unit value. Discharge capacitor before any internal work.' },
+          { obs: 'Won\'t start; door open/close has no effect', comp: 'Door interlock switch', score: 'HIGH', note: 'Three interlock switches operate in sequence\u2014any failure disables the unit. Testing and replacement are common, low-cost repairs.' },
+          { obs: 'Keypad partially or fully unresponsive', comp: 'Touchpad membrane or control board', score: 'LOW', note: 'Membrane keypads delaminate over time; often sold as an assembly with the control board. May approach full unit value on older OTR models.' },
+          { obs: 'Sparking inside the cooking cavity', comp: 'Waveguide cover (mica plate) or damaged cavity', score: 'HIGH', note: 'Most commonly caused by a dirty or damaged waveguide cover. Mica cover replacement is a low-cost fix.' },
+          { obs: 'Turntable not rotating', comp: 'Turntable motor or drive coupling', score: 'HIGH', note: 'Motor and coupling are inexpensive parts; straightforward replacement on most models.' }
+        ],
+        tests: [
+          { name: 'Door Interlock Switch Test', tool: 'Multimeter (continuity)', access: 'Internal (DISCHARGE CAPACITOR FIRST)', proc: 'Test each switch for correct open/closed state with door open vs. closed. Primary switch must close with door closed; monitor switch must open with door open.', normal: 'Each switch changes state correctly with door position', abnormal: 'Any switch failing its open/closed test = replace that switch.' },
+          { name: 'High-Voltage Diode Test', tool: 'Multimeter', access: 'HV compartment (DISCHARGE CAPACITOR FIRST)', proc: 'Test diode for one-way conductivity (continuity in one direction only).', normal: 'Continuity in one direction only', abnormal: 'Continuity both directions (shorted) or no continuity (open) = failed diode; replace.' },
+          { name: 'High-Voltage Capacitor Test', tool: 'Multimeter with capacitance function', access: 'HV compartment (DISCHARGE CAPACITOR FIRST using a resistor or insulated screwdriver across terminals)', proc: 'After discharging, measure capacitance and check for short.', normal: '0.90\u20131.05 \u03bcF typical; no continuity to chassis', abnormal: 'Significantly off-spec capacitance or continuity to chassis = shorted capacitor; replace.' },
+          { name: 'Magnetron Insulation Test', tool: 'Multimeter', access: 'HV compartment (DISCHARGE CAPACITOR FIRST)', proc: 'Test resistance between magnetron antenna/filament leads and chassis ground.', normal: 'Open circuit (no continuity to chassis)', abnormal: 'Continuity to chassis = shorted magnetron. At this point, unit replacement is typically the better economic choice.' }
+        ],
+        codes: [
+          { label: 'OTR installation clearances:', text: ' Must be listed for above-range use. Minimum 66 in. AFF (above finished floor) to bottom of unit, or per manufacturer minimum\u2014whichever is greater.' },
+          { label: 'Ventilation (OTR):', text: ' Fan must exhaust to exterior or through a recirculating charcoal filter. Charcoal filters require periodic replacement.' },
+          { label: 'Circuit:', text: ' Dedicated 20A, 120V circuit recommended for built-in and OTR models.' },
+          { label: 'Age threshold:', text: ' Average lifespan 7\u201310 years. Magnetron failure on units over 7 years typically warrants replacement rather than repair given cost of parts plus labor.' }
+        ]
+      },
+
+      'hot-tub': {
+        intro: 'A hot tub (portable spa) heats and circulates water using an electric pump and inline heater. A circulation pump moves water through the filter and then through a flow heater (inline electric element). One or more jet pumps provide pressure for hydrotherapy jets. Electronic controls\u2014a topside control panel and a main circuit board\u2014manage temperature, jet speed, and lighting. The entire system is fed by a dedicated GFCI-protected electrical circuit through a local disconnect panel.',
+        components: ['Circulation pump', 'Jet pump(s)', 'Flow heater (electric heating element)', 'Topside control panel and main circuit board', 'High-limit sensor and thermostat', 'Flow switch or pressure switch', 'Filter housing and cartridge', 'Ozone generator or UV sanitizer (if equipped)', 'Air blower (if equipped)', 'GFCI disconnect panel'],
+        failures: [
+          { obs: 'Water not heating', comp: 'Heater element or high-limit sensor (tripped)', score: 'HIGH', note: 'Verify flow switch is closed before condemning the heater. A tripped high-limit resets after cool-down; find the root cause of overtemp.' },
+          { obs: 'FLO, FL1, or similar flow error code', comp: 'Flow switch, pressure switch, or dirty filter', score: 'HIGH', note: 'Clean or replace filter first\u2014restricted flow is the most common cause. Flow switch replacement is low cost.' },
+          { obs: 'Jets not working; pump won\'t prime or start', comp: 'Jet pump motor or circuit board relay', score: 'MEDIUM', note: 'Check for air lock in pump (prime the system). Relay failure on the circuit board is common on units over 8 years.' },
+          { obs: 'Water leaking at equipment bay', comp: 'Pump union O-rings or heater manifold fittings', score: 'HIGH', note: 'Union O-rings and threaded fittings are inexpensive, common repairs. Requires draining the spa for access.' },
+          { obs: 'Control panel error codes or full unresponsiveness', comp: 'Topside panel or main circuit board', score: 'LOW', note: 'Circuit board replacement cost varies widely. Balboa, Gecko, and Spa Quip boards have good aftermarket availability.' }
+        ],
+        tests: [
+          { name: 'Heater Element Resistance', tool: 'Multimeter', access: 'Equipment bay (power off)', proc: 'Disconnect heater leads; test resistance across element terminals.', normal: '8\u201316 \u03a9 depending on kW rating (e.g., ~11 \u03a9 for a 4 kW element)', abnormal: 'Open circuit = failed element. Also verify 240V reaching heater terminals during call for heat.' },
+          { name: 'High-Limit Sensor Test', tool: 'Multimeter (resistance)', access: 'Heater manifold (power off)', proc: 'Disconnect sensor; test resistance at known water temperature; compare to sensor spec chart.', normal: 'NTC thermistor reading consistent with spec at measured water temperature', abnormal: 'Open or significantly off-spec = replace sensor.' },
+          { name: 'Flow Switch Continuity', tool: 'Multimeter (continuity)', access: 'Equipment bay', proc: 'With pump running at operating speed, test continuity across flow switch terminals.', normal: 'Switch closes (continuity) when adequate flow is present', abnormal: 'Open with pump running = failed switch or insufficient flow. Check filter condition first.' },
+          { name: 'GFCI Disconnect Test', tool: 'Test button on disconnect panel', access: 'Spa disconnect panel', proc: 'Press TEST button; GFCI should trip. Restore by pressing RESET.', normal: 'Trips and resets cleanly', abnormal: 'Fails to trip = defective GFCI protection; replace. Nuisance tripping = ground fault in heater, pump motor, or lighting circuit.' }
+        ],
+        codes: [
+          { label: 'GFCI requirement:', text: ' All hot tub electrical supply must be GFCI protected (NEC 680.44). Dedicated circuit required.' },
+          { label: 'Setback from structures:', text: ' Minimum 5 ft from any window, door, or opening into a structure (NEC 680.43). Local codes may vary.' },
+          { label: 'Equipotential bonding:', text: ' All metal components within 5 ft of spa water must be bonded together and to equipment ground (NEC 680.43). Missing bonding is a shock hazard.' },
+          { label: 'Disconnecting means:', text: ' Readily accessible disconnect within sight of spa required (NEC 680.12). Typically installed 5\u201350 ft from spa (varies by jurisdiction).' },
+          { label: 'Safety cover:', text: ' Locking safety cover required per ASTM F1346 in most jurisdictions; critical for child safety compliance.' },
+          { label: 'Age threshold:', text: ' Average lifespan 10\u201315 years. Shell delamination or cracking is a replacement indicator. Electronic components often fail at 8\u201312 years.' }
+        ]
+      },
+
+      'well-pump': {
+        intro: 'A submersible well pump is a sealed motor-pump assembly installed below the water level in a well casing. It pushes water upward through a drop pipe to a pressure tank and then to the home\'s plumbing. A pressure switch monitors tank pressure and cycles the pump on/off. The pressure tank uses an internal bladder or diaphragm to maintain pressure between pump cycles. A control box (single-phase motors) provides starting capacitance and overload protection.',
+        components: ['Submersible pump motor and impeller assembly', 'Drop pipe and pitless adapter', 'Pressure switch (typically 30/50 or 40/60 psi settings)', 'Pressure tank (bladder or diaphragm type)', 'Control box (single-phase motors)', 'Torque arrestor', 'Check valve (in drop pipe)', 'Submersible pump cable and conduit'],
+        failures: [
+          { obs: 'No water; pump not running', comp: 'Pressure switch, control box, or pump motor', score: 'MEDIUM', note: 'Test pressure switch and control box before pulling the pump\u2014pump extraction is labor-intensive and costly.' },
+          { obs: 'Pump short-cycles (starts/stops every few seconds)', comp: 'Pressure tank (waterlogged bladder)', score: 'HIGH', note: 'A waterlogged pressure tank is the most common cause of short-cycling. Tank replacement is straightforward and does not require pulling the pump.' },
+          { obs: 'Low water pressure throughout home', comp: 'Worn pump, pressure switch setting, or partially blocked intake screen', score: 'MEDIUM', note: 'Pressure switch adjustment may restore pressure within limits. Persistent low pressure with correct switch setting indicates pump wear.' },
+          { obs: 'No water but pump runs (motor running, no delivery)', comp: 'Failed check valve or severely worn impeller', score: 'MEDIUM', note: 'A failed foot valve or drop pipe check valve allows the water column to fall back. Requires pump extraction for diagnosis and repair.' },
+          { obs: 'Pump runs continuously (never reaches cut-off pressure)', comp: 'Pressure switch, worn pump, or inadequate well yield', score: 'MEDIUM', note: 'Verify cut-off pressure at the tank gauge. If pressure never reaches cut-off, pump is undersized, worn, or well yield is insufficient.' }
+        ],
+        tests: [
+          { name: 'Pressure Tank Pre-Charge Test', tool: 'Tire pressure gauge', access: 'Schrader valve on pressure tank (pump off, tank drained)', proc: 'With pump circuit off and tank pressure relieved, check air pre-charge at Schrader valve.', normal: 'Pre-charge = 2 psi below cut-in pressure (e.g., 28 psi for a 30/50 switch)', abnormal: 'Water comes from Schrader valve = bladder has failed (waterlogged); replace tank.' },
+          { name: 'Pressure Switch Contact Test', tool: 'Multimeter (continuity)', access: 'Pressure switch (power off)', proc: 'With system below cut-in pressure, test continuity across switch contacts.', normal: 'Contacts closed (continuity) when pressure is below cut-in; open when above cut-off', abnormal: 'Contacts pitted, chattering, or stuck = replace switch.' },
+          { name: 'Control Box Running Current', tool: 'Clamp ammeter', access: 'Control box output leads to pump', proc: 'Measure running current on pump leads during operation; compare to nameplate amps.', normal: 'Within 10% of nameplate amperage', abnormal: 'High amps = pump binding or locked rotor. Low amps = open motor winding. Either warrants pump pull.' },
+          { name: 'Pump Motor Insulation Test', tool: 'Insulation resistance tester (megohmmeter)', access: 'Well head electrical connection (pump cable conductors)', proc: 'Test insulation resistance from each motor lead to ground.', normal: 'Greater than 1 M\u03a9 (typically 10 M\u03a9+ on a healthy motor)', abnormal: 'Less than 1 M\u03a9 = compromised winding insulation; motor should be pulled and inspected.' }
+        ],
+        codes: [
+          { label: 'Wire type:', text: ' Submersible pump cable (UF or submersible-rated jacketed cable) required from panel to well head. Standard NM (Romex) is not permitted in wet or underground locations.' },
+          { label: 'Circuit:', text: ' Typically 240V 2-wire + ground; 15A\u201330A depending on pump horsepower. Dedicated circuit required.' },
+          { label: 'Wellhead protection:', text: ' Well casing must extend above grade and be sealed against surface water entry (EPA and state requirements vary).' },
+          { label: 'Age threshold:', text: ' Submersible pump motors average 10\u201315 years; pressure tanks average 8\u201312 years; surface components (switch, control box) can be replaced without pulling the pump.' },
+          { label: 'Water testing:', text: ' After pump replacement or major service, water quality testing is recommended. Note if property has water treatment equipment (softener, filtration) that may affect system pressure.' }
+        ]
+      },
+
+      'pool-heater': {
+        intro: 'A pool heater warms circulating pool or spa water. Gas heaters burn natural gas or LP propane through a copper or cupro-nickel heat exchanger; combustion gases exit through a flue. Electric heat pump pool heaters extract heat from ambient air using a refrigerant circuit (similar to a reverse-cycle air conditioner). All pool heaters include a water flow switch that prevents operation without adequate circulation, and a high-limit sensor to prevent overheating.',
+        components: ['Gas valve and ignition control board (gas units)', 'Heat exchanger\u2014copper or cupro-nickel tubes and headers', 'High-limit sensors (inlet and outlet water temperature)', 'Flow switch or pressure switch', 'Pilot assembly or electronic ignition (gas)', 'Control board / thermostat', 'Compressor, fan motor, and refrigerant circuit (heat pump units)', 'Bypass valve (if installed)'],
+        failures: [
+          { obs: 'Ignition error; unit won\'t fire', comp: 'Igniter/spark assembly, ignition board, or gas valve', score: 'MEDIUM', note: 'Ignition boards and gas valves are available for most major brands within 5\u201310 years of production.' },
+          { obs: 'Heater fires then shuts off quickly (short-cycling)', comp: 'High-limit sensor or flow switch (low flow)', score: 'HIGH', note: 'A dirty filter or closed valve causes insufficient flow. Check filter and all valves before testing the flow switch.' },
+          { obs: 'High-limit error code; no overtemp condition', comp: 'High-limit sensor or scale buildup in heat exchanger', score: 'HIGH', note: 'Scale buildup in hard-water areas restricts flow and causes localized overtemp. Descaling is a maintenance item.' },
+          { obs: 'Heater runs but no heat output', comp: 'Heat exchanger leak or internal corrosion (gas); refrigerant issue (heat pump)', score: 'LOW', note: 'Corroded or pitted heat exchangers are a common end-of-life cause for gas pool heaters. Replacement heat exchangers are expensive relative to unit value.' },
+          { obs: 'Pool water temperature not rising', comp: 'Undersized heater, heat loss, or reduced output', score: 'MEDIUM', note: 'Verify heater is appropriately sized for pool volume and ambient temperatures. Check for degraded pool cover or high water loss.' }
+        ],
+        tests: [
+          { name: 'Flow Switch Continuity', tool: 'Multimeter (continuity)', access: 'Heater cabinet (pump running at operating speed)', proc: 'Test continuity across flow switch terminals with pump running.', normal: 'Switch closed (continuity) with adequate flow present', abnormal: 'Open with pump running = failed switch or low flow; check filter and all isolation valves.' },
+          { name: 'High-Limit Sensor Resistance', tool: 'Multimeter (resistance)', access: 'Heater plumbing connections (power off)', proc: 'Disconnect sensor; test resistance at known water temperature against sensor spec chart.', normal: 'Reading consistent with manufacturer\'s temperature-resistance curve', abnormal: 'Open or significantly off-spec = replace sensor.' },
+          { name: 'Gas Manifold Pressure', tool: 'Manometer (licensed technician)', access: 'Manifold test port (gas supply on, burner running)', proc: 'Measure outlet manifold pressure with all burners firing.', normal: 'Natural gas: 3.5\u2033 W.C.; LP: 10\u2033 W.C.', abnormal: 'Low pressure = regulator, supply, or meter issue.' },
+          { name: 'Heat Exchanger Visual Inspection', tool: 'Flashlight', access: 'Heater cabinet interior (power and gas off)', proc: 'Inspect heat exchanger tubes, headers, and combustion chamber for corrosion, pitting, scale, or water staining.', normal: 'Clean copper or cupro-nickel tubes; no green/white deposits', abnormal: 'Green/white deposits, pitting, active leaks, or water staining inside cabinet = heat exchanger cleaning or replacement required.' }
+        ],
+        codes: [
+          { label: 'Clearances (gas heaters):', text: ' Per manufacturer; typically 18 in. sides, 36 in. front service access. Not permitted in a confined space without combustion air provisions.' },
+          { label: 'GFCI protection:', text: ' Required for all pool equipment (NEC 680.22). All circuits supplying pool equipment within 20 ft of pool water require GFCI protection.' },
+          { label: 'Bonding:', text: ' Pool heater must be bonded to the pool\'s equipotential bonding grid (NEC 680.26).' },
+          { label: 'Age threshold:', text: ' Gas heaters average 8\u201312 years; heat pumps average 10\u201315 years. Heat exchanger corrosion is the primary end-of-life cause for gas units.' },
+          { label: 'Permits:', text: ' Gas pool heater installation typically requires a permit and inspection. LP installation requires a licensed LP contractor in most jurisdictions.' }
+        ]
+      },
+
+      'generator': {
+        intro: 'A standby generator automatically starts when utility power is lost and supplies power through a transfer switch. A gasoline, natural gas (NG), or LP propane engine drives an alternator (generator head) to produce AC power. An automatic transfer switch (ATS) disconnects the home from utility power and connects the generator within 10\u201330 seconds of an outage. A battery provides starting power; a trickle charger maintains it. The generator must exercise weekly (auto-test mode) to remain reliable.',
+        components: ['Engine (NG, LP, or gasoline)', 'Alternator / generator head', 'Automatic transfer switch (ATS)', 'Automatic voltage regulator (AVR)', 'Engine control unit (ECU) / control board', 'Engine battery and battery charger', 'Fuel supply system (gas solenoid valve for NG/LP)', 'Cooling system (air-cooled or liquid-cooled)', 'Output circuit breakers'],
+        failures: [
+          { obs: 'Generator won\'t start on power loss', comp: 'Dead battery, fuel supply issue, or control board fault', score: 'MEDIUM', note: 'Weak or dead battery is the most common cause. A failed weekly exercise cycle allows the battery to discharge. Fuel valve solenoid is another common failure point.' },
+          { obs: 'Generator starts but output voltage is incorrect', comp: 'Automatic voltage regulator (AVR) or capacitor (brushless alternators)', score: 'MEDIUM', note: 'AVR and run capacitors are available parts for most brands. Voltage testing at output terminals confirms the fault.' },
+          { obs: 'Transfer switch does not transfer to generator', comp: 'ATS contactor or ATS control board', score: 'MEDIUM', note: 'ATS contactors are a known wear item on high-cycle units. Replacement is straightforward on most brands.' },
+          { obs: 'Engine starts then shuts off after a few seconds', comp: 'Low oil level sensor, high-temp shutdown, or fuel delivery issue', score: 'HIGH', note: 'Check oil level and coolant level first\u2014safety shutdowns are doing their job. Also verify NG pressure or LP tank level.' },
+          { obs: 'Generator runs but circuits in home don\'t power', comp: 'Transfer switch failure, generator output breaker, or open circuit in load wiring', score: 'MEDIUM', note: 'Check the generator\'s own output breaker in addition to the ATS. Output breakers on older generators fail with age.' }
+        ],
+        tests: [
+          { name: 'Battery Voltage and Load Test', tool: 'Multimeter or battery load tester', access: 'Generator battery compartment', proc: 'Test open-circuit voltage; observe voltage during crank attempt.', normal: '12.4\u201312.8V at rest; does not drop below 10V during cranking', abnormal: 'Low resting voltage or severe voltage drop on crank = replace battery.' },
+          { name: 'Generator Output Voltage Test', tool: 'Multimeter (AC voltage)', access: 'Generator output terminals or ATS input terminals', proc: 'With generator running, measure L1\u2013L2 and each leg to neutral.', normal: 'L1\u2013L2 = 220\u2013240V; each leg to neutral = 110\u2013120V', abnormal: 'Single leg low or missing = AVR issue, open alternator winding, or failed capacitor.' },
+          { name: 'ATS Transfer Test', tool: 'Multimeter', access: 'ATS enclosure (qualified person only)', proc: 'Simulate utility loss; verify ATS opens utility connection and closes generator connection. Measure voltage at load-side output.', normal: 'Clean transfer with correct voltage at load within 10\u201330 seconds', abnormal: 'ATS input correct, no output = failed contactor or ATS control board.' },
+          { name: 'Load Bank / Full-Load Test', tool: 'Load bank unit (specialist)', access: 'Generator output terminals', proc: 'Apply rated kW load; observe voltage and frequency stability under full load.', normal: 'Voltage within \u00b15% of rated; frequency 60 Hz \u00b10.5 Hz under full load', abnormal: 'Voltage or frequency sag under load = alternator or engine governor issue.' }
+        ],
+        codes: [
+          { label: 'Transfer switch:', text: ' Required\u2014direct back-feed to utility without a transfer switch is illegal and endangers utility lineworkers (NEC 702.6). All standby installations require a listed ATS or manual transfer switch.' },
+          { label: 'Placement and exhaust clearances:', text: ' Minimum 5 ft from building openings (windows, doors). Exhaust must direct away from the structure. CO risk is severe from combustion exhaust.' },
+          { label: 'CO protection:', text: ' CO detectors required in the home. Generator must never be operated indoors or in attached garages, regardless of ventilation.' },
+          { label: 'Permit:', text: ' Standby generator installation requires a permit in most jurisdictions. Electrical and gas connections require licensed contractors.' },
+          { label: 'Maintenance records:', text: ' For insurance purposes, exercise/maintenance records are key documentation. Generators not on a regular maintenance schedule are higher risk.' },
+          { label: 'Age threshold:', text: ' Average lifespan 20\u201330 years with proper maintenance. Air-cooled generators (common residential) have shorter service lives than liquid-cooled commercial units.' }
+        ]
+      }
+
+    }; // end FR_DATA
+
+    // ── Build one tab pane's content from FR_DATA ─────────────────────────────
+    function buildPane(item, tab) {
+        var d = FR_DATA[item.id];
+        if (!d) {
+            return '<div class="placeholder-block">Content coming soon \u2014 ' + tab.label + ' for ' + item.name + '</div>';
+        }
+
+        if (tab.id === 'how-it-works') {
+            var html = '<div class="fr-content">'
+                + '<p class="fr-intro">' + d.intro + '</p>'
+                + (d.hiwExtra || '')
+                + '<p class="fr-subheading">Key Components</p>'
+                + '<ul class="fr-component-list">'
+                + d.components.map(function(c) { return '<li>' + c + '</li>'; }).join('')
+                + '</ul></div>';
+            return html;
+        }
+
+        if (tab.id === 'common-failures') {
+            return '<div class="fr-content">'
+                + d.failures.map(function(f) {
+                    return '<div class="failure-card">'
+                        + '<div class="failure-obs">' + f.obs + '</div>'
+                        + '<div class="failure-meta-row"><strong>Component:</strong> ' + f.comp + '</div>'
+                        + '<div class="failure-score-row" style="font-size:0.78rem"><strong style="color:#64748b">Repairability:</strong> ' + repairScore(f.score) + '</div>'
+                        + '<div class="failure-note">' + f.note + '</div>'
+                        + '</div>';
+                }).join('')
+                + '</div>';
+        }
+
+        if (tab.id === 'testing-guide') {
+            return '<div class="fr-content">'
+                + (d.testWarning ? '<div class="fr-safety-warning">' + d.testWarning + '</div>' : '')
+                + '<div class="fr-test-steps">'
+                + d.tests.map(function(s) {
+                    return '<div class="fr-test-step">'
+                        + '<div class="fr-test-name">' + s.name + '</div>'
+                        + '<div class="fr-test-meta"><strong>Tool:</strong> ' + s.tool
+                        + ' &nbsp;|&nbsp; <strong>Access:</strong> ' + s.access + '</div>'
+                        + '<div class="fr-test-procedure"><strong>Procedure:</strong> ' + s.proc + '</div>'
+                        + '<div class="fr-test-normal"><strong>Normal:</strong> ' + s.normal + '</div>'
+                        + '<div class="fr-test-abnormal"><strong>Abnormal:</strong> ' + s.abnormal + '</div>'
+                        + '</div>';
+                }).join('')
+                + '</div></div>';
+        }
+
+        if (tab.id === 'code-considerations') {
+            return '<div class="fr-content"><ul class="fr-code-list">'
+                + d.codes.map(function(c) {
+                    return '<li class="fr-code-item"><strong>' + c.label + '</strong>' + c.text + '</li>';
+                }).join('')
+                + '</ul>'
+                + (d.codeExtra || '')
+                + '</div>';
+        }
+
+        return '<div class="placeholder-block">Content not found.</div>';
     }
 
     // ── State ──────────────────────────────────────────────────────────────────
@@ -333,7 +763,6 @@
         if (!detail) return;
 
         if (frActiveId === itemId) {
-            // Collapse
             frActiveId  = null;
             frActiveTab = FR_TABS[0].id;
             detail.classList.add('fr-hidden');
@@ -378,9 +807,8 @@
         var panesHtml = FR_TABS.map(function(tab) {
             return '<div class="item-tab-pane' + (tab.id === frActiveTab ? ' active' : '')
                  + '" data-pane="' + tab.id + '">'
-                 + '<div class="placeholder-block">Content coming in Part 2 &mdash; '
-                 + tab.label + ' for ' + item.name
-                 + '</div></div>';
+                 + buildPane(item, tab)
+                 + '</div>';
         }).join('');
 
         detail.innerHTML =
@@ -392,12 +820,10 @@
             + '<div class="item-tabs">' + tabsHtml + '</div>'
             + '<div class="item-tab-panels">' + panesHtml + '</div>';
 
-        // Close button
         detail.querySelector('.item-detail-close').addEventListener('click', function() {
             toggleItem(frActiveId);
         });
 
-        // Tab switching
         detail.querySelectorAll('.item-tab').forEach(function(btn) {
             btn.addEventListener('click', function() {
                 frActiveTab = btn.dataset.tab;
@@ -425,7 +851,6 @@
                 card.classList.toggle('fr-hidden', !match);
                 if (match) visible++;
             });
-            // Collapse detail if its item was filtered out
             if (frActiveId) {
                 var ac = document.querySelector('.item-card[data-id="' + frActiveId + '"]');
                 if (ac && ac.classList.contains('fr-hidden')) toggleItem(frActiveId);
