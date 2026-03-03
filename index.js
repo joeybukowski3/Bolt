@@ -693,6 +693,31 @@ function renderDetail(data) {
     const tl = byId("table-loading"); if (tl) tl.classList.add("hidden");
     const te = byId("r-table"); if (te) te.classList.add("hidden");
   } else {
+  // What to Consider
+  const wtcEl = byId("what-to-consider");
+  if (wtcEl) {
+    const bullets = Array.isArray(data.whatToConsider) ? data.whatToConsider : [];
+    const confidence = fastData?.analysis?.modelConfidence;
+    const tier = Number(data.searchTier) || 1;
+    const isSpecific = tier >= 3;
+    const isLowConf = confidence === "estimated";
+    if (bullets.length) {
+      const label = isSpecific ? "What to Consider" : "General Replacement Considerations";
+      const boxClass = isSpecific ? "wtc-specific" : "wtc-general";
+      const note = (isSpecific && isLowConf)
+        ? `<div class="wtc-note">Note: Specs pulled from estimated match — verify before finalizing replacement selection.</div>`
+        : "";
+      wtcEl.className = `wtc-box ${boxClass}`;
+      wtcEl.innerHTML = `
+        <div class="wtc-label">${escapeHtml(label)}</div>
+        <ul class="wtc-list">${bullets.map(b => `<li>${escapeHtml(b)}</li>`).join("")}</ul>
+        ${note}
+      `;
+    } else {
+      wtcEl.className = "hidden";
+    }
+  }
+
   const tableMode = data.tableMode || "standard";
   const isTiered = tableMode === "tiered";
 

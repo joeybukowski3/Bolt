@@ -142,6 +142,7 @@ Required schema:
   "tableMode": "standard or product-line or tiered",
   "tableNote": "string or null",
   "narrowYourResults": "string or null",
+  "whatToConsider": ["string"],
   "itemNotes": {
     "lkqEvaluation": {
       "tier": "string",
@@ -223,6 +224,9 @@ Provide narrowYourResults only for searchTier 1, 2, or 3 (not 4). This is a shor
 - HVAC: suggest system type (central, mini-split, window unit), BTU/tonnage, and brand.
 - Water Heaters: suggest fuel type (gas, electric, heat pump), tank size, and brand.
 - General: suggest brand, model name, or model number for the most accurate report.
+
+--- whatToConsider ---
+- whatToConsider: 3-5 plain-language bullet points for what to prioritize in a replacement. For searchTier 3-4, derive from the confirmed specs of this specific item (lead with the most critical differentiating specs for the category). For searchTier 1-2, provide category-appropriate general guidance in conversational terms. Each bullet should be one line. No technical jargon unless it's a spec that must be matched exactly. Never leave this empty — even niche items should have relevant guidance.
 
 --- Other rules ---
 - itemNotes: only relevant for searchTier 3 and 4. For tiers 1-2, use empty values.
@@ -421,6 +425,9 @@ function sanitizeDetailPayload(payload, query) {
     tableMode,
     tableNote: cleanStr(src.tableNote) || null,
     narrowYourResults: cleanStr(src.narrowYourResults) || null,
+    whatToConsider: Array.isArray(src.whatToConsider)
+      ? src.whatToConsider.slice(0, 5).map(s => cleanStr(s)).filter(Boolean)
+      : [],
     itemNotes: {
       lkqEvaluation: {
         tier: cleanStr(lkqEval.tier) || "",
