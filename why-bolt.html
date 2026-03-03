@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bolt - Disclaimer</title>
+    <title>Why Bolt? — Bolt Item Research Tool</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="shared.css">
@@ -80,7 +80,79 @@
 
         /* Content Zone */
         .content-zone { background: #ffffff; border-radius: 24px 24px 0 0; margin: 2rem -1.5rem 0; padding: 3rem 2rem 4rem; min-height: 60vh; }
-        .content-inner { max-width: 720px; margin: 0 auto; }
+        .content-inner { max-width: 800px; margin: 0 auto; }
+
+        /* Page Hero */
+        .page-hero { text-align: center; padding-bottom: 2.5rem; border-bottom: 1px solid var(--border-color); margin-bottom: 2.5rem; }
+        .page-hero h1 { font-size: 2.25rem; font-weight: 800; color: var(--text-dark); line-height: 1.2; margin-bottom: 0.75rem; }
+        .page-hero .subheadline { font-size: 1.1rem; color: var(--text-mid); font-weight: 400; max-width: 520px; margin: 0 auto; }
+        .page-hero .subheadline strong { color: var(--text-dark); font-weight: 600; }
+
+        /* Feature Cards Grid */
+        .feature-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-bottom: 2.5rem; }
+
+        .feature-card {
+            background: var(--bg-card-alt);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.75rem 1.5rem;
+            transition: box-shadow 0.2s, border-color 0.2s;
+        }
+        .feature-card:hover {
+            box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+            border-color: rgba(234,179,8,0.35);
+        }
+
+        .card-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: rgba(234,179,8,0.12);
+            border: 1px solid rgba(234,179,8,0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            flex-shrink: 0;
+        }
+
+        .card-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+            line-height: 1.3;
+        }
+
+        .card-desc {
+            font-size: 0.9rem;
+            color: var(--text-mid);
+            line-height: 1.7;
+        }
+
+        /* Closing Statement */
+        .closing-statement {
+            text-align: center;
+            padding: 2rem;
+            background: linear-gradient(135deg, #0f1629 0%, #1a2a4a 100%);
+            border-radius: 16px;
+            border: 1px solid rgba(234,179,8,0.2);
+        }
+        .closing-statement p {
+            font-size: 1.05rem;
+            font-weight: 500;
+            color: rgba(241,245,249,0.9);
+            line-height: 1.6;
+            font-style: italic;
+        }
+        .closing-statement p::before,
+        .closing-statement p::after {
+            content: '"';
+            color: var(--accent);
+            font-style: normal;
+            font-weight: 700;
+        }
 
         @media (max-width: 640px) {
             .nav { flex-direction: column; gap: 0.5rem; align-items: flex-start; }
@@ -88,6 +160,9 @@
             .nav-links { gap: 0.25rem; }
             .nav-link { padding: 0.4rem 0.6rem; font-size: 0.75rem; }
             .content-zone { padding: 2rem 1rem 3rem; border-radius: 16px 16px 0 0; }
+            .page-hero h1 { font-size: 1.75rem; }
+            .page-hero .subheadline { font-size: 0.95rem; }
+            .feature-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -108,60 +183,64 @@
             <div class="nav-links">
                 <a href="index.html" class="nav-link">Item Lookup</a>
                 <a href="item-age.html" class="nav-link">How Old is my Item?</a>
-                <a href="why-bolt.html" class="nav-link">Why Bolt?</a>
+                <a href="why-bolt.html" class="nav-link active">Why Bolt?</a>
             </div>
         </nav>
 
         <div class="content-zone">
             <div class="content-inner">
 
-                <div class="static-card">
-                    <div class="static-card-header">
-                        <h2>&#9888; Disclaimer</h2>
-                        <p>Accuracy limitations and user responsibilities.</p>
+                <div class="page-hero">
+                    <h1>Why Bolt?</h1>
+                    <p class="subheadline">Searching Google is a starting point. <strong>Bolt is a finish line.</strong></p>
+                </div>
+
+                <div class="feature-grid">
+
+                    <div class="feature-card">
+                        <div class="card-icon">&#9881;</div>
+                        <div class="card-title">Built for the Job</div>
+                        <p class="card-desc">Bolt isn't a general search engine. Every search is framed around product research — replacement value, repairability, recalls, and age — so you're never starting from scratch.</p>
                     </div>
-                    <div class="static-card-body">
-                        <div class="disclaimer-block">
-                            <strong>For informational purposes only.</strong> Results produced by this tool are intended to assist in the research and estimation of manufacture dates and product valuations. They do not constitute a certified appraisal, legal determination, or professional opinion and should not be relied upon as the sole basis for any financial, legal, or insurance decision.
-                        </div>
 
-                        <div class="static-section">
-                            <h3>Accuracy Limitations</h3>
-                            <p>Serial number formats vary by brand, product line, and production era. Many manufacturers reuse year codes on repeating cycles of 10 to 30 years, meaning a single serial number may correspond to multiple possible manufacture years. While we flag these cases and assign a confidence level, we cannot guarantee the result will always match the actual manufacture date of the specific unit.</p>
-                            <p>Our database is maintained to the best of our ability but may not reflect every serial format variation, regional manufacturing difference, or mid-cycle format change introduced by a manufacturer.</p>
-                        </div>
-
-                        <div class="static-section">
-                            <h3>AI-Assisted Results</h3>
-                            <p>The Item Lookup feature uses an AI language model to estimate product age, valuation, and replacement options when no serial number is available. AI-generated results are estimates based on general product knowledge and publicly available information. They are more likely to contain errors than direct serial number decodes and should be treated as a starting point for further research, not a definitive answer.</p>
-                        </div>
-
-                        <div class="static-section">
-                            <h3>User Responsibility</h3>
-                            <p>Users are solely responsible for verifying all results before using them in any formal context. For insurance claims, legal proceedings, or other situations requiring a defensible determination, we strongly recommend corroborating any result with supporting documentation such as purchase receipts, installation records, or manufacturer verification.</p>
-                        </div>
-
-                        <div class="static-section">
-                            <h3>No Warranties</h3>
-                            <p>This tool is provided "as is" without warranties of any kind, express or implied. We make no representations regarding the accuracy, completeness, or fitness of the information provided. Use of this tool is at your own risk.</p>
-                        </div>
+                    <div class="feature-card">
+                        <div class="card-icon">&#9889;</div>
+                        <div class="card-title">Structured, Not Scattered</div>
+                        <p class="card-desc">Instead of running five different searches and hoping you find the right answer, Bolt runs them automatically and surfaces what matters in one place.</p>
                     </div>
+
+                    <div class="feature-card">
+                        <div class="card-icon">&#10003;</div>
+                        <div class="card-title">Conclusions, Not Just Links</div>
+                        <p class="card-desc">Google hands you a list of pages. Bolt hands you actionable information a report writer can use immediately.</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="card-icon">&#9672;</div>
+                        <div class="card-title">Consistent Every Time</div>
+                        <p class="card-desc">Every user, every search, same disciplined process. No more variation in results based on how someone happens to phrase a query that day.</p>
+                    </div>
+
+                </div>
+
+                <div class="closing-statement">
+                    <p>Bolt doesn't replace your judgment. It gives you better information to make it with.</p>
                 </div>
 
                 <div class="footer">
                     <p class="footer-tagline">Built for fast, accurate insurance product research and age verification.</p>
                     <div class="footer-links">
-                        <a href="/disclaimer">Disclaimer</a>
+                        <a href="disclaimer.html">Disclaimer</a>
                         <span class="footer-sep">|</span>
-                        <a href="/contact">Contact</a>
+                        <a href="contact.html">Contact</a>
                         <span class="footer-sep">|</span>
-                        <a href="/privacy-policy">Privacy Policy</a>
+                        <a href="privacy-policy.html">Privacy Policy</a>
                         <span class="footer-sep">|</span>
-                        <a href="/security">Security</a>
+                        <a href="security.html">Security</a>
                         <span class="footer-sep">|</span>
-                        <a href="/data-protection">Data Protection</a>
+                        <a href="data-protection.html">Data Protection</a>
                         <span class="footer-sep">|</span>
-                        <a href="/terms">Terms of Use</a>
+                        <a href="terms.html">Terms of Use</a>
                     </div>
                     <p>&copy; 2026 Bolt. Always verify results for accuracy.</p>
                 </div>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bolt - Disclaimer</title>
+    <title>Bolt - Security Policy</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="shared.css">
@@ -117,34 +117,53 @@
 
                 <div class="static-card">
                     <div class="static-card-header">
-                        <h2>&#9888; Disclaimer</h2>
-                        <p>Accuracy limitations and user responsibilities.</p>
+                        <h2>&#128737; Security Policy</h2>
+                        <p>Responsible use, access controls, and reporting.</p>
                     </div>
                     <div class="static-card-body">
+
                         <div class="disclaimer-block">
-                            <strong>For informational purposes only.</strong> Results produced by this tool are intended to assist in the research and estimation of manufacture dates and product valuations. They do not constitute a certified appraisal, legal determination, or professional opinion and should not be relied upon as the sole basis for any financial, legal, or insurance decision.
+                            <strong>Responsible use required.</strong> This tool is provided for legitimate insurance research and product age verification purposes only. Automated access, scraping, and abuse are prohibited.
                         </div>
 
                         <div class="static-section">
-                            <h3>Accuracy Limitations</h3>
-                            <p>Serial number formats vary by brand, product line, and production era. Many manufacturers reuse year codes on repeating cycles of 10 to 30 years, meaning a single serial number may correspond to multiple possible manufacture years. While we flag these cases and assign a confidence level, we cannot guarantee the result will always match the actual manufacture date of the specific unit.</p>
-                            <p>Our database is maintained to the best of our ability but may not reflect every serial format variation, regional manufacturing difference, or mid-cycle format change introduced by a manufacturer.</p>
+                            <h3>Permitted Use</h3>
+                            <p>Bolt is designed to assist insurance professionals, adjusters, and property owners in researching product manufacture dates and estimated replacement values. All use of this tool must be manual, in good faith, and consistent with its intended purpose.</p>
+                            <p>You may use Bolt to look up individual items as part of a legitimate insurance claim, appraisal, or research workflow.</p>
                         </div>
 
                         <div class="static-section">
-                            <h3>AI-Assisted Results</h3>
-                            <p>The Item Lookup feature uses an AI language model to estimate product age, valuation, and replacement options when no serial number is available. AI-generated results are estimates based on general product knowledge and publicly available information. They are more likely to contain errors than direct serial number decodes and should be treated as a starting point for further research, not a definitive answer.</p>
+                            <h3>Prohibited Activities</h3>
+                            <p>The following activities are strictly prohibited:</p>
+                            <ul>
+                                <li><strong>Automated scraping</strong> — using bots, scripts, crawlers, or any automated method to extract data from this site in bulk.</li>
+                                <li><strong>API abuse</strong> — sending high-volume, programmatic, or repeated requests in a manner that circumvents normal use or degrades service for others.</li>
+                                <li><strong>Reverse engineering</strong> — attempting to extract, copy, or replicate the underlying serial number database, AI prompts, or proprietary logic.</li>
+                                <li><strong>Unauthorized access</strong> — attempting to access server infrastructure, backend APIs, or administrative systems beyond what is publicly exposed.</li>
+                                <li><strong>Misrepresentation</strong> — presenting tool output as a certified appraisal, official manufacturer record, or professional opinion without independent verification.</li>
+                            </ul>
                         </div>
 
                         <div class="static-section">
-                            <h3>User Responsibility</h3>
-                            <p>Users are solely responsible for verifying all results before using them in any formal context. For insurance claims, legal proceedings, or other situations requiring a defensible determination, we strongly recommend corroborating any result with supporting documentation such as purchase receipts, installation records, or manufacturer verification.</p>
+                            <h3>Rate Limiting and Access Controls</h3>
+                            <p>Bolt implements server-side rate limiting on all API endpoints. Excessive or abusive request patterns may result in temporary or permanent access restrictions without prior notice. These controls exist to protect service availability for all legitimate users.</p>
                         </div>
 
                         <div class="static-section">
-                            <h3>No Warranties</h3>
-                            <p>This tool is provided "as is" without warranties of any kind, express or implied. We make no representations regarding the accuracy, completeness, or fitness of the information provided. Use of this tool is at your own risk.</p>
+                            <h3>Third-Party Infrastructure</h3>
+                            <p>Bolt runs on Vercel's hosting infrastructure and uses Google's Gemini AI API and Upstash Redis for caching. Security of those services is governed by their respective providers. Bolt does not store credentials, payment information, or sensitive personal data on its own servers.</p>
                         </div>
+
+                        <div class="static-section">
+                            <h3>Reporting a Security Issue</h3>
+                            <p>If you discover a security vulnerability, data exposure, or behavior that appears unintended, please report it responsibly using our <a href="/contact" style="color:#3b82f6;">contact form</a>. Include a clear description of the issue and steps to reproduce it. We will investigate and respond promptly. Please do not publicly disclose vulnerabilities before we have had an opportunity to address them.</p>
+                        </div>
+
+                        <div class="static-section">
+                            <h3>Informational Purposes Only</h3>
+                            <p>All results produced by this tool are for informational purposes only. They do not constitute certified appraisals, legal opinions, or manufacturer-verified records. Users are responsible for independently verifying any result before relying on it in a formal context.</p>
+                        </div>
+
                     </div>
                 </div>
 

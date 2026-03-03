@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bolt - Disclaimer</title>
+    <title>Bolt - Data Protection</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="shared.css">
@@ -117,34 +117,60 @@
 
                 <div class="static-card">
                     <div class="static-card-header">
-                        <h2>&#9888; Disclaimer</h2>
-                        <p>Accuracy limitations and user responsibilities.</p>
+                        <h2>&#128203; Data Protection</h2>
+                        <p>What data we handle, and what we do not collect.</p>
                     </div>
                     <div class="static-card-body">
-                        <div class="disclaimer-block">
-                            <strong>For informational purposes only.</strong> Results produced by this tool are intended to assist in the research and estimation of manufacture dates and product valuations. They do not constitute a certified appraisal, legal determination, or professional opinion and should not be relied upon as the sole basis for any financial, legal, or insurance decision.
+
+                        <div class="notice-box">
+                            <div class="notice-box-title">Summary</div>
+                            <p>Bolt does not collect personal data, create user accounts, or track individuals. No login is required. Search queries entered into the Item Lookup tool may be processed by third-party AI services. Do not enter personal identifying information into any search field.</p>
                         </div>
 
                         <div class="static-section">
-                            <h3>Accuracy Limitations</h3>
-                            <p>Serial number formats vary by brand, product line, and production era. Many manufacturers reuse year codes on repeating cycles of 10 to 30 years, meaning a single serial number may correspond to multiple possible manufacture years. While we flag these cases and assign a confidence level, we cannot guarantee the result will always match the actual manufacture date of the specific unit.</p>
-                            <p>Our database is maintained to the best of our ability but may not reflect every serial format variation, regional manufacturing difference, or mid-cycle format change introduced by a manufacturer.</p>
+                            <h3>No Personal Data Collected</h3>
+                            <p>Bolt does not collect, store, or process personal identifying information as part of its core functionality. There are no user accounts, registration flows, login systems, or persistent user profiles of any kind.</p>
+                            <p>We do not collect your name, email address, phone number, physical address, or any other identifying information unless you voluntarily provide it through the contact form.</p>
                         </div>
 
                         <div class="static-section">
-                            <h3>AI-Assisted Results</h3>
-                            <p>The Item Lookup feature uses an AI language model to estimate product age, valuation, and replacement options when no serial number is available. AI-generated results are estimates based on general product knowledge and publicly available information. They are more likely to contain errors than direct serial number decodes and should be treated as a starting point for further research, not a definitive answer.</p>
+                            <h3>No User Accounts</h3>
+                            <p>Bolt has no account system. You do not sign in, register, or authenticate to use this tool. There is no user database. No credentials are stored on our servers because none are created.</p>
                         </div>
 
                         <div class="static-section">
-                            <h3>User Responsibility</h3>
-                            <p>Users are solely responsible for verifying all results before using them in any formal context. For insurance claims, legal proceedings, or other situations requiring a defensible determination, we strongly recommend corroborating any result with supporting documentation such as purchase receipts, installation records, or manufacturer verification.</p>
+                            <h3>Search Queries and Third-Party AI Processing</h3>
+                            <p>When you use the Item Lookup search feature, the text of your query is transmitted to our server and forwarded to <strong>Google's Gemini AI API</strong> to generate a research result. This means your query text leaves our infrastructure and is processed on Google's servers under <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" style="color:#3b82f6;">Google's Privacy Policy</a>.</p>
+                            <p>Queries may also be stored briefly in a server-side cache (Upstash Redis) with a 15-minute expiration to improve response speed for repeated lookups. After expiration, cached data is automatically deleted.</p>
+                            <p><strong>Important:</strong> Do not enter personal identifying information — such as names, addresses, policy numbers, Social Security numbers, or any other sensitive data — into the search bar. The search field is designed for product descriptions (e.g., brand, model, and approximate age), not personal information.</p>
                         </div>
 
                         <div class="static-section">
-                            <h3>No Warranties</h3>
-                            <p>This tool is provided "as is" without warranties of any kind, express or implied. We make no representations regarding the accuracy, completeness, or fitness of the information provided. Use of this tool is at your own risk.</p>
+                            <h3>Serial Number Lookups</h3>
+                            <p>The "How Old is my Item?" serial number decoder runs entirely within your browser using local JavaScript. Serial numbers you enter for supported brands are never transmitted to Bolt's servers or any third party. The decoding happens locally on your device.</p>
                         </div>
+
+                        <div class="static-section">
+                            <h3>No Tracking or Analytics</h3>
+                            <p>Bolt does not load advertising trackers, social media pixels, or behavioral analytics scripts. No cookies are set by this application. No persistent data is written to your browser's local storage or session storage.</p>
+                        </div>
+
+                        <div class="static-section">
+                            <h3>Third-Party Services Involved</h3>
+                            <p>The following external providers may receive data as part of normal tool operation:</p>
+                            <ul>
+                                <li><strong>Google Gemini API</strong> — receives product search query text to generate AI research results.</li>
+                                <li><strong>Upstash Redis</strong> — receives cache keys derived from normalized query text for short-term result caching.</li>
+                                <li><strong>Vercel</strong> — hosts this application and may retain standard server access logs (IP address, request path, timestamp).</li>
+                                <li><strong>Google Fonts</strong> — serves the typeface used by this site; your browser contacts Google's servers to download the font.</li>
+                            </ul>
+                        </div>
+
+                        <div class="static-section">
+                            <h3>Contact and Inquiries</h3>
+                            <p>If you have questions about how data is handled, or if you submitted information through the contact form and wish to request its deletion, please use our <a href="/contact" style="color:#3b82f6;">contact form</a>. Include "Data Request" in your message so we can prioritize your inquiry.</p>
+                        </div>
+
                     </div>
                 </div>
 
