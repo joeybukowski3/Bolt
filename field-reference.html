@@ -193,6 +193,27 @@
         /* Safety warning banner */
         .fr-safety-warning { background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 0.6rem 0.85rem; margin-bottom: 0.7rem; font-size: 0.8rem; color: #991b1b; font-weight: 600; }
 
+        /* Technical Terms clickable cards */
+        .gen-ref-grid { grid-template-columns: repeat(auto-fill, minmax(185px, 1fr)); }
+        .gen-ref-card { cursor: pointer; transition: border-color 0.18s, box-shadow 0.18s, transform 0.18s, background 0.18s; }
+        .gen-ref-card:hover { border-color: var(--accent); background: #fffbeb; transform: translateY(-1px); box-shadow: 0 4px 14px rgba(0,0,0,0.07); }
+        .gen-ref-card.active { border-color: var(--accent); background: #fffbeb; box-shadow: 0 4px 14px rgba(234,179,8,0.15); }
+
+        /* GR detail panel */
+        .gr-detail { background: var(--bg-card-alt); border: 1.5px solid var(--border-color); border-radius: 14px; margin-top: 1rem; overflow: hidden; }
+        .gr-detail.fr-hidden { display: none; }
+        .gr-detail-header { padding: 1.1rem 1.25rem 1rem; display: flex; align-items: center; gap: 0.65rem; border-bottom: 1px solid var(--border-color); }
+        .gr-detail-icon { font-size: 1.35rem; line-height: 1; flex-shrink: 0; }
+        .gr-detail-title { font-size: 0.95rem; font-weight: 700; color: var(--text-dark); flex: 1; }
+        .gr-detail-close { background: none; border: none; cursor: pointer; font-size: 1.1rem; color: var(--text-light); padding: 0.25rem 0.4rem; border-radius: 6px; line-height: 1; margin-left: auto; flex-shrink: 0; }
+        .gr-detail-close:hover { background: var(--border-color); color: var(--text-mid); }
+        .gr-detail-body { padding: 1.25rem; }
+        .fr-ref-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; margin-bottom: 0.25rem; }
+        .fr-ref-table th { background: var(--bg-secondary, #f1f5f9); color: var(--text-dark); font-weight: 600; text-align: left; padding: 0.45rem 0.65rem; border-bottom: 2px solid var(--border-color); white-space: nowrap; }
+        .fr-ref-table td { padding: 0.4rem 0.65rem; border-bottom: 1px solid var(--border-color); color: var(--text-mid); vertical-align: top; }
+        .fr-ref-table tr:last-child td { border-bottom: none; }
+        .fr-ref-table tr:hover td { background: rgba(234,179,8,0.04); }
+
         @media (max-width: 640px) {
             .nav { flex-direction: column; gap: 0.5rem; align-items: flex-start; }
             .nav-left { flex-wrap: wrap; }
@@ -238,34 +259,69 @@
                     <p class="subheadline">Practical reference material for property loss assessors, adjusters, and insurance professionals.</p>
                 </div>
 
-                <!-- General Reference section -->
+                <!-- Technical Terms and Testing References section -->
                 <div class="fr-section-heading">
-                    <span class="fr-section-title">General Reference</span>
-                    <span class="part2-badge">Part 2</span>
+                    <span class="fr-section-title">Technical Terms and Testing References</span>
                 </div>
-                <p class="fr-section-sub">Terminology, methods, and documentation standards used across property insurance assessments.</p>
-                <div class="gen-ref-grid">
-                    <div class="gen-ref-card">
-                        <span class="gen-ref-card-icon">&#128196;</span>
-                        <div class="gen-ref-card-title">Insurance Terminology</div>
-                        <div class="gen-ref-card-desc">Definitions and common terms &mdash; coming in Part 2</div>
+                <p class="fr-section-sub">Testing methods, electrical concepts, and diagnostic references for field technicians and insurance assessors. Select a topic to expand.</p>
+                <div class="gen-ref-grid" id="gr-grid">
+                    <div class="gen-ref-card" data-gr-id="ohm-testing" role="button" tabindex="0" aria-expanded="false">
+                        <span class="gen-ref-card-icon">&#9126;</span>
+                        <div class="gen-ref-card-title">Ohm Testing (Resistance)</div>
+                        <div class="gen-ref-card-desc">Meter setup, normal ranges, and what open or shorted readings mean</div>
                     </div>
-                    <div class="gen-ref-card">
+                    <div class="gen-ref-card" data-gr-id="short-to-ground" role="button" tabindex="0" aria-expanded="false">
+                        <span class="gen-ref-card-icon">&#9889;</span>
+                        <div class="gen-ref-card-title">Short to Ground</div>
+                        <div class="gen-ref-card-desc">Detection, causes, safety implications, and repairability</div>
+                    </div>
+                    <div class="gen-ref-card" data-gr-id="voltage-testing" role="button" tabindex="0" aria-expanded="false">
+                        <span class="gen-ref-card-icon">&#128268;</span>
+                        <div class="gen-ref-card-title">Voltage Testing</div>
+                        <div class="gen-ref-card-desc">120V and 240V normal ranges, variance, and low-voltage diagnosis</div>
+                    </div>
+                    <div class="gen-ref-card" data-gr-id="amperage-testing" role="button" tabindex="0" aria-expanded="false">
+                        <span class="gen-ref-card-icon">&#128988;</span>
+                        <div class="gen-ref-card-title">Amperage / Current Draw</div>
+                        <div class="gen-ref-card-desc">Clamp meter use, normal ranges, and high or low draw indicators</div>
+                    </div>
+                    <div class="gen-ref-card" data-gr-id="double-tap" role="button" tabindex="0" aria-expanded="false">
+                        <span class="gen-ref-card-icon">&#9888;&#65039;</span>
+                        <div class="gen-ref-card-title">Double Tapped Breakers</div>
+                        <div class="gen-ref-card-desc">Visual identification, code status, and insurance evaluation</div>
+                    </div>
+                    <div class="gen-ref-card" data-gr-id="voltage-imbalance" role="button" tabindex="0" aria-expanded="false">
                         <span class="gen-ref-card-icon">&#128200;</span>
-                        <div class="gen-ref-card-title">Depreciation Methods</div>
-                        <div class="gen-ref-card-desc">ACV, RCV, and calculation guides &mdash; coming in Part 2</div>
+                        <div class="gen-ref-card-title">Voltage Imbalance</div>
+                        <div class="gen-ref-card-desc">Measurement, acceptable limits, and motor damage implications</div>
                     </div>
-                    <div class="gen-ref-card">
+                    <div class="gen-ref-card" data-gr-id="lost-neutral" role="button" tabindex="0" aria-expanded="false">
+                        <span class="gen-ref-card-icon">&#128308;</span>
+                        <div class="gen-ref-card-title">Lost Neutral</div>
+                        <div class="gen-ref-card-desc">Symptoms, meter identification, and emergency response</div>
+                    </div>
+                    <div class="gen-ref-card" data-gr-id="reversed-hot-ground" role="button" tabindex="0" aria-expanded="false">
+                        <span class="gen-ref-card-icon">&#128997;</span>
+                        <div class="gen-ref-card-title">Reversed Hot/Ground</div>
+                        <div class="gen-ref-card-desc">Identification, meaning, code status, and risk level</div>
+                    </div>
+                    <div class="gen-ref-card" data-gr-id="reversed-hot-neutral" role="button" tabindex="0" aria-expanded="false">
+                        <span class="gen-ref-card-icon">&#128998;</span>
+                        <div class="gen-ref-card-title">Reversed Hot/Neutral</div>
+                        <div class="gen-ref-card-desc">Why it&#39;s more dangerous than hot/ground and what damage it causes</div>
+                    </div>
+                    <div class="gen-ref-card" data-gr-id="lra" role="button" tabindex="0" aria-expanded="false">
                         <span class="gen-ref-card-icon">&#128295;</span>
-                        <div class="gen-ref-card-title">Property Assessment</div>
-                        <div class="gen-ref-card-desc">Field assessment procedures &mdash; coming in Part 2</div>
+                        <div class="gen-ref-card-title">Locked Rotor Amps (LRA)</div>
+                        <div class="gen-ref-card-desc">What LRA is, field identification, and repairability by cause</div>
                     </div>
-                    <div class="gen-ref-card">
-                        <span class="gen-ref-card-icon">&#128203;</span>
-                        <div class="gen-ref-card-title">Documentation Standards</div>
-                        <div class="gen-ref-card-desc">Report writing requirements &mdash; coming in Part 2</div>
+                    <div class="gen-ref-card" data-gr-id="meg-testing" role="button" tabindex="0" aria-expanded="false">
+                        <span class="gen-ref-card-icon">&#128300;</span>
+                        <div class="gen-ref-card-title">Meg Testing</div>
+                        <div class="gen-ref-card-desc">Insulation resistance testing: procedure, normal readings, and low-reading implications</div>
                     </div>
                 </div>
+                <div id="gr-detail" class="gr-detail fr-hidden"></div>
 
                 <!-- Section break -->
                 <hr class="fr-divider">
@@ -859,10 +915,609 @@
         });
     }
 
+    // ── Technical Terms & Testing References (GR) ─────────────────────────────
+    var GR_DATA = {
+        'ohm-testing': {
+            title: 'Ohm Testing (Resistance)',
+            icon: '&#9126;',
+            intro: 'Resistance testing with a digital multimeter (DMM) is one of the most fundamental diagnostic techniques. It measures how much a component opposes the flow of electrical current, measured in ohms (\u03a9). Always de-energize and discharge any capacitors before testing.',
+            sections: [
+                {
+                    heading: 'Meter Setup',
+                    type: 'list',
+                    items: [
+                        '<strong>Power off and isolate.</strong> Always disconnect power and discharge any capacitors before testing. Resistance testing is performed on de-energized circuits only.',
+                        'Set the multimeter to the \u03a9 (ohms) or continuity mode appropriate for the expected range.',
+                        'Touch probes to both terminals of the component being tested.',
+                        'Zero the leads first (touch probes together and note any lead resistance \u2014 subtract if significant).'
+                    ]
+                },
+                {
+                    heading: 'Normal Ranges by Component',
+                    type: 'table',
+                    headers: ['Component', 'Expected Range', 'Notes'],
+                    rows: [
+                        ['Heating element (dryer / oven)', '8 \u2013 50 \u03a9', 'Varies by wattage; check spec sheet'],
+                        ['Compressor motor winding (R\u2013S)', '2 \u2013 8 \u03a9', 'R\u2013C and S\u2013C also testable'],
+                        ['Refrigerator defrost heater', '20 \u2013 80 \u03a9', 'Higher resistance = lower wattage'],
+                        ['Electric motor winding', '0.5 \u2013 20 \u03a9', 'Depends on motor size and type'],
+                        ['Thermostat (closed)', '0 \u2013 0.5 \u03a9', 'Should read near zero when closed'],
+                        ['Thermostat (open)', 'OL / \u221e', 'Open circuit when set point not reached'],
+                        ['Fuse (good)', '0 \u2013 0.5 \u03a9', 'Reads continuity when intact'],
+                        ['Fuse (blown)', 'OL / \u221e', 'No continuity']
+                    ]
+                },
+                {
+                    heading: 'Interpreting Readings',
+                    type: 'list',
+                    items: [
+                        '<strong>OL or \u221e (infinite):</strong> Open circuit \u2014 wire broken, element burned out, fuse blown, or switch open at test point.',
+                        '<strong>0 or near-0 \u03a9:</strong> Continuity \u2014 normal for closed switches, fuses, and wire runs. A shorted element may also read near zero.',
+                        '<strong>Expected range:</strong> Component is intact and within spec.',
+                        '<strong>Out of spec but not open/shorted:</strong> Component may be degraded \u2014 flag for further investigation.'
+                    ]
+                },
+                {
+                    heading: 'Field Application',
+                    type: 'paragraphs',
+                    body: 'For insurance documentation, record the measured value, the component tested, and whether it falls within the manufacturer or industry-standard range. An open reading on a heating element confirms it is burned out. A reading near zero across a motor winding that should have measurable resistance indicates an internal winding short.'
+                }
+            ]
+        },
+        'short-to-ground': {
+            title: 'Short to Ground',
+            icon: '&#9889;',
+            warning: 'A confirmed short to ground on an energized circuit is a fire and electrocution hazard. Do not restore power until the fault is located and resolved.',
+            intro: 'A short to ground occurs when an energized (hot) conductor comes into contact with a grounded surface \u2014 such as a metal chassis, pipe, or ground wire \u2014 creating an unintended low-resistance current path. This is distinct from insulation degradation (meg test territory) and typically causes immediate breaker trips.',
+            sections: [
+                {
+                    heading: 'Detection',
+                    type: 'list',
+                    items: [
+                        'With power off and the circuit isolated: set DMM to resistance (\u03a9) or continuity mode.',
+                        'Test from the hot wire or terminal to the metal chassis / ground wire.',
+                        'A reading near 0 \u03a9 or an audible continuity tone indicates a short to ground.',
+                        'Disconnect sub-assemblies (motor, compressor, elements) one at a time to isolate the faulty component.'
+                    ]
+                },
+                {
+                    heading: 'Common Causes',
+                    type: 'list',
+                    items: [
+                        'Damaged wire insulation rubbing against a metal edge or pinched behind a panel',
+                        'Failed motor winding with winding-to-frame contact',
+                        'Compressor internal failure (winding shorted to shell)',
+                        'Rodent damage to insulation',
+                        'Moisture or corrosion on terminals creating a leakage path',
+                        'Burned heating element contacting its housing'
+                    ]
+                },
+                {
+                    heading: 'Safety Implications',
+                    type: 'paragraphs',
+                    body: 'On a properly grounded circuit, a hard short to ground will trip the breaker immediately. On an ungrounded circuit (older two-prong), the fault current may travel through the chassis, creating a shock hazard without tripping the breaker. GFCI protection will detect leakage current \u2265 5 mA and trip regardless of ground availability.'
+                },
+                {
+                    heading: 'Repairability for Insurance Purposes',
+                    type: 'list',
+                    items: [
+                        '<strong>Wire damage (pinch or chafe):</strong> Often repairable \u2014 replace the damaged harness section.',
+                        '<strong>Motor winding shorted to frame:</strong> Motor replacement required.',
+                        '<strong>Compressor shorted to shell:</strong> Compressor or unit replacement \u2014 not repairable in the field.',
+                        '<strong>Heating element:</strong> Element replacement \u2014 straightforward.',
+                        '<strong>Control board trace shorted to chassis:</strong> Board replacement required.'
+                    ]
+                }
+            ]
+        },
+        'voltage-testing': {
+            title: 'Voltage Testing',
+            icon: '&#128268;',
+            warning: 'Voltage testing is performed on live circuits. Use properly rated test leads and insulated probes. Follow all electrical safety precautions.',
+            intro: 'Voltage testing verifies that circuits are delivering the correct supply voltage to components. It is performed with the circuit energized using a DMM set to AC voltage (VAC).',
+            sections: [
+                {
+                    heading: 'Normal Voltage Ranges',
+                    type: 'table',
+                    headers: ['Circuit Type', 'Nominal', 'Acceptable Range', 'Notes'],
+                    rows: [
+                        ['120V single-phase', '120 VAC', '114 \u2013 126 VAC', '\u00b15% of nominal'],
+                        ['240V single-phase', '240 VAC', '228 \u2013 252 VAC', '\u00b15% of nominal'],
+                        ['208V (commercial)', '208 VAC', '197 \u2013 218 VAC', 'Common in multi-family/commercial'],
+                        ['120V appliance outlet', '120 VAC', '110 \u2013 126 VAC', 'May dip slightly under load']
+                    ]
+                },
+                {
+                    heading: 'How to Test',
+                    type: 'list',
+                    items: [
+                        'Set DMM to AC voltage (VAC) at a range above the expected voltage.',
+                        'For 120V circuits: test between hot and neutral, and separately hot to ground.',
+                        'For 240V circuits: test L1\u2013L2, and each leg to neutral (should read ~120V each).',
+                        'Test at the receptacle or terminal under load when possible \u2014 voltage drops under load reveal high-resistance connections.'
+                    ]
+                },
+                {
+                    heading: 'Low Voltage Diagnosis',
+                    type: 'list',
+                    items: [
+                        '<strong>&lt; 105 VAC on 120V circuit:</strong> Indicates high-resistance connection, undersized wiring, overloaded circuit, or utility supply issue.',
+                        '<strong>Excessive drop under load:</strong> Suggests loose connection at outlet, panel, or junction box \u2014 a fire risk.',
+                        '<strong>Leg imbalance on 240V:</strong> Could indicate a lost or weak neutral, or a utility issue \u2014 see Lost Neutral reference.',
+                        '<strong>High voltage (&gt; 130V):</strong> Utility overvoltage \u2014 contact utility provider; can damage sensitive electronics and motors.'
+                    ]
+                },
+                {
+                    heading: 'Insurance Context',
+                    type: 'paragraphs',
+                    body: 'Document voltage readings at the appliance circuit during inspection. Low voltage over time causes motor overheating and premature compressor failure. A utility-caused voltage event (surge or sag) may affect coverage determination. Always test voltage at the appliance circuit, not just at the main panel.'
+                }
+            ]
+        },
+        'amperage-testing': {
+            title: 'Amperage / Current Draw Testing',
+            icon: '&#128988;',
+            intro: 'Measuring current draw (amperage) confirms whether a motor or compressor is operating within its designed load. A clamp meter is used on energized circuits \u2014 no circuit interruption required. Clamp around a single conductor only.',
+            sections: [
+                {
+                    heading: 'How to Measure',
+                    type: 'list',
+                    items: [
+                        'Use a clamp meter set to AC amps (A). Clamp around a single conductor only \u2014 clamping both hot and neutral cancels the reading.',
+                        'Measure at the component disconnect or the wire feeding the motor or compressor.',
+                        'Take readings under normal operating conditions (running, not starting) and note startup inrush.',
+                        'Compare to the nameplate RLA (Rated Load Amps) and LRA (Locked Rotor Amps) values on the unit.'
+                    ]
+                },
+                {
+                    heading: 'Current Draw Reference',
+                    type: 'table',
+                    headers: ['Condition', 'Typical Finding', 'Interpretation'],
+                    rows: [
+                        ['Running amps = nameplate RLA', 'Normal', 'Operating within design spec'],
+                        ['Running amps 10\u201320% above RLA', 'High draw', 'Check airflow, refrigerant charge, condenser cleanliness'],
+                        ['Running amps > 20% above RLA', 'Severely high', 'Compressor or motor under stress \u2014 may be near failure'],
+                        ['Running amps < 50% of RLA', 'Low draw', 'Possible open winding, loss of phase, or capacitor failure'],
+                        ['Startup amps = LRA value', 'Normal inrush', 'Expected during initial motor start'],
+                        ['Startup amps persist (no start)', 'Locked rotor', 'See LRA reference \u2014 motor or compressor seized']
+                    ]
+                },
+                {
+                    heading: 'Causes of High Current Draw',
+                    type: 'list',
+                    items: [
+                        'Dirty condenser coil or evaporator \u2014 increased compressor load',
+                        'Low refrigerant \u2014 compressor works harder with less efficiency',
+                        'Failing start or run capacitor \u2014 motor draws more amps to compensate',
+                        'Bearing wear or mechanical drag on motor shaft',
+                        'Tight or partially seized compressor mechanical components'
+                    ]
+                },
+                {
+                    heading: 'Causes of Low Current Draw',
+                    type: 'list',
+                    items: [
+                        'Open motor winding \u2014 one phase not contributing; motor may still run weakly on remaining phases',
+                        'Failed run capacitor \u2014 motor loses efficiency',
+                        'Loss of phase on 3-phase equipment',
+                        'Undersized or disconnected supply conductor'
+                    ]
+                }
+            ]
+        },
+        'double-tap': {
+            title: 'Double Tapped Breakers',
+            icon: '&#9888;&#65039;',
+            intro: 'A double-tapped breaker has two or more conductors connected to a single breaker terminal that is rated and designed for only one conductor. This is one of the most common electrical deficiencies found during insurance inspections.',
+            sections: [
+                {
+                    heading: 'Visual Identification',
+                    type: 'list',
+                    items: [
+                        'Open the panel cover and inspect the breaker terminals (the screw connections at the bottom of each breaker).',
+                        'A double-tap is present when two wires \u2014 typically two 12 AWG or 14 AWG conductors \u2014 are inserted under a single breaker screw terminal.',
+                        'This is distinct from a tandem/duplex breaker, which is specifically manufactured and listed to accept two circuits in one slot.',
+                        'Check all breakers, especially those near the bottom where wiring is most congested.'
+                    ]
+                },
+                {
+                    heading: 'Code Status',
+                    type: 'paragraphs',
+                    body: 'Double-tapping is prohibited by NEC 110.3(B) and 408.41 unless the breaker is listed for two conductors. Some breakers (certain Square D QO and Siemens models) have dual-rated terminals and will carry a marking on the breaker body. Most standard residential breakers (Eaton BR, older GE, Murray) are single-conductor only. The standard fix is to pigtail \u2014 join both wires with a wire nut to a short jumper \u2014 or add a separate breaker.'
+                },
+                {
+                    heading: 'Insurance Evaluation',
+                    type: 'list',
+                    items: [
+                        '<strong>Fire risk:</strong> A loose connection at a double-tapped terminal can arc and start a fire inside the panel.',
+                        '<strong>Overcurrent protection failure:</strong> If one wire makes poor contact, it may not trip the breaker under overload, leaving that circuit unprotected.',
+                        '<strong>Commonly flagged:</strong> Many carriers require correction before binding or renewing a policy.',
+                        '<strong>Correction cost:</strong> Typically $75\u2013$250 per occurrence. Full panel replacement is not required unless other significant deficiencies exist.'
+                    ]
+                },
+                {
+                    heading: 'Listed Exceptions',
+                    type: 'paragraphs',
+                    body: 'Some breaker models are UL-listed for dual conductors \u2014 these will have a marking on the breaker body or in the panel schedule indicating "2 conductors permitted." Square D QO breakers frequently carry this listing. Document any such exception in inspection notes if confirmed.'
+                }
+            ]
+        },
+        'voltage-imbalance': {
+            title: 'Voltage Imbalance',
+            icon: '&#128200;',
+            intro: 'Voltage imbalance occurs when the voltage levels across phases or legs are not equal. Even small imbalances cause disproportionately large increases in motor current and heat, dramatically shortening motor and compressor lifespan.',
+            sections: [
+                {
+                    heading: 'How to Measure',
+                    type: 'list',
+                    items: [
+                        'With the circuit energized and the load operating, measure voltage across each leg pair.',
+                        'For 240V split-phase: measure L1\u2013L2, L1\u2013N, and L2\u2013N.',
+                        'For 3-phase: measure L1\u2013L2, L2\u2013L3, and L1\u2013L3.',
+                        'Calculate average voltage: (V1 + V2 + V3) \u00f7 3.',
+                        'Calculate imbalance %: (max deviation from average \u00f7 average) \u00d7 100.'
+                    ]
+                },
+                {
+                    heading: 'Acceptable Limits',
+                    type: 'table',
+                    headers: ['Imbalance Level', 'Status', 'Implication'],
+                    rows: [
+                        ['< 1%', 'Excellent', 'No concern \u2014 well within spec'],
+                        ['1 \u2013 2%', 'Acceptable', 'Monitor; no immediate action required'],
+                        ['2 \u2013 3%', 'Elevated', 'Increases motor winding temperature; begin investigation'],
+                        ['3 \u2013 5%', 'Problem', 'Significant derating required; motor damage likely over time'],
+                        ['> 5%', 'Critical', 'NEMA standards require motor derating or shutdown']
+                    ]
+                },
+                {
+                    heading: 'Motor Damage Implications',
+                    type: 'paragraphs',
+                    body: 'Per NEMA MG1-14.35, a voltage imbalance of 3.5% causes approximately a 25% increase in motor temperature rise. At 5% imbalance, winding temperatures can rise 50% above design limits, accelerating insulation breakdown and reducing motor life from years to months. For compressors, voltage imbalance is a common cause of early winding failure not attributable to the compressor itself.'
+                },
+                {
+                    heading: 'Common Causes',
+                    type: 'list',
+                    items: [
+                        'Utility-side imbalance \u2014 unequal load distribution across phases at the transformer',
+                        'Single-phase loads unevenly distributed across legs in the panel',
+                        'Loose or corroded service entrance connections',
+                        'One leg of a 240V circuit with a high-resistance connection'
+                    ]
+                },
+                {
+                    heading: 'Field Protocol',
+                    type: 'paragraphs',
+                    body: 'If imbalance > 2% is found on a motor that has failed, document the measurement and note its likely contribution to premature failure. Contact the utility if the imbalance originates upstream of the meter. For in-panel causes, identify and correct unequal loading or tighten service entrance connections.'
+                }
+            ]
+        },
+        'lost-neutral': {
+            title: 'Lost Neutral',
+            icon: '&#128308;',
+            warning: 'A lost neutral is a critical electrical emergency. Sensitive electronics and appliances can be destroyed within seconds. If suspected, shut off the main breaker immediately and contact an electrician and the utility.',
+            intro: 'A lost neutral occurs when the neutral conductor is broken, corroded, or disconnected on a 120/240V split-phase service. The neutral is the return path for 120V circuits. When lost, the two hot legs form a voltage divider through connected loads, severely over-voltaging some circuits while under-voltaging others.',
+            sections: [
+                {
+                    heading: 'What Happens',
+                    type: 'paragraphs',
+                    body: 'On a 240V split-phase panel, each hot leg is 120V relative to neutral. If neutral is lost, the two 120V legs now form a voltage divider through whatever loads are connected. A high-resistance load on one leg "steals" voltage from the other. Loads on the high-voltage leg may see 150\u2013200V+, causing immediate failure. Loads on the low-voltage leg may see under 60V and fail to operate.'
+                },
+                {
+                    heading: 'Common Symptoms',
+                    type: 'list',
+                    items: [
+                        'Lights flickering \u2014 one set very bright while another is very dim',
+                        'Multiple 120V appliances failing simultaneously or behaving erratically',
+                        'Electronics damaged or dead after the event',
+                        'Outlets testing at abnormal voltages (well above or below 120V)',
+                        'Voltage varies as loads are switched on or off'
+                    ]
+                },
+                {
+                    heading: 'Meter Identification',
+                    type: 'list',
+                    items: [
+                        'Measure L1\u2013N and L2\u2013N at the panel or outlet with loads connected.',
+                        'Normal: both legs read 120V \u00b1 5%. With lost neutral: one leg may read 150\u2013190V, the other 30\u201370V.',
+                        'The sum of L1\u2013N + L2\u2013N voltages should always equal approximately 240V \u2014 a correct reading (120 + 120) confirms neutral is intact.',
+                        'Test neutral to ground: in a working circuit, neutral reads near 0V to ground. Elevated voltage on neutral (> 5V) indicates resistance in the neutral path.'
+                    ]
+                },
+                {
+                    heading: 'Common Causes',
+                    type: 'list',
+                    items: [
+                        'Corroded or loose service entrance neutral at the weather head, meter base, or main lug',
+                        'Broken neutral wire in the panel or at a junction box',
+                        'Utility-side neutral failure (overhead service drop)',
+                        'Aluminum neutral connection that has oxidized and loosened over time',
+                        'Rodent damage to service entrance wiring'
+                    ]
+                },
+                {
+                    heading: 'Insurance Context',
+                    type: 'paragraphs',
+                    body: 'A lost neutral event frequently destroys multiple appliances simultaneously. Document which circuits failed, voltage readings if obtainable, and whether the failure was utility-side or on the customer-side of the meter. Utility-caused events may be the utility\'s liability; customer-side wiring failures fall under the homeowner\'s policy.'
+                }
+            ]
+        },
+        'reversed-hot-ground': {
+            title: 'Reversed Hot/Ground',
+            icon: '&#128997;',
+            intro: 'A reversed hot/ground wiring error occurs when the black (hot) conductor is connected to the ground terminal of an outlet, and the ground wire is connected to the hot terminal. The outlet may appear functional but presents a serious safety hazard.',
+            sections: [
+                {
+                    heading: 'Identification',
+                    type: 'list',
+                    items: [
+                        'A standard plug-in outlet tester will light the "hot/ground reversed" indicator.',
+                        'With a DMM: the small slot (hot terminal) should read ~120V relative to ground. On a reversed outlet, the small slot reads near 0V to ground, and the large slot reads ~120V.',
+                        'Hot-to-neutral voltage reads correctly (~120V) because only hot and ground are swapped \u2014 the neutral is still wired correctly.'
+                    ]
+                },
+                {
+                    heading: 'Code Status and Risk',
+                    type: 'paragraphs',
+                    body: 'Reversed hot/ground violates NEC 406.4. The ground conductor is not current-carrying and is not protected by a breaker. When hot is connected to the ground terminal, the metal chassis of any plugged-in appliance becomes energized at 120V, creating an electrocution hazard whenever someone touches the appliance while contacting a grounded surface. The breaker will not trip because no overload occurs.'
+                },
+                {
+                    heading: 'Risk vs. Reversed Hot/Neutral',
+                    type: 'paragraphs',
+                    body: 'Reversed hot/ground is serious but slightly less immediately damaging to equipment than reversed hot/neutral, because the ground wire has high impedance in most circuits, limiting current through connected equipment. However, the shock hazard from an energized chassis is significant, particularly with metal-bodied appliances and power tools.'
+                },
+                {
+                    heading: 'Insurance Implications',
+                    type: 'list',
+                    items: [
+                        'An energized appliance chassis can cause electrocution if a person contacts the equipment while grounded.',
+                        'GFCI protection at or upstream of the outlet can mitigate the shock risk but does not correct the underlying wiring error.',
+                        'Document the location and count of affected outlets; correction requires rewiring the outlet.'
+                    ]
+                }
+            ]
+        },
+        'reversed-hot-neutral': {
+            title: 'Reversed Hot/Neutral',
+            icon: '&#128998;',
+            warning: 'Reversed hot/neutral is a severe wiring defect. Switch-controlled loads may remain energized even when switched off. Plugged-in appliances may have internal components at line voltage. Correct immediately.',
+            intro: 'A reversed hot/neutral error occurs when the black (hot) and white (neutral) conductors are connected to the wrong terminals at an outlet or fixture. This is more hazardous than a reversed hot/ground condition because neutral is a current-carrying conductor that passes through no fuse or breaker protection.',
+            sections: [
+                {
+                    heading: 'Why It Is More Dangerous Than Hot/Ground',
+                    type: 'paragraphs',
+                    body: 'When hot and neutral are reversed, the neutral bus \u2014 and anything connected to it \u2014 is at 120V relative to ground, while the hot terminal reads 0V locally at the outlet. This means the neutral wire, which is never fused or protected by a breaker, carries full line voltage. Contact with the neutral wire anywhere in the circuit while grounded results in a full 120V shock. Additionally, in a switched circuit, the switch now interrupts the neutral rather than the hot \u2014 so even with the switch off, the load remains connected to line voltage.'
+                },
+                {
+                    heading: 'Equipment Damage',
+                    type: 'list',
+                    items: [
+                        'Sensitive electronics with ground-referenced internal circuitry may be immediately damaged or destroyed.',
+                        'Motor-driven appliances may run in reverse or with reduced performance.',
+                        'Surge protectors and UPS units may operate incorrectly or fail to protect because their reference point is inverted.',
+                        'Electronic appliances with switch-mode power supplies have some reverse-polarity tolerance but should not be operated on reversed circuits.'
+                    ]
+                },
+                {
+                    heading: 'Detection',
+                    type: 'list',
+                    items: [
+                        'Standard outlet tester: lights the "hot/neutral reversed" indicator.',
+                        'DMM between the large slot (neutral terminal) and ground: should read near 0V normally. On a reversed outlet, reads ~120V.',
+                        'DMM between the small slot (hot terminal) and ground: should read ~120V normally. On a reversed outlet, reads near 0V.'
+                    ]
+                },
+                {
+                    heading: 'Required Action',
+                    type: 'paragraphs',
+                    body: 'This condition requires immediate correction by a licensed electrician. The outlet must be rewired, and all downstream outlets and fixtures on the same circuit must be inspected for the same error. If the reversal occurs at the panel or at a junction box, the entire circuit may be affected.'
+                }
+            ]
+        },
+        'lra': {
+            title: 'Locked Rotor Amps (LRA)',
+            icon: '&#128295;',
+            intro: 'Locked Rotor Amps (LRA) is the maximum current a motor draws at startup when the rotor is stationary \u2014 before it begins to spin. All motors draw significantly more current at startup than during normal running. If a motor or compressor fails to start and remains locked, it continuously draws LRA-level current, quickly overheating the windings.',
+            sections: [
+                {
+                    heading: 'LRA vs RLA by Motor Type',
+                    type: 'table',
+                    headers: ['Motor Type', 'Typical LRA:RLA Ratio', 'Example'],
+                    rows: [
+                        ['Residential compressor (1\u20133 ton)', '5\u20137\u00d7 RLA', 'RLA: 10A \u2192 LRA: 50\u201370A'],
+                        ['PSC condenser fan motor', '3\u20134\u00d7 RLA', 'RLA: 1.5A \u2192 LRA: 5\u20136A'],
+                        ['Refrigerator compressor', '4\u20136\u00d7 RLA', 'RLA: 1\u20132A \u2192 LRA: 6\u201312A'],
+                        ['Washer drive motor', '4\u20135\u00d7 RLA', 'RLA: 3A \u2192 LRA: 12\u201315A']
+                    ]
+                },
+                {
+                    heading: 'Field Identification of Locked Rotor',
+                    type: 'list',
+                    items: [
+                        'Motor or compressor hums but does not start (electrical hum, no mechanical rotation).',
+                        'Clamp meter on the supply wire reads at or near the LRA nameplate value while the motor remains stationary.',
+                        'Breaker may trip after a few seconds \u2014 thermal-magnetic breakers protect against sustained overcurrent.',
+                        'Compressor feels warm after a failed start attempt \u2014 internal thermal protector may be tripped.'
+                    ]
+                },
+                {
+                    heading: 'Common Causes',
+                    type: 'list',
+                    items: [
+                        '<strong>Failed start capacitor:</strong> Most common cause on single-phase motors. The capacitor provides the phase shift needed for starting torque. Test capacitance with a capacitor meter.',
+                        '<strong>Failed run capacitor:</strong> Less common but can prevent starting under load.',
+                        '<strong>Mechanical seizure:</strong> Compressor piston or valves seized due to lubrication failure or liquid slugging.',
+                        '<strong>Low supply voltage:</strong> Insufficient voltage reduces starting torque \u2014 motor cannot overcome load inertia.',
+                        '<strong>Defective start relay (PTC or current relay):</strong> Relay fails to engage the start winding.',
+                        '<strong>Refrigerant overcharge or liquid lock:</strong> Hydraulic lock prevents compressor from starting.'
+                    ]
+                },
+                {
+                    heading: 'Repairability by Cause',
+                    type: 'table',
+                    headers: ['Cause', 'Repair Approach', 'Cost Tier'],
+                    rows: [
+                        ['Failed start capacitor', 'Replace capacitor', 'Low ($15\u2013$75 part)'],
+                        ['Failed run capacitor', 'Replace capacitor', 'Low ($15\u2013$75 part)'],
+                        ['Failed start relay', 'Replace relay', 'Low ($10\u2013$50 part)'],
+                        ['Low voltage (utility)', 'Contact utility; consider hard start kit', 'Low\u2013Medium'],
+                        ['Refrigerant issue', 'Evacuate, correct charge, restart', 'Medium'],
+                        ['Mechanical seizure (compressor)', 'Compressor replacement', 'High \u2014 often total loss'],
+                        ['Seized motor (fan / pump)', 'Motor replacement', 'Medium']
+                    ]
+                }
+            ]
+        },
+        'meg-testing': {
+            title: 'Meg Testing (Insulation Resistance)',
+            icon: '&#128300;',
+            warning: 'Meg testing applies high DC voltage to the circuit under test. Disconnect all equipment and verify the circuit is completely de-energized. Never meg-test electronic components, printed circuit boards, or semiconductor devices \u2014 they will be destroyed.',
+            intro: 'Megohmmeter (meg) testing measures the resistance of electrical insulation between conductors or between a conductor and ground. A megohmmeter applies a high DC voltage (typically 500V or 1000V) to stress-test insulation. Results are measured in megohms (M\u03a9). This test identifies degraded insulation before a failure occurs.',
+            sections: [
+                {
+                    heading: 'Equipment and Setup',
+                    type: 'list',
+                    items: [
+                        'Use a calibrated megohmmeter (500V or 1000V DC test voltage for residential/commercial wiring).',
+                        'Disconnect the circuit from all loads and from the panel. Isolate all equipment at both ends.',
+                        'Test conductor to ground: connect one probe to the conductor(s) under test, the other to a verified ground point.',
+                        'Apply test voltage for 1 minute and read the insulation resistance value.'
+                    ]
+                },
+                {
+                    heading: 'Acceptable vs. Fail Readings',
+                    type: 'table',
+                    headers: ['Reading', 'Status', 'Interpretation'],
+                    rows: [
+                        ['\u2265 1,000 M\u03a9', 'Excellent', 'New or like-new insulation \u2014 no concern'],
+                        ['100 \u2013 999 M\u03a9', 'Good', 'Normal for in-service wiring \u2014 no action required'],
+                        ['10 \u2013 99 M\u03a9', 'Marginal', 'Aging insulation \u2014 monitor; investigate moisture or damage'],
+                        ['1 \u2013 9 M\u03a9', 'Poor', 'Significant degradation \u2014 replacement recommended'],
+                        ['< 1 M\u03a9', 'Fail', 'Insulation breakdown \u2014 do not energize; repair or replace required'],
+                        ['Near 0', 'Hard fault', 'Dead short to ground \u2014 immediate action required']
+                    ]
+                },
+                {
+                    heading: 'When Meg Testing Is Used',
+                    type: 'list',
+                    items: [
+                        'Motor winding insulation testing \u2014 confirm windings have not degraded to ground',
+                        'Compressor winding-to-shell insulation \u2014 identify early-stage hermetic failure',
+                        'Branch circuit wiring after water intrusion or fire damage',
+                        'Service entrance cables showing signs of insulation deterioration',
+                        'Pre-energization testing of repaired or rewired circuits'
+                    ]
+                },
+                {
+                    heading: 'Motor Winding Reference',
+                    type: 'table',
+                    headers: ['Motor Size', 'Minimum Acceptable (IEEE 43)', 'Fail Threshold'],
+                    rows: [
+                        ['< 1 HP', '\u2265 1 M\u03a9', '< 1 M\u03a9'],
+                        ['1 \u2013 10 HP', '\u2265 5 M\u03a9 (rule of thumb)', '< 1 M\u03a9'],
+                        ['> 10 HP', 'Per manufacturer spec', '< 1 M\u03a9']
+                    ]
+                },
+                {
+                    heading: 'Field Protocol and Limitations',
+                    type: 'paragraphs',
+                    body: 'For insurance documentation, record: test voltage used, conductors or equipment tested, measured value in M\u03a9, and ambient temperature and humidity (insulation resistance varies with temperature). A passing meg test does not certify future reliable operation \u2014 it confirms insulation is intact at the time of test. Meg testing must not be performed on circuits containing electronic controls, VFDs, or semiconductor components unless they are fully disconnected.'
+                }
+            ]
+        }
+    };
+
+    function buildGrHtml(data) {
+        var html = '';
+        if (data.warning) {
+            html += '<div class="fr-safety-warning">' + data.warning + '</div>';
+        }
+        if (data.intro) {
+            html += '<p class="fr-intro">' + data.intro + '</p>';
+        }
+        (data.sections || []).forEach(function(sec) {
+            html += '<h4 class="fr-subheading">' + sec.heading + '</h4>';
+            if (sec.type === 'list') {
+                html += '<ul class="fr-component-list">';
+                sec.items.forEach(function(item) { html += '<li>' + item + '</li>'; });
+                html += '</ul>';
+            } else if (sec.type === 'table') {
+                html += '<div style="overflow-x:auto;margin-bottom:0.5rem"><table class="fr-ref-table"><thead><tr>';
+                sec.headers.forEach(function(h) { html += '<th>' + h + '</th>'; });
+                html += '</tr></thead><tbody>';
+                sec.rows.forEach(function(row) {
+                    html += '<tr>';
+                    row.forEach(function(cell) { html += '<td>' + cell + '</td>'; });
+                    html += '</tr>';
+                });
+                html += '</tbody></table></div>';
+            } else if (sec.type === 'paragraphs') {
+                var bodies = Array.isArray(sec.body) ? sec.body : [sec.body];
+                bodies.forEach(function(p) { html += '<p>' + p + '</p>'; });
+            }
+        });
+        return html;
+    }
+
+    function renderGrDetail(grId) {
+        var panel = document.getElementById('gr-detail');
+        var data = GR_DATA[grId];
+        if (!panel || !data) return;
+        panel.innerHTML =
+              '<div class="gr-detail-header">'
+            + '<span class="gr-detail-icon">' + data.icon + '</span>'
+            + '<span class="gr-detail-title">' + data.title + '</span>'
+            + '<button class="gr-detail-close" aria-label="Close">&times;</button>'
+            + '</div>'
+            + '<div class="gr-detail-body">' + buildGrHtml(data) + '</div>';
+        panel.dataset.grId = grId;
+        panel.querySelector('.gr-detail-close').addEventListener('click', function() {
+            toggleGrItem(grId);
+        });
+    }
+
+    function toggleGrItem(grId) {
+        var panel = document.getElementById('gr-detail');
+        if (!panel) return;
+        var currentId = panel.dataset.grId;
+        var isOpen = !panel.classList.contains('fr-hidden');
+        document.querySelectorAll('.gen-ref-card').forEach(function(c) {
+            c.classList.remove('active');
+            c.setAttribute('aria-expanded', 'false');
+        });
+        if (isOpen && currentId === grId) {
+            panel.classList.add('fr-hidden');
+            panel.dataset.grId = '';
+            return;
+        }
+        renderGrDetail(grId);
+        panel.classList.remove('fr-hidden');
+        var card = document.querySelector('.gen-ref-card[data-gr-id="' + grId + '"]');
+        if (card) {
+            card.classList.add('active');
+            card.setAttribute('aria-expanded', 'true');
+        }
+        setTimeout(function() {
+            panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 30);
+    }
+
+    function initGrGrid() {
+        document.querySelectorAll('.gen-ref-card').forEach(function(card) {
+            var grId = card.dataset.grId;
+            if (!grId) return;
+            card.addEventListener('click', function() { toggleGrItem(grId); });
+            card.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleGrItem(grId); }
+            });
+        });
+    }
+
     // ── Boot ───────────────────────────────────────────────────────────────────
     document.addEventListener('DOMContentLoaded', function() {
         renderItemGrid();
         initSearch();
+        initGrGrid();
     });
     </script>
 </body>

@@ -375,6 +375,43 @@
         .panel-nav-btn { background: white; border: 1px solid var(--border-color); border-radius: 999px; padding: 0.35rem 0.9rem; font-size: 0.75rem; font-weight: 600; font-family: inherit; color: var(--text-mid); cursor: pointer; transition: border-color 0.15s, color 0.15s, background 0.15s; }
         .panel-nav-btn:hover { border-color: var(--accent); color: var(--text-dark); background: var(--accent-dim); }
 
+        /* ── Compare Replacement Option Tool ── */
+        .compare-trigger-row { margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid var(--border-color); }
+        .compare-toggle-btn { background: #fff; border: 1.5px solid var(--accent); border-radius: 999px; padding: 0.5rem 1.2rem; font-size: 0.81rem; font-weight: 600; color: #92400e; cursor: pointer; font-family: inherit; transition: background 0.15s, box-shadow 0.15s; }
+        .compare-toggle-btn:hover { background: var(--accent-dim); box-shadow: 0 2px 8px rgba(234,179,8,0.2); }
+        .compare-toggle-btn.active { background: var(--accent-dim); }
+        .compare-panel { background: var(--bg-card-alt); border: 1.5px solid var(--border-color); border-radius: 14px; margin-top: 0.875rem; overflow: hidden; }
+        .compare-panel-header { display: flex; align-items: center; gap: 0.6rem; padding: 0.85rem 1rem; border-bottom: 1px solid var(--border-color); }
+        .compare-panel-icon { font-size: 1.05rem; flex-shrink: 0; }
+        .compare-panel-title { font-size: 0.88rem; font-weight: 700; color: var(--text-dark); flex: 1; }
+        .compare-panel-close { background: none; border: none; cursor: pointer; font-size: 1.1rem; color: var(--text-light); padding: 0.2rem 0.4rem; border-radius: 6px; line-height: 1; }
+        .compare-panel-close:hover { background: var(--border-color); }
+        .compare-input-row { display: flex; gap: 0.5rem; padding: 0.85rem 1rem 0.4rem; }
+        .compare-input { flex: 1; border: 1.5px solid var(--border-color); border-radius: 8px; padding: 0.5rem 0.8rem; font-size: 0.85rem; font-family: inherit; color: var(--text-dark); background: #fff; }
+        .compare-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px rgba(234,179,8,0.15); }
+        .compare-submit-btn { background: var(--accent); border: none; border-radius: 8px; padding: 0.5rem 1.2rem; font-size: 0.83rem; font-weight: 700; color: #000; cursor: pointer; font-family: inherit; white-space: nowrap; transition: background 0.15s; flex-shrink: 0; }
+        .compare-submit-btn:hover { background: var(--accent-hover); }
+        .compare-submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .compare-checkbox-label { display: flex; align-items: center; gap: 0.45rem; padding: 0.2rem 1rem 0.85rem; font-size: 0.79rem; color: var(--text-mid); cursor: pointer; }
+        .compare-checkbox-label input { cursor: pointer; accent-color: var(--accent); }
+        .compare-loading { padding: 0.75rem 1rem; }
+        .compare-result { padding: 0.85rem 1rem; }
+        .compare-table-wrap { overflow-x: auto; margin-bottom: 0.85rem; }
+        .compare-table { width: 100%; border-collapse: collapse; font-size: 0.81rem; }
+        .compare-table th { background: #f1f5f9; color: var(--text-dark); font-weight: 600; text-align: left; padding: 0.45rem 0.7rem; border-bottom: 2px solid var(--border-color); white-space: nowrap; }
+        .compare-table th.compare-col-entered { background: #fffbeb; color: #92400e; }
+        .compare-table td { padding: 0.4rem 0.7rem; border-bottom: 1px solid var(--border-color); color: var(--text-mid); vertical-align: top; }
+        .compare-table tr:last-child td { border-bottom: none; }
+        .compare-table td.compare-col-entered { background: rgba(255,251,235,0.4); }
+        .lkq-verdict { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.18rem 0.6rem; border-radius: 999px; font-size: 0.72rem; font-weight: 700; }
+        .lkq-match { background: #dcfce7; color: #15803d; }
+        .lkq-close { background: #fef3c7; color: #92400e; }
+        .lkq-no-match { background: #fee2e2; color: #dc2626; }
+        .compare-summary { font-size: 0.83rem; color: var(--text-mid); line-height: 1.65; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 10px; padding: 0.8rem 0.95rem; margin-bottom: 0.8rem; }
+        .compare-add-btn { background: #1e293b; border: none; border-radius: 8px; padding: 0.5rem 1.15rem; font-size: 0.79rem; font-weight: 600; color: #fff; cursor: pointer; font-family: inherit; transition: background 0.15s; }
+        .compare-add-btn:hover { background: #0f172a; }
+        .compare-add-btn.added { background: #15803d; cursor: default; }
+
         /* ── Tiered table columns ── */
         .tier-col-badge { display:inline-block; padding:0.15rem 0.5rem; border-radius:999px; font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.04em; margin-bottom:0.15rem; }
         .tier-col-entry  { background:#e2e8f0; color:#475569; }
@@ -867,6 +904,27 @@
                         <div id="narrow-results" class="narrow-results hidden">
                             <div class="narrow-results-header">&#128269; Narrow Your Results</div>
                             <p id="narrow-results-tip"></p>
+                        </div>
+                        <div id="compare-trigger-row" class="compare-trigger-row hidden">
+                            <button id="compare-toggle-btn" class="compare-toggle-btn">&#128270; Compare a Replacement Option</button>
+                        </div>
+                        <div id="compare-panel" class="compare-panel hidden">
+                            <div class="compare-panel-header">
+                                <span class="compare-panel-icon">&#128270;</span>
+                                <span class="compare-panel-title">Compare a Replacement Option</span>
+                                <button class="compare-panel-close" id="compare-panel-close">&times;</button>
+                            </div>
+                            <div class="compare-input-row">
+                                <input type="text" id="compare-input" class="compare-input" placeholder="Enter brand + model number (e.g. Samsung RF28R7351SR)" />
+                                <button id="compare-submit" class="compare-submit-btn">Compare</button>
+                            </div>
+                            <label class="compare-checkbox-label">
+                                <input type="checkbox" id="compare-include-existing" /> Include loaded Brand Match &amp; Option 1
+                            </label>
+                            <div id="compare-loading" class="compare-loading hidden">
+                                <div class="section-spinner">Looking up replacement&hellip;</div>
+                            </div>
+                            <div id="compare-result" class="compare-result hidden"></div>
                         </div>
                     </div>
                     <div class="panel-nav no-print">

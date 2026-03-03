@@ -3,6 +3,7 @@ let fastData = null;
 let detailData = null;
 let currentCategory = "general";
 let acvData = { msrp: 0, age: 0 };
+let _compareBlock = null;
 
 // ── Section filter state ──────────────────────────────────────────────────────
 
@@ -805,6 +806,9 @@ function renderDetail(data) {
       }
       tableLoading.classList.add("hidden");
       tableEl.classList.remove("hidden");
+      // Reveal compare trigger when table has data
+      const compareTriggerEl = byId("compare-trigger-row");
+      if (compareTriggerEl) compareTriggerEl.classList.remove("hidden");
     }
   }
 
@@ -1052,6 +1056,277 @@ function renderDetail(data) {
   }
 }
 
+// ── Compare Replacement Option Tool ───────────────────────────────────────────
+
+function getTableVal(table, label) {
+  if (!Array.isArray(table)) return "—";
+  const row = table.find((r) => (r.label || "").toLowerCase().includes(label.toLowerCase()));
+  return row ? (row.original || "—") : "—";
+}
+
+function getTableColVal(table, label, col) {
+  if (!Array.isArray(table)) return "—";
+  const row = table.find((r) => (r.label || "").toLowerCase().includes(label.toLowerCase()));
+  return row ? (row[col] || "—") : "—";
+}
+
+function deriveLkqVerdict(origFast, entFast, origDetail, entDetail) {
+  const origCat = ((origFast && origFast.analysis && origFast.analysis.category) || "").toLowerCase().trim();
+  const entCat  = ((entFast  && entFast.analysis  && entFast.analysis.category)  || "").toLowerCase().trim();
+  if (!origCat || !entCat) return "CLOSE MATCH";
+
+  const catMatch = origCat === entCat
+    || origCat.includes(entCat) || entCat.includes(origCat)
+    || origCat.split(/\s+/).some((w) => w.length > 3 && entCat.includes(w));
+  if (!catMatch) return "NOT LKQ";
+
+  const origCapStr = getTableVal(origDetail && origDetail.table, "capacity") !== "—"
+    ? getTableVal(origDetail && origDetail.table, "capacity")
+    : getTableVal(origDetail && origDetail.table, "size");
+  const entCapStr = getTableVal(entDetail && entDetail.table, "capacity") !== "—"
+    ? getTableVal(entDetail && entDetail.table, "capacity")
+    : getTableVal(entDetail && entDetail.table, "size");
+
+  if (origCapStr !== "—" && entCapStr !== "—") {
+    const origNum = parseFloat(origCapStr.replace(/[^0-9.]/g, ""));
+    const entNum  = parseFloat(entCapStr.replace(/[^0-9.]/g, ""));
+    if (origNum && entNum) {
+      const diff = Math.abs(origNum - entNum) / Math.max(origNum, entNum);
+      if (diff <= 0.08) return "MATCH";
+      if (diff <= 0.22) return "CLOSE MATCH";
+      return "NOT LKQ";
+    }
+  }
+  return "CLOSE MATCH";
+}
+
+function buildCompareSummary(origFast, entFast, verdict, enteredQuery) {
+  const origDesc  = (origFast && origFast.analysis && (origFast.analysis.quickSummary || origFast.analysis.estimatedModel)) || "the original item";
+  const entDesc   = (entFast  && entFast.analysis  && (entFast.analysis.quickSummary  || entFast.analysis.estimatedModel))  || enteredQuery || "the entered model";
+  const origCat   = (origFast && origFast.analysis && origFast.analysis.category) || "item";
+  const entCat    = (entFast  && entFast.analysis  && entFast.analysis.category)  || "item";
+  const origPrice = (origFast && origFast.analysis && (origFast.analysis.currentMarketPrice || origFast.analysis.launchMsrp)) || "—";
+  const entPrice  = (entFast  && entFast.analysis  && (entFast.analysis.currentMarketPrice  || entFast.analysis.launchMsrp))  || "—";
+
+  if (verdict === "MATCH") {
+    return `${entDesc} is a ${entCat} in the same category as ${origDesc}, with comparable specifications that meet LKQ standards. Current market pricing: Original ${origPrice}; Entered model ${entPrice}. This replacement option appears to qualify as like-kind and quality.`;
+  }
+  if (verdict === "CLOSE MATCH") {
+    return `${entDesc} is a ${entCat} in the same general category as ${origDesc}, though specifications may differ in some areas. Current market values — Original: ${origPrice}; Entered model: ${entPrice}. This replacement may qualify as LKQ depending on the specific claims criteria applied; independent verification is recommended.`;
+  }
+  return `${entDesc} (${entCat}) does not appear to be like-kind and quality compared to ${origDesc} (${origCat}). The item categories or specifications differ significantly. Current market values — Original: ${origPrice}; Entered model: ${entPrice}. Independent verification is required before using this item as a replacement.`;
+}
+
+function renderCompareTable(entFast, entDetail, includeExisting) {
+  const origTable = (detailData && detailData.table) || [];
+  const entTable  = (entDetail  && entDetail.table)  || [];
+
+  const verdict = deriveLkqVerdict(fastData, entFast, detailData, entDetail);
+
+  const verdictHtml = verdict === "MATCH"
+    ? '<span class="lkq-verdict lkq-match">&#10003; MATCH</span>'
+    : verdict === "CLOSE MATCH"
+      ? '<span class="lkq-verdict lkq-close">&#9888; CLOSE MATCH</span>'
+      : '<span class="lkq-verdict lkq-no-match">&#10007; NOT LKQ</span>';
+
+  const entModelName = escapeHtml(
+    (entFast && entFast.analysis && (entFast.analysis.estimatedModel || entFast.analysis.entered)) ||
+    (byId("compare-input") && byId("compare-input").value.trim()) || "Entered Model"
+  );
+
+  const cols = [{ key: "original", label: "Original Item", entered: false }];
+  if (includeExisting) {
+    cols.push({ key: "brandMatch", label: "Brand Match", entered: false });
+    cols.push({ key: "option1",    label: "Option 1",    entered: false });
+  }
+  cols.push({ key: "entered", label: entModelName, entered: true });
+
+  const fa = (fastData && fastData.analysis) || {};
+  const ea = (entFast  && entFast.analysis)  || {};
+
+  const rows = [
+    {
+      label: "Item Type",
+      original:   fa.category   || "—",
+      brandMatch: getTableColVal(origTable, "item type", "brandMatch") || fa.category || "—",
+      option1:    getTableColVal(origTable, "item type", "option1")    || fa.category || "—",
+      entered:    ea.category   || "—",
+      isHtml: false
+    },
+    {
+      label: "Brand",
+      original:   getTableVal(origTable, "brand") !== "—" ? getTableVal(origTable, "brand") : ((fa.quickSummary || "").split(" ")[0] || "—"),
+      brandMatch: getTableColVal(origTable, "brand", "brandMatch"),
+      option1:    getTableColVal(origTable, "brand", "option1"),
+      entered:    getTableVal(entTable, "brand")  !== "—" ? getTableVal(entTable, "brand")  : ((ea.quickSummary || "").split(" ")[0] || "—"),
+      isHtml: false
+    },
+    {
+      label: "Model Number",
+      original:   fa.estimatedModel || getTableVal(origTable, "model") || "—",
+      brandMatch: getTableColVal(origTable, "model", "brandMatch"),
+      option1:    getTableColVal(origTable, "model", "option1"),
+      entered:    ea.estimatedModel || getTableVal(entTable,  "model") || "—",
+      isHtml: false
+    },
+    {
+      label: "Capacity / Size",
+      original:   getTableVal(origTable, "capacity") !== "—" ? getTableVal(origTable, "capacity") : getTableVal(origTable, "size"),
+      brandMatch: getTableColVal(origTable, "capacity", "brandMatch") !== "—" ? getTableColVal(origTable, "capacity", "brandMatch") : getTableColVal(origTable, "size", "brandMatch"),
+      option1:    getTableColVal(origTable, "capacity", "option1")    !== "—" ? getTableColVal(origTable, "capacity", "option1")    : getTableColVal(origTable, "size", "option1"),
+      entered:    getTableVal(entTable,  "capacity")  !== "—" ? getTableVal(entTable,  "capacity")  : getTableVal(entTable,  "size"),
+      isHtml: false
+    },
+    {
+      label: "Key Specifications",
+      original:   fa.keyDetails || "—",
+      brandMatch: getTableColVal(origTable, "key", "brandMatch") || "—",
+      option1:    getTableColVal(origTable, "key", "option1")    || "—",
+      entered:    ea.keyDetails || "—",
+      isHtml: false
+    },
+    {
+      label: "Original Retail Price",
+      original:   fa.launchMsrp || "—",
+      brandMatch: getTableColVal(origTable, "retail", "brandMatch") || getTableColVal(origTable, "msrp", "brandMatch") || "—",
+      option1:    getTableColVal(origTable, "retail", "option1")    || getTableColVal(origTable, "msrp", "option1")    || "—",
+      entered:    ea.launchMsrp || "—",
+      isHtml: false
+    },
+    {
+      label: "Current Market Value",
+      original:   fa.currentMarketPrice || "—",
+      brandMatch: getTableColVal(origTable, "market", "brandMatch") || getTableColVal(origTable, "current", "brandMatch") || "—",
+      option1:    getTableColVal(origTable, "market", "option1")    || getTableColVal(origTable, "current", "option1")    || "—",
+      entered:    ea.currentMarketPrice || "—",
+      isHtml: false
+    },
+    {
+      label: "Energy Efficiency",
+      original:   getTableVal(origTable, "energy"),
+      brandMatch: getTableColVal(origTable, "energy", "brandMatch"),
+      option1:    getTableColVal(origTable, "energy", "option1"),
+      entered:    getTableVal(entTable,  "energy"),
+      isHtml: false
+    },
+    {
+      label: "LKQ Assessment",
+      original:   '<span class="lkq-verdict lkq-match" style="font-size:0.7rem">&#10003; Original</span>',
+      brandMatch: "—",
+      option1:    "—",
+      entered:    verdictHtml,
+      isHtml: true
+    }
+  ];
+
+  let thead = "<tr><th>Feature</th>";
+  cols.forEach((col) => {
+    thead += `<th${col.entered ? ' class="compare-col-entered"' : ""}>${escapeHtml(col.label)}</th>`;
+  });
+  thead += "</tr>";
+
+  let tbody = rows.map((row) => {
+    let tr = `<tr><td>${escapeHtml(row.label)}</td>`;
+    cols.forEach((col) => {
+      const val = col.key === "entered" ? row.entered
+        : col.key === "brandMatch" ? row.brandMatch
+        : col.key === "option1"    ? row.option1
+        : row.original;
+      const cellClass = col.entered ? ' class="compare-col-entered"' : "";
+      const content   = row.isHtml ? (val || "—") : escapeHtml(val || "—");
+      tr += `<td${cellClass}>${content}</td>`;
+    });
+    tr += "</tr>";
+    return tr;
+  }).join("");
+
+  const summaryText = buildCompareSummary(fastData, entFast, verdict, (byId("compare-input") || {}).value || "");
+
+  _compareBlock = {
+    key: "comparison",
+    title: "Replacement Comparison",
+    text: `Comparing original vs. ${(entFast && entFast.analysis && entFast.analysis.estimatedModel) || "entered model"}\nLKQ Verdict: ${verdict}\n${summaryText}`
+  };
+
+  return `
+    <div class="compare-table-wrap">
+      <table class="compare-table">
+        <thead>${thead}</thead>
+        <tbody>${tbody}</tbody>
+      </table>
+    </div>
+    <div class="compare-summary">${escapeHtml(summaryText)}</div>
+    <button class="compare-add-btn" id="compare-add-btn">&#128196; Add This Comparison to Report Summary</button>`;
+}
+
+async function runComparison() {
+  const inputEl   = byId("compare-input");
+  const loadingEl = byId("compare-loading");
+  const resultEl  = byId("compare-result");
+  const submitBtn = byId("compare-submit");
+  const includeExisting = byId("compare-include-existing") ? byId("compare-include-existing").checked : false;
+
+  const query = inputEl ? inputEl.value.trim() : "";
+  if (!query) {
+    if (inputEl) {
+      inputEl.focus();
+      inputEl.style.borderColor = "var(--red)";
+      setTimeout(() => { inputEl.style.borderColor = ""; }, 1500);
+    }
+    return;
+  }
+  if (!fastData) return;
+
+  if (loadingEl) loadingEl.classList.remove("hidden");
+  if (resultEl) resultEl.classList.add("hidden");
+  if (submitBtn) submitBtn.disabled = true;
+
+  try {
+    const [entFastRaw, entDetailRaw] = await Promise.all([
+      fetch(`/api/search?mode=research-fast&query=${encodeURIComponent(query)}`).then((r) => r.json()).catch(() => null),
+      fetch(`/api/search?mode=research-detail&query=${encodeURIComponent(query)}`).then((r) => r.json()).catch(() => null)
+    ]);
+
+    const entFast   = entFastRaw   && typeof entFastRaw   === "object" ? entFastRaw   : null;
+    const entDetail = entDetailRaw && typeof entDetailRaw === "object" && !entDetailRaw.error ? entDetailRaw : null;
+
+    if (!entFast) {
+      if (resultEl) {
+        resultEl.innerHTML = '<p style="color:var(--red);font-size:0.85rem;padding:0.25rem 0;">Could not retrieve data for this model. Please refine your query.</p>';
+        resultEl.classList.remove("hidden");
+      }
+      return;
+    }
+
+    if (resultEl) {
+      resultEl.innerHTML = renderCompareTable(entFast, entDetail, includeExisting);
+      resultEl.classList.remove("hidden");
+      const addBtn = byId("compare-add-btn");
+      if (addBtn) {
+        addBtn.addEventListener("click", () => {
+          if (_compareBlock) {
+            addBtn.textContent = "✓ Added to Report Summary";
+            addBtn.classList.add("added");
+            addBtn.disabled = true;
+          }
+        });
+      }
+    }
+  } finally {
+    if (loadingEl) loadingEl.classList.add("hidden");
+    if (submitBtn) submitBtn.disabled = false;
+  }
+}
+
+function toggleComparePanel() {
+  const btn   = byId("compare-toggle-btn");
+  const panel = byId("compare-panel");
+  if (!panel || !btn) return;
+  const isOpen = !panel.classList.contains("hidden");
+  panel.classList.toggle("hidden", isOpen);
+  btn.classList.toggle("active", !isOpen);
+}
+
 // ── Summary Modal ─────────────────────────────────────────────────────────────
 
 let _summaryState = {};
@@ -1124,6 +1399,9 @@ function openSummaryModal() {
       text: detailData.technicalSpecs.split(",").slice(0, 10).map((s) => `• ${s.trim()}`).join("\n")
     });
   }
+
+  // Include comparison block if user added one
+  if (_compareBlock) blocks.push(_compareBlock);
 
   // Save state (all included by default)
   _summaryState = {};
@@ -1306,6 +1584,17 @@ async function performSearch() {
 
   fastData = null;
   detailData = null;
+  _compareBlock = null;
+
+  // Reset compare tool
+  const compareTrigger = byId("compare-trigger-row");
+  const comparePanel   = byId("compare-panel");
+  const compareResult  = byId("compare-result");
+  const compareToggle  = byId("compare-toggle-btn");
+  if (compareTrigger) compareTrigger.classList.add("hidden");
+  if (comparePanel)   comparePanel.classList.add("hidden");
+  if (compareResult)  { compareResult.classList.add("hidden"); compareResult.innerHTML = ""; }
+  if (compareToggle)  compareToggle.classList.remove("active");
 
   // Kick off both fetches simultaneously (skip detail if all detail sections are off)
   const fastPromise = fetch(`/api/search?mode=research-fast&query=${encodeURIComponent(query)}`)
@@ -1471,6 +1760,12 @@ document.addEventListener("DOMContentLoaded", () => {
   if (snBtn) snBtn.addEventListener("click", handleSerialDecode);
   const snInputEl2 = byId("sn-input");
   if (snInputEl2) snInputEl2.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); handleSerialDecode(); } });
+
+  // Compare tool wiring
+  byId("compare-toggle-btn")?.addEventListener("click", toggleComparePanel);
+  byId("compare-panel-close")?.addEventListener("click", toggleComparePanel);
+  byId("compare-submit")?.addEventListener("click", runComparison);
+  byId("compare-input")?.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); runComparison(); } });
 
   // Section filter checkboxes
   const filterMap = [
