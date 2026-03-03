@@ -14,6 +14,174 @@ const selectedSections = {
   technical:    true
 };
 
+// ── Serial Number Decode ──────────────────────────────────────────────────────
+// Maps and helpers mirror item-age.js (not loaded on this page)
+const SN_YEAR_W   = {'L':2021,'M':2022,'P':2023,'R':2024,'S':2025,'T':2006,'U':2007,'W':2008,'X':2009,'Y':2010,'A':2011,'B':2012,'C':2013,'D':2014,'E':2015,'F':2016,'G':2017,'H':2018,'J':2019,'K':2020};
+const SN_YEAR_S   = {'B':2011,'C':2012,'D':2013,'F':2014,'G':2015,'H':2016,'J':2017,'K':2018,'M':2019,'N':2020,'R':2021,'T':2022,'W':2023,'X':2024,'Y':2025};
+const SN_YEAR_GE  = {'L':2022,'M':2023,'R':2024,'S':2025,'T':2014,'V':2015,'Z':2016,'A':2017,'D':2018,'F':2019,'G':2020,'H':2021};
+const SN_MONTHS_FULL  = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const SN_MONTH_GE = {'A':'January','B':'February','D':'March','F':'April','G':'May','H':'June','L':'July','M':'August','R':'September','S':'October','T':'November','V':'December'};
+
+function snMonthIdx(m) {
+  if (!m) return -1;
+  const f = SN_MONTHS_FULL.indexOf(m);
+  if (f !== -1) return f;
+  const short = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return short.indexOf(m);
+}
+
+const SN_DATA = {
+  Appliances: {
+    'Samsung':         { decode: s => { if (s.length < 10) return null; const yc = s.length >= 15 ? s[7] : s[s.length-3]; const mc = s.length >= 15 ? s[8] : s[s.length-2]; const yr = SN_YEAR_S[yc]; const mo = {'1':'Jan','2':'Feb','3':'Mar','4':'Apr','5':'May','6':'Jun','7':'Jul','8':'Aug','9':'Sep','A':'Oct','B':'Nov','C':'Dec'}[mc]; return yr && mo ? {month:mo, year:yr, details:`Samsung: year char at pos ${s.length>=15?8:'−3'}, month at next.`} : null; } },
+    'Whirlpool':       { decode: s => { const yr=SN_YEAR_W[s[2]]; const wk=parseInt(s.substring(3,5)); return yr&&!isNaN(wk)?{week:wk,year:yr,details:'Whirlpool: char 3=year, digits 4-5=week.'}:null; } },
+    'Maytag':          { decode: s => { const yr=SN_YEAR_W[s[2]]; const wk=parseInt(s.substring(3,5)); return yr&&!isNaN(wk)?{week:wk,year:yr,details:'Maytag/Whirlpool style.'}:null; } },
+    'KitchenAid':      { decode: s => { const yr=SN_YEAR_W[s[2]]; const wk=parseInt(s.substring(3,5)); return yr&&!isNaN(wk)?{week:wk,year:yr,details:'KitchenAid/Whirlpool style.'}:null; } },
+    'Jenn-Air':        { decode: s => { const yr=SN_YEAR_W[s[2]]; const wk=parseInt(s.substring(3,5)); return yr&&!isNaN(wk)?{week:wk,year:yr,details:'Jenn-Air/Whirlpool style.'}:null; } },
+    'Amana':           { decode: s => { const yr=SN_YEAR_W[s[2]]; const wk=parseInt(s.substring(3,5)); return yr&&!isNaN(wk)?{week:wk,year:yr,details:'Amana/Whirlpool style.'}:null; } },
+    'GE':              { decode: s => { const yr=SN_YEAR_GE[s[1]]; const mo=SN_MONTH_GE[s[0]]; return yr&&mo?{month:mo,year:yr,details:'GE: char 1=month, char 2=year.'}:null; } },
+    'GE Profile':      { decode: s => { const yr=SN_YEAR_GE[s[1]]; const mo=SN_MONTH_GE[s[0]]; return yr&&mo?{month:mo,year:yr,details:'GE Profile style.'}:null; } },
+    'GE Cafe':         { decode: s => { const yr=SN_YEAR_GE[s[1]]; const mo=SN_MONTH_GE[s[0]]; return yr&&mo?{month:mo,year:yr,details:'GE Cafe style.'}:null; } },
+    'GE Monogram':     { decode: s => { const yr=SN_YEAR_GE[s[1]]; const mo=SN_MONTH_GE[s[0]]; return yr&&mo?{month:mo,year:yr,details:'GE Monogram style.'}:null; } },
+    'Hotpoint':        { decode: s => { const yr=SN_YEAR_GE[s[1]]; const mo=SN_MONTH_GE[s[0]]; return yr&&mo?{month:mo,year:yr,details:'Hotpoint/GE style.'}:null; } },
+    'LG':              { decode: s => { const yd=parseInt(s[0]); if(isNaN(yd)) return null; const mo=SN_MONTHS_FULL[parseInt(s.substring(1,3))-1]; const yr=2000+yd+(yd<5?20:10); return mo?{month:mo,year:yr,details:`LG: digit 1=year, digits 2-3=month.`}:null; } },
+    'Frigidaire':      { decode: s => { const yd=parseInt(s[2]); return !isNaN(yd)?{year:2010+yd,details:'Frigidaire: 3rd digit=year last digit.'}:null; } },
+    'Electrolux':      { decode: s => { const yd=parseInt(s[2]); return !isNaN(yd)?{year:2010+yd,details:'Electrolux/Frigidaire style.'}:null; } },
+    'Bosch':           { decode: s => { const m=s.match(/FD\s*(\d{4})/i)||s.match(/^(\d{4})/); if(!m) return null; const yr=1920+parseInt(m[1].substring(0,2)); const mo=SN_MONTHS_FULL[parseInt(m[1].substring(2,4))-1]; return mo?{month:mo,year:yr,details:'Bosch FD: add 20 to first two FD digits.'}:null; } },
+    'Thermador':       { decode: s => { const m=s.match(/FD\s*(\d{4})/i)||s.match(/^(\d{4})/); if(!m) return null; const yr=1920+parseInt(m[1].substring(0,2)); const mo=SN_MONTHS_FULL[parseInt(m[1].substring(2,4))-1]; return mo?{month:mo,year:yr,details:'Thermador/Bosch style.'}:null; } },
+    'Bradford White':  { decode: s => { const ymap={'A':2004,'B':2005,'C':2006,'D':2007,'E':2008,'F':2009,'G':2010,'H':2011,'J':2012,'K':2013,'L':2014,'M':2015,'N':2016,'P':2017,'S':2018,'T':2019,'W':2020,'X':2021,'Y':2022,'Z':2023}; const mmap={'A':'Jan','B':'Feb','C':'Mar','D':'Apr','E':'May','F':'Jun','G':'Jul','H':'Aug','J':'Sep','K':'Oct','L':'Nov','M':'Dec'}; return ymap[s[0]]&&mmap[s[1]]?{month:mmap[s[1]],year:ymap[s[0]],details:'Bradford White: char 1=year, char 2=month.'}:null; } },
+    'Rheem':           { decode: s => { const d=s.replace(/\D/g,'').substring(0,4); const mo=parseInt(d.substring(0,2)); const yr=2000+parseInt(d.substring(2,4)); return mo>0&&mo<=12?{month:SN_MONTHS_FULL[mo-1],year:yr,details:'Rheem: digits 1-2=month, 3-4=year.'}:null; } },
+    'Ruud':            { decode: s => { const d=s.replace(/\D/g,'').substring(0,4); const mo=parseInt(d.substring(0,2)); const yr=2000+parseInt(d.substring(2,4)); return mo>0&&mo<=12?{month:SN_MONTHS_FULL[mo-1],year:yr,details:'Ruud style.'}:null; } },
+    'A.O. Smith':      { decode: s => { const d=s.replace(/\D/g,'').substring(0,4); const mo=parseInt(d.substring(0,2)); const yr=2000+parseInt(d.substring(2,4)); return mo>0&&mo<=12?{month:SN_MONTHS_FULL[mo-1],year:yr,details:'A.O. Smith style.'}:null; } },
+  },
+  HVAC: {
+    'Carrier':         { decode: s => { const wk=parseInt(s.substring(0,2)); const yr=2000+parseInt(s.substring(2,4)); return !isNaN(wk)&&!isNaN(yr)?{week:wk,year:yr,details:'Carrier: digits 1-2=week, 3-4=year.'}:null; } },
+    'Bryant':          { decode: s => { const wk=parseInt(s.substring(0,2)); const yr=2000+parseInt(s.substring(2,4)); return !isNaN(wk)&&!isNaN(yr)?{week:wk,year:yr,details:'Bryant style.'}:null; } },
+    'Lennox':          { decode: s => { const wk=parseInt(s.substring(0,2)); const yr=2000+parseInt(s.substring(2,4)); return !isNaN(wk)&&!isNaN(yr)?{week:wk,year:yr,details:'Lennox style.'}:null; } },
+    'York':            { decode: s => { const wk=parseInt(s.substring(0,2)); const yr=2000+parseInt(s.substring(2,4)); return !isNaN(wk)&&!isNaN(yr)?{week:wk,year:yr,details:'York style.'}:null; } },
+    'Trane':           { decode: s => { const yr=2000+parseInt(s.substring(2,4)); return !isNaN(yr)?{year:yr,details:'Trane: digits 3-4=year.'}:null; } },
+    'American Standard':{ decode: s => { const yr=2000+parseInt(s.substring(2,4)); return !isNaN(yr)?{year:yr,details:'American Standard/Trane style.'}:null; } },
+    'Goodman':         { decode: s => { const yr=2000+parseInt(s.substring(0,2)); const mo=parseInt(s.substring(2,4)); return !isNaN(yr)&&mo<=12?{month:SN_MONTHS_FULL[mo-1],year:yr,details:'Goodman: digits 1-2=year, 3-4=month.'}:null; } },
+  },
+  Electronics: {
+    'Apple':           { decode: s => { if(s.length!==12) return null; const yc=s[3]; const wc=s[4]; return {details:`Apple 12-char: char 4 (${yc})=year code, char 5 (${wc})=week code. Manual lookup required.`}; } },
+    'ASUS':            { decode: s => { const ymap={'A':2010,'B':2011,'C':2012,'D':2013,'E':2014,'F':2015,'G':2016,'H':2017,'J':2018,'K':2019,'L':2020,'M':2021,'N':2022}; const yr=ymap[s[0]]; const mo=parseInt(s[1])||( s[1]==='A'?10:s[1]==='B'?11:12); return yr&&mo<=12?{month:SN_MONTHS_FULL[mo-1],year:yr,details:'ASUS: char 1=year, char 2=month.'}:null; } },
+    'Google Pixel':    { decode: s => { const yr=2010+parseInt(s[0]); return !isNaN(yr)?{year:yr,details:'Pixel: first digit + 2010 = year.'}:null; } },
+  }
+};
+
+function snContextBrand() {
+  if (!fastData || !fastData.analysis) return null;
+  const text = ((fastData.analysis.estimatedModel || '') + ' ' + (fastData.analysis.itemDescription || '')).toLowerCase();
+  const brands = [];
+  for (const cat of Object.values(SN_DATA)) brands.push(...Object.keys(cat));
+  brands.sort((a, b) => b.length - a.length); // longer names first
+  for (const b of brands) { if (text.includes(b.toLowerCase())) return b; }
+  return null;
+}
+
+function tryDecodeSerial(serial) {
+  const s = serial.trim().replace(/\s+/g, '').toUpperCase();
+  if (!s) return { type: 'unknown' };
+
+  const hits = [];
+  const contextBrand = snContextBrand();
+
+  // Try context-matched brand first
+  if (contextBrand) {
+    for (const cat of Object.values(SN_DATA)) {
+      if (cat[contextBrand]) {
+        try { const r = cat[contextBrand].decode(s); if (r && r.year) hits.push({ brand: contextBrand, priority: true, ...r }); } catch (_) {}
+        break;
+      }
+    }
+  }
+
+  // Brute-force remaining brands if context decode didn't produce a precise result
+  const bestSoFar = hits[0];
+  if (!bestSoFar || (!bestSoFar.month && !bestSoFar.week)) {
+    for (const cat of Object.values(SN_DATA)) {
+      for (const [brand, entry] of Object.entries(cat)) {
+        if (brand === contextBrand) continue;
+        try { const r = entry.decode(s); if (r && r.year) hits.push({ brand, ...r }); } catch (_) {}
+      }
+    }
+  }
+
+  if (!hits.length) return { type: 'unknown' };
+
+  hits.sort((a, b) => {
+    const score = x => (x.priority ? 10 : 0) + (x.month ? 2 : x.week ? 1 : 0);
+    return score(b) - score(a);
+  });
+
+  const best = hits[0];
+  const now = new Date();
+  const curYear = now.getFullYear();
+  const curMonth = now.getMonth();
+
+  if (best.month) {
+    const mIdx = snMonthIdx(best.month);
+    const diffM = (curYear - best.year) * 12 + (curMonth - (mIdx !== -1 ? mIdx : curMonth));
+    const ageYears = Math.max(0, Math.round(diffM / 12 * 10) / 10);
+    return { type: 'exact', year: best.year, month: best.month, ageYears, brand: best.brand, details: best.details, label: `${best.month} ${best.year}` };
+  }
+
+  if (best.week) {
+    const curWeek = Math.ceil((now - new Date(curYear, 0, 1)) / (7 * 24 * 3600 * 1000));
+    const diffW = (curYear - best.year) * 52 + (curWeek - best.week);
+    const ageYears = Math.max(0, Math.round(diffW / 52 * 10) / 10);
+    return { type: 'exact', year: best.year, week: best.week, ageYears, brand: best.brand, details: best.details, label: `Week ${best.week}, ${best.year}` };
+  }
+
+  return { type: 'range', year: best.year, ageMin: curYear - best.year, ageMax: curYear - best.year + 1, brand: best.brand, details: best.details, label: String(best.year) };
+}
+
+function handleSerialDecode() {
+  const snInput = byId('sn-input');
+  const snResultLi = byId('sn-result-li');
+  const snResultText = byId('sn-result-text');
+  const snBtn = byId('sn-decode-btn');
+  if (!snInput || !snResultLi || !snResultText) return;
+
+  const serial = snInput.value.trim();
+  if (!serial) return;
+
+  if (snBtn) { snBtn.disabled = true; snBtn.textContent = 'Decoding…'; }
+  const result = tryDecodeSerial(serial);
+  if (snBtn) { snBtn.disabled = false; snBtn.textContent = 'Decode Serial Number'; }
+
+  if (result.type === 'exact') {
+    const ageStr = `${result.ageYears} year${result.ageYears !== 1 ? 's' : ''}`;
+    setText('r-estimated-age', `Manufactured ${result.label} — approximately ${ageStr} old. Confirmed via Serial Number.`);
+    setText('m-age', `~${ageStr} old (serial confirmed)`);
+    snResultText.innerHTML = `<span class="sn-status sn-confirmed">&#10003; Confirmed via Serial Number</span><span class="sn-detail">${escapeHtml(result.label)} &mdash; ~${ageStr}</span>`;
+    if (acvData.msrp > 0) {
+      const ageNum = Math.round(result.ageYears);
+      const ageInput = byId('acv-age-input');
+      if (ageInput) ageInput.value = String(ageNum);
+      acvData.age = ageNum;
+      renderACVDisplay(acvData.msrp, ageNum, currentCategory);
+    }
+  } else if (result.type === 'range') {
+    const resAge = (fastData && fastData.releaseDate) ? (fastData.releaseDate.estimatedAge || '') : '';
+    const era    = (fastData && fastData.releaseDate) ? (fastData.releaseDate.productionEra || '') : '';
+    const consistent = resAge.includes(String(result.year)) || era.includes(String(result.year));
+    const note = consistent ? 'Consistent with research data.' : 'Cross-reference with research data above.';
+    setText('r-estimated-age', `Manufactured in ${result.year} — approximately ${result.ageMin}–${result.ageMax} years old. ${note}`);
+    setText('m-age', `~${result.ageMin}–${result.ageMax} yrs old (serial decoded)`);
+    snResultText.innerHTML = `<span class="sn-status sn-range">&#9432; Year decoded — ${escapeHtml(note)}</span><span class="sn-detail">${result.year} &mdash; ~${result.ageMin}&ndash;${result.ageMax} yrs</span>`;
+    if (acvData.msrp > 0) {
+      const ageInput = byId('acv-age-input');
+      if (ageInput) ageInput.value = String(result.ageMin);
+      acvData.age = result.ageMin;
+      renderACVDisplay(acvData.msrp, result.ageMin, currentCategory);
+    }
+  } else {
+    snResultText.innerHTML = `<span class="sn-status sn-unknown">&#10007; Serial number not recognized &mdash; estimated age based on research only</span>`;
+  }
+  snResultLi.style.display = '';
+}
+
 // Returns true if any "detail" section is selected (skip detail API call if all off)
 function needsDetailFetch() {
   return selectedSections.howItWorks || selectedSections.itemNotes ||
@@ -331,6 +499,14 @@ function renderFast(data) {
   setText("r-estimated-age", releaseDate.estimatedAge || "Not available");
   setText("r-discontinuation", releaseDate.discontinuation || analysis.status || "Unknown");
   setText("r-service-life", ""); // filled by renderDetail
+
+  // Reveal serial decode widget and reset for this new search
+  const snInputLi   = byId("sn-input-li");
+  const snResultLi  = byId("sn-result-li");
+  const snInputEl   = byId("sn-input");
+  if (snInputLi)  snInputLi.style.display  = "";
+  if (snResultLi) snResultLi.style.display = "none";
+  if (snInputEl)  snInputEl.value          = "";
 
   // Advisory banner (show for tier 1/2/3 — less than specific model)
   const ageAdvisory = byId("age-advisory");
@@ -1199,6 +1375,12 @@ document.addEventListener("DOMContentLoaded", () => {
       performSearch();
     });
   });
+
+  // Serial decode button + Enter key
+  const snBtn = byId("sn-decode-btn");
+  if (snBtn) snBtn.addEventListener("click", handleSerialDecode);
+  const snInputEl2 = byId("sn-input");
+  if (snInputEl2) snInputEl2.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); handleSerialDecode(); } });
 
   // Section filter checkboxes
   const filterMap = [

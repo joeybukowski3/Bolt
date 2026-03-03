@@ -205,6 +205,19 @@
         .report-list li::before { content: '\2022'; color: var(--accent); font-weight: 700; flex-shrink: 0; }
         .report-list .label { font-weight: 700; color: var(--text-dark); white-space: nowrap; }
         .report-list .label::after { content: ':'; }
+        /* ── Serial decode widget ── */
+        .report-list .sn-li::before { content: none; }
+        .sn-ctrl { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; flex: 1; min-width: 0; }
+        #sn-input { flex: 1; min-width: 140px; padding: 0.32rem 0.6rem; font-size: 0.82rem; font-family: inherit; border: 1px solid var(--border-color); border-radius: 6px; outline: none; color: var(--text-dark); background: #fff; transition: border-color 0.15s; }
+        #sn-input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(234,179,8,0.12); }
+        #sn-decode-btn { padding: 0.32rem 0.85rem; font-size: 0.78rem; font-weight: 600; font-family: inherit; background: var(--accent); color: #000; border: none; border-radius: 6px; cursor: pointer; white-space: nowrap; transition: background 0.15s; flex-shrink: 0; }
+        #sn-decode-btn:hover { background: var(--accent-hover); }
+        #sn-decode-btn:disabled { opacity: 0.6; cursor: default; }
+        .sn-status { font-size: 0.8rem; font-weight: 600; }
+        .sn-confirmed { color: #16a34a; }
+        .sn-range { color: #b45309; }
+        .sn-unknown { color: #dc2626; }
+        .sn-detail { font-size: 0.78rem; color: var(--text-mid); margin-left: 0.4rem; }
         .section-subtitle { font-size: 0.88rem; font-weight: 700; color: var(--text-dark); margin: 1.25rem 0 0.6rem; padding-bottom: 0.3rem; border-bottom: 1px solid var(--border-color); }
 
         /* ── Estimation Banner ── */
@@ -724,6 +737,17 @@
                         <ul class="report-list">
                             <li><span class="label">Production Era</span> <span id="r-production-era"></span></li>
                             <li><span class="label">Discontinuation</span> <span id="r-discontinuation"></span></li>
+                            <li class="sn-li" id="sn-input-li" style="display:none">
+                                <span class="label">Serial No.</span>
+                                <span class="sn-ctrl">
+                                    <input type="text" id="sn-input" placeholder="Enter serial number…" autocomplete="off" spellcheck="false" maxlength="40">
+                                    <button id="sn-decode-btn" type="button">Decode Serial Number</button>
+                                </span>
+                            </li>
+                            <li class="sn-li" id="sn-result-li" style="display:none">
+                                <span class="label"></span>
+                                <span id="sn-result-text"></span>
+                            </li>
                             <li><span class="label">Estimated Age</span> <span id="r-estimated-age"></span></li>
                             <li><span class="label">Service Life</span> <span id="r-service-life"></span></li>
                         </ul>
