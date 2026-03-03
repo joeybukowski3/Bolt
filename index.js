@@ -407,6 +407,13 @@ function getFallbackRetailerNames(category) {
   return ["Best Buy", "Home Depot", "Walmart"];
 }
 
+function buildModelLink(modelText) {
+  const text = (modelText || "").trim();
+  if (!text || text === "N/A") return escapeHtml(text || "N/A");
+  const url = `https://www.google.com/search?q=${encodeURIComponent(text)}`;
+  return `<a class="model-link" href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(text)}</a>`;
+}
+
 function buildRetailerLinks(retailerCsv, searchQuery) {
   const filter = getRetailerFilter(currentCategory);
 
@@ -734,9 +741,10 @@ function renderDetail(data) {
         tbody.innerHTML = allRows
           .map((row) => {
             const isRetailers = (row.label || "").toLowerCase().includes("retailer");
-            const elCell = isRetailers ? buildRetailerLinks(row.entryLevel, colSearch.entryLevel) : escapeHtml(row.entryLevel || "N/A");
-            const mgCell = isRetailers ? buildRetailerLinks(row.midGrade,   colSearch.midGrade)   : escapeHtml(row.midGrade   || "N/A");
-            const prCell = isRetailers ? buildRetailerLinks(row.premium,    colSearch.premium)    : escapeHtml(row.premium    || "N/A");
+            const isModel     = (row.label || "").toLowerCase() === "model";
+            const elCell = isRetailers ? buildRetailerLinks(row.entryLevel, colSearch.entryLevel) : isModel ? buildModelLink(row.entryLevel) : escapeHtml(row.entryLevel || "N/A");
+            const mgCell = isRetailers ? buildRetailerLinks(row.midGrade,   colSearch.midGrade)   : isModel ? buildModelLink(row.midGrade)   : escapeHtml(row.midGrade   || "N/A");
+            const prCell = isRetailers ? buildRetailerLinks(row.premium,    colSearch.premium)    : isModel ? buildModelLink(row.premium)    : escapeHtml(row.premium    || "N/A");
             return `<tr>
               <td>${escapeHtml(row.label || "")}</td>
               <td>${elCell}</td>
@@ -749,10 +757,11 @@ function renderDetail(data) {
         tbody.innerHTML = allRows
           .map((row) => {
             const isRetailers = (row.label || "").toLowerCase().includes("retailer");
-            const origCell = isRetailers ? buildRetailerLinks(row.original,   colSearch.original)   : escapeHtml(row.original   || "N/A");
-            const bmCell   = isRetailers ? buildRetailerLinks(row.brandMatch, colSearch.brandMatch) : escapeHtml(row.brandMatch || "N/A");
-            const o1Cell   = isRetailers ? buildRetailerLinks(row.option1,    colSearch.option1)    : escapeHtml(row.option1    || "N/A");
-            const o2Cell   = isRetailers ? buildRetailerLinks(row.option2,    colSearch.option2)    : escapeHtml(row.option2    || "N/A");
+            const isModel     = (row.label || "").toLowerCase() === "model";
+            const origCell = isRetailers ? buildRetailerLinks(row.original,   colSearch.original)   : isModel ? buildModelLink(row.original)   : escapeHtml(row.original   || "N/A");
+            const bmCell   = isRetailers ? buildRetailerLinks(row.brandMatch, colSearch.brandMatch) : isModel ? buildModelLink(row.brandMatch) : escapeHtml(row.brandMatch || "N/A");
+            const o1Cell   = isRetailers ? buildRetailerLinks(row.option1,    colSearch.option1)    : isModel ? buildModelLink(row.option1)    : escapeHtml(row.option1    || "N/A");
+            const o2Cell   = isRetailers ? buildRetailerLinks(row.option2,    colSearch.option2)    : isModel ? buildModelLink(row.option2)    : escapeHtml(row.option2    || "N/A");
             return `<tr>
               <td>${escapeHtml(row.label || "")}</td>
               <td>${origCell}</td>
