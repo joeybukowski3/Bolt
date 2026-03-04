@@ -1,1195 +1,469 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+<meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bolt — Item Research Tool</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="shared.css">
-    <style>
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-        :root {
-            --bg-primary: #0f1629;
-            --bg-secondary: #161d35;
-            --bg-card: #ffffff;
-            --bg-card-alt: #f8fafc;
-            --bg-input: rgba(255,255,255,0.06);
-            --border-color: #e2e8f0;
-            --border-accent: rgba(234,179,8,0.4);
-            --text-dark: #1e293b;
-            --text-mid: #475569;
-            --text-light: #94a3b8;
-            --text-white: #f1f5f9;
-            --text-muted-dark: #64748b;
-            --accent: #eab308;
-            --accent-hover: #facc15;
-            --accent-dim: rgba(234,179,8,0.1);
-            --accent-dim-dark: rgba(234,179,8,0.15);
-            --blue: #3b82f6;
-            --blue-light: #dbeafe;
-            --red: #ef4444;
-            --red-light: #fef2f2;
-            --green: #22c55e;
-            --green-light: #f0fdf4;
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: #0a0e1a;
-            color: var(--text-white);
-            min-height: 100vh;
-            line-height: 1.6;
-        }
-
-        /* ── Decorative BG (hero area only) ── */
-        .circuit-bg { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
-        .circuit-bg::before { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent 49.5%, rgba(234,179,8,0.03) 49.5%, rgba(234,179,8,0.03) 50.5%, transparent 50.5%), linear-gradient(0deg, transparent 49.5%, rgba(234,179,8,0.03) 49.5%, rgba(234,179,8,0.03) 50.5%, transparent 50.5%); background-size: 60px 60px; }
-        .circuit-bg::after { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 0%, rgba(234,179,8,0.05) 0%, transparent 55%); }
-
-        /* ── Mascot loader ── */
-        @keyframes runDogLoader { 0% { left: -80px; } 100% { left: calc(100% + 80px); } }
-        @keyframes pulse-glow { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
-        @keyframes cape-flutter { 0%, 100% { transform: rotate(-15deg) skewX(0deg); } 50% { transform: rotate(-25deg) skewX(-5deg); } }
-        .mascot-area { text-align: center; margin-bottom: 0.75rem; display: none; }
-        .mascot-area.brt-loading { display: block; }
-        #loader-track { width: 400px; max-width: 90vw; overflow: hidden; margin: 0 auto 0.5rem; position: relative; height: 4.5rem; }
-        #loader-dog { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 60px; height: 60px; }
-        #loader-dog.running { left: -80px; transform: none; animation: runDogLoader 2.8s linear infinite; }
-        #loader-dog.running .dog-cape { animation: cape-flutter 0.4s ease-in-out infinite; }
-        .loader-text { color: rgba(255,255,255,0.78); font-style: italic; font-size: 0.9rem; display: none; }
-        .loader-text.visible { display: block; animation: pulse-glow 2s ease-in-out infinite; }
-
-        /* ── Section filters ── */
-        .section-filters { max-width: 700px; margin: 1rem auto 0; display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; justify-content: center; }
-        .section-filters-label { font-size: 0.66rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: rgba(255,255,255,0.55); white-space: nowrap; flex-shrink: 0; }
-        .section-filter-list { display: flex; flex-wrap: wrap; gap: 0.35rem; justify-content: center; }
-        .section-filter-chip { display: inline-flex; align-items: center; gap: 0.35rem; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.16); border-radius: 999px; padding: 0.28rem 0.65rem 0.28rem 0.45rem; cursor: pointer; font-size: 0.72rem; font-weight: 500; color: rgba(255,255,255,0.80); transition: background 0.15s, border-color 0.15s; user-select: none; }
-        .section-filter-chip:hover { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.28); }
-        .section-filter-chip.is-checked { background: var(--accent-dim-dark); border-color: rgba(234,179,8,0.45); color: var(--text-white); }
-        .section-filter-chip input[type="checkbox"] { width: 12px; height: 12px; accent-color: var(--accent); cursor: pointer; flex-shrink: 0; margin: 0; }
-
-        /* ── Search examples dropdown ── */
-        .search-examples-dropdown { max-width: 700px; margin: 0.65rem auto 0; text-align: center; }
-        .search-examples-toggle { background: none; border: none; cursor: pointer; font-family: inherit; font-size: 0.74rem; color: rgba(255,255,255,0.55); padding: 0.25rem 0.5rem; border-radius: 6px; display: inline-flex; align-items: center; gap: 0.35rem; transition: color 0.15s; }
-        .search-examples-toggle:hover { color: rgba(255,255,255,0.85); }
-        .examples-chevron { display: inline-block; transition: transform 0.2s; font-size: 0.6rem; }
-        .examples-chevron.open { transform: rotate(180deg); }
-        .search-examples-list { display: none; list-style: none; padding: 0; margin: 0.4rem auto 0; max-width: 480px; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; overflow: hidden; text-align: left; }
-        .search-examples-list.open { display: block; }
-        .search-examples-list li button { width: 100%; text-align: left; background: none; border: none; border-bottom: 1px solid rgba(255,255,255,0.09); padding: 0.55rem 1rem; font-family: inherit; font-size: 0.8rem; color: rgba(255,255,255,0.85); cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: background 0.15s; }
-        .search-examples-list li:last-child button { border-bottom: none; }
-        .search-examples-list li button::before { content: '→'; color: var(--accent); font-size: 0.7rem; flex-shrink: 0; }
-        .search-examples-list li button:hover { background: rgba(255,255,255,0.09); color: var(--text-white); }
-
-        /* ── Results zone ── */
-        .results-zone { background: #f1f5f9; border-radius: 24px 24px 0 0; padding: 2rem 2rem 3rem; min-height: 60vh; }
-        .results-inner { max-width: 1100px; margin: 0 auto; }
-        .results-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem; }
-        .results-label-group { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
-        .results-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-muted-dark); }
-        .results-header-actions { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
-        .print-btn, .copy-btn { background: white; color: var(--text-mid); border: 1px solid var(--border-color); padding: 0.4rem 1rem; border-radius: 8px; font-size: 0.75rem; font-weight: 600; font-family: inherit; cursor: pointer; transition: all 0.2s; }
-        .print-btn:hover, .copy-btn:hover { background: #f8fafc; border-color: var(--accent); color: var(--text-dark); }
-
-        /* ── Tab bar ── */
-        .tab-bar { display: flex; background: #e2e8f0; border-radius: 12px; padding: 3px; gap: 3px; margin-bottom: 1.25rem; overflow-x: auto; scrollbar-width: none; }
-        .tab-bar::-webkit-scrollbar { display: none; }
-        .tab-btn { flex: 1; min-width: max-content; border: none; background: transparent; padding: 0.45rem 0.9rem; border-radius: 9px; font-size: 0.75rem; font-weight: 600; font-family: inherit; cursor: pointer; color: var(--text-mid); transition: all 0.18s; white-space: nowrap; }
-        .tab-btn.active { background: white; color: var(--text-dark); box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
-        .tab-btn:hover:not(.active) { color: var(--text-dark); background: rgba(255,255,255,0.5); }
-        .tab-panel { display: none; }
-        .tab-panel.active { display: block; }
-
-        /* ── Overview panel grid ── */
-        #panel-overview.active { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-        #panel-overview > .metrics-strip,
-        #panel-overview > #card-analysis,
-        #panel-overview > #card-how-it-works,
-        #panel-overview > #card-item-notes { grid-column: 1 / -1; }
-        #panel-overview > .card { margin-bottom: 0; }
-        @media (max-width: 700px) { #panel-overview.active { grid-template-columns: 1fr; } }
-
-        /* ── Metrics strip ── */
-        .metrics-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; }
-        @media (max-width: 640px) { .metrics-strip { grid-template-columns: repeat(2, 1fr); } }
-        .metric-card { background: white; border: 1px solid var(--border-color); border-radius: 12px; padding: 0.75rem 1rem; display: flex; flex-direction: column; gap: 0.2rem; box-shadow: 0 1px 2px rgba(0,0,0,0.04); }
-        .metric-label { font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted-dark); }
-        .metric-value { font-size: 0.95rem; font-weight: 700; color: var(--text-dark); line-height: 1.2; }
-        .metric-value.acv { color: var(--green); }
-        .metric-sub { font-size: 0.68rem; color: var(--text-muted-dark); }
-
-        /* ── Summary Modal ── */
-        .summary-modal { position: fixed; inset: 0; z-index: 1000; background: #f1f5f9; overflow-y: auto; display: flex; flex-direction: column; }
-        .summary-modal.hidden { display: none; }
-        .summary-modal-bar { position: sticky; top: 0; z-index: 10; background: white; border-bottom: 1px solid var(--border-color); padding: 0.85rem 1.5rem; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
-        .summary-modal-title { font-size: 1rem; font-weight: 700; color: var(--text-dark); }
-        .summary-modal-close { background: none; border: 1px solid var(--border-color); border-radius: 8px; padding: 0.3rem 0.75rem; font-size: 0.8rem; cursor: pointer; color: var(--text-mid); font-family: inherit; transition: all 0.15s; }
-        .summary-modal-close:hover { background: #f1f5f9; border-color: var(--text-mid); }
-        .summary-modal-body { max-width: 760px; width: 100%; margin: 0 auto; padding: 1.5rem; flex: 1; }
-        .generate-btn { width: 100%; padding: 0.85rem; background: var(--accent); color: #000; border: none; border-radius: 10px; font-size: 0.88rem; font-weight: 700; font-family: inherit; cursor: pointer; transition: background 0.2s; margin-bottom: 1.25rem; }
-        .generate-btn:hover { background: var(--accent-hover); }
-        .summary-section-block { background: white; border: 1px solid var(--border-color); border-radius: 12px; margin-bottom: 0.65rem; overflow: hidden; transition: opacity 0.2s; }
-        .summary-section-header { display: flex; align-items: center; justify-content: space-between; padding: 0.7rem 1rem; }
-        .summary-section-title { font-size: 0.85rem; font-weight: 700; color: var(--text-dark); }
-        .summary-toggle-btn { font-size: 0.7rem; font-weight: 700; padding: 0.2rem 0.65rem; border-radius: 999px; border: 1px solid; cursor: pointer; font-family: inherit; transition: all 0.15s; white-space: nowrap; }
-        .summary-toggle-btn.included { background: #dcfce7; color: #15803d; border-color: #86efac; }
-        .summary-toggle-btn.excluded { background: #f1f5f9; color: var(--text-muted-dark); border-color: var(--border-color); }
-        .summary-section-preview { padding: 0 1rem 0.85rem; font-size: 0.79rem; color: var(--text-mid); line-height: 1.65; white-space: pre-wrap; border-top: 1px solid #f1f5f9; }
-        .summary-section-block.excluded { opacity: 0.45; }
-        .summary-section-block.excluded .summary-section-preview { text-decoration: line-through; }
-        .summary-notes-block { background: white; border: 1px solid var(--border-color); border-radius: 12px; padding: 1rem 1rem 0.85rem; margin-bottom: 0.65rem; }
-        .summary-notes-block h3 { font-size: 0.85rem; font-weight: 700; color: var(--text-dark); margin-bottom: 0.3rem; }
-        .summary-notes-block p { font-size: 0.75rem; color: var(--text-muted-dark); margin-bottom: 0.6rem; line-height: 1.5; }
-        .summary-notes-textarea { width: 100%; min-height: 120px; padding: 0.65rem 0.75rem; border: 1px solid var(--border-color); border-radius: 8px; font-size: 0.82rem; font-family: inherit; color: var(--text-dark); resize: vertical; background: var(--bg-card-alt); }
-        .summary-notes-textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-dim); }
-        .summary-toast { position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%); background: #1e293b; color: white; padding: 0.65rem 1.4rem; border-radius: 8px; font-size: 0.82rem; font-weight: 600; z-index: 1100; opacity: 1; transition: opacity 0.4s; pointer-events: none; }
-        .summary-toast.hidden { opacity: 0; }
-        @media (max-width: 640px) { .summary-modal-body { padding: 1rem; } }
-
-        /* ── Tech expand button ── */
-        .tech-expand-btn { display: inline-flex; align-items: center; gap: 0.35rem; margin-top: 0.75rem; background: none; border: 1px solid var(--border-color); border-radius: 8px; padding: 0.35rem 0.85rem; font-size: 0.78rem; font-weight: 600; font-family: inherit; color: var(--text-mid); cursor: pointer; transition: all 0.15s; }
-        .tech-expand-btn:hover { border-color: var(--accent); color: var(--text-dark); background: var(--bg-card-alt); }
-        .tech-extra-specs { margin-top: 0.25rem; }
-
-        /* ── Tier Badge ── */
-        .tier-badge { display:inline-flex; align-items:center; padding:0.25rem 0.75rem; border-radius:999px; font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; }
-        .tier-entry   { background:#e2e8f0; color:#475569; }
-        .tier-mid     { background:#dbeafe; color:#1d4ed8; }
-        .tier-upper   { background:#dcfce7; color:#15803d; }
-        .tier-premium { background:#fef3c7; color:#92400e; }
-        .tier-luxury  { background:#1a202c; color:#eab308; }
-
-        /* ── Skeleton shimmer ── */
-        @keyframes skeleton-shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
-        .skeleton-line { height:0.9rem; border-radius:6px; background:linear-gradient(90deg,#e2e8f0 25%,#f1f5f9 50%,#e2e8f0 75%); background-size:200% 100%; animation:skeleton-shimmer 1.4s infinite; margin-bottom:0.5rem; }
-        .skeleton-line.short { width:40%; }
-        .skeleton-line.med { width:70%; }
-        .skeleton-line.full { width:100%; }
-        .section-spinner { display:flex; align-items:center; gap:0.5rem; color:var(--text-muted-dark); font-size:0.8rem; font-style:italic; padding:0.75rem 0; }
-        .section-spinner::before { content:''; width:14px; height:14px; border:2px solid var(--border-color); border-top-color:var(--accent); border-radius:50%; animation:spin 0.8s linear infinite; flex-shrink:0; }
-        @keyframes spin { to { transform:rotate(360deg); } }
-
-        /* ── MSRP two-value display ── */
-        .msrp-pair { display:flex; flex-direction:column; gap:0.2rem; }
-        .msrp-label { font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-muted-dark); }
-        .msrp-value { font-size:0.88rem; color:var(--text-dark); font-weight:600; }
-        .msrp-note  { font-size:0.75rem; color:var(--text-muted-dark); font-style:italic; }
-
-        /* ── ACV step breakdown ── */
-        .acv-steps { font-size:0.82rem; color:var(--text-muted-dark); font-family:monospace; background:var(--bg-card-alt); padding:0.6rem 0.75rem; border-radius:8px; margin-top:0.5rem; line-height:1.8; white-space:pre-line; }
-
-        /* ── Refine tip ── */
-        .refine-tip { background:#f0f9ff; border:1px solid #bae6fd; border-radius:10px; padding:0.875rem 1rem; margin-top:1rem; font-size:0.85rem; color:#0c4a6e; }
-        .refine-tip strong { font-weight:700; }
-        .chip-btn { margin-right:0.4rem; margin-top:0.4rem; border-radius:999px; }
-
-        /* ── Top spec pills ── */
-        .quick-spec-pills { display:flex; flex-wrap:wrap; gap:0.4rem; margin:0.75rem 0 0.25rem; }
-        .quick-spec-pill { background:var(--bg-card-alt); border:1px solid var(--border-color); border-radius:8px; padding:0.3rem 0.65rem; font-size:0.78rem; color:var(--text-mid); }
-        .quick-spec-pill strong { color:var(--text-dark); font-weight:600; }
-
-        /* ── Cards ── */
-        .card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 1.25rem 1.5rem; margin-bottom: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02); }
-        .card-title { font-size: 0.95rem; font-weight: 700; color: var(--text-dark); margin-bottom: 0.85rem; padding-bottom: 0.6rem; border-bottom: 2px solid var(--accent-dim); display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
-        .card-title .title-icon { color: var(--accent); font-size: 1.1rem; }
-        .card-title .title-number { background: var(--accent); color: #000; width: 22px; height: 22px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 800; flex-shrink: 0; }
-        .card-accent-stripe { height: 3px; background: linear-gradient(90deg, var(--accent), var(--blue), var(--accent)); border-radius: 3px; margin-bottom: 0.85rem; opacity: 0.6; }
-
-        /* ── Report text styles ── */
-        .report-overview { font-size: 0.85rem; color: var(--text-mid); line-height: 1.7; margin-bottom: 1rem; }
-        .report-list { list-style: none; padding: 0; margin: 0; }
-        .report-list li { padding: 0.4rem 0; font-size: 0.85rem; color: var(--text-mid); line-height: 1.6; border-bottom: 1px solid #f1f5f9; display: flex; align-items: baseline; gap: 0.5rem; }
-        .report-list li:last-child { border-bottom: none; }
-        .report-list li::before { content: '\2022'; color: var(--accent); font-weight: 700; flex-shrink: 0; }
-        .report-list .label { font-weight: 700; color: var(--text-dark); white-space: nowrap; }
-        .report-list .label::after { content: ':'; }
-        /* ── Serial decode widget ── */
-        .report-list .sn-li::before { content: none; }
-        .sn-ctrl { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; flex: 1; min-width: 0; }
-        #sn-input { flex: 1; min-width: 140px; padding: 0.32rem 0.6rem; font-size: 0.82rem; font-family: inherit; border: 1px solid var(--border-color); border-radius: 6px; outline: none; color: var(--text-dark); background: #fff; transition: border-color 0.15s; }
-        #sn-input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(234,179,8,0.12); }
-        #sn-decode-btn { padding: 0.32rem 0.85rem; font-size: 0.78rem; font-weight: 600; font-family: inherit; background: var(--accent); color: #000; border: none; border-radius: 6px; cursor: pointer; white-space: nowrap; transition: background 0.15s; flex-shrink: 0; }
-        #sn-decode-btn:hover { background: var(--accent-hover); }
-        #sn-decode-btn:disabled { opacity: 0.6; cursor: default; }
-        .sn-status { font-size: 0.8rem; font-weight: 600; }
-        .sn-confirmed { color: #16a34a; }
-        .sn-range { color: #b45309; }
-        .sn-unknown { color: #dc2626; }
-        .sn-detail { font-size: 0.78rem; color: var(--text-mid); margin-left: 0.4rem; }
-        .section-subtitle { font-size: 0.88rem; font-weight: 700; color: var(--text-dark); margin: 1.25rem 0 0.6rem; padding-bottom: 0.3rem; border-bottom: 1px solid var(--border-color); }
-
-        /* ── Estimation Banner ── */
-        .estimation-banner { background: #fef9c3; border: 1px solid #fde68a; border-left: 4px solid #f59e0b; border-radius: 10px; padding: 0.75rem 1rem; margin-bottom: 1rem; color: #92400e; font-size: 0.82rem; line-height: 1.5; display: flex; align-items: flex-start; gap: 0.5rem; }
-        .estimation-banner .banner-icon { font-size: 1.1rem; flex-shrink: 0; }
-
-        /* Advisory Banner */
-        .advisory-banner { background: #fffbeb; border: 1px solid #fef3c7; border-radius: 8px; padding: 1rem; margin-top: 1rem; display: flex; gap: 0.75rem; }
-        .advisory-icon { color: #d97706; font-size: 1.2rem; }
-        .advisory-content h4 { font-size: 0.8rem; font-weight: 700; color: #92400e; margin-bottom: 0.25rem; }
-        .advisory-content p { font-size: 0.75rem; color: #b45309; margin-bottom: 0.5rem; }
-        .advisory-tips { margin-top: 0.5rem; padding-left: 1rem; font-size: 0.75rem; color: #b45309; }
-        .advisory-tips li { margin-bottom: 0.2rem; }
-
-        /* ── Valuation interactive ── */
-        .acv-value { color: var(--green); font-weight: 700; font-size: 1rem; }
-        .acv-formula { font-style: italic; color: var(--text-muted-dark); font-size: 0.78rem; }
-        .age-input-row { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem; flex-wrap: wrap; }
-        .age-input { width: 60px; padding: 0.3rem 0.5rem; border: 1px solid var(--border-color); border-radius: 6px; font-size: 0.85rem; font-family: inherit; text-align: center; color: var(--text-dark); }
-        .age-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-dim); }
-        .age-label { font-size: 0.8rem; color: var(--text-muted-dark); }
-        .recalc-btn { background: var(--accent); color: #000; border: none; padding: 0.3rem 0.75rem; border-radius: 6px; font-size: 0.75rem; font-weight: 700; font-family: inherit; cursor: pointer; transition: background 0.2s; }
-        .recalc-btn:hover { background: var(--accent-hover); }
-
-        /* ── Error Codes ── */
-        .error-codes-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
-        .error-codes-table th { background: var(--bg-card-alt); color: var(--text-muted-dark); font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; padding: 0.4rem 0.6rem; text-align: left; border-bottom: 1px solid var(--border-color); }
-        .error-codes-table td { padding: 0.4rem 0.6rem; border-bottom: 1px solid #f1f5f9; color: var(--text-mid); }
-        .error-codes-table td:first-child { font-weight: 700; color: var(--red); white-space: nowrap; width: 80px; }
-        .error-codes-table td:nth-child(2) { width: 30%; }
-        .error-codes-table tr:last-child td { border-bottom: none; }
-
-        /* Replacement guidance card */
-        .lkq-block { background: var(--bg-card-alt); border-radius: 10px; padding: 0.85rem 1rem; margin-bottom: 0.85rem; }
-        .lkq-title { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted-dark); margin-bottom: 0.5rem; }
-        .lkq-spec-list { list-style: none; padding: 0; margin: 0; }
-        .lkq-spec-list li { font-size: 0.82rem; color: var(--text-mid); padding: 0.2rem 0; display: flex; align-items: baseline; gap: 0.4rem; }
-        .lkq-spec-list li::before { content: '✓'; color: var(--green); font-weight: 700; flex-shrink: 0; }
-        .lkq-spec-list.variation li::before { content: '~'; color: var(--blue); }
-
-        /* ── Failures list ── */
-        .failures-list { list-style: none; padding: 0; }
-        .failures-list li { padding: 0.6rem 0; border-bottom: 1px solid #f1f5f9; font-size: 0.82rem; }
-        .failures-list li:last-child { border-bottom: none; }
-        .failures-component { font-weight: 700; color: var(--text-dark); font-size: 0.82rem; }
-        .failures-detail { color: var(--text-mid); margin-top: 0.15rem; }
-        .failures-symptoms { color: var(--text-muted-dark); font-size: 0.78rem; font-style: italic; margin-top: 0.1rem; }
-
-        /* ── Troubleshooting ── */
-        .troubleshoot-steps { list-style: none; padding: 0; counter-reset: step; }
-        .troubleshoot-steps li { counter-increment: step; padding: 0.5rem 0 0.5rem 2rem; border-bottom: 1px solid #f1f5f9; font-size: 0.82rem; color: var(--text-mid); position: relative; }
-        .troubleshoot-steps li:last-child { border-bottom: none; }
-        .troubleshoot-steps li::before { content: counter(step); position: absolute; left: 0; top: 0.5rem; background: var(--accent); color: #000; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 800; }
-        .repair-resources { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.75rem; }
-        .repair-link { display: inline-flex; align-items: center; gap: 0.3rem; background: var(--blue-light); color: #1d4ed8; padding: 0.35rem 0.75rem; border-radius: 999px; font-size: 0.72rem; font-weight: 700; text-decoration: none; border: 1px solid rgba(59,130,246,0.2); transition: all 0.2s; }
-        .repair-link:hover { background: #bfdbfe; }
-
-        /* ── Repair Parts ── */
-        .parts-list { list-style: none; padding: 0; }
-        .part-item { padding: 0.65rem 0; border-bottom: 1px solid #f1f5f9; }
-        .part-item:last-child { border-bottom: none; }
-        .part-name-link { font-weight: 700; font-size: 0.85rem; color: var(--blue); text-decoration: underline; }
-        .part-name-link:hover { color: #1d4ed8; }
-        .part-name-link::after { content: ' \2197'; font-size: 0.72em; font-weight: 400; opacity: 0.7; }
-        .part-number { font-size: 0.75rem; color: var(--text-muted-dark); margin-top: 0.2rem; }
-        .part-buy-links { display: flex; gap: 0.5rem; margin-top: 0.35rem; flex-wrap: wrap; }
-        .part-buy-link { display: inline-block; padding: 0.25rem 0.65rem; font-size: 0.72rem; font-weight: 600; text-decoration: none; border-radius: 999px; border: 1px solid rgba(59,130,246,0.25); background: var(--blue-light); color: #1d4ed8; transition: background 0.15s; }
-        .part-buy-link:hover { background: #bfdbfe; }
-        .parts-footer { margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--border-color); }
-        .parts-footer-link { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.8rem; font-weight: 700; color: var(--blue); text-decoration: none; }
-        .parts-footer-link:hover { text-decoration: underline; }
-        .parts-available-note { font-size: 0.78rem; color: #1d4ed8; background: var(--blue-light); border: 1px solid rgba(59,130,246,0.2); border-radius: 6px; padding: 0.35rem 0.7rem; margin-top: 0.5rem; display: inline-block; }
-
-        /* ── Recalls list ── */
-        .recalls-list { list-style: none; padding: 0; }
-        .recalls-list li { padding: 0.6rem 0; border-bottom: 1px solid #f1f5f9; font-size: 0.82rem; }
-        .recalls-list li:last-child { border-bottom: none; }
-        .recall-title { font-weight: 700; color: var(--red); display: flex; align-items: center; gap: 0.4rem; }
-        .recall-date { font-size: 0.72rem; color: var(--text-muted-dark); }
-        .recall-desc { color: var(--text-mid); margin-top: 0.2rem; }
-        .recall-link { color: var(--blue); text-decoration: none; font-size: 0.78rem; font-weight: 600; }
-        .recall-link:hover { text-decoration: underline; }
-
-        /* ── Manufacturer / Manual links ── */
-        .mfr-links { display: flex; flex-direction: column; gap: 0.5rem; }
-        .mfr-link-item { display: flex; align-items: center; gap: 0.75rem; background: var(--bg-card-alt); border-radius: 8px; padding: 0.65rem 0.9rem; }
-        .mfr-link-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted-dark); min-width: 90px; }
-        .mfr-link-a { color: var(--blue); text-decoration: none; font-size: 0.82rem; font-weight: 600; }
-        .mfr-link-a:hover { text-decoration: underline; }
-
-        /* ── Table (replacement) ── */
-        .data-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
-        .data-table th { background: var(--bg-card-alt); color: var(--text-muted-dark); font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; padding: 0.55rem 0.65rem; text-align: left; border-bottom: 2px solid var(--border-color); }
-        .data-table th.highlight { color: var(--accent); }
-        .data-table td { padding: 0.55rem 0.65rem; border-bottom: 1px solid #f1f5f9; color: var(--text-mid); line-height: 1.4; }
-        .data-table tr:last-child td { border-bottom: none; }
-        .data-table tr:hover td { background: #fefce8; }
-        .data-table td:first-child { font-weight: 600; color: var(--text-dark); background: var(--bg-card-alt); white-space: nowrap; }
-        .data-table td.brand-match { color: #92400e; font-weight: 600; background: #fef9c3; }
-        .retailer-links a { color: var(--blue); text-decoration: none; font-weight: 600; font-size: 0.78rem; }
-        .retailer-links a:not(:last-child)::after { content: ' · '; color: var(--text-muted-dark); font-weight: 400; }
-        .retailer-links a:hover { text-decoration: underline; }
-        .model-link { color: var(--blue); text-decoration: underline; font-weight: 700; cursor: pointer; }
-        .model-link:hover { color: #1d4ed8; }
-        .model-link::after { content: ' \2197'; font-size: 0.75em; font-weight: 400; opacity: 0.75; }
-
-        /* ── How It Works card ── */
-        .how-it-works-text { font-size: 0.85rem; color: var(--text-mid); line-height: 1.7; }
-
-        /* ── None found state ── */
-        .none-found { color: var(--text-muted-dark); font-style: italic; font-size: 0.82rem; padding: 0.5rem 0; }
-
-        .hidden { display: none !important; }
-
-        .collapse-btn { width: 100%; padding: 0.75rem; background: #f1f5f9; border: none; border-radius: 8px; color: var(--text-mid); font-size: 0.8rem; font-weight: 700; cursor: pointer; margin-top: 1rem; transition: background 0.2s; }
-        .collapse-btn:hover { background: #e2e8f0; }
-
-        /* ── Variations ── */
-        .variations-section { margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--border-color); }
-        .variations-label { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-muted-dark); margin-bottom: 0.5rem; }
-        .variation-chips { display: flex; flex-wrap: wrap; gap: 0.4rem; }
-        .variation-chip { display: inline-flex; flex-direction: column; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.4rem 0.75rem; cursor: pointer; text-align: left; font-family: inherit; transition: border-color 0.15s, background 0.15s; }
-        .variation-chip:hover { border-color: var(--accent); background: var(--accent-dim); }
-        .variation-chip-label { font-size: 0.78rem; font-weight: 600; color: var(--blue); line-height: 1.3; }
-        .variation-chip-note { font-size: 0.68rem; color: var(--text-muted-dark); margin-top: 0.2rem; line-height: 1.4; max-width: 18rem; }
-        @media (max-width: 600px) { .variation-chip { width: 100%; } .variation-chip-note { max-width: 100%; } }
-
-        /* ── Table note ── */
-        .table-note { background:#fffbeb; border:1px solid #fde68a; border-radius:8px; padding:0.65rem 0.9rem; margin-bottom:0.75rem; font-size:0.8rem; color:#92400e; }
-        .table-note strong { font-weight:700; }
-
-        /* ── What to Consider ── */
-        .wtc-box { border-radius:8px; padding:0.85rem 1rem; margin-bottom:0.75rem; }
-        .wtc-specific { background:#f0fdf4; border:1px solid #bbf7d0; }
-        .wtc-general { background:#eff6ff; border:1px solid #bfdbfe; }
-        .wtc-label { font-size:0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.45rem; }
-        .wtc-specific .wtc-label { color:#15803d; }
-        .wtc-general .wtc-label { color:#1d4ed8; }
-        .wtc-list { padding-left:1.1rem; font-size:0.85rem; color:#1e293b; }
-        .wtc-list li { margin-bottom:0.25rem; }
-        .wtc-note { margin-top:0.55rem; font-size:0.78rem; color:#92400e; background:#fffbeb; border:1px solid #fde68a; border-radius:6px; padding:0.4rem 0.6rem; }
-
-        /* ── Narrow Your Results ── */
-        .narrow-results { background:#f0f9ff; border:1px solid #bae6fd; border-radius:10px; padding:0.875rem 1rem; margin-top:1.25rem; }
-        .narrow-results-header { display:flex; align-items:center; gap:0.5rem; font-size:0.82rem; font-weight:700; color:#0c4a6e; margin-bottom:0.4rem; }
-        .narrow-results p { font-size:0.82rem; color:#0c4a6e; line-height:1.6; margin:0; }
-
-        /* ── Model number hint ── */
-        .model-number-hint { display: flex; align-items: center; gap: 0.6rem; background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 10px; padding: 0.65rem 1rem; margin-bottom: 0.75rem; font-size: 0.82rem; color: #0c4a6e; }
-        .model-number-hint .hint-icon { font-size: 1rem; flex-shrink: 0; }
-
-        /* ── Panel bottom navigation ── */
-        .panel-nav { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; padding: 1.25rem 0 0; border-top: 1px solid var(--border-color); margin-top: 1.25rem; }
-        .panel-nav-label { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-muted-dark); flex-shrink: 0; margin-right: 0.25rem; }
-        .panel-nav-btn { background: white; border: 1px solid var(--border-color); border-radius: 999px; padding: 0.35rem 0.9rem; font-size: 0.75rem; font-weight: 600; font-family: inherit; color: var(--text-mid); cursor: pointer; transition: border-color 0.15s, color 0.15s, background 0.15s; }
-        .panel-nav-btn:hover { border-color: var(--accent); color: var(--text-dark); background: var(--accent-dim); }
-
-        /* ── Compare Replacement Option Tool ── */
-        .compare-trigger-row { margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid var(--border-color); }
-        .compare-toggle-btn { background: #fff; border: 1.5px solid var(--accent); border-radius: 999px; padding: 0.5rem 1.2rem; font-size: 0.81rem; font-weight: 600; color: #92400e; cursor: pointer; font-family: inherit; transition: background 0.15s, box-shadow 0.15s; }
-        .compare-toggle-btn:hover { background: var(--accent-dim); box-shadow: 0 2px 8px rgba(234,179,8,0.2); }
-        .compare-toggle-btn.active { background: var(--accent-dim); }
-        .compare-panel { background: var(--bg-card-alt); border: 1.5px solid var(--border-color); border-radius: 14px; margin-top: 0.875rem; overflow: hidden; }
-        .compare-panel-header { display: flex; align-items: center; gap: 0.6rem; padding: 0.85rem 1rem; border-bottom: 1px solid var(--border-color); }
-        .compare-panel-icon { font-size: 1.05rem; flex-shrink: 0; }
-        .compare-panel-title { font-size: 0.88rem; font-weight: 700; color: var(--text-dark); flex: 1; }
-        .compare-panel-close { background: none; border: none; cursor: pointer; font-size: 1.1rem; color: var(--text-light); padding: 0.2rem 0.4rem; border-radius: 6px; line-height: 1; }
-        .compare-panel-close:hover { background: var(--border-color); }
-        .compare-input-row { display: flex; gap: 0.5rem; padding: 0.85rem 1rem 0.4rem; }
-        .compare-input { flex: 1; border: 1.5px solid var(--border-color); border-radius: 8px; padding: 0.5rem 0.8rem; font-size: 0.85rem; font-family: inherit; color: var(--text-dark); background: #fff; }
-        .compare-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px rgba(234,179,8,0.15); }
-        .compare-submit-btn { background: var(--accent); border: none; border-radius: 8px; padding: 0.5rem 1.2rem; font-size: 0.83rem; font-weight: 700; color: #000; cursor: pointer; font-family: inherit; white-space: nowrap; transition: background 0.15s; flex-shrink: 0; }
-        .compare-submit-btn:hover { background: var(--accent-hover); }
-        .compare-submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .compare-checkbox-label { display: flex; align-items: center; gap: 0.45rem; padding: 0.2rem 1rem 0.85rem; font-size: 0.79rem; color: var(--text-mid); cursor: pointer; }
-        .compare-checkbox-label input { cursor: pointer; accent-color: var(--accent); }
-        .compare-loading { padding: 0.75rem 1rem; }
-        .compare-result { padding: 0.85rem 1rem; }
-        .compare-table-wrap { overflow-x: auto; margin-bottom: 0.85rem; }
-        .compare-table { width: 100%; border-collapse: collapse; font-size: 0.81rem; }
-        .compare-table th { background: #f1f5f9; color: var(--text-dark); font-weight: 600; text-align: left; padding: 0.45rem 0.7rem; border-bottom: 2px solid var(--border-color); white-space: nowrap; }
-        .compare-table th.compare-col-entered { background: #fffbeb; color: #92400e; }
-        .compare-table td { padding: 0.4rem 0.7rem; border-bottom: 1px solid var(--border-color); color: var(--text-mid); vertical-align: top; }
-        .compare-table tr:last-child td { border-bottom: none; }
-        .compare-table td.compare-col-entered { background: rgba(255,251,235,0.4); }
-        .lkq-verdict { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.18rem 0.6rem; border-radius: 999px; font-size: 0.72rem; font-weight: 700; }
-        .lkq-match { background: #dcfce7; color: #15803d; }
-        .lkq-close { background: #fef3c7; color: #92400e; }
-        .lkq-no-match { background: #fee2e2; color: #dc2626; }
-        .compare-summary { font-size: 0.83rem; color: var(--text-mid); line-height: 1.65; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 10px; padding: 0.8rem 0.95rem; margin-bottom: 0.8rem; }
-        .compare-add-btn { background: #1e293b; border: none; border-radius: 8px; padding: 0.5rem 1.15rem; font-size: 0.79rem; font-weight: 600; color: #fff; cursor: pointer; font-family: inherit; transition: background 0.15s; }
-        .compare-add-btn:hover { background: #0f172a; }
-        .compare-add-btn.added { background: #15803d; cursor: default; }
-
-        /* ── Tiered table columns ── */
-        .tier-col-badge { display:inline-block; padding:0.15rem 0.5rem; border-radius:999px; font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.04em; margin-bottom:0.15rem; }
-        .tier-col-entry  { background:#e2e8f0; color:#475569; }
-        .tier-col-mid    { background:#dbeafe; color:#1d4ed8; }
-        .tier-col-premium{ background:#fef3c7; color:#92400e; }
-        .data-table th.tier-entry-col { background:#f1f5f9; }
-        .data-table th.tier-mid-col   { background:#eff6ff; }
-        .data-table th.tier-premium-col { background:#fffbeb; }
-
-        /* ═══════════════════════════════════════════════════════════════
-           HOMEPAGE / MARKETING SECTIONS
-        ═══════════════════════════════════════════════════════════════ */
-
-        /* ── Nav ── */
-        .brt-nav { background: #0d1220; border-bottom: 1px solid #1e2a45; padding: 14px 48px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
-        .brt-nav-left { display: flex; align-items: center; gap: 12px; }
-        .brt-nav-logo { font-size: 20px; font-weight: 800; color: #fff; white-space: nowrap; }
-        .brt-bolt-color { color: #f59e0b; }
-        .brt-nav-tagline { font-size: 11px; font-weight: 400; color: #94a3b8; letter-spacing: 1.2px; text-transform: uppercase; border-left: 1px solid #2d3f60; padding-left: 12px; line-height: 1.3; }
-        .brt-nav-links-wrap { display: flex; gap: 28px; align-items: center; }
-        .brt-nav-link { color: rgba(255,255,255,0.75); text-decoration: none; font-size: 14px; font-weight: 500; transition: color 0.15s; }
-        .brt-nav-link:hover { color: #fff; }
-        .brt-nav-cta { background: #f59e0b; color: #000; border: none; padding: 9px 22px; border-radius: 7px; font-weight: 700; font-size: 14px; font-family: inherit; cursor: pointer; transition: background 0.15s; white-space: nowrap; }
-        .brt-nav-cta:hover { background: #fbbf24; }
-        /* Hamburger */
-        .brt-hamburger { display: none; background: none; border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; padding: 6px 10px; cursor: pointer; flex-direction: column; gap: 4px; }
-        .brt-hamburger span { display: block; width: 18px; height: 2px; background: rgba(255,255,255,0.8); border-radius: 2px; transition: all 0.2s; }
-
-        /* ── Hero ── */
-        .brt-hero { background: linear-gradient(135deg, #0d1220 0%, #0f1e3a 50%, #0d1220 100%); padding: 80px 48px 70px; text-align: center; border-bottom: 1px solid #1e2a45; position: relative; z-index: 1; }
-        .brt-hero-inner { max-width: 780px; margin: 0 auto; }
-        .brt-hero-badge { display: inline-block; background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.3); color: #f59e0b; font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; padding: 6px 16px; border-radius: 20px; margin-bottom: 22px; }
-        .brt-hero-h1 { font-size: 48px; font-weight: 800; line-height: 1.15; color: #fff; margin-bottom: 18px; letter-spacing: -0.5px; }
-        .brt-hero-h1 span { color: #f59e0b; }
-        .brt-hero-p { font-size: 17px; color: rgba(255,255,255,0.72); max-width: 620px; margin: 0 auto 36px; line-height: 1.7; }
-
-        /* ── Hero search bar ── */
-        .brt-search-wrapper { max-width: 660px; margin: 0 auto 16px; position: relative; }
-        .brt-search-bar { width: 100%; padding: 18px 150px 18px 22px; background: rgba(255,255,255,0.07); border: 1.5px solid #2d3f60; border-radius: 12px; font-size: 15px; color: #fff; font-family: inherit; outline: none; transition: border-color 0.2s; }
-        .brt-search-bar::placeholder { color: rgba(255,255,255,0.38); }
-        .brt-search-bar:focus { border-color: #f59e0b; box-shadow: 0 0 0 3px rgba(245,158,11,0.12); }
-        .brt-search-btn { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); background: #f59e0b; color: #000; border: none; padding: 11px 22px; border-radius: 8px; font-weight: 700; font-size: 14px; font-family: inherit; cursor: pointer; transition: background 0.15s; white-space: nowrap; }
-        .brt-search-btn:hover { background: #fbbf24; }
-
-        /* ── Example pills ── */
-        .brt-example-pills { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 10px; }
-        .brt-example-pill { background: rgba(255,255,255,0.06); border: 1px solid #2d3f60; color: rgba(255,255,255,0.78); font-size: 12px; padding: 5px 14px; border-radius: 20px; cursor: pointer; font-family: inherit; transition: border-color 0.15s, color 0.15s; }
-        .brt-example-pill:hover { border-color: #f59e0b; color: #f59e0b; }
-
-        /* ── Search hint ── */
-        .brt-search-hint { font-size: 11px; color: rgba(255,255,255,0.42); margin-bottom: 0; }
-
-        /* ── Trust Strip ── */
-        .brt-trust-strip { background: #0d1220; border-bottom: 1px solid #1e2a45; padding: 16px 48px; display: flex; justify-content: center; gap: 40px; align-items: center; flex-wrap: wrap; }
-        .brt-trust-item { display: flex; align-items: center; gap: 8px; color: #94a3b8; font-size: 13px; font-weight: 500; }
-        .brt-trust-item strong { color: #cbd5e1; }
-
-        /* ── Shared section wrapper ── */
-        .brt-section { padding: 72px 48px; max-width: 1200px; margin: 0 auto; }
-        .brt-section-label { text-transform: uppercase; letter-spacing: 2px; font-size: 11px; font-weight: 700; color: #f59e0b; margin-bottom: 10px; }
-        .brt-section-title { font-size: 32px; font-weight: 800; color: #fff; margin-bottom: 12px; letter-spacing: -0.3px; }
-        .brt-section-sub { font-size: 15px; color: #94a3b8; max-width: 540px; line-height: 1.7; margin-bottom: 44px; }
-        .brt-divider { border: none; border-top: 1px solid #1e2a45; }
-
-        /* ── Coverage grid ── */
-        .brt-categories-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
-        .brt-cat-card { background: #111827; border: 1px solid #1e2a45; border-radius: 12px; padding: 22px 18px; text-align: center; transition: border-color 0.2s; }
-        .brt-cat-card:hover { border-color: #f59e0b; }
-        .brt-cat-card .brt-cat-emoji { font-size: 30px; margin-bottom: 10px; display: block; }
-        .brt-cat-card h3 { font-size: 13px; font-weight: 700; color: #e2e8f0; margin-bottom: 5px; }
-        .brt-cat-card p { font-size: 12px; color: #94a3b8; line-height: 1.5; }
-
-        /* ── Sample report section ── */
-        .brt-sample-section { background: #0d1220; border-top: 1px solid #1e2a45; border-bottom: 1px solid #1e2a45; padding: 72px 48px; }
-        .brt-sample-inner { max-width: 1200px; margin: 0 auto; }
-        .brt-sample-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; }
-
-        /* Highlight list (left column) */
-        .brt-report-highlights { display: flex; flex-direction: column; gap: 12px; margin-bottom: 28px; }
-        .brt-highlight-item { display: flex; align-items: flex-start; gap: 12px; background: rgba(245,158,11,0.05); border: 1px solid rgba(245,158,11,0.15); border-radius: 8px; padding: 13px 15px; }
-        .brt-highlight-icon { font-size: 19px; flex-shrink: 0; }
-        .brt-highlight-text h4 { font-size: 13px; font-weight: 700; color: #e2e8f0; margin-bottom: 3px; }
-        .brt-highlight-text p { font-size: 12px; color: #94a3b8; line-height: 1.5; }
-
-        /* Report card mockup (right column) */
-        .brt-sample-label { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #94a3b8; margin-bottom: 8px; }
-        .brt-report-card { background: #111827; border: 1px solid #2d3f60; border-radius: 16px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.4); }
-        .brt-report-header { background: linear-gradient(90deg, #0f1e3a, #1a2d50); padding: 18px 22px; border-bottom: 1px solid #2d3f60; display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
-        .brt-report-header-text h4 { font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 3px; }
-        .brt-report-header-text .brt-sub { font-size: 11px; color: #94a3b8; }
-        .brt-report-badge { background: #f59e0b; color: #000; font-size: 10px; font-weight: 700; padding: 3px 10px; border-radius: 10px; white-space: nowrap; flex-shrink: 0; }
-        .brt-stat-row { display: grid; grid-template-columns: repeat(4, 1fr); border-bottom: 1px solid #1e2a45; }
-        .brt-stat { padding: 14px; border-right: 1px solid #1e2a45; text-align: center; }
-        .brt-stat:last-child { border-right: none; }
-        .brt-stat .brt-slabel { font-size: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
-        .brt-stat .brt-svalue { font-size: 17px; font-weight: 800; color: #f59e0b; }
-        .brt-stat .brt-ssub { font-size: 10px; color: #94a3b8; margin-top: 2px; }
-        .brt-report-rows { padding: 18px 22px; }
-        .brt-report-row { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-bottom: 1px solid #1a2235; font-size: 13px; }
-        .brt-report-row:last-child { border-bottom: none; }
-        .brt-report-row .brt-rname { color: #94a3b8; }
-        .brt-rstatus { font-size: 11px; padding: 2px 10px; border-radius: 10px; font-weight: 600; }
-        .brt-status-green { background: rgba(34,197,94,0.12); color: #4ade80; }
-        .brt-status-yellow { background: rgba(245,158,11,0.12); color: #f59e0b; }
-        .brt-status-blue { background: rgba(59,130,246,0.12); color: #60a5fa; }
-        .brt-report-footer { background: #0d1220; padding: 12px 22px; display: flex; justify-content: space-between; align-items: center; }
-        .brt-report-footer span { font-size: 11px; color: #94a3b8; }
-        .brt-pdf-btn { font-size: 11px; background: #1e2a45; color: #94a3b8; padding: 5px 12px; border-radius: 6px; font-weight: 600; border: none; cursor: default; }
-
-        /* ── How It Works ── */
-        .brt-how-section { padding: 72px 48px; max-width: 1200px; margin: 0 auto; }
-        .brt-how-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
-        .brt-how-card { background: #111827; border: 1px solid #1e2a45; border-radius: 12px; padding: 30px 26px; }
-        .brt-how-num { font-size: 11px; font-weight: 700; color: #f59e0b; letter-spacing: 1px; margin-bottom: 14px; text-transform: uppercase; }
-        .brt-how-icon { font-size: 26px; margin-bottom: 12px; display: block; }
-        .brt-how-card h3 { font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 9px; }
-        .brt-how-card p { font-size: 13px; color: #94a3b8; line-height: 1.7; }
-
-        /* ── Report Breakdown ── */
-        .brt-breakdown-section { background: #0d1220; border-top: 1px solid #1e2a45; border-bottom: 1px solid #1e2a45; padding: 72px 48px; }
-        .brt-breakdown-inner { max-width: 1200px; margin: 0 auto; }
-        .brt-breakdown-sub { font-size: 15px; color: #94a3b8; max-width: 540px; line-height: 1.7; margin-bottom: 36px; }
-        .brt-breakdown-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
-        .brt-breakdown-card { background: #111827; border: 1px solid #1e2a45; border-radius: 10px; padding: 18px; display: flex; gap: 13px; align-items: flex-start; transition: border-color 0.2s; }
-        .brt-breakdown-card:hover { border-color: #2d3f60; }
-        .brt-breakdown-icon { font-size: 20px; flex-shrink: 0; }
-        .brt-breakdown-text h4 { font-size: 13px; font-weight: 700; color: #e2e8f0; margin-bottom: 4px; }
-        .brt-breakdown-text p { font-size: 12px; color: #94a3b8; line-height: 1.5; }
-
-        /* ── Bottom CTA ── */
-        .brt-cta-section { text-align: center; padding: 80px 48px; max-width: 720px; margin: 0 auto; }
-        .brt-cta-section h2 { font-size: 34px; font-weight: 800; color: #fff; margin-bottom: 14px; letter-spacing: -0.3px; }
-        .brt-cta-section p { font-size: 16px; color: #94a3b8; margin-bottom: 32px; line-height: 1.7; }
-        .brt-cta-search-wrap { position: relative; max-width: 580px; margin: 0 auto; }
-        .brt-cta-search-wrap .brt-search-bar { padding-right: 140px; }
-
-        /* ── Footer ── */
-        .brt-footer-new { background: #0a0e1a; border-top: 1px solid #1e2a45; padding: 22px 48px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
-        .brt-footer-new p { font-size: 12px; color: #64748b; }
-        .brt-footer-links { display: flex; gap: 20px; flex-wrap: wrap; }
-        .brt-footer-links a { font-size: 12px; color: #64748b; text-decoration: none; transition: color 0.15s; }
-        .brt-footer-links a:hover { color: #94a3b8; }
-
-        /* ── Hide homepage sections when results are visible ── */
-        #results:not(.hidden) ~ #homepage-sections { display: none; }
-
-        /* ── Print ── */
-        @media print {
-            .no-print { display: none !important; }
-            body { background: white !important; color: #000 !important; }
-            .results-zone { background: white !important; padding: 0 !important; }
-            .card { box-shadow: none !important; border: 1px solid #ddd !important; }
-            .section-spinner, .skeleton-line, .refine-tip { display: none !important; }
-            .tab-bar { display: none !important; }
-            .tab-panel { display: block !important; }
-            #panel-overview { display: block !important; }
-            .metrics-strip { display: none !important; }
-        }
-
-        /* ── Mobile responsive ── */
-        @media (max-width: 1024px) {
-            .brt-categories-grid { grid-template-columns: repeat(2, 1fr); }
-            .brt-breakdown-grid { grid-template-columns: repeat(2, 1fr); }
-        }
-        @media (max-width: 900px) {
-            .brt-sample-layout { grid-template-columns: 1fr; }
-            .brt-how-grid { grid-template-columns: 1fr 1fr; }
-        }
-        @media (max-width: 768px) {
-            .brt-nav { padding: 12px 20px; }
-            .brt-hamburger { display: flex; }
-            .brt-nav-links-wrap { display: none; flex-direction: column; position: absolute; top: 100%; left: 0; right: 0; background: #0d1220; border-bottom: 1px solid #1e2a45; padding: 16px 20px; gap: 16px; z-index: 200; }
-            .brt-nav-links-wrap.open { display: flex; }
-            .brt-nav-tagline { display: none; }
-            .brt-hero { padding: 56px 20px 52px; }
-            .brt-hero-h1 { font-size: 34px; }
-            .brt-hero-p { font-size: 15px; }
-            .brt-search-bar { padding: 15px 130px 15px 16px; font-size: 14px; }
-            .brt-trust-strip { padding: 14px 20px; gap: 20px; }
-            .brt-section { padding: 52px 20px; }
-            .brt-sample-section { padding: 52px 20px; }
-            .brt-how-section { padding: 52px 20px; }
-            .brt-breakdown-section { padding: 52px 20px; }
-            .brt-cta-section { padding: 60px 20px; }
-            .brt-footer-new { padding: 20px; flex-direction: column; align-items: flex-start; }
-            .brt-categories-grid { grid-template-columns: 1fr 1fr; }
-            .brt-how-grid { grid-template-columns: 1fr; }
-            .brt-breakdown-grid { grid-template-columns: 1fr 1fr; }
-            .brt-cta-section h2 { font-size: 26px; }
-            .results-zone { padding: 1.5rem 1rem 2rem; border-radius: 16px 16px 0 0; }
-        }
-        @media (max-width: 480px) {
-            .brt-categories-grid { grid-template-columns: 1fr; }
-            .brt-breakdown-grid { grid-template-columns: 1fr; }
-            .brt-stat-row { grid-template-columns: repeat(2, 1fr); }
-            .brt-stat:nth-child(2) { border-right: none; }
-            .brt-stat:nth-child(3), .brt-stat:nth-child(4) { border-top: 1px solid #1e2a45; }
-            .section-filters { flex-direction: column; align-items: center; }
-        }
-        @media (max-width: 640px) {
-            .brt-hero-h1 { font-size: 28px; }
-            .brt-example-pills { gap: 6px; }
-            .brt-example-pill { font-size: 11px; padding: 4px 11px; }
-            .metrics-strip { grid-template-columns: repeat(2, 1fr); }
-        }
-    </style>
+    <title>Serial Number Age Decoder | Item Assist</title>
+    <meta name="description" content="Instantly decode appliance and electronics serial numbers to find manufacture date and age. Supports GE, Whirlpool, Samsung, LG, Bosch and more.">
+    <link rel="canonical" href="https://www.decodemyitem.com/">
+    <link rel="stylesheet" href="global.css">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
 </head>
 <body>
     <div class="circuit-bg"></div>
+    <div class="circuit-nodes">
+        <div class="node"></div><div class="node"></div><div class="node"></div><div class="node"></div>
+        <div class="node"></div><div class="node"></div><div class="node"></div><div class="node"></div>
+    </div>
 
-    <!-- ════════════════════════════════════════════════════════════
-         NAVIGATION
-    ════════════════════════════════════════════════════════════ -->
-    <nav class="brt-nav no-print">
-        <div class="brt-nav-left">
-            <div class="brt-nav-logo">Bolt <span class="brt-bolt-color">&#9889;</span></div>
-            <span class="brt-nav-tagline">Intuitive Data Aggregation</span>
+        <aside class="sidebar">
+        <div class="sidebar-header">
+            <a class="sidebar-logo" href="/"><img class="ia-sidebar-logo" src="/assets/item-assist-logo.png" width="150" height="150" alt="Item Assist logo"></a>
         </div>
-        <button class="brt-hamburger" id="brt-hamburger" aria-label="Toggle menu" aria-expanded="false">
-            <span></span><span></span><span></span>
-        </button>
-        <div class="brt-nav-links-wrap" id="brt-nav-links">
-            <a href="item-age.html" class="brt-nav-link">Serial Number Decoder</a>
-            <a href="field-reference.html" class="brt-nav-link">Field Reference</a>
-            <a href="why-bolt.html" class="brt-nav-link">Why Bolt?</a>
-            <button id="nav-cta-btn" class="brt-nav-cta">Start Searching</button>
+        <div class="sidebar-section">
+            <div class="sidebar-title">Categories</div>
+            <button class="cat-tab active" data-cat="appliances" onclick="selectCategory('appliances', this)">Appliances</button>
+            <button class="cat-tab" data-cat="waterHeaters" onclick="selectCategory('waterHeaters', this)">Water Heaters</button>
+            <button class="cat-tab" data-cat="hvac" onclick="selectCategory('hvac', this)">HVAC</button>
+            <button class="cat-tab" data-cat="electronics" onclick="selectCategory('electronics', this)">Electronics</button>
         </div>
-    </nav>
+        <div class="sidebar-section">
+            <div class="sidebar-title">Brands</div>
+            <a class="sidebar-link" href="/goodman">Goodman</a>
+            <a class="sidebar-link" href="/carrier">Carrier</a>
+            <a class="sidebar-link" href="/rheem">Rheem</a>
+            <a class="sidebar-link" href="/trane">Trane</a>
+            <a class="sidebar-link" href="/whirlpool">Whirlpool</a>
+            <a class="sidebar-link" href="/ge">GE</a>
+            <a class="sidebar-link" href="/samsung">Samsung</a>
+            <a class="sidebar-link" href="/lg">LG</a>
+            <a class="sidebar-link" href="/sony">Sony</a>
+            <a class="sidebar-link" href="/bosch">Bosch</a>
+            <a class="sidebar-link" href="/maytag">Maytag</a>
+            <a class="sidebar-link" href="/frigidaire">Frigidaire</a>
+            <a class="sidebar-link" href="/kenmore">Kenmore</a>
+            <a class="sidebar-link" href="/apple">Apple</a>
+            <a class="sidebar-link" href="/hp">HP</a>
+            <a class="sidebar-link" href="/asus">ASUS</a>
+            <a class="sidebar-link" href="/google-pixel">Google Pixel</a>
+            <a class="sidebar-link" href="/vizio">Vizio</a>
+            <a class="sidebar-link" href="/panasonic">Panasonic</a>
+        </div>
+        <div class="sidebar-section">
+            <div class="sidebar-title">Resources</div>
+            <a class="sidebar-link" href="/methodology">Methodology</a>
+            <a class="sidebar-link" href="/disclaimer">Disclaimer</a>
+            <a class="sidebar-link" href="/contact">Contact</a>
+        </div>
+    </aside>
+    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+    <div class="page-shell">
+    <div class="app-container content-wrapper container">
 
-    <!-- ════════════════════════════════════════════════════════════
-         HERO SECTION
-    ════════════════════════════════════════════════════════════ -->
-    <div class="brt-hero no-print" id="hero-section">
-        <div class="brt-hero-inner">
-            <div class="brt-hero-badge">&#9889; Built for Item Research</div>
-            <h1 class="brt-hero-h1">The Ultimate Assistant for <span>Technical Item Research</span></h1>
-            <p class="brt-hero-p">From Federal Pacific electrical panels to the latest iPhone &mdash; instant, comprehensive reports on age, value, recalls, diagnostics, and replacements. Built for professionals who need answers fast.</p>
+        <!-- Header -->
+        <div class="header">
+            <button class="sidebar-toggle" onclick="toggleSidebar()" aria-label="Toggle navigation">&#9776;</button>
+            <div class="header-brand">
+                <h1><span class="accent">&#9889;</span> Serial Number Age <span class="accent">Decoder</span></h1>
+                <p class="subtitle">Find manufacture dates for appliances, water heaters &amp; electronics</p>
+                <p class="header-tagline">Trusted by <strong>homeowners</strong> and <strong>insurance professionals</strong> to determine equipment age from serial numbers &mdash; no account required.</p>
+            </div>
+            
+        </div>
 
-            <!-- Main search bar (IDs preserved for JS) -->
-            <div class="brt-search-wrapper">
-                <input type="text" id="query" class="brt-search-bar" placeholder='Try "Generac 22kW generator" or "Federal Pacific panel"' autocomplete="off">
-                <button id="btn" class="brt-search-btn">&#9889; Search</button>
+        <section class="explain-strip" aria-label="Tool explanation">
+            <div class="explain-tool-cards">
+                <article class="explain-tool-card">
+                    <div class="explain-tool-head">
+                        <span class="explain-tool-icon" aria-hidden="true">&#9889;</span>
+                        <h2>Serial Number Decoder</h2>
+                    </div>
+                    <p>Enter any serial number and instantly decode the manufacture date. Covers 100+ brands across appliances, water heaters, HVAC, and electronics.</p>
+                    <span class="explain-tool-tag">Fastest method - no AI required</span>
+                </article>
+                <article class="explain-tool-card">
+                    <div class="explain-tool-head">
+                        <span class="explain-tool-icon" aria-hidden="true">&#10024;</span>
+                        <h2>Smart Lookup</h2>
+                    </div>
+                    <p>No serial number? Search by model number, brand, or product description to get an estimated age range using advanced online research.</p>
+                    <span class="explain-tool-tag">Works without a serial number</span>
+                </article>
             </div>
 
-            <!-- Mascot loader (shown only during search via JS) -->
-            <div class="mascot-area" id="mascot-wrapper">
-                <div id="loader-track">
-                    <div id="loader-dog">
-                        <svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg" width="60" height="60">
-                            <g class="dog-cape">
-                                <path d="M22 28 L8 46 L28 40 Z" fill="#dc2626" opacity="0.9"/>
-                                <path d="M24 30 L12 50 L30 42 Z" fill="#b91c1c" opacity="0.7"/>
-                            </g>
-                            <ellipse cx="30" cy="38" rx="14" ry="12" fill="white"/>
-                            <circle cx="38" cy="22" r="12" fill="white"/>
-                            <ellipse cx="30" cy="12" rx="4" ry="7" fill="white" transform="rotate(-15 30 12)"/>
-                            <ellipse cx="31" cy="13" rx="2.5" ry="5" fill="#fecaca" transform="rotate(-15 31 13)"/>
-                            <ellipse cx="46" cy="14" rx="4" ry="7" fill="white" transform="rotate(15 46 14)"/>
-                            <ellipse cx="45" cy="15" rx="2.5" ry="5" fill="#fecaca" transform="rotate(15 45 15)"/>
-                            <circle cx="34" cy="20" r="2.5" fill="#1e293b"/>
-                            <circle cx="42" cy="20" r="2.5" fill="#1e293b"/>
-                            <circle cx="35" cy="19" r="0.8" fill="white"/>
-                            <circle cx="43" cy="19" r="0.8" fill="white"/>
-                            <ellipse cx="39" cy="25" rx="2" ry="1.5" fill="#1e293b"/>
-                            <path d="M37 27 Q39 30 41 27" stroke="#1e293b" fill="none" stroke-width="0.8"/>
-                            <polygon points="28,32 31,36 29,36 32,42 27,37 30,37" fill="#eab308"/>
-                            <rect x="20" y="46" width="5" height="8" rx="2.5" fill="white"/>
-                            <rect x="35" y="46" width="5" height="8" rx="2.5" fill="white"/>
-                            <path d="M18 35 Q10 28 14 22" stroke="white" fill="none" stroke-width="3" stroke-linecap="round"/>
+            <div class="explain-use-cases" aria-label="Use cases">
+                <div class="explain-use-case"><span aria-hidden="true">&#127968;</span>Homeowners verifying equipment age</div>
+                <div class="explain-use-case"><span aria-hidden="true">&#128188;</span>Professionals researching item history</div>
+                <div class="explain-use-case"><span aria-hidden="true">&#128196;</span>Anyone without a data plate or receipt</div>
+            </div>
+
+            <div class="explain-handoff">
+                <p>Start by selecting your item type below - or use Smart Lookup if you don't have a serial number.</p>
+            </div>
+        </section>
+
+        <!-- Search Form -->
+<div class="main-card">
+            <!-- Category Tabs -->
+            
+
+            <!-- Form -->
+            <div class="form-area">
+                <div class="form-group">
+                    <label class="step-label sr-only" for="brand">Select Brand</label>
+                    <select id="brand" class="form-select">
+                        <option value="">-- Select Brand --</option>
+                    </select>
+                </div>
+
+                <!-- Era Dropdown -->
+                <div class="form-group era-group hidden" id="eraGroup">
+                    <label class="step-label sr-only" for="eraSelect">
+                        Manufacture Era
+                        <span class="info-icon" title="Manufacturer serial formats often repeat every 20 years; selecting the era ensures accuracy.">&#9432;</span>
+                    </label>
+                    <select id="eraSelect" class="form-select">
+                        <option value="">-- Select Era --</option>
+                        <option value="post">Post-2006 (manufactured after 2006)</option>
+                        <option value="pre">Pre-2006 (manufactured before 2006)</option>
+                    </select>
+                    <p class="era-note">Manufacturers often recycle serial formats every 20 years. Selecting the era ensures the decoding logic matches your specific unit.</p>
+                </div>
+
+                <div class="form-group">
+                    <label class="step-label sr-only" for="serial">Enter Serial Number</label>
+                    <input type="text" id="serial" class="form-input" placeholder="Enter serial number (e.g., CB2501800)">
+                    <div class="helper-text">Enter the serial number exactly as shown on the product label</div>
+                </div>
+
+                <button id="decodeBtn" class="decode-btn" disabled onclick="decodeSerial()">Decode Serial Number</button>
+            </div>
+        </div>
+
+<!-- Loading -->
+        <div id="ageLoading" class="results-card hidden">
+            <div class="loading-inner">
+                <div class="zeus-loader" id="zeusLoader" aria-hidden="true">
+                    <div class="zeus-loader-lane" id="zeusLoaderLane">
+                        <div class="zeus-hand-glow" id="zeusHandGlow"></div>
+                        <svg class="zeus-silhouette" id="zeusSilhouette" viewBox="0 0 96 96" aria-hidden="true" focusable="false">
+                            <path d="M28 18c7-6 18-5 24 1 4 4 6 9 6 14v7l9 8v18H24V52l9-8v-6c0-5 2-11 5-14l-6-6 6-6 6 6zM36 68h22l6 10H30l6-10z" fill="currentColor"></path>
+                            <path d="M58 39c0 7-5 12-12 12-2 0-4 0-6-1 2 4 7 7 12 7 9 0 16-7 16-16 0-2 0-3-1-5-1 2-4 3-9 3z" fill="currentColor"></path>
+                        </svg>
+                        <svg class="zeus-bolt" id="zeusBolt" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                            <path d="M13 1L4 13h6l-1 10 11-14h-6l-1-8z" fill="currentColor"></path>
                         </svg>
                     </div>
                 </div>
-                <span id="loader-text" class="loader-text">Consulting live market data and technical records...</span>
-            </div>
-
-            <!-- Example pills (click to search) -->
-            <div class="brt-example-pills">
-                <span class="brt-example-pill" data-example='LG C3 65" TV'>LG C3 65&quot; TV</span>
-                <span class="brt-example-pill" data-example="Rheem 50-gal Water Heater">Rheem 50-gal Water Heater</span>
-                <span class="brt-example-pill" data-example="iPhone 17 Pro">iPhone 17 Pro</span>
-                <span class="brt-example-pill" data-example="Federal Pacific Electrical Panel">Federal Pacific Electrical Panel</span>
-                <span class="brt-example-pill" data-example="Carrier 5-ton AC">Carrier 5-ton AC</span>
-                <span class="brt-example-pill" data-example="Sunpower Solar Inverter">Sunpower Solar Inverter</span>
-                <span class="brt-example-pill" data-example="Sub-Zero Classic Built-In Refrigerator">Sub-Zero Classic Built-In Refrigerator</span>
-                <span class="brt-example-pill" data-example="samsung range Model#NSG6DG8700SR">samsung range Model#NSG6DG8700SR</span>
-            </div>
-            <div class="brt-search-hint">Works with brand names, model numbers, serial numbers, or general descriptions</div>
-
-            <!-- Section filters -->
-            <div class="section-filters" role="group" aria-label="Report sections to include">
-                <span class="section-filters-label">Include in report:</span>
-                <div class="section-filter-list">
-                    <label class="section-filter-chip is-checked"><input type="checkbox" id="sec-how-it-works" checked> How It Works</label>
-                    <label class="section-filter-chip is-checked"><input type="checkbox" id="sec-item-notes" checked> Item Notes</label>
-                    <label class="section-filter-chip is-checked"><input type="checkbox" id="sec-replacements" checked> Replacement Options</label>
-                    <label class="section-filter-chip is-checked"><input type="checkbox" id="sec-diagnostics" checked> Diagnostics &amp; Repair</label>
-                    <label class="section-filter-chip is-checked"><input type="checkbox" id="sec-technical" checked> Technical Details</label>
-                    <label class="section-filter-chip is-checked"><input type="checkbox" id="sec-valuation" checked> Valuation &amp; Depreciation</label>
-                </div>
-            </div>
-
-        </div>
-    </div>
-
-    <!-- ════════════════════════════════════════════════════════════
-         RESULTS (hidden initially — sibling selector hides #homepage-sections when visible)
-    ════════════════════════════════════════════════════════════ -->
-    <div id="results" class="hidden">
-        <div class="results-zone">
-            <div class="results-inner">
-
-                <div class="results-header no-print">
-                    <div class="results-label-group">
-                        <span class="results-label">Research Report</span>
-                        <span id="tier-badge" class="tier-badge hidden"></span>
-                    </div>
-                    <div class="results-header-actions">
-                        <button id="copy-btn" class="copy-btn">&#128203; Generate Customized Summary</button>
-                        <button class="print-btn" id="print-btn">&#128424; Print to PDF</button>
-                    </div>
-                </div>
-                <div id="model-number-hint" class="model-number-hint hidden no-print">
-                    <span class="hint-icon">&#128161;</span>
-                    <span><strong>Tip:</strong> Include a full model number for our most comprehensive report.</span>
-                </div>
-                <div class="tab-bar no-print" role="tablist" aria-label="Report sections">
-                    <button class="tab-btn active" role="tab" id="tab-overview" aria-selected="true" aria-controls="panel-overview">Overview</button>
-                    <button class="tab-btn" role="tab" id="tab-replacements" aria-selected="false" aria-controls="panel-replacements">Replacement Options</button>
-                    <button class="tab-btn" role="tab" id="tab-diagnostics" aria-selected="false" aria-controls="panel-diagnostics">Diagnostics &amp; Repair</button>
-                    <button class="tab-btn" role="tab" id="tab-technical" aria-selected="false" aria-controls="panel-technical">Technical Details</button>
-                </div>
-
-                <div id="estimation-banner" class="estimation-banner hidden">
-                    <span class="banner-icon">&#9888;</span>
-                    <span id="estimation-text"></span>
-                </div>
-
-                <div id="refine-tip" class="refine-tip hidden">
-                    <strong>&#128161; Refine your search:</strong> <span id="refine-tip-text"></span>
-                </div>
-
-                <!-- Overview Tab -->
-                <div id="panel-overview" class="tab-panel active" role="tabpanel" aria-labelledby="tab-overview">
-                    <div class="metrics-strip">
-                        <div class="metric-card">
-                            <span class="metric-label">Age</span>
-                            <span class="metric-value" id="m-age">—</span>
-                        </div>
-                        <div class="metric-card">
-                            <span class="metric-label">Launch MSRP</span>
-                            <span class="metric-value" id="m-msrp">—</span>
-                        </div>
-                        <div class="metric-card">
-                            <span class="metric-label">Est. ACV</span>
-                            <span class="metric-value acv" id="m-acv">—</span>
-                        </div>
-                        <div class="metric-card">
-                            <span class="metric-label">Availability</span>
-                            <span class="metric-value" id="m-availability" style="font-size:0.78rem; line-height:1.3;">—</span>
-                        </div>
-                    </div>
-
-                    <div class="card" id="card-analysis">
-                        <div class="card-title"><span class="title-number">1</span> Current Item Analysis <span class="title-icon">&#9889;</span></div>
-                        <div class="card-accent-stripe"></div>
-                        <p class="report-overview" id="r-overview"></p>
-                        <div id="parts-available-note" class="parts-available-note hidden">&#128270; Parts research available — see Diagnostics &amp; Repair section.</div>
-                        <ul class="report-list">
-                            <li><span class="label">Search Query</span> <span id="r-search-query"></span></li>
-                            <li><span class="label">Assumptions Used</span> <span id="r-assumptions"></span></li>
-                            <li><span class="label">Item Description</span> <span id="r-item-desc"></span></li>
-                        </ul>
-                        <div class="section-subtitle">Key Specifications</div>
-                        <div class="quick-spec-pills" id="r-top-specs-pills"></div>
-                        <div id="refinement-chips" class="no-print" style="margin-top:0.5rem;"></div>
-                        <div id="r-variations" class="variations-section hidden no-print">
-                            <div class="variations-label">Variations</div>
-                            <div class="variation-chips" id="r-variation-chips"></div>
-                        </div>
-                    </div>
-
-                    <div class="card" id="card-how-it-works">
-                        <div class="card-title"><span class="title-number">2</span> How It Works <span class="title-icon">&#128161;</span></div>
-                        <div class="card-accent-stripe"></div>
-                        <div id="how-it-works-content">
-                            <div class="section-spinner">Loading...</div>
-                        </div>
-                    </div>
-
-                    <div class="card" id="card-release-date">
-                        <div class="card-title"><span class="title-number">3</span> Release Date &amp; Age <span class="title-icon">&#128197;</span></div>
-                        <div class="card-accent-stripe"></div>
-                        <ul class="report-list">
-                            <li><span class="label">Production Era</span> <span id="r-production-era"></span></li>
-                            <li><span class="label">Discontinuation</span> <span id="r-discontinuation"></span></li>
-                            <li class="sn-li" id="sn-input-li" style="display:none">
-                                <span class="label">Serial No.</span>
-                                <span class="sn-ctrl">
-                                    <input type="text" id="sn-input" placeholder="Enter serial number…" autocomplete="off" spellcheck="false" maxlength="40">
-                                    <button id="sn-decode-btn" type="button">Decode Serial Number</button>
-                                </span>
-                            </li>
-                            <li class="sn-li" id="sn-result-li" style="display:none">
-                                <span class="label"></span>
-                                <span id="sn-result-text"></span>
-                            </li>
-                            <li><span class="label">Estimated Age</span> <span id="r-estimated-age"></span></li>
-                            <li><span class="label">Service Life</span> <span id="r-service-life"></span></li>
-                        </ul>
-                        <div id="age-advisory" class="advisory-banner hidden">
-                            <div class="advisory-icon">&#9888;&#65039;</div>
-                            <div class="advisory-content">
-                                <h4>Incomplete Query Advisory</h4>
-                                <p>Estimated based on category norms. For higher precision, include brand + model or a serial number.</p>
-                                <ul class="advisory-tips">
-                                    <li>Add specific brand and model number</li>
-                                    <li>Locate serial number on manufacturer label</li>
-                                    <li>Check rear label for serial format</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card" id="card-valuation">
-                        <div class="card-title"><span class="title-number">4</span> Valuation &amp; Depreciation <span class="title-icon">&#128200;</span></div>
-                        <div class="card-accent-stripe"></div>
-                        <ul class="report-list" id="valuation-list">
-                            <li id="msrp-row">
-                                <span class="label">MSRP</span>
-                                <span>
-                                    <div class="msrp-pair">
-                                        <span class="msrp-label">Launch MSRP</span>
-                                        <span class="msrp-value" id="r-launch-msrp"></span>
-                                        <span class="msrp-label" style="margin-top:0.4rem">Current Market Price</span>
-                                        <span class="msrp-value" id="r-market-price"></span>
-                                        <span class="msrp-note" id="r-market-price-note"></span>
-                                    </div>
-                                </span>
-                            </li>
-                            <li id="acv-row">
-                                <span class="label">ACV Calculation</span>
-                                <span>
-                                    <span class="acv-value" id="r-acv"></span>
-                                    <span class="acv-formula" id="r-acv-formula" style="display:block; margin-top:0.2rem;"></span>
-                                    <div class="acv-steps" id="r-acv-steps" style="display:none;"></div>
-                                    <div class="age-input-row">
-                                        <span class="age-label">Adjust age:</span>
-                                        <input type="number" id="acv-age-input" class="age-input" min="0" max="100" value="0">
-                                        <span class="age-label">years</span>
-                                        <button class="recalc-btn" id="recalc-btn">Recalculate</button>
-                                        <button class="recalc-btn" id="generate-valuation-btn" style="display:none;">Generate Price Estimate</button>
-                                    </div>
-                                    <span class="acv-note" id="r-acv-note"></span>
-                                </span>
-                            </li>
-                        </ul>
-                    </div>
-
-                    <div class="card" id="card-item-notes">
-                        <div class="card-title"><span class="title-number">5</span> Item Notes <span class="title-icon">&#128203;</span></div>
-                        <div class="card-accent-stripe"></div>
-                        <div id="item-notes-content">
-                            <div class="skeleton-line med"></div>
-                            <div class="skeleton-line full"></div>
-                            <div class="skeleton-line short"></div>
-                        </div>
-                    </div>
-                    <div class="panel-nav no-print">
-                        <span class="panel-nav-label">Jump to:</span>
-                        <button class="panel-nav-btn" data-tab="tab-replacements">Replacement Options</button>
-                        <button class="panel-nav-btn" data-tab="tab-diagnostics">Diagnostics &amp; Repair</button>
-                        <button class="panel-nav-btn" data-tab="tab-technical">Technical Details</button>
-                    </div>
-                </div><!-- /panel-overview -->
-
-                <!-- Replacement Options Tab -->
-                <div id="panel-replacements" class="tab-panel" role="tabpanel" aria-labelledby="tab-replacements">
-                    <div class="card" id="card-table" style="overflow-x: auto;">
-                        <div class="card-title"><span class="title-number">6</span> Current Replacement Options <span class="title-icon">&#128260;</span></div>
-                        <div class="card-accent-stripe"></div>
-                        <div id="what-to-consider" class="hidden"></div>
-                        <div id="table-note" class="table-note hidden"></div>
-                        <div id="table-loading" class="section-spinner">Loading replacement options...</div>
-                        <table id="r-table" class="data-table hidden">
-                            <thead id="table-head"><tr id="table-head-row">
-                                <th>Feature</th><th>Original Item</th><th class="highlight">Brand Match</th><th>Option 1</th><th>Option 2</th>
-                            </tr></thead>
-                            <tbody id="table-body"></tbody>
-                        </table>
-                        <div id="narrow-results" class="narrow-results hidden">
-                            <div class="narrow-results-header">&#128269; Narrow Your Results</div>
-                            <p id="narrow-results-tip"></p>
-                        </div>
-                        <div id="compare-trigger-row" class="compare-trigger-row hidden">
-                            <button id="compare-toggle-btn" class="compare-toggle-btn">&#128270; Compare a Replacement Option</button>
-                        </div>
-                        <div id="compare-panel" class="compare-panel hidden">
-                            <div class="compare-panel-header">
-                                <span class="compare-panel-icon">&#128270;</span>
-                                <span class="compare-panel-title">Compare a Replacement Option</span>
-                                <button class="compare-panel-close" id="compare-panel-close">&times;</button>
-                            </div>
-                            <div class="compare-input-row">
-                                <input type="text" id="compare-input" class="compare-input" placeholder="Enter brand + model number (e.g. Samsung RF28R7351SR)" />
-                                <button id="compare-submit" class="compare-submit-btn">Compare</button>
-                            </div>
-                            <label class="compare-checkbox-label">
-                                <input type="checkbox" id="compare-include-existing" /> Include loaded Brand Match &amp; Option 1
-                            </label>
-                            <div id="compare-loading" class="compare-loading hidden">
-                                <div class="section-spinner">Looking up replacement&hellip;</div>
-                            </div>
-                            <div id="compare-result" class="compare-result hidden"></div>
-                        </div>
-                    </div>
-                    <div class="panel-nav no-print">
-                        <span class="panel-nav-label">Jump to:</span>
-                        <button class="panel-nav-btn" data-tab="tab-overview">Overview</button>
-                        <button class="panel-nav-btn" data-tab="tab-diagnostics">Diagnostics &amp; Repair</button>
-                        <button class="panel-nav-btn" data-tab="tab-technical">Technical Details</button>
-                    </div>
-                </div><!-- /panel-replacements -->
-
-                <!-- Diagnostics & Repair Tab -->
-                <div id="panel-diagnostics" class="tab-panel" role="tabpanel" aria-labelledby="tab-diagnostics">
-                    <div class="card" id="card-manual-mfr">
-                        <div class="card-title"><span class="title-number">7</span> Owner&apos;s Manual &amp; Manufacturer Page <span class="title-icon">&#128196;</span></div>
-                        <div class="card-accent-stripe"></div>
-                        <div id="manual-content"><div class="section-spinner">Loading...</div></div>
-                        <div id="manufacturer-page-content" style="margin-top:0.5rem;"></div>
-                    </div>
-                    <div class="card" id="card-error-codes">
-                        <div class="card-title"><span class="title-number">8</span> Error Codes <span class="title-icon">&#128308;</span></div>
-                        <div class="card-accent-stripe"></div>
-                        <div id="error-codes-content"><div class="section-spinner">Loading...</div></div>
-                    </div>
-                    <div class="card" id="card-failures">
-                        <div class="card-title"><span class="title-number">9</span> Common Reported Failures <span class="title-icon">&#128295;</span></div>
-                        <div class="card-accent-stripe"></div>
-                        <div id="failures-content"><div class="section-spinner">Loading...</div></div>
-                    </div>
-                    <div class="card" id="card-parts">
-                        <div class="card-title">&#128270; Repair Parts <span class="title-icon">&#128269;</span></div>
-                        <div class="card-accent-stripe"></div>
-                        <div id="parts-content"><div class="section-spinner">Loading...</div></div>
-                    </div>
-                    <div class="card" id="card-troubleshooting">
-                        <div class="card-title"><span class="title-number">10</span> Troubleshooting &amp; Repair <span class="title-icon">&#128736;</span></div>
-                        <div class="card-accent-stripe"></div>
-                        <div id="troubleshooting-content"><div class="section-spinner">Loading...</div></div>
-                    </div>
-                    <div class="card" id="card-recalls">
-                        <div class="card-title"><span class="title-number">11</span> Recall Notices or Class Action <span class="title-icon">&#9888;</span></div>
-                        <div class="card-accent-stripe"></div>
-                        <div id="recalls-content"><div class="section-spinner">Loading...</div></div>
-                    </div>
-                    <div class="panel-nav no-print">
-                        <span class="panel-nav-label">Jump to:</span>
-                        <button class="panel-nav-btn" data-tab="tab-overview">Overview</button>
-                        <button class="panel-nav-btn" data-tab="tab-replacements">Replacement Options</button>
-                        <button class="panel-nav-btn" data-tab="tab-technical">Technical Details</button>
-                    </div>
-                </div><!-- /panel-diagnostics -->
-
-                <!-- Technical Details Tab -->
-                <div id="panel-technical" class="tab-panel" role="tabpanel" aria-labelledby="tab-technical">
-                    <div class="card" id="card-technical">
-                        <div class="card-title">Technical Details <span class="title-icon">&#9881;</span></div>
-                        <div class="card-accent-stripe"></div>
-                        <div id="tech-panel-content"><div class="section-spinner">Loading...</div></div>
-                    </div>
-                    <div class="panel-nav no-print">
-                        <span class="panel-nav-label">Jump to:</span>
-                        <button class="panel-nav-btn" data-tab="tab-overview">Overview</button>
-                        <button class="panel-nav-btn" data-tab="tab-replacements">Replacement Options</button>
-                        <button class="panel-nav-btn" data-tab="tab-diagnostics">Diagnostics &amp; Repair</button>
-                    </div>
-                </div><!-- /panel-technical -->
-
-                <footer class="no-print" style="text-align: center; padding: 2rem 0; opacity: 0.5; font-size: 0.75rem; color: var(--text-muted-dark);">
-                    <p>Results are generated for informational purposes. Always verify critical data independently.</p>
-                </footer>
-
+                <div class="loading-text" id="loadingText">Researching product information...</div>
             </div>
         </div>
-    </div><!-- /results -->
 
-    <!-- ════════════════════════════════════════════════════════════
-         HOMEPAGE MARKETING SECTIONS
-         Hidden automatically when #results is visible (CSS sibling selector)
-    ════════════════════════════════════════════════════════════ -->
-    <div id="homepage-sections">
-
-        <!-- Trust Strip -->
-        <div class="brt-trust-strip no-print">
-            <div class="brt-trust-item">&#127991; <strong>14+ Brands</strong>&nbsp;Decoded</div>
-            <div class="brt-trust-item">&#128225; <strong>Real-Time</strong>&nbsp;Market Data</div>
-            <div class="brt-trust-item">&#9888;&#65039; <strong>Recall &amp; Class Action</strong>&nbsp;Notices</div>
-            <div class="brt-trust-item">&#128202; <strong>ACV Calculations</strong>&nbsp;Built In</div>
-            <div class="brt-trust-item">&#128424; <strong>Instant PDF</strong>&nbsp;Reports</div>
+        <!-- Serial Decode Results -->
+        <div id="serialResults" class="results-card hidden">
+            <div class="results-header">
+                <h3>&#128202; Decoded Results</h3>
+                <div class="brand-logo-wrap" id="serialBrandLogo"></div>
+            </div>
+            <div class="results-body">
+                <div class="result-row result-row--primary">
+                    <span class="result-label">Manufacture Date</span>
+                    <span class="result-value" id="resultYear"></span>
+                </div>
+                <div class="result-row" id="resultMonthRow">
+                    <span class="result-label">Month / Period</span>
+                    <span class="result-value" id="resultMonth"></span>
+                </div>
+                <div class="result-row">
+                    <span class="result-label">Brand</span>
+                    <span class="result-value" id="resultBrand"></span>
+                </div>
+                <div class="result-row">
+                    <span class="result-label">Estimated Age</span>
+                    <span class="result-value" id="resultEstimatedAge">&mdash;</span>
+                </div>
+                <div class="info-block method">
+                    <h4>Decoding Method</h4>
+                    <p id="resultMethod"></p>
+                </div>
+                <div class="info-block notes">
+                    <h4>Important Notes</h4>
+                    <p id="resultNotes"></p>
+                </div>
+                <details class="determination-details">
+                    <summary>How this was determined</summary>
+                    <div class="determination-body">
+                        We use manufacturer serial format rules and published industry references to extract manufacture date information from serial numbers. Some brands reuse year codes across decades, which is why multiple valid years may appear. When two years are shown, the correct decade can typically be confirmed using physical condition, purchase records, or known installation dates.
+                    </div>
+                </details>
+            </div>
+            <div class="results-footer">
+                <button class="copy-btn" onclick="copyClaimFile()">Copy Information</button>
+                <button class="decode-again-btn" onclick="decodeAnotherItem()">Decode Another Item</button>
+                <button class="error-btn" onclick="openFeedbackModal()">&#9888; Possible Error? Let Us Know</button>
+            </div>
+            <div class="more-options-section">
+                <button class="more-options-toggle" onclick="toggleMoreOptions()">
+                    <span class="more-options-arrow" id="moreOptionsArrow">&#9654;</span> More options
+                </button>
+                <div class="more-options-body hidden" id="moreOptionsBody">
+                    <details class="options-drawer">
+                        <summary>Replacement Options</summary>
+                        <div class="options-drawer-body">
+                            <p class="placeholder-note">This section loads on demand.</p>
+                            <p class="placeholder-hint">Find current-market replacement units for this brand and product type.</p>
+                            <button class="ai-generate-btn" onclick="generateAISection('replacements', this)">&#128161; Generate (uses AI)</button>
+                            <div class="ai-generate-result hidden" id="ai-result-replacements"></div>
+                        </div>
+                    </details>
+                    <details class="options-drawer">
+                        <summary>Detailed Specifications</summary>
+                        <div class="options-drawer-body">
+                            <p class="placeholder-note">This section loads on demand.</p>
+                            <p class="placeholder-hint">Technical specifications and features for this product class.</p>
+                            <button class="ai-generate-btn" onclick="generateAISection('specs', this)">&#128161; Generate (uses AI)</button>
+                            <div class="ai-generate-result hidden" id="ai-result-specs"></div>
+                        </div>
+                    </details>
+                    <details class="options-drawer">
+                        <summary>Market Data</summary>
+                        <div class="options-drawer-body">
+                            <p class="placeholder-note">This section loads on demand.</p>
+                            <p class="placeholder-hint">Current pricing and market availability for this product category.</p>
+                            <button class="ai-generate-btn" onclick="generateAISection('market', this)">&#128161; Generate (uses AI)</button>
+                            <div class="ai-generate-result hidden" id="ai-result-market"></div>
+                        </div>
+                    </details>
+                </div>
+            </div>
         </div>
 
-        <!-- Coverage Section -->
-        <section class="brt-section no-print">
-            <div class="brt-section-label">Coverage</div>
-            <h2 class="brt-section-title">Everything You Need to Research.<br>All in One Place.</h2>
-            <p class="brt-section-sub">Whether you're working on a kitchen appliance or evaluating a rooftop solar system, Bolt has you covered.</p>
-            <div class="brt-categories-grid">
-                <div class="brt-cat-card"><span class="brt-cat-emoji">&#128268;</span><h3>Appliances</h3><p>Washers, dryers, refrigerators, dishwashers, ranges, and more</p></div>
-                <div class="brt-cat-card"><span class="brt-cat-emoji">&#128241;</span><h3>Electronics &amp; Devices</h3><p>TVs, smartphones, laptops, tablets, audio equipment</p></div>
-                <div class="brt-cat-card"><span class="brt-cat-emoji">&#127777;&#65039;</span><h3>HVAC Systems</h3><p>Air conditioners, heat pumps, furnaces, air handlers</p></div>
-                <div class="brt-cat-card"><span class="brt-cat-emoji">&#128703;</span><h3>Water Heaters</h3><p>Tank and tankless, electric and gas, age decoded by serial</p></div>
-                <div class="brt-cat-card"><span class="brt-cat-emoji">&#9889;</span><h3>Generators</h3><p>Standby and portable, Generac, Kohler, Briggs &amp; more</p></div>
-                <div class="brt-cat-card"><span class="brt-cat-emoji">&#9728;&#65039;</span><h3>Solar Systems</h3><p>Inverters, solar panels, battery storage, charge controllers</p></div>
-                <div class="brt-cat-card"><span class="brt-cat-emoji">&#128267;</span><h3>Electrical Systems</h3><p>Federal Pacific, Zinsco, breaker panels, wiring, service equipment</p></div>
-                <div class="brt-cat-card"><span class="brt-cat-emoji">&#128269;</span><h3>Custom &amp; Specialty</h3><p>Pool equipment, smart home, commercial items, and more</p></div>
+        <!-- Age Estimate Results -->
+        <div id="ageResults" class="results-card hidden">
+            <div class="results-header">
+                <h3>&#128337; Estimated Age</h3>
+                <div class="brand-logo-wrap" id="ageBrandLogo"></div>
+            </div>
+            <div class="results-body" id="smart-lookup-results"></div>
+            <div class="results-footer">
+                <button class="decode-again-btn" onclick="decodeAnotherItem()">Decode Another Item</button>
+                <button class="error-btn" onclick="openFeedbackModal()">&#9888; Possible Error? Let Us Know</button>
+            </div>
+        </div>
+
+        <!-- Popular Brands SEO Section -->
+        <section class="popular-brands-section" aria-label="Decode by brand">
+            <h2 class="brands-section-title">Decode by Brand</h2>
+            <p class="brands-section-desc">Dedicated serial number decode guides for major appliance and electronics brands.</p>
+            <div class="brands-grid">
+                <a href="/ge" class="brand-tile">
+                    <span class="brand-tile-name">GE</span>
+                    <span class="brand-tile-desc">Refrigerators, ranges, washers</span>
+                </a>
+                <a href="/whirlpool" class="brand-tile">
+                    <span class="brand-tile-name">Whirlpool</span>
+                    <span class="brand-tile-desc">All Whirlpool family brands</span>
+                </a>
+                <a href="/samsung" class="brand-tile">
+                    <span class="brand-tile-name">Samsung</span>
+                    <span class="brand-tile-desc">Appliances &amp; TVs</span>
+                </a>
+                <a href="/lg" class="brand-tile">
+                    <span class="brand-tile-name">LG</span>
+                    <span class="brand-tile-desc">Appliances &amp; TVs</span>
+                </a>
+                <a href="/bosch" class="brand-tile">
+                    <span class="brand-tile-name">Bosch</span>
+                    <span class="brand-tile-desc">Dishwashers, washers, ranges</span>
+                </a>
+                <a href="/maytag" class="brand-tile">
+                    <span class="brand-tile-name">Maytag</span>
+                    <span class="brand-tile-desc">Pre &amp; post-2006 formats</span>
+                </a>
+                <a href="/frigidaire" class="brand-tile">
+                    <span class="brand-tile-name">Frigidaire</span>
+                    <span class="brand-tile-desc">Refrigerators, ranges, washers</span>
+                </a>
+                <a href="/kenmore" class="brand-tile">
+                    <span class="brand-tile-name">Kenmore</span>
+                    <span class="brand-tile-desc">OEM identification guide</span>
+                </a>
+                <a href="/apple" class="brand-tile">
+                    <span class="brand-tile-name">Apple</span>
+                    <span class="brand-tile-desc">iPhones, iPads, Macs</span>
+                </a>
+                <a href="/hp" class="brand-tile">
+                    <span class="brand-tile-name">HP</span>
+                    <span class="brand-tile-desc">Laptops, desktops, printers</span>
+                </a>
+                <a href="/asus" class="brand-tile">
+                    <span class="brand-tile-name">ASUS</span>
+                    <span class="brand-tile-desc">Laptops, motherboards, desktops</span>
+                </a>
+                <a href="/google-pixel" class="brand-tile">
+                    <span class="brand-tile-name">Google Pixel</span>
+                    <span class="brand-tile-desc">Pixel phones &amp; tablets</span>
+                </a>
+                <a href="/sony" class="brand-tile">
+                    <span class="brand-tile-name">Sony</span>
+                    <span class="brand-tile-desc">Bravia TVs &amp; home theater</span>
+                </a>
+                <a href="/vizio" class="brand-tile">
+                    <span class="brand-tile-name">Vizio</span>
+                    <span class="brand-tile-desc">Vizio TVs all series</span>
+                </a>
+                <a href="/panasonic" class="brand-tile">
+                    <span class="brand-tile-name">Panasonic</span>
+                    <span class="brand-tile-desc">TVs &amp; home theater</span>
+                </a>
             </div>
         </section>
-
-        <hr class="brt-divider">
-
-        <!-- Sample Report Section -->
-        <div class="brt-sample-section no-print">
-            <div class="brt-sample-inner">
-                <div class="brt-sample-layout">
-                    <div>
-                        <div class="brt-section-label">Sample Report</div>
-                        <h2 class="brt-section-title">See Exactly What You Get — Before You Search</h2>
-                        <p class="brt-section-sub">Every search generates a structured, professional report with the data you need to research and document products with confidence.</p>
-                        <div class="brt-report-highlights">
-                            <div class="brt-highlight-item">
-                                <div class="brt-highlight-icon">&#128197;</div>
-                                <div class="brt-highlight-text"><h4>Age &amp; Production Era</h4><p>Manufacture date decoded from serial numbers. Production eras, discontinuation dates, and estimated remaining service life.</p></div>
-                            </div>
-                            <div class="brt-highlight-item">
-                                <div class="brt-highlight-icon">&#128176;</div>
-                                <div class="brt-highlight-text"><h4>Launch MSRP &amp; Current ACV</h4><p>Original retail price with real-time depreciation calculation. Adjustable ACV tool built into every report.</p></div>
-                            </div>
-                            <div class="brt-highlight-item">
-                                <div class="brt-highlight-icon">&#128260;</div>
-                                <div class="brt-highlight-text"><h4>Current Replacement Options</h4><p>Like-kind and quality replacements with live pricing. Side-by-side comparison table included.</p></div>
-                            </div>
-                            <div class="brt-highlight-item">
-                                <div class="brt-highlight-icon">&#9888;&#65039;</div>
-                                <div class="brt-highlight-text"><h4>Recalls &amp; Class Actions</h4><p>Active recall notices and class action lawsuits relevant to the specific item &mdash; critical for liability reporting.</p></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div>
-                        <div class="brt-sample-label">Example Report Output</div>
-                        <div class="brt-report-card">
-                            <div class="brt-report-header">
-                                <div class="brt-report-header-text">
-                                    <div style="font-size:10px;color:#94a3b8;margin-bottom:3px;text-transform:uppercase;letter-spacing:1px;">Sample Report</div>
-                                    <h4>Generac 22kW Air-Cooled Standby Generator</h4>
-                                    <div class="brt-sub">Model 7043 &middot; Serial: 7043A2019123456</div>
-                                </div>
-                                <div class="brt-report-badge">&#9889; Complete</div>
-                            </div>
-                            <div class="brt-stat-row">
-                                <div class="brt-stat"><div class="brt-slabel">Item Age</div><div class="brt-svalue">5 yrs</div><div class="brt-ssub">Mfg. 2019</div></div>
-                                <div class="brt-stat"><div class="brt-slabel">Launch MSRP</div><div class="brt-svalue">$4,999</div><div class="brt-ssub">at release</div></div>
-                                <div class="brt-stat"><div class="brt-slabel">Est. ACV</div><div class="brt-svalue">$3,124</div><div class="brt-ssub">5-yr depreciation</div></div>
-                                <div class="brt-stat"><div class="brt-slabel">Availability</div><div class="brt-svalue" style="font-size:13px;margin-top:2px;">Active</div><div class="brt-ssub">In production</div></div>
-                            </div>
-                            <div class="brt-report-rows">
-                                <div class="brt-report-row"><span class="brt-rname">&#128197; Age &amp; Production Era</span><span class="brt-rstatus brt-status-green">Complete</span></div>
-                                <div class="brt-report-row"><span class="brt-rname">&#128176; Valuation &amp; ACV</span><span class="brt-rstatus brt-status-green">Complete</span></div>
-                                <div class="brt-report-row"><span class="brt-rname">&#128260; Replacement Options (3 found)</span><span class="brt-rstatus brt-status-green">Complete</span></div>
-                                <div class="brt-report-row"><span class="brt-rname">&#9888;&#65039; Recall Notices</span><span class="brt-rstatus brt-status-yellow">1 Active Notice</span></div>
-                                <div class="brt-report-row"><span class="brt-rname">&#128295; Common Failures &amp; Diagnostics</span><span class="brt-rstatus brt-status-green">Complete</span></div>
-                                <div class="brt-report-row"><span class="brt-rname">&#128736;&#65039; Troubleshooting &amp; Repair Data</span><span class="brt-rstatus brt-status-green">Complete</span></div>
-                                <div class="brt-report-row"><span class="brt-rname">&#128196; Owner's Manual Link</span><span class="brt-rstatus brt-status-blue">Linked</span></div>
-                                <div class="brt-report-row"><span class="brt-rname">&#10060; Error Code Database</span><span class="brt-rstatus brt-status-green">Complete</span></div>
-                            </div>
-                            <div class="brt-report-footer">
-                                <span>Generated in 4.2 seconds &middot; Bolt Research Team</span>
-                                <span class="brt-pdf-btn">&#128424; Export PDF</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- How It Works Section -->
-        <section class="brt-how-section no-print">
-            <div class="brt-section-label">Process</div>
-            <h2 class="brt-section-title">Research That Fits Your Workflow</h2>
-            <p class="brt-section-sub">Three steps. Seconds per search. Everything you need to write a report or document a product.</p>
-            <div class="brt-how-grid">
-                <div class="brt-how-card">
-                    <div class="brt-how-num">Step 01</div>
-                    <span class="brt-how-icon">&#128269;</span>
-                    <h3>Enter What You Know</h3>
-                    <p>Type a brand name, model number, serial number, or general description. Bolt handles everything from generic categories to hyper-specific model numbers.</p>
-                </div>
-                <div class="brt-how-card">
-                    <div class="brt-how-num">Step 02</div>
-                    <span class="brt-how-icon">&#9889;</span>
-                    <h3>Get Your Full Report</h3>
-                    <p>Within seconds, Bolt generates a structured report covering all key data points &mdash; age, value, recalls, replacements, and repair history.</p>
-                </div>
-                <div class="brt-how-card">
-                    <div class="brt-how-num">Step 03</div>
-                    <span class="brt-how-icon">&#128202;</span>
-                    <h3>Export &amp; Apply</h3>
-                    <p>Add your own notes, generate a customized summary, and export to PDF. Generate a formatted summary ready for any report or document.</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- Report Breakdown Section -->
-        <div class="brt-breakdown-section no-print">
-            <div class="brt-breakdown-inner">
-                <div class="brt-section-label">What's in every report</div>
-                <h2 class="brt-section-title">Built for Professionals. Not Generic Search.</h2>
-                <p class="brt-breakdown-sub">Every Bolt report includes the exact data points that matter for property research professionals &mdash; not generic product specs.</p>
-                <div class="brt-breakdown-grid">
-                    <div class="brt-breakdown-card"><div class="brt-breakdown-icon">&#128197;</div><div class="brt-breakdown-text"><h4>Manufacture Date &amp; Age</h4><p>Serial number decoded or estimated. Production eras, discontinuation, and service life.</p></div></div>
-                    <div class="brt-breakdown-card"><div class="brt-breakdown-icon">&#128176;</div><div class="brt-breakdown-text"><h4>Launch MSRP &amp; ACV</h4><p>Original retail price and real-time depreciation. Adjustable by year for accurate valuation.</p></div></div>
-                    <div class="brt-breakdown-card"><div class="brt-breakdown-icon">&#128260;</div><div class="brt-breakdown-text"><h4>Current Replacement Options</h4><p>Live-priced like-kind and quality alternatives with side-by-side feature comparison.</p></div></div>
-                    <div class="brt-breakdown-card"><div class="brt-breakdown-icon">&#9888;&#65039;</div><div class="brt-breakdown-text"><h4>Recall &amp; Class Action Notices</h4><p>Active safety recalls and relevant class actions tied to the specific item.</p></div></div>
-                    <div class="brt-breakdown-card"><div class="brt-breakdown-icon">&#128295;</div><div class="brt-breakdown-text"><h4>Common Failures &amp; Diagnostics</h4><p>Known failure patterns, reported defects, and diagnostic guidance by model.</p></div></div>
-                    <div class="brt-breakdown-card"><div class="brt-breakdown-icon">&#128736;&#65039;</div><div class="brt-breakdown-text"><h4>Troubleshooting &amp; Repair Data</h4><p>Repair pathways, error code databases, and repairability assessments.</p></div></div>
-                    <div class="brt-breakdown-card"><div class="brt-breakdown-icon">&#128196;</div><div class="brt-breakdown-text"><h4>Owner's Manual &amp; Manufacturer Docs</h4><p>Direct links to official documentation, spec sheets, and support pages.</p></div></div>
-                    <div class="brt-breakdown-card"><div class="brt-breakdown-icon">&#128203;</div><div class="brt-breakdown-text"><h4>Customizable Summary Export</h4><p>Add your own notes and generate a formatted summary ready for any report or file.</p></div></div>
-                    <div class="brt-breakdown-card"><div class="brt-breakdown-icon">&#128424;</div><div class="brt-breakdown-text"><h4>PDF Print-Ready Output</h4><p>Every report is formatted to print cleanly. Professional output in seconds, every time.</p></div></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Bottom CTA Section -->
-        <div class="brt-cta-section no-print">
-            <h2>Start Your First Search</h2>
-            <p>Join professionals who use Bolt to research items faster and write better reports &mdash; without the hours of manual lookup.</p>
-            <div class="brt-cta-search-wrap">
-                <input type="text" id="query-cta" class="brt-search-bar" placeholder="Enter a model, brand, or description..." autocomplete="off">
-                <button id="btn-cta" class="brt-search-btn">&#9889; Search</button>
-            </div>
-        </div>
 
         <!-- Footer -->
-        <footer class="brt-footer-new no-print">
-            <p>&copy; 2026 Bolt Research Team &middot; Results for informational purposes. Always verify critical data independently.</p>
-            <div class="brt-footer-links">
+        <div class="footer">
+            <p class="footer-tagline">Built for fast, reliable equipment age lookups.</p>
+            <div class="footer-links">
+                <a href="/methodology">Methodology</a>
+                <span class="footer-sep">|</span>
                 <a href="/disclaimer">Disclaimer</a>
-                <a href="/privacy-policy">Privacy Policy</a>
+                <span class="footer-sep">|</span>
                 <a href="/contact">Contact</a>
-                <a href="/security">Security</a>
-                <a href="/data-protection">Data Protection</a>
-                <a href="/terms">Terms of Use</a>
+                            <span class="footer-sep">|</span>
+                <a href="/privacy-policy">Privacy Policy</a>
             </div>
-        </footer>
-
-    </div><!-- /homepage-sections -->
-
-    <!-- ════════════════════════════════════════════════════════════
-         SUMMARY MODAL (unchanged)
-    ════════════════════════════════════════════════════════════ -->
-    <div id="summary-modal" class="summary-modal hidden" role="dialog" aria-modal="true" aria-labelledby="summary-modal-heading">
-        <div class="summary-modal-bar">
-            <span class="summary-modal-title" id="summary-modal-heading">&#128203; Generate Customized Summary</span>
-            <button class="summary-modal-close" id="summary-modal-close" aria-label="Close">&#10005; Close</button>
+            <p class="footer-verify">Database Last Verified: February 2026. All decoding logic is cross-referenced with manufacturer technical bulletins.</p>
+            <p>&copy; 2026 Item Assist. Always verify results for accuracy.</p>
+            <p class="footer-db">Database updated February 2026 &nbsp;&middot;&nbsp; Sources: Manufacturer documentation and authorized publications</p>
         </div>
-        <div class="summary-modal-body">
-            <button class="generate-btn" id="generate-summary-top">&#9889; Generate &amp; Copy Summary</button>
-            <div id="summary-sections"></div>
-            <div class="summary-notes-block">
-                <h3>Notes</h3>
-                <p>Add your own research notes to be appended at the end of the generated summary.</p>
-                <textarea class="summary-notes-textarea" id="summary-notes" placeholder="Enter your notes here..."></textarea>
+
+    </div><!-- /app-container -->
+    </div><!-- /page-shell -->
+
+    <!-- Guide Drawer -->
+    <div id="guideOverlay" class="guide-overlay" onclick="closeGuide()"></div>
+    <div id="guideDrawer" class="guide-drawer">
+        <div class="guide-drawer-header">
+            <h3>&#9432; How to Use This Tool</h3>
+            <button class="guide-drawer-close" onclick="closeGuide()">&#x2715;</button>
+        </div>
+        <div class="guide-drawer-body">
+            <h4>Quick Decoding</h4>
+            <ol>
+                <li>Click <strong>Appliances</strong> or <strong>Water Heaters</strong></li>
+                <li>Choose the <strong>brand</strong> from the dropdown</li>
+                <li>If an <strong>Era selector</strong> appears, choose Pre-2006 or Post-2006</li>
+                <li>Enter the <strong>serial number</strong> exactly as shown on the label</li>
+                <li>Click <strong>Decode Serial Number</strong></li>
+            </ol>
+            <h4>No Serial Number?</h4>
+            <p>Use the <strong>Smart Lookup</strong> section. Enter a model number, brand name, or description (e.g., "GE Profile PFE28KSKSS") to get an AI-powered age estimate.</p>
+            <h4>Finding Serial Numbers</h4>
+            <ul>
+                <li><strong>Refrigerators:</strong> Inside on the left or right wall</li>
+                <li><strong>Ovens/Ranges:</strong> Inside the door or on the back panel</li>
+                <li><strong>Dishwashers:</strong> Top edge of the door or side panel</li>
+                <li><strong>Washers/Dryers:</strong> Inside the door or on the back</li>
+                <li><strong>Water Heaters:</strong> On a sticker/plate on the side of the tank</li>
+            </ul>
+            <div class="warning-note">
+                <strong>For Insurance Claims:</strong> Many serial number codes repeat every 10–20 years. Always verify the decade using physical condition, model features, purchase receipts, or installation records. Document which method you used to determine the final manufacture date.
             </div>
-            <button class="generate-btn" id="generate-summary-bottom">&#9889; Generate &amp; Copy Summary</button>
         </div>
     </div>
-    <div class="summary-toast hidden" id="summary-toast" aria-live="polite">&#10003; Summary copied to clipboard</div>
 
-    <script src="index.js" defer></script>
+    <!-- Feedback Modal -->
+    <div id="feedbackModal" class="modal-overlay hidden" onclick="if(event.target===this)closeFeedbackModal()">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>&#9888; Report an Issue</h3>
+                <button class="modal-close" onclick="closeFeedbackModal()">&#x2715;</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-field">
+                    <label class="sr-only" for="fbBrand">Brand</label>
+                    <input type="text" id="fbBrand" class="form-input" readonly>
+                </div>
+                <div class="modal-field">
+                    <label class="sr-only" for="fbSerial">Serial Number / Search Query</label>
+                    <input type="text" id="fbSerial" class="form-input" readonly>
+                </div>
+                <div class="modal-field">
+                    <label class="sr-only" for="fbType">Issue Type</label>
+                    <select id="fbType" class="form-select">
+                        <option value="">-- Select issue type --</option>
+                        <option value="wrong_year">Wrong year / date</option>
+                        <option value="wrong_month">Wrong month</option>
+                        <option value="wrong_brand">Wrong brand identified</option>
+                        <option value="format_error">Format / decode error</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="modal-field">
+                    <label class="sr-only" for="fbDetails">Details (optional)</label>
+                    <textarea id="fbDetails" class="form-input" rows="3" placeholder="What seems wrong? What is the correct date if known?"></textarea>
+                </div>
+                <div id="fbThanks" class="fb-thanks hidden">&#10003; Thank you! Your feedback helps improve this tool.</div>
+                <div id="fbActions" class="modal-actions">
+                    <button class="decode-btn" onclick="submitFeedback()">Submit Feedback</button>
+                    <button class="cancel-btn" onclick="closeFeedbackModal()">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="decoder-data.js"></script>
+    <script src="script.js"></script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Serial Number Age Decoder",
+      "url": "https://www.decodemyitem.com",
+      "description": "Decode appliance and electronics serial numbers to find manufacture date and age. Free, instant results for GE, Whirlpool, Samsung, LG, Bosch and more.",
+      "applicationCategory": "UtilityApplication",
+      "operatingSystem": "Any",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How do I decode a serial number?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Select your appliance brand from the dropdown, enter the full serial number exactly as shown on the product label, and click Decode. The tool applies the manufacturer's encoding rules to extract the manufacture date instantly."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Where is the serial number located on my appliance?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Serial number location varies by appliance. On refrigerators, check inside the fresh food compartment wall. On dishwashers, look on the inner edge of the door. Washers and dryers typically have it on the door frame. Ranges show it on the oven door frame. Water heaters display it on a label on the side of the tank."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How accurate is this serial number decoder?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "For supported brands, accuracy is high when the full serial number is entered correctly. Some manufacturers reuse year codes on repeating cycles, which may result in two possible manufacture years being shown. In those cases, physical condition and model features can help confirm the correct decade."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does this tool work for both appliances and electronics?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. The decoder supports major home appliances including refrigerators, washers, dryers, dishwashers, and ranges, plus water heaters and electronics including Samsung and LG TVs. Use the Smart Lookup feature for brands or models not listed in the main tabs."
+          }
+        }
+      ]
+    }
+    </script>
 </body>
 </html>
