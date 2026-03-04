@@ -1192,51 +1192,36 @@ function renderDetail(data) {
     const tl = byId("table-loading"); if (tl) tl.classList.add("hidden");
     const te = byId("r-table"); if (te) te.classList.add("hidden");
   } else {
-  // What to Consider
+  // ─ Item Notes Checklist ─
   const wtcEl = byId("lkq-evaluator-guidance");
   if (wtcEl) {
-    const lkq = data.itemNotes?.lkqEvaluation || {};
-    const mustMatch = Array.isArray(lkq.mustMatchSpecs) ? lkq.mustMatchSpecs : [];
-    const acceptable = Array.isArray(lkq.acceptableVariation) ? lkq.acceptableVariation : [];
-    const evaluatorNotes = Array.isArray(data.whatToConsider) ? data.whatToConsider : [];
-    const availDetail = safeText(data.itemNotes?.availabilityDetail, "");
+    const topSpecs = Array.isArray(fastData?.analysis?.topSpecs) ? fastData.analysis.topSpecs : [];
     const typeKey = normalizeItemTypeKey(fastData?.analysis?.itemType || fastData?.analysis?.category || currentCategory);
-    const thresholdByType = {
-      tv: "Display technology and resolution should be equal or higher; screen size variance should generally remain within +/-10% unless documented functional equivalence exists.",
-      refrigerator: "Total capacity should remain within +/-10%; configuration and dispenser/ice-maker functionality should be equivalent unless documented as non-material.",
-      washer: "Capacity and load type should match; cycle capability and control platform should be equivalent or better with no performance downgrade.",
-      dryer: "Capacity and fuel type should match; cycle capability and sensing technology should be equivalent or better.",
-      dishwasher: "Capacity/place-settings and drying system should be equivalent; sound level should not represent a material downgrade.",
-      range: "Fuel type and configuration should match; oven capacity and core cooktop/oven functions should be equivalent or better.",
-      water_heater: "Fuel type and capacity should match; first-hour rating/recovery performance should be equivalent or better.",
-      hvac: "System type and capacity should match; efficiency ratings (SEER/AFUE/HSPF) should be equivalent or better.",
-      computer: "CPU class, RAM, storage, and GPU capability should be equivalent or better for the documented use profile.",
-      laptop: "CPU class, RAM, storage, and display class should be equivalent or better for the documented use profile.",
-      phone: "Display tier, chipset class, storage, and camera system should be equivalent or better."
-    };
-    const bullets = [];
-    mustMatch.forEach((spec) => {
-      bullets.push(`Required match check: verify ${spec} is equivalent to the claimed item; if not equivalent, classify as below LKQ unless an exception is documented.`);
-    });
-    acceptable.forEach((spec) => {
-      bullets.push(`Variance threshold check: ${spec} may vary only within standard market tolerance and only where no functional downgrade is introduced.`);
-    });
-    evaluatorNotes.forEach((note) => {
-      bullets.push(`Evaluator verification: ${note}`);
-    });
-    if (thresholdByType[typeKey]) {
-      bullets.push(`Item-type threshold: ${thresholdByType[typeKey]}`);
-    }
-    if (availDetail) {
-      bullets.push(`Availability verification: document current market availability and comparable sourcing evidence (${availDetail}).`);
-    }
-    bullets.push("Approval control: confirm same item class and intended use, with no material quality or performance downgrade.");
-    bullets.push("Documentation control: retain model/spec comparison evidence and pricing support in the claim file before approval.");
-    const label = "LKQ Evaluation Criteria";
-    wtcEl.className = "wtc-box wtc-specific";
+    
+    // Header label
+    const label = "Item Notes";
+
+    // Generate checklist from topSpecs (Claimed Item Values)
+    const checklistHtml = topSpecs.map(s => {
+      return `<li style="margin-bottom:0.4rem; display:flex; align-items:baseline; gap:0.6rem; color:var(--text-dark); font-weight:600; font-size:0.88rem;">
+        <span style="color:var(--accent); font-size:1.1rem; font-weight:900; line-height:1;">☐</span>
+        <span>${escapeHtml(s.label)}: <span style="font-weight:400; color:var(--text-mid);">${escapeHtml(s.value)}</span></span>
+      </li>`;
+    }).join("");
+
+    // Availability Note (short, single sentence)
+    const availStatus = fastData?.availability || "";
+    const availNote = availStatus ? `<div style="margin-top:0.75rem; font-size:0.75rem; color:var(--text-muted-dark); border-top:1px solid rgba(0,0,0,0.05); padding-top:0.6rem;">
+      <strong>Note:</strong> ${escapeHtml(availStatus)}
+    </div>` : "";
+
+    wtcEl.className = "wtc-box wtc-general"; // Light blue ghost-white style
     wtcEl.innerHTML = `
-      <div class="wtc-label">${escapeHtml(label)}</div>
-      <ul class="wtc-list">${bullets.map((b) => `<li>${escapeHtml(b)}</li>`).join("")}</ul>
+      <div class="wtc-label" style="border-bottom:1px solid rgba(0,0,0,0.05); padding-bottom:0.4rem; margin-bottom:0.75rem;">${escapeHtml(label)}</div>
+      <ul class="wtc-list" style="list-style:none; padding-left:0; margin:0;">
+        ${checklistHtml || '<li style="font-size:0.85rem; color:var(--text-muted);">No technical specifications identified for this model.</li>'}
+      </ul>
+      ${availNote}
     `;
   }
 
