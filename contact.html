@@ -1,235 +1,211 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon-bolt.svg?v=1">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5946778263750869" crossorigin="anonymous"></script>
+<meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bolt - Contact</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="shared.css">
-    <style>
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-        :root {
-            --bg-primary: #0f1629;
-            --bg-secondary: #161d35;
-            --bg-card: #ffffff;
-            --bg-card-alt: #f8fafc;
-            --bg-input: rgba(255,255,255,0.06);
-            --border-color: #e2e8f0;
-            --border-accent: rgba(234,179,8,0.4);
-            --text-dark: #1e293b;
-            --text-mid: #475569;
-            --text-light: #94a3b8;
-            --text-white: #f1f5f9;
-            --text-muted-dark: #64748b;
-            --accent: #eab308;
-            --accent-hover: #facc15;
-            --accent-dim: rgba(234,179,8,0.1);
-            --accent-dim-dark: rgba(234,179,8,0.15);
-            --blue: #3b82f6;
-            --blue-light: #dbeafe;
-            --red: #ef4444;
-            --red-light: #fef2f2;
-            --green: #22c55e;
-            --green-light: #f0fdf4;
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-white);
-            min-height: 100vh;
-            line-height: 1.6;
-        }
-
-        .circuit-bg { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
-        .circuit-bg::before {
-            content: ''; position: absolute; inset: 0;
-            background:
-                linear-gradient(90deg, transparent 49.5%, rgba(234,179,8,0.04) 49.5%, rgba(234,179,8,0.04) 50.5%, transparent 50.5%),
-                linear-gradient(0deg, transparent 49.5%, rgba(234,179,8,0.04) 49.5%, rgba(234,179,8,0.04) 50.5%, transparent 50.5%);
-            background-size: 60px 60px;
-        }
-        .circuit-bg::after {
-            content: ''; position: absolute; inset: 0;
-            background: radial-gradient(ellipse at 50% 0%, rgba(234,179,8,0.06) 0%, transparent 60%),
-                        radial-gradient(ellipse at 50% 100%, rgba(59,130,246,0.04) 0%, transparent 60%);
-        }
-        .lightning-bolts { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
-        .bolt-shape { position: absolute; font-size: 15rem; opacity: 0.03; color: var(--accent); font-weight: 800; transform: rotate(-12deg); user-select: none; }
-        .bolt-shape:nth-child(1) { top: 10%; left: 5%; }
-        .bolt-shape:nth-child(2) { top: 15%; left: 30%; font-size: 20rem; }
-        .bolt-shape:nth-child(3) { top: 8%; right: 25%; font-size: 18rem; transform: rotate(8deg); }
-        .bolt-shape:nth-child(4) { top: 12%; right: 5%; }
-
-        .app-container { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 0 1.5rem; }
-
-        /* Navigation */
-        .nav { display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 0; }
-        .nav-left { display: flex; align-items: center; gap: 0.75rem; }
-        .nav-brand { display: flex; align-items: center; gap: 0.3rem; font-size: 1.3rem; font-weight: 800; color: var(--text-white); text-decoration: none; white-space: nowrap; }
-        .nav-brand .bolt-icon { color: var(--accent); }
-        .nav-links { display: flex; align-items: center; gap: 0.5rem; }
-        .nav-link { color: var(--text-light); text-decoration: none; font-size: 0.875rem; font-weight: 500; padding: 0.5rem 1rem; border-radius: 8px; transition: all 0.2s; white-space: nowrap; }
-        .nav-link:hover { color: var(--text-white); background: rgba(255,255,255,0.06); }
-        .nav-link.active { background: var(--accent); color: #000; font-weight: 600; }
-        .nav-link.active:hover { background: var(--accent-hover); }
-
-        /* Content Zone */
-        .content-zone { background: #ffffff; border-radius: 24px 24px 0 0; margin: 2rem -1.5rem 0; padding: 3rem 2rem 4rem; min-height: 60vh; }
-        .content-inner { max-width: 720px; margin: 0 auto; }
-
-        /* Contact Form */
-        .contact-form { display: flex; flex-direction: column; gap: 1.25rem; margin-top: 0.5rem; }
-        .form-group { display: flex; flex-direction: column; gap: 0.35rem; }
-        .form-label { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-mid); }
-        .form-input,
-        .form-textarea {
-            padding: 0.75rem 1rem;
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            font-size: 0.95rem;
-            font-family: inherit;
-            color: var(--text-dark);
-            outline: none;
-            transition: border-color 0.2s, box-shadow 0.2s;
-            width: 100%;
-            background: #ffffff;
-        }
-        .form-input:focus,
-        .form-textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); }
-        .form-input::placeholder,
-        .form-textarea::placeholder { color: var(--text-light); }
-        .form-textarea { resize: vertical; min-height: 140px; }
-        .submit-btn {
-            background: var(--accent);
-            color: #000;
-            border: none;
-            padding: 0.85rem 2rem;
-            border-radius: 10px;
-            font-size: 1rem;
-            font-weight: 700;
-            font-family: inherit;
-            cursor: pointer;
-            transition: background 0.2s;
-            align-self: flex-start;
-        }
-        .submit-btn:hover { background: var(--accent-hover); }
-        .success-banner {
-            display: none;
-            background: #f0fdf4;
-            border-left: 4px solid #22c55e;
-            border-radius: 0 10px 10px 0;
-            padding: 1rem 1.25rem;
-            color: #15803d;
-            font-size: 0.9rem;
-            line-height: 1.6;
-            margin-top: 1.25rem;
-        }
-
-        @media (max-width: 640px) {
-            .nav { flex-direction: column; gap: 0.5rem; align-items: flex-start; }
-            .nav-left { flex-wrap: wrap; }
-            .nav-links { gap: 0.25rem; }
-            .nav-link { padding: 0.4rem 0.6rem; font-size: 0.75rem; }
-            .content-zone { padding: 2rem 1rem 3rem; border-radius: 16px 16px 0 0; }
-        }
-    </style>
+    <title>Contact – Serial Number Decoder</title>
+    <link rel="canonical" href="https://www.decodemyitem.com/contact.html">
+    <link rel="stylesheet" href="global.css">
+    
 </head>
 <body>
     <div class="circuit-bg"></div>
-    <div class="lightning-bolts">
-        <div class="bolt-shape">&#9889;</div>
-        <div class="bolt-shape">&#9889;</div>
-        <div class="bolt-shape">&#9889;</div>
-        <div class="bolt-shape">&#9889;</div>
+    <div class="circuit-nodes">
+        <div class="node"></div><div class="node"></div><div class="node"></div><div class="node"></div>
+        <div class="node"></div><div class="node"></div><div class="node"></div><div class="node"></div>
     </div>
 
-    <div class="app-container">
-        <nav class="nav">
-            <div class="nav-left">
-                <a class="nav-brand" href="index.html">Bolt <span class="bolt-icon">&#9889;</span></a>
+        <aside class="sidebar">
+        <div class="sidebar-header">
+            <a class="sidebar-logo" href="/"><img class="ia-sidebar-logo" src="/assets/item-assist-logo.png" width="150" height="150" alt="Item Assist logo"></a>
+        </div>
+        <div class="sidebar-section">
+            <div class="sidebar-title">Categories</div>
+            <button class="cat-tab active" data-cat="appliances" onclick="selectCategory('appliances', this)">Appliances</button>
+            <button class="cat-tab" data-cat="waterHeaters" onclick="selectCategory('waterHeaters', this)">Water Heaters</button>
+            <button class="cat-tab" data-cat="hvac" onclick="selectCategory('hvac', this)">HVAC</button>
+            <button class="cat-tab" data-cat="electronics" onclick="selectCategory('electronics', this)">Electronics</button>
+        </div>
+        <div class="sidebar-section">
+            <div class="sidebar-title">Brands</div>
+            <a class="sidebar-link" href="/goodman">Goodman</a>
+            <a class="sidebar-link" href="/carrier">Carrier</a>
+            <a class="sidebar-link" href="/rheem">Rheem</a>
+            <a class="sidebar-link" href="/trane">Trane</a>
+            <a class="sidebar-link" href="/whirlpool">Whirlpool</a>
+            <a class="sidebar-link" href="/ge">GE</a>
+            <a class="sidebar-link" href="/samsung">Samsung</a>
+            <a class="sidebar-link" href="/lg">LG</a>
+            <a class="sidebar-link" href="/sony">Sony</a>
+            <a class="sidebar-link" href="/bosch">Bosch</a>
+            <a class="sidebar-link" href="/maytag">Maytag</a>
+            <a class="sidebar-link" href="/frigidaire">Frigidaire</a>
+            <a class="sidebar-link" href="/kenmore">Kenmore</a>
+            <a class="sidebar-link" href="/apple">Apple</a>
+            <a class="sidebar-link" href="/hp">HP</a>
+            <a class="sidebar-link" href="/asus">ASUS</a>
+            <a class="sidebar-link" href="/google-pixel">Google Pixel</a>
+            <a class="sidebar-link" href="/vizio">Vizio</a>
+            <a class="sidebar-link" href="/panasonic">Panasonic</a>
+        </div>
+        <div class="sidebar-section">
+            <div class="sidebar-title">Resources</div>
+            <a class="sidebar-link" href="/smart-lookup">Smart Lookup</a>
+            <a class="sidebar-link" href="/methodology">Methodology</a>
+            <a class="sidebar-link" href="/disclaimer">Disclaimer</a>
+            <a class="sidebar-link" href="/contact">Contact</a>
+        </div>
+    </aside>
+    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+    <div class="ad-zone"><div class="ad-label">Data Partner</div></div>
+    <div class="page-shell">
+    <div class="app-container content-wrapper container">
+
+        <div class="header">
+            <button class="sidebar-toggle" onclick="toggleSidebar()" aria-label="Toggle navigation">&#9776;</button>
+            <div class="header-brand">
+                <h1><span class="accent">&#9889;</span> Serial Number <span class="accent">Decoder</span></h1>
+                <p class="subtitle">Professional Serial Number Age Decoder for Appliances &amp; Equipment</p>
             </div>
-            <div class="nav-links">
-                <a href="index.html" class="nav-link">Item Lookup</a>
-                <a href="item-age.html" class="nav-link">Serial Number Decoder</a>
-                <a href="field-reference.html" class="nav-link">Field Reference</a>
-                <a href="why-bolt.html" class="nav-link">Why Bolt?</a>
+            
+        </div>
+
+        <div class="static-card">
+            <div class="static-card-header">
+                <h2>&#9993; Contact</h2>
+                <p>Get in touch with our team.</p>
             </div>
-        </nav>
+            <div class="static-card-body">
 
-        <div class="content-zone">
-            <div class="content-inner">
-
-                <div class="static-card">
-                    <div class="static-card-header">
-                        <h2>&#9993; Contact</h2>
-                        <p>Questions, feedback, or data inquiries.</p>
-                    </div>
-                    <div class="static-card-body">
-
-                        <div class="static-section">
-                            <h3>Get in Touch</h3>
-                            <p>Use the form below for questions about Bolt, feedback on a result, requests related to your data, or to report an inaccuracy in a serial number decode or product record.</p>
+                <div class="static-section">
+                    <h3>Send a Message</h3>
+                    <form id="contactForm" onsubmit="submitContact(event)">
+                        <div class="cf-field">
+                            <label for="cfName">Name</label>
+                            <input type="text" id="cfName" class="form-input" placeholder="Your name" autocomplete="name">
                         </div>
-
-                        <form class="contact-form" id="contact-form" action="#" onsubmit="handleContactSubmit(event)">
-                            <div class="form-group">
-                                <label class="form-label" for="contact-name">Name</label>
-                                <input type="text" id="contact-name" name="name" class="form-input" placeholder="Your name" required>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label" for="contact-email">Email Address</label>
-                                <input type="email" id="contact-email" name="email" class="form-input" placeholder="you@example.com" required>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label" for="contact-message">Message</label>
-                                <textarea id="contact-message" name="message" class="form-textarea" placeholder="Describe your question or feedback..." required></textarea>
-                            </div>
-                            <button type="submit" class="submit-btn">&#9889; Send Message</button>
-                        </form>
-
-                        <div class="success-banner" id="success-banner">
-                            <strong>Message received.</strong> Thank you for reaching out — we'll follow up at the email address you provided.
+                        <div class="cf-field">
+                            <label for="cfEmail">Email <span class="cf-required">*</span></label>
+                            <input type="email" id="cfEmail" class="form-input" placeholder="you@example.com" required autocomplete="email">
                         </div>
-
-                        <div class="static-section" style="margin-top: 2rem;">
-                            <h3>Response Time</h3>
-                            <p>We aim to respond to all inquiries within 2 business days. For data-related requests (access, deletion, or correction under applicable privacy law), please include "Data Request" in your message.</p>
+                        <div class="cf-field">
+                            <label for="cfMessage">Message <span class="cf-required">*</span></label>
+                            <textarea id="cfMessage" class="form-input" rows="5" placeholder="Questions, corrections, brand requests..." required></textarea>
                         </div>
-
-                    </div>
+                        <div id="cfStatus" class="cf-status hidden"></div>
+                        <button type="submit" id="cfBtn" class="decode-btn" style="margin-top:0.25rem;">Send Message</button>
+                    </form>
                 </div>
 
-                <div class="footer">
-                    <p class="footer-tagline">Built for fast, accurate insurance product research and age verification.</p>
-                    <div class="footer-links">
-                        <a href="/disclaimer">Disclaimer</a>
-                        <span class="footer-sep">|</span>
-                        <a href="/contact">Contact</a>
-                        <span class="footer-sep">|</span>
-                        <a href="/privacy-policy">Privacy Policy</a>
-                        <span class="footer-sep">|</span>
-                        <a href="/security">Security</a>
-                        <span class="footer-sep">|</span>
-                        <a href="/data-protection">Data Protection</a>
-                        <span class="footer-sep">|</span>
-                        <a href="/terms">Terms of Use</a>
-                    </div>
-                    <p>&copy; 2026 Bolt. Always verify results for accuracy.</p>
+                <div class="static-section">
+                    <h3>Report a Decode Error</h3>
+                    <p>
+                        The fastest way to flag an incorrect result is to use the built-in error reporting
+                        tool directly in the results card after any decode — it pre-fills the brand and
+                        serial number automatically.
+                    </p>
+                    <a class="feedback-link" href="/">&#8592; Go to Decoder &amp; Use Feedback Button</a>
+                </div>
+
+                <div class="note-block">
+                    We are a small team. Response times may vary. We do not provide certified appraisals
+                    or legal opinions — for those needs, please consult a licensed professional.
                 </div>
 
             </div>
         </div>
-    </div>
+
+        <div class="footer">
+            <p class="footer-tagline">Built for fast, reliable equipment age lookups.</p>
+            <div class="footer-links">
+                <a href="/methodology">Methodology</a>
+                <span class="footer-sep">|</span>
+                <a href="/disclaimer">Disclaimer</a>
+                <span class="footer-sep">|</span>
+                <a href="/contact">Contact</a>
+                            <span class="footer-sep">|</span>
+                <a href="/privacy-policy">Privacy Policy</a>
+            </div>
+            <p class="footer-verify">Database Last Verified: February 2026. All decoding logic is cross-referenced with manufacturer technical bulletins.</p>
+            <p>&copy; 2026 Serial Number Decoder. Always verify results for accuracy.</p>
+            <p class="footer-db">Database updated February 2026 &nbsp;&middot;&nbsp; Sources: Manufacturer documentation and authorized publications</p>
+        </div>
+
+    </div><!-- /app-container -->
+    </div><!-- /page-shell -->
 
     <script>
-        function handleContactSubmit(e) {
-            e.preventDefault();
-            document.getElementById('contact-form').style.display = 'none';
-            document.getElementById('success-banner').style.display = 'block';
+    async function submitContact(e) {
+        e.preventDefault();
+        var btn    = document.getElementById('cfBtn');
+        var status = document.getElementById('cfStatus');
+        var name    = document.getElementById('cfName').value.trim();
+        var email   = document.getElementById('cfEmail').value.trim();
+        var message = document.getElementById('cfMessage').value.trim();
+
+        btn.disabled = true;
+        btn.textContent = 'Sending…';
+        status.className = 'cf-status hidden';
+        status.textContent = '';
+
+        try {
+            var res = await fetch('/api/contact', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: name, email: email, message: message }),
+            });
+            var data = await res.json();
+            if (data.ok) {
+                status.className = 'cf-status success';
+                status.textContent = '✓ Message sent! We\'ll get back to you soon.';
+                document.getElementById('contactForm').reset();
+            } else {
+                throw new Error(data.error || 'Send failed');
+            }
+        } catch (err) {
+            status.className = 'cf-status error';
+            status.textContent = 'Something went wrong. Please try again.';
         }
+
+        btn.disabled = false;
+        btn.textContent = 'Send Message';
+    }
     </script>
+    <script src="script.js"></script>
+    <script src="smart-lookup.js"></script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
