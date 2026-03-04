@@ -1192,14 +1192,15 @@ function renderDetail(data) {
     const tl = byId("table-loading"); if (tl) tl.classList.add("hidden");
     const te = byId("r-table"); if (te) te.classList.add("hidden");
   } else {
-  // ─ Item Notes Checklist ─
+  // ─ LKQ Considerations Checklist ─
   const wtcEl = byId("lkq-evaluator-guidance");
   if (wtcEl) {
     const topSpecs = Array.isArray(fastData?.analysis?.topSpecs) ? fastData.analysis.topSpecs : [];
     const typeKey = normalizeItemTypeKey(fastData?.analysis?.itemType || fastData?.analysis?.category || currentCategory);
     
-    // Header label
-    const label = "Item Notes";
+    // Header labels
+    const label = "LKQ Considerations";
+    const subLabel = "These are important specifications to consider when determining a valid replacement option";
 
     // Generate checklist from topSpecs (Claimed Item Values)
     const checklistHtml = topSpecs.map(s => {
@@ -1217,7 +1218,10 @@ function renderDetail(data) {
 
     wtcEl.className = "wtc-box wtc-general"; // Light blue ghost-white style
     wtcEl.innerHTML = `
-      <div class="wtc-label" style="border-bottom:1px solid rgba(0,0,0,0.05); padding-bottom:0.4rem; margin-bottom:0.75rem;">${escapeHtml(label)}</div>
+      <div class="wtc-label" style="border-bottom:1px solid rgba(0,0,0,0.05); padding-bottom:0.4rem; margin-bottom:0.75rem; display:flex; align-items:baseline; gap:0.75rem; flex-wrap:wrap;">
+        <span style="white-space:nowrap;">${escapeHtml(label)}</span>
+        <span style="font-size:0.7rem; font-weight:400; color:var(--text-muted-dark); text-transform:none; letter-spacing:normal;">${escapeHtml(subLabel)}</span>
+      </div>
       <ul class="wtc-list" style="list-style:none; padding-left:0; margin:0;">
         ${checklistHtml || '<li style="font-size:0.85rem; color:var(--text-muted);">No technical specifications identified for this model.</li>'}
       </ul>
