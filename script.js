@@ -1102,10 +1102,10 @@ function enhanceHeaderBranding() {
   wrap.className = 'ia-header-wrap';
   wrap.innerHTML = '' +
     '<nav class="ia-header-nav ia-header-nav-center" aria-label="Site navigation">' +
-      '<a class="ia-header-nav-link" href="/">Serial Number Decoder</a>' +
-      '<a class="ia-header-nav-link" href="/smart-lookup">Smart Lookup</a>' +
-      '<a class="ia-header-nav-link" href="/methodology">Methodology</a>' +
-      '<a class="ia-header-nav-link" href="/contact">Contact</a>' +
+      '<a class="ia-header-nav-link" href="/">Item Lookup</a>' +
+      '<a class="ia-header-nav-link" href="/item-age">Serial Number Decoder</a>' +
+      '<a class="ia-header-nav-link" href="/field-reference">Field Reference</a>' +
+      '<a class="ia-header-nav-link" href="/why-bolt">Why Bolt?</a>' +
       '<a class="ia-header-nav-link ia-header-nav-security" href="/privacy-policy#security">Security &amp; Data Notice</a>' +
     '</nav>';
   header.appendChild(wrap);

@@ -914,6 +914,28 @@ function renderSpecPills(containerId, topSpecs) {
 
 // ── renderFast ───────────────────────────────────────────────────────────────
 
+function getFieldRefUrl(type, category) {
+  const t = (type || "").toLowerCase();
+  const c = (category || "").toLowerCase();
+  
+  if (t.includes("refrigerator") || c.includes("refrigerator")) return "field-reference.html?item=refrigerator";
+  if (t.includes("dishwasher") || c.includes("dishwasher")) return "field-reference.html?item=dishwasher";
+  if (t.includes("range") || c.includes("range") || t.includes("oven") || c.includes("oven")) {
+    if (t.includes("gas") || c.includes("gas")) return "field-reference.html?item=gas-range";
+    return "field-reference.html?item=electric-range";
+  }
+  if (t.includes("water heater") || c.includes("water heater")) return "field-reference.html?item=water-heater";
+  if (t.includes("microwave") || c.includes("microwave")) return "field-reference.html?item=microwave";
+  if (t.includes("hot tub") || c.includes("hot tub") || t.includes("spa") || c.includes("spa")) return "field-reference.html?item=hot-tub";
+  if (t.includes("well pump") || c.includes("well pump")) return "field-reference.html?item=well-pump";
+  if (t.includes("pool heater") || c.includes("pool heater")) return "field-reference.html?item=pool-heater";
+  if (t.includes("generator") || c.includes("generator")) return "field-reference.html?item=generator";
+  if (t.includes("panel") || c.includes("panel") || t.includes("breaker") || c.includes("breaker")) return "field-reference.html?item=service-panel";
+  if (t.includes("wiring") || c.includes("wiring")) return "field-reference.html?item=home-wiring";
+  
+  return null;
+}
+
 function renderFast(data) {
   if (!data || typeof data !== "object") return;
   fastData = data;
@@ -922,6 +944,20 @@ function renderFast(data) {
   const releaseDate = data.releaseDate || {};
   const searchTier = Number(data.searchTier) || 1;
   currentCategory = analysis.category || "general";
+
+  // Technical Reference Button
+  const refUrl = getFieldRefUrl(analysis.itemType, analysis.category);
+  const refBtnWrap = byId("r-field-ref-wrap");
+  if (refBtnWrap) {
+    if (refUrl) {
+      refBtnWrap.innerHTML = `<a href="${refUrl}" class="quick-spec-pill" style="background:var(--accent); color:#000; font-weight:700; text-decoration:none; display:inline-flex; align-items:center; gap:0.4rem; border:none; margin-top:0.5rem; padding:0.4rem 0.8rem;">
+        <span style="font-size:1rem;">&#128295;</span> View Technical Reference
+      </a>`;
+      refBtnWrap.classList.remove("hidden");
+    } else {
+      refBtnWrap.classList.add("hidden");
+    }
+  }
 
   // Model number hint (shown when full model not provided)
   const modelHint = byId("model-number-hint");

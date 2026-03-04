@@ -310,7 +310,43 @@
           const res = await fetch(`/api/search?mode=age&query=${encodeURIComponent(query)}`);
           const data = await res.json();
           document.getElementById('result-title').innerText = `${brand} Model Research: ${model}`;
-          document.getElementById('result-body').innerText = data.releaseDate?.estimatedAge || data.analysis?.overview || 'No specific age found.';
+          const overview = data.releaseDate?.estimatedAge || data.analysis?.overview || 'No specific age found.';
+          document.getElementById('result-body').innerText = overview;
+
+          // Technical Reference Cross-Link
+          const refBtnWrap = document.getElementById('age-field-ref-wrap');
+          if (refBtnWrap) {
+            let refUrl = null;
+            const b = brand.toLowerCase();
+            const cat = activeCategory.toLowerCase();
+
+            if (b.includes("federal pacific") || b.includes("zinsco") || b.includes("pushmatic") || b.includes("breaker") || b.includes("panel")) {
+                refUrl = "field-reference.html?item=service-panel";
+            } else if (cat.includes("wiring")) {
+                refUrl = "field-reference.html?item=home-wiring";
+            } else if (cat.includes("refrigerator")) {
+                refUrl = "field-reference.html?item=refrigerator";
+            } else if (cat.includes("dishwasher")) {
+                refUrl = "field-reference.html?item=dishwasher";
+            } else if (cat.includes("range") || cat.includes("oven")) {
+                refUrl = b.includes("gas") ? "field-reference.html?item=gas-range" : "field-reference.html?item=electric-range";
+            } else if (cat.includes("water heater")) {
+                refUrl = "field-reference.html?item=water-heater";
+            }
+
+            if (refUrl) {
+                refBtnWrap.innerHTML = `<div style="margin-top:1rem; padding-top:1rem; border-top:1px solid #e2e8f0;">
+                    <p style="font-size:0.75rem; color:#64748b; font-weight:700; text-transform:uppercase; margin-bottom:0.5rem; letter-spacing:0.05em;">Technical Guidance</p>
+                    <a href="${refUrl}" style="display:inline-flex; align-items:center; gap:0.5rem; background:#fffbeb; color:#92400e; border:1px solid #fde68a; padding:0.5rem 1rem; border-radius:8px; font-size:0.85rem; font-weight:700; text-decoration:none; transition:all 0.2s;">
+                        <span>&#128295;</span> View ${brand} Technical Reference
+                    </a>
+                </div>`;
+                refBtnWrap.classList.remove('hidden');
+            } else {
+                refBtnWrap.classList.add('hidden');
+            }
+          }
+
           document.getElementById('age-loading').classList.add('hidden');
           document.getElementById('age-result').classList.remove('hidden');
         } catch (e) {
