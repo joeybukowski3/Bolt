@@ -1088,28 +1088,30 @@ function addGuidedSearchButtonToBrandDecoderCard() {
 }
 
 function enhanceHeaderBranding() {
-  var header = document.querySelector('.header');
+  var header = document.querySelector('.brt-nav');
   if (!header) return;
-  if (header.getAttribute('data-ia-header-ready') === '1') return;
-  var oldTag = header.querySelector('.header-center-tagline');
-  if (oldTag) oldTag.remove();
-  var oldBrand = header.querySelector('.header-brand');
-  if (oldBrand) oldBrand.remove();
-  var oldWrap = header.querySelector('.ia-header-wrap');
-  if (oldWrap) oldWrap.remove();
+  
+  // The brt-nav is our master header. Ensure it is consistent everywhere.
+  var logoWrap = header.querySelector('.brt-nav-left');
+  if (logoWrap) {
+    logoWrap.style.cursor = 'pointer';
+    logoWrap.onclick = function() { window.location.href = '/'; };
+  }
 
-  var wrap = document.createElement('div');
-  wrap.className = 'ia-header-wrap';
-  wrap.innerHTML = '' +
-    '<nav class="ia-header-nav ia-header-nav-center" aria-label="Site navigation">' +
-      '<a class="ia-header-nav-link" href="/">Item Lookup</a>' +
-      '<a class="ia-header-nav-link" href="/item-age">Serial Number Decoder</a>' +
-      '<a class="ia-header-nav-link" href="/field-reference">Field Reference</a>' +
-      '<a class="ia-header-nav-link" href="/why-bolt">Why Bolt?</a>' +
-      '<a class="ia-header-nav-link ia-header-nav-security" href="/privacy-policy#security">Security &amp; Data Notice</a>' +
-    '</nav>';
-  header.appendChild(wrap);
-  header.setAttribute('data-ia-header-ready', '1');
+  var navLinks = header.querySelector('.brt-nav-links-wrap');
+  if (navLinks) {
+    navLinks.innerHTML = '' +
+      '<a href="/" class="brt-nav-link' + (window.location.pathname === '/' || window.location.pathname === '/index.html' ? ' active' : '') + '">Item Research</a>' +
+      '<a href="/item-age" class="brt-nav-link' + (window.location.pathname.indexOf('item-age') !== -1 ? ' active' : '') + '">Serial Decoder</a>' +
+      '<a href="/field-reference" class="brt-nav-link' + (window.location.pathname.indexOf('field-reference') !== -1 ? ' active' : '') + '">Field Reference</a>' +
+      '<a href="/why-bolt" class="brt-nav-link' + (window.location.pathname.indexOf('why-bolt') !== -1 ? ' active' : '') + '">Why Bolt?</a>' +
+      '<button id="nav-cta-btn" class="brt-nav-cta">Start Searching</button>';
+    
+    var cta = navLinks.querySelector('#nav-cta-btn');
+    if (cta) {
+      cta.onclick = function() { window.location.href = '/'; };
+    }
+  }
 }
 function enhanceSidebarLogo() {
   var logo = document.querySelector('.sidebar-logo');

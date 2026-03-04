@@ -201,19 +201,14 @@ function updateSectionVisibility() {
     show("card-valuation", selectedSections.valuation);
   }
 
-  // Tab buttons + redirect if the active tab is being hidden
-  const tabMap = [
-    { tab: "tab-replacements", key: "replacements" },
-    { tab: "tab-diagnostics",  key: "diagnostics"  }
-  ];
-  tabMap.forEach(({ tab, key }) => {
-    const btn = byId(tab);
-    if (!btn) return;
-    const on = selectedSections[key];
-    btn.classList.toggle("hidden", !on);
-    btn.setAttribute("aria-disabled", on ? "false" : "true");
-    if (!on && activeTab === tab) setActiveTab("tab-overview");
-  });
+  // Re-render both tab bars to sync visibility settings
+  renderReportSectionTabs();
+
+  // If the active tab is being hidden, redirect to overview
+  const activeTabKey = activeTab.replace('tab-', '');
+  if (activeTabKey !== 'overview' && !selectedSections[activeTabKey]) {
+    setActiveTab("tab-overview");
+  }
 
   // If detail data is already loaded, re-render so newly-enabled sections populate
   if (detailData) renderDetail(detailData);
@@ -344,43 +339,91 @@ function renderACVDisplay(msrp, age, category) {
 
 const TAB_IDS = ["tab-overview", "tab-replacements", "tab-diagnostics"];
 
+function renderReportSectionTabs() {
+  const tabs = [
+    { id: "tab-overview", label: "Overview", key: "overview" },
+    { id: "tab-replacements", label: "Replacement Options", key: "replacements" },
+    { id: "tab-diagnostics", label: "Diagnostics & Repair", key: "diagnostics" }
+  ];
+
+  const buildHtml = () => {
+    return `
+      <div class="tab-bar no-print" role="tablist" aria-label="Report sections">
+        ${tabs.map(t => {
+          const isVisible = t.key === 'overview' || selectedSections[t.key];
+          if (!isVisible) return '';
+          return `
+            <button class="tab-btn ${activeTab === t.id ? 'active' : ''}" 
+                    role="tab" 
+                    data-tab-target="${t.id}"
+                    aria-selected="${activeTab === t.id ? 'true' : 'false'}" 
+                    aria-controls="${t.id.replace('tab-', 'panel-')}">${t.label}</button>
+          `;
+        }).join('')}
+      </div>
+    `;
+  };
+
+  const html = buildHtml();
+  const top = byId("report-tabs-top");
+  const bottom = byId("report-tabs-bottom");
+  if (top) top.innerHTML = html;
+  if (bottom) bottom.innerHTML = html;
+
+  // Wire up listeners for all instances
+  document.querySelectorAll(".tab-btn").forEach(btn => {
+    btn.onclick = () => {
+      const target = btn.dataset.tabTarget;
+      if (target) setActiveTab(target);
+    };
+    btn.onkeydown = (e) => {
+      const visible = tabs.filter(t => t.key === 'overview' || selectedSections[t.key]).map(t => t.id);
+      const id = btn.dataset.tabTarget;
+      const idx = visible.indexOf(id);
+      if (idx === -1) return;
+      
+      let nextId = null;
+      if (e.key === "ArrowRight") nextId = visible[(idx + 1) % visible.length];
+      if (e.key === "ArrowLeft")  nextId = visible[(idx - 1 + visible.length) % visible.length];
+      if (e.key === "Home") nextId = visible[0];
+      if (e.key === "End")  nextId = visible[visible.length - 1];
+      
+      if (nextId) {
+        e.preventDefault();
+        setActiveTab(nextId);
+        // Find the button in the same container to focus
+        const container = btn.closest('.report-tabs-container');
+        if (container) {
+          const nextBtn = container.querySelector(`[data-tab-target="${nextId}"]`);
+          if (nextBtn) nextBtn.focus();
+        }
+      }
+    };
+  });
+}
+
 function setActiveTab(tabId) {
   if (!TAB_IDS.includes(tabId)) return;
   activeTab = tabId;
 
+  // Toggle panels
   TAB_IDS.forEach((id) => {
-    const btn = byId(id);
     const panel = byId(id.replace("tab-", "panel-"));
-    if (btn) {
-      btn.classList.toggle("active", id === tabId);
-      btn.setAttribute("aria-selected", id === tabId ? "true" : "false");
-    }
     if (panel) panel.classList.toggle("active", id === tabId);
   });
-}
 
-function getVisibleTabs() {
-  return TAB_IDS.filter((id) => {
-    const btn = byId(id);
-    return btn && !btn.classList.contains("hidden");
-  });
+  // Re-render both tab bars to sync active state
+  renderReportSectionTabs();
+  
+  // Scroll to results top when switching (standard behavior)
+  const results = byId("results");
+  if (results) results.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
 function initTabs() {
-  TAB_IDS.forEach((id) => {
-    const btn = byId(id);
-    if (!btn) return;
-    btn.addEventListener("click", () => setActiveTab(id));
-    btn.addEventListener("keydown", (e) => {
-      const visible = getVisibleTabs();
-      const idx = visible.indexOf(id);
-      if (idx === -1) return;
-      if (e.key === "ArrowRight") { e.preventDefault(); const next = visible[(idx + 1) % visible.length]; setActiveTab(next); byId(next)?.focus(); }
-      if (e.key === "ArrowLeft")  { e.preventDefault(); const prev = visible[(idx - 1 + visible.length) % visible.length]; setActiveTab(prev); byId(prev)?.focus(); }
-      if (e.key === "Home") { e.preventDefault(); setActiveTab(visible[0]); byId(visible[0])?.focus(); }
-      if (e.key === "End")  { e.preventDefault(); setActiveTab(visible[visible.length - 1]); byId(visible[visible.length - 1])?.focus(); }
-    });
-  });
+  // Initially tabs are rendered when search completes, 
+  // but we can ensure they are ready.
+  renderReportSectionTabs();
 }
 
 // ── Recalculate ACV (from age input, no API call) ────────────────────────────
