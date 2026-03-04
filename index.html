@@ -418,6 +418,15 @@
         .compare-add-btn:hover { background: #0f172a; }
         .compare-add-btn.added { background: #15803d; cursor: default; }
 
+        /* Tier comparison indicators */
+        .tier-indicator { font-size: 0.68rem; font-weight: 700; margin-top: 0.2rem; display: flex; align-items: center; gap: 0.3rem; }
+        .tier-lower  { color: #16a34a; } /* Green as per prompt: "Display a green indicator: ✔ Luxury is greater than Average" */
+        .tier-equal  { color: #16a34a; }
+        .tier-higher { color: #16a34a; }
+        
+        /* Config disclaimer */
+        .config-disclaimer { font-size: 0.72rem; color: var(--text-muted-dark); font-style: italic; margin-top: 0.4rem; line-height: 1.4; font-weight: 400; }
+
         /* ── Tiered table columns ── */
         .tier-col-badge { display:inline-block; padding:0.15rem 0.5rem; border-radius:999px; font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.04em; margin-bottom:0.15rem; }
         .tier-col-entry  { background:#e2e8f0; color:#475569; }

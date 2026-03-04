@@ -1727,6 +1727,17 @@ function renderCompareTable(entFast, entDetail, includeExisting) {
     }
   });
 
+  const formatTierIndicator = (origTier, candTier) => {
+    const tiers = ["Budget", "Average", "Premium", "Luxury"];
+    const oIdx = tiers.indexOf(origTier);
+    const cIdx = tiers.indexOf(candTier);
+    if (oIdx === -1 || cIdx === -1) return "";
+    
+    if (cIdx < oIdx) return `<div class="tier-indicator tier-lower">✔ ${origTier} is greater than ${candTier}</div>`;
+    if (cIdx === oIdx) return `<div class="tier-indicator tier-equal">✔ Same tier classification</div>`;
+    return `<div class="tier-indicator tier-higher">✔ Replacement tier exceeds original tier</div>`;
+  };
+
   const rows = [
     {
       label: "Item Type",
@@ -1743,9 +1754,12 @@ function renderCompareTable(entFast, entDetail, includeExisting) {
       label: "Tier",
       values: Object.fromEntries(cols.map((col) => {
         const n = normalizedByCol[col.key];
-        return [col.key, normalizeTierLabel(n.tier)];
+        const tierLabel = normalizeTierLabel(n.tier);
+        if (col.key === "original") return tierLabel;
+        const indicator = formatTierIndicator(normalizeTierLabel(originalSide.tier), tierLabel);
+        return `${tierLabel}${indicator}`;
       })),
-      isHtml: false,
+      isHtml: true,
       mandatory: true
     },
     {
@@ -1803,6 +1817,10 @@ function renderCompareTable(entFast, entDetail, includeExisting) {
   );
 
   const lkqRow = { label: "LKQ Grade", values: {}, isHtml: true, mandatory: true };
+  const configCategories = ["computer", "laptop", "phone", "electronics"];
+  const showConfigDisclaimer = configCategories.includes(originalTypeKey);
+  const configDisclaimer = showConfigDisclaimer ? `<div class="config-disclaimer">(Certain configurations of this item contain upgraded parts that may affect LKQ determination)</div>` : "";
+
   cols.forEach((col) => {
     if (col.key === "original") {
       lkqRow.values[col.key] = lkqGradeHtml("LKQ");
@@ -1814,7 +1832,7 @@ function renderCompareTable(entFast, entDetail, includeExisting) {
       candidate: r.values[col.key]
     }));
     const grade = deriveLkqGrade(originalSide, normalizedByCol[col.key], candidateSpecRows, originalTypeKey);
-    lkqRow.values[col.key] = lkqGradeHtml(grade);
+    lkqRow.values[col.key] = `${lkqGradeHtml(grade)}${col.entered ? configDisclaimer : ""}`;
   });
   rows.push(lkqRow);
 
@@ -2106,6 +2124,25 @@ function generateSummary() {
   });
 }
 
+function resetCompareTool() {
+  const input = byId("compare-input");
+  if (input) input.value = "";
+  const result = byId("compare-result");
+  if (result) {
+    result.innerHTML = "";
+    result.classList.add("hidden");
+  }
+  const checkbox = byId("compare-include-existing");
+  if (checkbox) checkbox.checked = false;
+  const panel = byId("compare-panel");
+  if (panel) panel.classList.add("hidden");
+  const trigger = byId("compare-trigger-row");
+  if (trigger) trigger.classList.add("hidden");
+  const toggle = byId("compare-toggle-btn");
+  if (toggle) toggle.classList.remove("active");
+  _compareBlock = null;
+}
+
 // ── performSearch ─────────────────────────────────────────────────────────────
 
 async function performSearch() {
@@ -2113,6 +2150,8 @@ async function performSearch() {
   if (!queryInput) return;
   const query = queryInput.value.trim();
   if (!query) return;
+
+  resetCompareTool();
 
   // Check sessionStorage cache first
   const cacheKey = `bolt_v6_${query.toLowerCase()}`;
