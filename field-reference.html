@@ -287,7 +287,7 @@
             'ohm-testing': {
                 title: 'Ohm Testing (Resistance)',
                 icon: '&#9126;',
-                intro: 'Measures resistance (\u03a9) to determine if a component is intact, degraded, or shorted. Always performed on de-energized circuits.',
+                intro: '<strong>Measures the electrical resistance of a component to determine if the internal circuitry is intact, degraded, or shorted.</strong> A reading of "Open" (infinite Ohms) on a heating element or motor winding confirms a definitive failure that requires component replacement. This measurement is critical for verifying functional damage in property claims where a simple visual inspection is insufficient to prove failure. For example, a dryer heating element may look physically intact but have a broken internal coil, which can only be confirmed through an Ohm test.',
                 sections: [
                     { heading: 'Basic Ranges', type: 'table', headers: ['Component', 'Normal', 'Abnormal'], rows: [['Heating Element', '10 \u2013 40 \u03a9', 'OL (Open) or < 5 \u03a9'], ['Motor Winding', '2 \u2013 20 \u03a9', 'OL or 0 \u03a9'], ['Solenoid Coil', '100 \u2013 2,000 \u03a9', 'OL'], ['Switch (Closed)', '0 \u2013 0.5 \u03a9', '> 1 \u03a9']] }
                 ]
@@ -296,63 +296,63 @@
                 title: 'Short to Ground',
                 icon: '&#9889;',
                 warning: 'Shock and fire hazard. Do not restore power until isolated.',
-                intro: 'Occurs when a hot conductor touches the metal frame or ground wire, creating an unintended current path.',
+                intro: '<strong>An electrical fault where an energized conductor makes unintended contact with the metal chassis or ground wire of an appliance.</strong> This condition creates a severe safety hazard and typically results in an immediate circuit breaker trip to prevent fire or electrocution. In a claim scenario, finding a short to ground in a compressor or motor indicates a catastrophic internal failure that usually justifies a full unit replacement. For example, a refrigerator that instantly trips its GFCI outlet when the compressor tries to start is often suffering from a motor winding that has shorted to the frame.',
                 sections: [{ heading: 'Detection', type: 'list', items: ['Power OFF', 'Set meter to continuity', 'One probe to hot/neutral, other to metal chassis', 'Beep = Failure (Short to ground)'] }]
             },
             'voltage-testing': {
                 title: 'Voltage Testing',
                 icon: '&#128268;',
                 warning: 'Live circuit testing. Requires PPE and rated probes.',
-                intro: 'Verifies the source power reaching the equipment. Typical residential service is 120/240V split-phase.',
+                intro: '<strong>Verifies the presence and stability of electrical pressure reaching an appliance, measured in Volts AC (VAC).</strong> This is the foundational step in any diagnostic process to determine if a failure originated from the building\'s wiring or the appliance itself. Claims professionals use voltage readings to identify power quality issues like surges or sags that may have caused electronic board damage. For instance, measuring 240V at an electric oven\'s terminal block confirms the house supply is correct, isolating the fault to an internal component failure.',
                 sections: [{ heading: 'Standard Readings', type: 'table', headers: ['Test Point', 'Target', 'Limit'], rows: [['Hot to Neutral', '120V', '114-126V'], ['Hot to Ground', '120V', '114-126V'], ['Hot to Hot (240V)', '240V', '228-252V']] }]
             },
             'amperage-testing': {
                 title: 'Amperage/Current Draw Testing',
                 icon: '&#128988;',
-                intro: 'Measuring current flow to verify motor load. High amps indicate mechanical bind; low amps indicate open circuits.',
+                intro: '<strong>Measures the actual flow of electricity while a motor or compressor is under load to assess its mechanical and electrical efficiency.</strong> High amperage draw is a primary indicator of mechanical stress, such as worn bearings or a failing compressor, which can lead to imminent burnout. Field assessors use these readings to identify equipment that is operating outside its rated specifications, signaling a high risk of future loss. For example, a central AC motor drawing significantly more amps than its nameplate rating is likely nearing the end of its functional life due to excessive friction or winding degradation.',
                 sections: [{ heading: 'The Rule', type: 'paragraphs', body: 'Watts = Volts x Amps. Continuous loads should not exceed 80% of the breaker rating (e.g., 16A on a 20A breaker).' }]
             },
             'double-tap': {
                 title: 'Double Tapped Breakers',
                 icon: '&#128295;',
-                intro: 'Two wires connected to one terminal. Causes loose connections and overheating.',
+                intro: '<strong>A code violation where two separate circuit conductors are connected to a single breaker terminal designed for only one wire.</strong> This condition often results in loose connections, which can cause arcing, overheating, and potential fire hazards inside the electrical panel. While the circuit may appear functional, insurers and home inspectors flag this as a required repair to ensure safety and code compliance. An example is finding both a bathroom light circuit and a bedroom outlet circuit sharing a single 20A breaker terminal, which exceeds the manufacturer\'s listing.',
                 sections: [{ heading: 'Code Status', type: 'paragraphs', body: 'Prohibited unless the breaker is explicitly rated for two conductors (common on Square D QO models).' }]
             },
             'voltage-imbalance': {
                 title: 'Voltage Imbalance',
                 icon: '&#128200;',
-                intro: 'Difference in voltage between phases. Even a 2% imbalance causes disproportionate motor heating.',
+                intro: '<strong>The difference in voltage levels between phases of a power supply, which can cause severe overheating in three-phase motors.</strong> Even a minor imbalance of 2% can lead to a significant increase in operating temperature, rapidly shortening the lifespan of a compressor or motor. This is often the root cause of "unexplained" failures in commercial equipment where the utility power delivery is inconsistent. For instance, a walk-in freezer compressor may fail repeatedly if one leg of its 208V supply is consistently lower than the others, leading to insulation breakdown.',
                 sections: [{ heading: 'Limit', type: 'paragraphs', body: 'NEMA standards require motor derating if imbalance exceeds 1%. 5% is grounds for immediate shutdown.' }]
             },
             'lost-neutral': {
                 title: 'Lost Neutral',
                 icon: '&#128308;',
                 warning: 'Critical Emergency. Shut off main breaker immediately.',
-                intro: 'Neutral connection break causes voltage to "float." One leg may go to 160V while the other drops to 80V.',
+                intro: '<strong>A critical electrical failure where the return path for electricity is broken, causing voltage to "float" and fluctuate wildly.</strong> This event can result in 120V outlets seeing as much as 200V+, which instantly destroys sensitive electronics and creates an extreme fire risk. From a claims perspective, a lost neutral is often a utility-side event caused by storm damage or loose service entrance connections. An example is a homeowner reporting that multiple appliances, such as the TV, refrigerator, and LED lighting, all failed simultaneously during a high-wind event.',
                 sections: [{ heading: 'Indicator', type: 'list', items: ['Lights very bright in one room, dim in another', 'Multiple 120V appliances failing simultaneously'] }]
             },
             'reversed-hot-ground': {
                 title: 'Reversed Hot/Ground',
                 icon: '&#128295;',
-                intro: 'Energizes the metal chassis of an appliance. Extremely dangerous shock hazard.',
+                intro: '<strong>A dangerous wiring error where the energized "hot" wire is incorrectly connected to the ground terminal of an outlet.</strong> This error energizes the metal shell of any plugged-in appliance, creating a lethal shock hazard for anyone who touches the device while grounded. In an insurance context, this is a severe liability and safety hazard that must be remediated immediately. For example, a metal-bodied toaster on a reversed hot/ground outlet will become electrically "live," and touching it while standing on a damp concrete floor could result in electrocution.',
                 sections: [{ heading: 'Tester Result', type: 'paragraphs', body: '3-light plug-in tester will show the specific "Hot/Grd Rev" light pattern.' }]
             },
             'reversed-hot-neutral': {
                 title: 'Reversed Hot/Neutral',
                 icon: '&#128998;',
-                intro: 'Hot and neutral swapped. Device works but switch interrupts the neutral, leaving the device "hot" even when off.',
+                intro: '<strong>A wiring defect where the hot and neutral wires are swapped, keeping the appliance "hot" even when the power switch is off.</strong> While many devices will still function, the internal safety switches and fuses are now on the wrong side of the circuit, which can lead to shock hazards during maintenance. This is a common finding in DIY electrical work and older homes that should be corrected to meet modern safety standards. An example is a lamp where the threaded portion of the bulb socket remains energized even with the switch off, posing a risk when changing a light bulb.',
                 sections: [{ heading: 'Identification', type: 'paragraphs', body: 'Large slot of outlet measures 120V to ground instead of 0V.' }]
             },
             'lra': {
                 title: 'Locked Rotor Amps (LRA)',
                 icon: '&#128295;',
-                intro: 'Current drawn by a motor that is energized but not rotating. Typical LRA is 5-7x higher than running amps.',
+                intro: '<strong>The maximum current a motor draws when it is energized but mechanically unable to rotate.</strong> Sustained LRA draw generates massive internal heat that will melt winding insulation and permanently destroy the motor within seconds. Claims adjusters use LRA readings to confirm if a compressor has "seized," which is a definitive, unrepairable mechanical failure. A common real-world example is a central AC unit that hums loudly but fails to start, with a clamp meter showing it drawing 5 to 7 times its normal running current.',
                 sections: [{ heading: 'Diagnosis', type: 'paragraphs', body: 'If a compressor hums and draws LRA but doesn\'t start, it is mechanically seized or the start capacitor has failed.' }]
             },
             'meg-testing': {
                 title: 'Meg Testing (Insulation Resistance Testing)',
                 icon: '&#128300;',
-                intro: 'Applying high voltage (500-1000V) to check insulation resistance. Identifies moisture or winding breakdown.',
+                intro: '<strong>Uses high-voltage DC to measure the integrity of the electrical insulation inside motor windings and cable runs.</strong> This test can find microscopic cracks, carbon tracking, or moisture that a standard multimeter cannot detect, acting as a predictor of imminent equipment failure. For high-value claims involving HVAC or well pumps, a Meg test is the professional standard for proving that an item has been internally compromised. For example, meg-testing a submerged pump motor after a flood can confirm if the internal insulation has been breached, even if the pump still operates.',
                 sections: [{ heading: 'Fail Point', type: 'paragraphs', body: 'Anything less than 1 Megohm (1,000,000 \u03a9) is considered a failure in residential systems.' }]
             }
         },
