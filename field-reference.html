@@ -352,7 +352,7 @@
             'meg-testing': {
                 title: 'Meg Testing (Insulation Resistance Testing)',
                 icon: '&#128300;',
-                intro: '<strong>Uses high-voltage DC to measure the integrity of the electrical insulation inside motor windings and cable runs.</strong> This test can find microscopic cracks, carbon tracking, or moisture that a standard multimeter cannot detect, acting as a predictor of imminent equipment failure. For high-value claims involving HVAC or well pumps, a Meg test is the professional standard for proving that an item has been internally compromised. For example, meg-testing a submerged pump motor after a flood can confirm if the internal insulation has been breached, even if the pump still operates.',
+                intro: '<strong>Uses high-voltage DC to "stress test" the insulation inside motor windings and cable runs.</strong> This test can find microscopic cracks, carbon tracking, or moisture that a standard multimeter cannot detect, acting as a predictor of imminent equipment failure. For high-value claims involving HVAC or well pumps, a Meg test is the professional standard for proving that an item has been internally compromised. For example, meg-testing a submerged pump motor after a flood can confirm if the internal insulation has been breached, even if the pump still operates.',
                 sections: [{ heading: 'Fail Point', type: 'paragraphs', body: 'Anything less than 1 Megohm (1,000,000 \u03a9) is considered a failure in residential systems.' }]
             }
         },
@@ -360,7 +360,7 @@
             'refrigerant-pressures': {
                 title: 'Refrigerant Pressures',
                 icon: '&#128200;',
-                intro: 'Pressure-Temperature (P/T) relationship references for common residential and appliance refrigerants.',
+                intro: '<strong>Measures internal pressures to identify refrigerant charge levels, blockages, or compressor efficiency.</strong><br>Technicians utilize a manifold gauge set to monitor Low Side (Suction) and High Side (Liquid) pressures while the system is under load, cross-referencing these values with a P/T chart adjusted for ambient temperature. In a claim scenario, finding "static" pressure that fails to change when the compressor is energized confirms a terminal mechanical failure or a major system leak. This procedure is the primary method for validating high-value "sealed system" losses that typically necessitate full unit replacement.',
                 sections: [
                     { heading: 'R-410A (Residential AC)', type: 'table', headers: ['Ambient Temp', 'Low (Suction)', 'High (Liquid)'], rows: [['70\u00b0F', '105 PSI', '300 PSI'], ['80\u00b0F', '125 PSI', '360 PSI'], ['90\u00b0F', '140 PSI', '420 PSI']] },
                     { heading: 'R-134a (Standard Fridge)', type: 'table', headers: ['Evap Temp', 'Pressure (PSI)', 'Usage'], rows: [['0\u00b0F', '6.5 PSI', 'Freezer'], ['20\u00b0F', '18.4 PSI', 'Refrigerator'], ['40\u00b0F', '35.0 PSI', 'Cooler']] },
@@ -370,25 +370,25 @@
             'start-components': {
                 title: 'Start Components',
                 icon: '&#128268;',
-                intro: 'Critical startup components for single-phase induction motors.',
+                intro: '<strong>Evaluates individual electrical parts that provide the torque required to start single-phase motors under mechanical load.</strong><br>Using a multimeter to measure capacitance (\u00b5F) or resistance (\u03a9), a technician verifies the integrity of start capacitors, potential relays, and PTC thermistors to ensure the motor receives the necessary electrical "kick." For evaluation purposes, if these components test within spec but the motor remains in a Locked Rotor state, the failure is confirmed as internal to the motor or compressor. For example, identifying a $40 failed capacitor can prevent an unnecessary $2,000 unit replacement, making this a mandatory verification step for major component claims.',
                 sections: [{ heading: 'Checks', type: 'list', items: ['Run Capacitor: Continuous phase shift; bulged = fail.', 'Start Capacitor: High torque for < 1s; oily = fail.', 'Potential Relay: Drops start cap at ~75% speed.', 'Hard Start Kit: Aftermarket cap/relay combo for weak compressors.'] }]
             },
             'test-disconnected': {
                 title: 'Bench Testing',
                 icon: '&#128295;',
-                intro: 'Standard procedures for isolated component diagnostics.',
+                intro: '<strong>A method of isolating a component from the main circuit to test its integrity without interference from feedback or parallel paths.</strong><br>This is performed by disconnecting all electrical leads and measuring resistance, continuity, or insulation integrity directly on the component\'s terminals. Bench testing is the "gold standard" for field diagnostics because it eliminates false readings caused by other parts in the circuit that might mask a fault or create a bypass. For instance, a solenoid valve may show "ghost" continuity through a control board while installed, but bench testing reveals a dead short to the frame that confirms functional damage.',
                 sections: [{ heading: 'Isolation Steps', type: 'list', items: ['Label all wires before removal.', 'Discharge capacitors using 20k \u03a9 resistor.', 'Ohm windings directly on component pins.', 'Meg-test to chassis before re-installing.'] }]
             },
             'motor-testing': {
                 title: 'Motor Testing',
                 icon: '&#128187;',
-                intro: 'Comprehensive electrical and mechanical motor health checks.',
+                intro: '<strong>A multi-step diagnostic used to verify both the electrical health and mechanical freedom of an induction motor.</strong><br>The procedure involves measuring winding resistance for balance, performing a Meg-test for insulation integrity, and physically checking the shaft for bearing drag or axial play. In a claims context, a motor that is electrically sound but draws high amperage or hums without turning is suffering from mechanical failure, which may be classified as wear-and-tear or accidental damage depending on the cause. For example, a furnace blower motor that hums but won\'t spin freely by hand is a confirmed mechanical loss.',
                 sections: [{ heading: 'Diagnostic Values', type: 'list', items: ['PSC Motor: Both windings should measure resistance.', 'ECM Motor: Check 120V/240V power PLUS low-voltage signal.', 'Bearing Check: Spin by hand; should coast silently.', 'End Play: Mechanical wiggle should be < 1/16 inch.'] }]
             },
             'compressor-testing': {
                 title: 'Compressor Testing',
                 icon: '&#128640;',
-                intro: 'Diagnosing hermetic refrigeration compressors.',
+                intro: '<strong>The definitive diagnostic for identifying terminal electrical or mechanical failure in refrigeration and HVAC units.</strong><br>Technicians use a multimeter to "ohm out" the Start, Run, and Common terminals to verify winding integrity and use a clamp meter to measure Locked Rotor Amps (LRA) during startup. A finding of "Open" windings or a short to the copper suction line confirms a catastrophic internal failure that cannot be repaired. For example, a compressor that pulls full nameplate LRA current without rotating is mechanically seized, justifying a full system replacement in the majority of professional evaluations.',
                 sections: [{ heading: 'Terminal Rule', type: 'paragraphs', body: 'Identify Common, Start, and Run. C-S + C-R = S-R (\u00b1 10% tolerance). Any terminal to Ground must be OL.' }]
             }
         },
@@ -536,7 +536,7 @@
                     'High Voltage Transformer: Converts 120V to ~2,000V for the magnetron.',
                     'HV Capacitor: Retains high-voltage charge for circuit stability.',
                     'Interlock Switches: Safety sensors that disable power if door is open.',
-                    'Turntable Motor: Low-speed AC motor for even heat distribution.',
+                    'Turntable motor: Low-speed AC motor for even heat distribution.',
                     'HV Diode: Rectifies power for the magnetron circuit.'
                 ],
                 failures: [
@@ -671,7 +671,7 @@
                     'Bus Bars: Conductive rails that distribute power to breakers.',
                     'Branch Breakers: Individual switches for room circuits.',
                     'Neutral Bus: The return path for all standard 120V circuits.',
-                    'Ground Bus: The safety path for fault current to the earth.',
+                    'Ground Bus: The safety path for fault return current to the earth.',
                     'Bonding Jumper: Connects neutral and ground (Main panel only).'
                 ],
                 failures: [
