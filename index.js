@@ -9,10 +9,8 @@ let _compareBlock = null;
 
 const selectedSections = {
   howItWorks:   true,
-  itemNotes:    true,
   replacements: true,
   diagnostics:  true,
-  technical:    true,
   valuation:    true
 };
 
@@ -186,9 +184,8 @@ function handleSerialDecode() {
 
 // Returns true if any "detail" section is selected (skip detail API call if all off)
 function needsDetailFetch() {
-  return selectedSections.howItWorks || selectedSections.itemNotes ||
-         selectedSections.replacements || selectedSections.diagnostics ||
-         selectedSections.technical;
+  return selectedSections.howItWorks ||
+         selectedSections.replacements || selectedSections.diagnostics;
 }
 
 // Show/hide cards and tab buttons based on selectedSections.
@@ -199,7 +196,6 @@ function updateSectionVisibility() {
 
   // Cards inside the Overview panel
   show("card-how-it-works", selectedSections.howItWorks);
-  show("card-item-notes",   selectedSections.itemNotes);
   // Valuation only exists at tier 3+ — don't override tier-based hiding
   if (fastData && Number(fastData.searchTier) >= 3) {
     show("card-valuation", selectedSections.valuation);
@@ -208,8 +204,7 @@ function updateSectionVisibility() {
   // Tab buttons + redirect if the active tab is being hidden
   const tabMap = [
     { tab: "tab-replacements", key: "replacements" },
-    { tab: "tab-diagnostics",  key: "diagnostics"  },
-    { tab: "tab-technical",    key: "technical"    }
+    { tab: "tab-diagnostics",  key: "diagnostics"  }
   ];
   tabMap.forEach(({ tab, key }) => {
     const btn = byId(tab);
@@ -347,7 +342,7 @@ function renderACVDisplay(msrp, age, category) {
 
 // ── Tab navigation ────────────────────────────────────────────────────────────
 
-const TAB_IDS = ["tab-overview", "tab-replacements", "tab-diagnostics", "tab-technical"];
+const TAB_IDS = ["tab-overview", "tab-replacements", "tab-diagnostics"];
 
 function setActiveTab(tabId) {
   if (!TAB_IDS.includes(tabId)) return;
@@ -1012,17 +1007,13 @@ function renderFast(data) {
   // Tier 2: category only — hide valuation, item notes; show replacement table (tiered mode)
   // Tier 3+: full report
   const cardValuation = byId("card-valuation");
-  const cardItemNotes = byId("card-item-notes");
 
   if (searchTier <= 1) {
     show(cardValuation, false);
-    show(cardItemNotes, false);
   } else if (searchTier === 2) {
     show(cardValuation, false);
-    show(cardItemNotes, false);
   } else {
     show(cardValuation, selectedSections.valuation);
-    show(cardItemNotes, true);
   }
 
   // Metrics strip — age and availability always, MSRP/ACV only for tier 3+
@@ -1114,32 +1105,7 @@ function renderDetail(data) {
   const query = (fastData?.analysis?.entered || "").trim();
 
   // ─ Item Notes card ─
-  const itemNotesContent = selectedSections.itemNotes ? byId("item-notes-content") : null;
-  if (itemNotesContent) {
-    const lkq = data.itemNotes?.lkqEvaluation || {};
-    const mustMatch = Array.isArray(lkq.mustMatchSpecs) ? lkq.mustMatchSpecs : [];
-    const acceptable = Array.isArray(lkq.acceptableVariation) ? lkq.acceptableVariation : [];
-    const availDetail = data.itemNotes?.availabilityDetail || "";
-
-    const mustMatchHtml = mustMatch.length
-      ? `<ul class="lkq-spec-list">${mustMatch.map((s) => `<li>${escapeHtml(s)}</li>`).join("")}</ul>`
-      : '<p class="none-found">No must-match specs specified.</p>';
-
-    const acceptableHtml = acceptable.length
-      ? `<div class="lkq-title" style="margin-top:0.5rem">Acceptable variation:</div>
-         <ul class="lkq-spec-list variation">${acceptable.map((s) => `<li>${escapeHtml(s)}</li>`).join("")}</ul>`
-      : "";
-
-    itemNotesContent.innerHTML = `
-      <div class="lkq-block">
-        <div class="lkq-title">LKQ Replacement Evaluation${lkq.tier ? ` — ${escapeHtml(lkq.tier)}` : ""}</div>
-        <div class="lkq-title" style="margin-top:0.5rem">Must match:</div>
-        ${mustMatchHtml}
-        ${acceptableHtml}
-      </div>
-      ${availDetail ? `<div class="section-subtitle">Availability Detail</div><p class="report-overview">${escapeHtml(availDetail)}</p>` : ""}
-    `;
-  }
+  // Item Notes and Availability are consolidated into LKQ guidance in Replacement Options.
 
   // ─ Replacement table ─
   if (!selectedSections.replacements) {
@@ -1148,28 +1114,51 @@ function renderDetail(data) {
     const te = byId("r-table"); if (te) te.classList.add("hidden");
   } else {
   // What to Consider
-  const wtcEl = byId("what-to-consider");
+  const wtcEl = byId("lkq-evaluator-guidance");
   if (wtcEl) {
-    const bullets = Array.isArray(data.whatToConsider) ? data.whatToConsider : [];
-    const confidence = fastData?.analysis?.modelConfidence;
-    const tier = Number(data.searchTier) || 1;
-    const isSpecific = tier >= 3;
-    const isLowConf = confidence === "estimated";
-    if (bullets.length) {
-      const label = isSpecific ? "What to Consider" : "General Replacement Considerations";
-      const boxClass = isSpecific ? "wtc-specific" : "wtc-general";
-      const note = (isSpecific && isLowConf)
-        ? `<div class="wtc-note">Note: Specs pulled from estimated match — verify before finalizing replacement selection.</div>`
-        : "";
-      wtcEl.className = `wtc-box ${boxClass}`;
-      wtcEl.innerHTML = `
-        <div class="wtc-label">${escapeHtml(label)}</div>
-        <ul class="wtc-list">${bullets.map(b => `<li>${escapeHtml(b)}</li>`).join("")}</ul>
-        ${note}
-      `;
-    } else {
-      wtcEl.className = "hidden";
+    const lkq = data.itemNotes?.lkqEvaluation || {};
+    const mustMatch = Array.isArray(lkq.mustMatchSpecs) ? lkq.mustMatchSpecs : [];
+    const acceptable = Array.isArray(lkq.acceptableVariation) ? lkq.acceptableVariation : [];
+    const evaluatorNotes = Array.isArray(data.whatToConsider) ? data.whatToConsider : [];
+    const availDetail = safeText(data.itemNotes?.availabilityDetail, "");
+    const typeKey = normalizeItemTypeKey(fastData?.analysis?.itemType || fastData?.analysis?.category || currentCategory);
+    const thresholdByType = {
+      tv: "Display technology and resolution should be equal or higher; screen size variance should generally remain within +/-10% unless documented functional equivalence exists.",
+      refrigerator: "Total capacity should remain within +/-10%; configuration and dispenser/ice-maker functionality should be equivalent unless documented as non-material.",
+      washer: "Capacity and load type should match; cycle capability and control platform should be equivalent or better with no performance downgrade.",
+      dryer: "Capacity and fuel type should match; cycle capability and sensing technology should be equivalent or better.",
+      dishwasher: "Capacity/place-settings and drying system should be equivalent; sound level should not represent a material downgrade.",
+      range: "Fuel type and configuration should match; oven capacity and core cooktop/oven functions should be equivalent or better.",
+      water_heater: "Fuel type and capacity should match; first-hour rating/recovery performance should be equivalent or better.",
+      hvac: "System type and capacity should match; efficiency ratings (SEER/AFUE/HSPF) should be equivalent or better.",
+      computer: "CPU class, RAM, storage, and GPU capability should be equivalent or better for the documented use profile.",
+      laptop: "CPU class, RAM, storage, and display class should be equivalent or better for the documented use profile.",
+      phone: "Display tier, chipset class, storage, and camera system should be equivalent or better."
+    };
+    const bullets = [];
+    mustMatch.forEach((spec) => {
+      bullets.push(`Required match check: verify ${spec} is equivalent to the claimed item; if not equivalent, classify as below LKQ unless an exception is documented.`);
+    });
+    acceptable.forEach((spec) => {
+      bullets.push(`Variance threshold check: ${spec} may vary only within standard market tolerance and only where no functional downgrade is introduced.`);
+    });
+    evaluatorNotes.forEach((note) => {
+      bullets.push(`Evaluator verification: ${note}`);
+    });
+    if (thresholdByType[typeKey]) {
+      bullets.push(`Item-type threshold: ${thresholdByType[typeKey]}`);
     }
+    if (availDetail) {
+      bullets.push(`Availability verification: document current market availability and comparable sourcing evidence (${availDetail}).`);
+    }
+    bullets.push("Approval control: confirm same item class and intended use, with no material quality or performance downgrade.");
+    bullets.push("Documentation control: retain model/spec comparison evidence and pricing support in the claim file before approval.");
+    const label = "LKQ Evaluation Criteria";
+    wtcEl.className = "wtc-box wtc-specific";
+    wtcEl.innerHTML = `
+      <div class="wtc-label">${escapeHtml(label)}</div>
+      <ul class="wtc-list">${bullets.map((b) => `<li>${escapeHtml(b)}</li>`).join("")}</ul>
+    `;
   }
 
   const tableMode = data.tableMode || "standard";
@@ -1270,10 +1259,7 @@ function renderDetail(data) {
       tableEl.classList.remove("hidden");
       // Reveal compare trigger when table has data
       const compareTriggerEl = byId("compare-trigger-row");
-      if (compareTriggerEl) {
-        if (tableEl.parentElement) tableEl.parentElement.insertBefore(compareTriggerEl, tableEl);
-        compareTriggerEl.classList.remove("hidden");
-      }
+      if (compareTriggerEl) compareTriggerEl.classList.remove("hidden");
     }
   }
 
@@ -1292,50 +1278,7 @@ function renderDetail(data) {
   } // end if (selectedSections.replacements)
 
   // ─ Technical Details panel ─
-  if (selectedSections.technical) {
-    const techPanelContent = byId("tech-panel-content");
-    if (techPanelContent) {
-      const techSpecs = data.technicalSpecs || "";
-      const specs = techSpecs.split(",").map((s) => s.trim()).filter(Boolean);
-      let techHtml = "";
-      if (specs.length) {
-        const PRIMARY_COUNT = 5;
-        const primary = specs.slice(0, PRIMARY_COUNT);
-        const extra = specs.slice(PRIMARY_COUNT);
-        techHtml += `<ul class="report-list">${primary.map((s) => `<li>${escapeHtml(s)}</li>`).join("")}</ul>`;
-        if (extra.length) {
-          const extraId = "tech-extra-specs";
-          techHtml += `
-            <div id="${extraId}" class="tech-extra-specs hidden">
-              <ul class="report-list">${extra.map((s) => `<li>${escapeHtml(s)}</li>`).join("")}</ul>
-            </div>
-            <button class="tech-expand-btn" id="tech-expand-btn" aria-expanded="false" aria-controls="${extraId}">
-              Full Technical Specifications (${extra.length} more) &#9660;
-            </button>`;
-        }
-      }
-      if (data.materials) {
-        techHtml += `<div class="section-subtitle">Materials</div><p class="report-overview">${escapeHtml(data.materials)}</p>`;
-      }
-      if (data.serviceLife) {
-        techHtml += `<div class="section-subtitle">Service Life</div><p class="report-overview">${escapeHtml(data.serviceLife)}</p>`;
-      }
-      techPanelContent.innerHTML = techHtml || `<p class="none-found">No technical specifications available.</p>`;
-
-      // Wire expand toggle
-      const expandBtn = byId("tech-expand-btn");
-      const extraEl = byId("tech-extra-specs");
-      if (expandBtn && extraEl) {
-        expandBtn.addEventListener("click", () => {
-          const open = extraEl.classList.toggle("hidden");
-          expandBtn.setAttribute("aria-expanded", open ? "false" : "true");
-          expandBtn.innerHTML = open
-            ? `Full Technical Specifications (${extraEl.querySelectorAll("li").length} more) &#9660;`
-            : `Hide Additional Specifications &#9650;`;
-        });
-      }
-    }
-  }
+  // Technical Details tab removed.
 
   // ─ Service life (always in Release Date card) ─
   setText("r-service-life", data.serviceLife || "");
@@ -1398,72 +1341,63 @@ function renderDetail(data) {
   const failuresContent = byId("failures-content");
   if (failuresContent) {
     const failures = Array.isArray(data.failures) ? data.failures : [];
-    if (!failures.length) {
-      failuresContent.innerHTML = `<p class="none-found">No common failures data available.</p>`;
-    } else {
-      failuresContent.innerHTML = `<ul class="failures-list">${failures
-        .map(
-          (f) => `<li>
-            <div class="failures-component">${escapeHtml(f.component || "")}</div>
-            ${f.whyItFails ? `<div class="failures-detail">${escapeHtml(f.whyItFails)}</div>` : ""}
-            ${f.symptoms ? `<div class="failures-symptoms">Symptoms: ${escapeHtml(f.symptoms)}</div>` : ""}
-          </li>`
-        )
-        .join("")}</ul>`;
-    }
-  }
-
-  // ─ Repair Parts ─
-  const partsContent = byId("parts-content");
-  if (partsContent) {
     const parts = Array.isArray(data.repairParts) ? data.repairParts : [];
-    const query  = (fastData?.analysis?.estimatedModel || fastData?.analysis?.entered || "").trim();
+    const query = (fastData?.analysis?.estimatedModel || fastData?.analysis?.entered || "").trim();
     const ctxText = ((fastData?.analysis?.itemDescription || "") + " " + query).toLowerCase();
     const cat = (currentCategory || "general").toLowerCase();
 
-    const isAppliance = ["refrigerator","washer","dryer","dishwasher","water_heater","small_appliance","hvac"].includes(cat);
-    const isHotTub    = ctxText.includes("hot tub") || ctxText.includes("hottub") || ctxText.includes("spa") || ctxText.includes("jacuzzi");
-    const isGenerac   = ctxText.includes("generac");
+    const isAppliance = ["refrigerator", "washer", "dryer", "dishwasher", "water_heater", "small_appliance", "hvac", "range"].includes(cat);
+    const isElectronics = ["tv", "electronics", "computer", "laptop", "phone"].includes(cat);
+    const isHotTub = ctxText.includes("hot tub") || ctxText.includes("hottub") || ctxText.includes("spa") || ctxText.includes("jacuzzi");
+    const isGenerac = ctxText.includes("generac");
 
-    if (!parts.length) {
-      partsContent.innerHTML = query
-        ? `<p class="none-found">No parts data available for this item.</p>`
-        : `<p class="none-found">Enter a model number or item description to find repair parts.</p>`;
-    } else {
-      const listHtml = parts.map((part) => {
-        const googleUrl = `https://www.google.com/search?q=${encodeURIComponent((query + " " + part.name).trim())}`;
-        let html = `<li class="part-item"><a class="part-name-link" href="${escapeHtml(googleUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(part.name)}</a>`;
-        if (isAppliance && part.partNumber) {
-          const apUrl = `https://www.appliancepartspros.com/search?q=${encodeURIComponent(part.partNumber)}`;
-          const spUrl = `https://www.searspartsdirect.com/search#query=${encodeURIComponent(part.partNumber)}`;
-          html += `<div class="part-number">Part #: ${escapeHtml(part.partNumber)}</div>
-            <div class="part-buy-links">
-              <a class="part-buy-link" href="${escapeHtml(apUrl)}" target="_blank" rel="noopener noreferrer">AppliancePartsPros</a>
-              <a class="part-buy-link" href="${escapeHtml(spUrl)}" target="_blank" rel="noopener noreferrer">Sears Parts Direct</a>
-            </div>`;
-        }
-        return html + `</li>`;
-      }).join("");
+    const inferPartName = (failure, idx) => {
+      if (parts[idx]?.name) return parts[idx].name;
+      if (failure.component) return failure.component;
+      return "replacement part";
+    };
 
-      let footerHtml = "";
-      if (isHotTub) {
-        footerHtml = `<div class="parts-footer"><a class="parts-footer-link" href="https://www.hottubsupplystore.com/search?q=${encodeURIComponent(query)}" target="_blank" rel="noopener noreferrer">&#128270; Search Hot Tub Supply Store for ${escapeHtml(query)} parts</a></div>`;
-      } else if (isGenerac) {
-        footerHtml = `<div class="parts-footer"><a class="parts-footer-link" href="https://www.generac.com/for-homeowners/product-support/serial-number-lookup" target="_blank" rel="noopener noreferrer">&#128270; Generac Serial Number Lookup</a></div>`;
-      } else {
-        const repairUrl = `https://www.google.com/search?q=${encodeURIComponent((query + " repair parts").trim())}`;
-        footerHtml = `<div class="parts-footer"><a class="parts-footer-link" href="${escapeHtml(repairUrl)}" target="_blank" rel="noopener noreferrer">&#128270; Find Repair Parts for ${escapeHtml(query)}</a></div>`;
-      }
+    const failureRows = failures.map((f, idx) => {
+      const failureText = [f.component, f.whyItFails, f.symptoms].filter(Boolean).join(" - ") || "Reported failure";
+      const partName = inferPartName(f, idx);
+      const googleUrl = `https://www.google.com/search?q=${encodeURIComponent((query + " " + partName).trim())}`;
+      return `<li>
+        <div class="failures-component">${escapeHtml(failureText)}</div>
+        <div class="failures-detail"><a class="part-name-link" href="${escapeHtml(googleUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(partName)}</a></div>
+      </li>`;
+    });
 
-      partsContent.innerHTML = `<ul class="parts-list">${listHtml}</ul>${footerHtml}`;
+    const resourceButtons = [];
+    if (isAppliance) {
+      resourceButtons.push(`<a class="repair-link" href="https://www.appliancepartspros.com" target="_blank" rel="noopener noreferrer">AppliancePartsPros</a>`);
+      resourceButtons.push(`<a class="repair-link" href="https://www.searspartsdirect.com" target="_blank" rel="noopener noreferrer">Sears Parts Direct</a>`);
+    }
+    if (isElectronics) {
+      resourceButtons.push(`<a class="repair-link" href="https://www.shopjimmy.com" target="_blank" rel="noopener noreferrer">ShopJimmy</a>`);
+    }
+    if (data.manufacturerPage?.url) {
+      resourceButtons.push(`<a class="repair-link" href="${escapeHtml(data.manufacturerPage.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(data.manufacturerPage.label || "Manufacturer Support")}</a>`);
+    }
+    if (isHotTub) {
+      resourceButtons.push(`<a class="repair-link" href="https://www.hottubsupplystore.com/search?q=${encodeURIComponent(query)}" target="_blank" rel="noopener noreferrer">Hot Tub Supply Store</a>`);
+    }
+    if (isGenerac) {
+      resourceButtons.push(`<a class="repair-link" href="https://www.generac.com/for-homeowners/product-support/serial-number-lookup" target="_blank" rel="noopener noreferrer">Generac Support</a>`);
+    }
 
-      // Surface note in the overview summary
+    const listHtml = failureRows.length
+      ? `<ul class="failures-list">${failureRows.join("")}</ul>`
+      : `<p class="none-found">No common failures data available.</p>`;
+    const resourcesHtml = resourceButtons.length
+      ? `<div class="repair-resources">${resourceButtons.join("")}</div>`
+      : "";
+
+    failuresContent.innerHTML = `${listHtml}${resourcesHtml}`;
+    if (failureRows.length) {
       const partsNote = byId("parts-available-note");
       if (partsNote) partsNote.classList.remove("hidden");
     }
   }
-
-  // ─ Owner's Manual + Manufacturer Page combined (Section 10) ─
   const manualContent = byId("manual-content");
   if (manualContent) {
     if (data.manual?.url) {
@@ -1589,12 +1523,65 @@ function renderCompareTable(entFast, entDetail, includeExisting) {
   const originalSide = normalizedByCol.original;
   const originalTypeKey = normalizeItemTypeKey(originalSide.itemType);
   const featureSchema = getComparisonFeatureList(originalTypeKey);
+  const normalizeTierLabel = (tier) => {
+    const raw = String(tier || "").trim().toLowerCase();
+    if (!raw) return "Average";
+    if (raw.includes("luxury")) return "Luxury";
+    if (raw.includes("premium")) return "Premium";
+    if (raw.includes("upper")) return "Upper Mid-Grade";
+    if (raw.includes("mid")) return "Mid-Grade";
+    if (raw.includes("entry")) return "Entry Level";
+    if (raw.includes("average")) return "Average";
+    return "Average";
+  };
+  const formatItemTypeDisplay = (value) => {
+    const key = normalizeItemTypeKey(value);
+    const labels = {
+      tv: "TV", refrigerator: "Refrigerator", washer: "Washer", dryer: "Dryer",
+      dishwasher: "Dishwasher", range: "Range", hvac: "HVAC", water_heater: "Water Heater",
+      computer: "Computer", laptop: "Laptop", phone: "Phone", small_appliance: "Small Appliance",
+      electronics: "Electronics", general: "General"
+    };
+    return labels[key] || safeText(value, "General");
+  };
+  const compareIndicator = (label, originalValue, candidateValue) => {
+    const oRaw = safeText(originalValue, "N/A");
+    const cRaw = safeText(candidateValue, "N/A");
+    if (oRaw === "N/A" || cRaw === "N/A") return null;
+    const labelText = String(label || "").toLowerCase();
+    const o = oRaw.toLowerCase();
+    const c = cRaw.toLowerCase();
+    const resolutionRank = (v) => /8k/.test(v) ? 5 : /4k|2160/.test(v) ? 4 : /1440|2k/.test(v) ? 3 : /1080|full\s*hd/.test(v) ? 2 : /720|hd/.test(v) ? 1 : 0;
+    const technologyRank = (v) => /mini\s*led|oled/.test(v) ? 4 : /qled|quantum/.test(v) ? 3 : /led/.test(v) ? 2 : /lcd/.test(v) ? 1 : 0;
+    let verdict = null;
+    if (labelText.includes("resolution")) {
+      const ro = resolutionRank(o); const rc = resolutionRank(c);
+      if (ro > 0 && rc > 0) verdict = rc > ro ? "superior" : rc < ro ? "inferior" : "equal";
+    }
+    if (!verdict && (labelText.includes("display") || labelText.includes("technology") || labelText.includes("panel"))) {
+      const to = technologyRank(o); const tc = technologyRank(c);
+      if (to > 0 && tc > 0) verdict = tc > to ? "superior" : tc < to ? "inferior" : "equal";
+    }
+    if (!verdict) {
+      const on = parseFirstNumber(oRaw);
+      const cn = parseFirstNumber(candidateValue);
+      if (Number.isFinite(on) && Number.isFinite(cn) && on > 0) {
+        const ratio = cn / on;
+        verdict = ratio <= 0.85 ? "inferior" : ratio >= 1.2 ? "superior" : "equal";
+      }
+    }
+    if (!verdict && (o === c || c.includes(o) || o.includes(c))) verdict = "equal";
+    if (!verdict) return null;
+    if (verdict === "inferior") return { icon: "&#10007;", cls: "compare-quality-bad", title: "Below original quality" };
+    if (verdict === "superior") return { icon: "&#9733;", cls: "compare-quality-good", title: "Above original quality" };
+    return { icon: "&#10003;", cls: "compare-quality-ok", title: "Meets LKQ variance" };
+  };
 
   const categoryMismatchValues = {};
   let hasAnyMismatch = false;
   cols.forEach((col) => {
     if (col.key === "original") {
-      categoryMismatchValues[col.key] = "—";
+      categoryMismatchValues[col.key] = "-";
       return;
     }
     const candidateType = normalizedByCol[col.key].itemType;
@@ -1602,14 +1589,19 @@ function renderCompareTable(entFast, entDetail, includeExisting) {
       hasAnyMismatch = true;
       categoryMismatchValues[col.key] = `Category mismatch: original is ${String(originalSide.itemType).toUpperCase()}, replacement is ${String(candidateType).toUpperCase()} (check query).`;
     } else {
-      categoryMismatchValues[col.key] = "—";
+      categoryMismatchValues[col.key] = "-";
     }
   });
 
   const rows = [
     {
       label: "Item Type",
-      values: Object.fromEntries(cols.map((col) => [col.key, safeText(normalizedByCol[col.key].itemType, "N/A")])),
+      values: Object.fromEntries(cols.map((col) => {
+        if (col.key === "original") {
+          return [col.key, formatItemTypeDisplay(originalSide.itemType || fastData?.analysis?.category || fastData?.analysis?.itemType)];
+        }
+        return [col.key, formatItemTypeDisplay(normalizedByCol[col.key].itemType || originalSide.itemType)];
+      })),
       isHtml: false,
       mandatory: true
     },
@@ -1617,7 +1609,7 @@ function renderCompareTable(entFast, entDetail, includeExisting) {
       label: "Brand & Tier",
       values: Object.fromEntries(cols.map((col) => {
         const n = normalizedByCol[col.key];
-        return [col.key, `${safeText(n.brand, "N/A")} (${safeText(n.tier, "Average")})`];
+        return [col.key, `${safeText(n.brand, "N/A")} \u2014 ${normalizeTierLabel(n.tier)}`];
       })),
       isHtml: false,
       mandatory: true
@@ -1692,10 +1684,6 @@ function renderCompareTable(entFast, entDetail, includeExisting) {
   });
   rows.push(lkqRow);
 
-  const DEFAULT_SPEC_ROWS = 4;
-  let shownSpecCount = 0;
-  let hasHiddenRows = false;
-
   let thead = "<tr><th>Feature</th>";
   cols.forEach((col) => {
     thead += `<th${col.entered ? ' class="compare-col-entered"' : ""}>${escapeHtml(col.label)}</th>`;
@@ -1703,20 +1691,17 @@ function renderCompareTable(entFast, entDetail, includeExisting) {
   thead += "</tr>";
 
   let tbody = rows.map((row) => {
-    let collapsed = false;
-    if (row.isSpec) {
-      shownSpecCount += 1;
-      if (shownSpecCount > DEFAULT_SPEC_ROWS) {
-        collapsed = true;
-        hasHiddenRows = true;
-      }
-    }
-    const trClass = collapsed ? ' class="compare-extra-row hidden"' : "";
-    let tr = `<tr${trClass}><td>${escapeHtml(row.label)}</td>`;
+    let tr = `<tr><td>${escapeHtml(row.label)}</td>`;
     cols.forEach((col) => {
       const val = row.values[col.key];
       const cellClass = col.entered ? ' class="compare-col-entered"' : "";
-      const content = row.isHtml ? (val || "N/A") : escapeHtml(val || "N/A");
+      let content = row.isHtml ? (val || "N/A") : escapeHtml(val || "N/A");
+      if (row.isSpec && col.key !== "original") {
+        const indicator = compareIndicator(row.label, row.values.original, row.values[col.key]);
+        if (indicator) {
+          content = `<span class="compare-quality ${indicator.cls}" title="${escapeHtml(indicator.title)}">${indicator.icon}</span> ${content}`;
+        }
+      }
       tr += `<td${cellClass}>${content}</td>`;
     });
     tr += "</tr>";
@@ -1739,10 +1724,6 @@ function renderCompareTable(entFast, entDetail, includeExisting) {
     text: `Comparing original vs. ${(entFast && entFast.analysis && entFast.analysis.estimatedModel) || "entered model"}\nLKQ Grade: ${enteredGrade}\n${summaryText}`
   };
 
-  const fullToggleBtn = hasHiddenRows
-    ? `<button class="compare-add-btn" id="compare-show-full-btn" style="margin-top:0.5rem">Show full comparison</button>`
-    : "";
-
   return `
     <div class="compare-table-wrap">
       <table class="compare-table">
@@ -1750,7 +1731,6 @@ function renderCompareTable(entFast, entDetail, includeExisting) {
         <tbody>${tbody}</tbody>
       </table>
     </div>
-    ${fullToggleBtn}
     <div class="compare-summary">${escapeHtml(summaryText)}</div>
     <button class="compare-add-btn" id="compare-add-btn">&#128196; Add This Comparison to Report Summary</button>`;
 }
@@ -1797,18 +1777,11 @@ async function runComparison() {
     if (resultEl) {
       resultEl.innerHTML = renderCompareTable(entFast, entDetail, includeExisting);
       resultEl.classList.remove("hidden");
-      const fullBtn = byId("compare-show-full-btn");
-      if (fullBtn) {
-        fullBtn.addEventListener("click", () => {
-          resultEl.querySelectorAll(".compare-extra-row").forEach((row) => row.classList.remove("hidden"));
-          fullBtn.remove();
-        });
-      }
       const addBtn = byId("compare-add-btn");
       if (addBtn) {
         addBtn.addEventListener("click", () => {
           if (_compareBlock) {
-            addBtn.textContent = "✓ Added to Report Summary";
+            addBtn.textContent = "\u2713 Added to Report Summary";
             addBtn.classList.add("added");
             addBtn.disabled = true;
           }
@@ -1908,14 +1881,6 @@ function openSummaryModal() {
     const codes = Array.isArray(detailData.errorCodes) ? detailData.errorCodes : [];
     if (codes.length) lines.push(`Error codes: ${codes.map((c) => c.code).join(", ")}`);
     if (lines.length) blocks.push({ key: "diagnostics", title: "Diagnostics & Repair", text: lines.join("\n") });
-  }
-
-  // Technical Details
-  if (detailData?.technicalSpecs) {
-    blocks.push({
-      key: "technical", title: "Technical Details",
-      text: detailData.technicalSpecs.split(",").slice(0, 10).map((s) => `• ${s.trim()}`).join("\n")
-    });
   }
 
   // Include comparison block if user added one
@@ -2051,17 +2016,6 @@ async function performSearch() {
     if (el) el.innerHTML = `<div class="section-spinner">Loading...</div>`;
   });
 
-  const skeletonSections = ["item-notes-content"];
-  skeletonSections.forEach((id) => {
-    const el = byId(id);
-    if (el) {
-      el.innerHTML = `
-        <div class="skeleton-line med"></div>
-        <div class="skeleton-line full"></div>
-        <div class="skeleton-line short"></div>`;
-    }
-  });
-
   // Manual + mfr page spinner
   const manualContent = byId("manual-content");
   if (manualContent) manualContent.innerHTML = `<div class="section-spinner">Loading...</div>`;
@@ -2089,10 +2043,6 @@ async function performSearch() {
   // Reset table header to standard layout
   const tableHeadRow = byId("table-head-row");
   if (tableHeadRow) tableHeadRow.innerHTML = `<th>Feature</th><th>Original Item</th><th class="highlight">Brand Match</th><th>Option 1</th><th>Option 2</th>`;
-
-  // Reset technical panel
-  const techPanelContent = byId("tech-panel-content");
-  if (techPanelContent) techPanelContent.innerHTML = `<div class="section-spinner">Loading...</div>`;
 
   // Reset metrics strip
   setText("m-age", "—");
@@ -2289,10 +2239,8 @@ document.addEventListener("DOMContentLoaded", () => {
   // Section filter checkboxes
   const filterMap = [
     { id: "sec-how-it-works", key: "howItWorks"   },
-    { id: "sec-item-notes",   key: "itemNotes"    },
     { id: "sec-replacements", key: "replacements" },
     { id: "sec-diagnostics",  key: "diagnostics"  },
-    { id: "sec-technical",    key: "technical"    },
     { id: "sec-valuation",    key: "valuation"    }
   ];
   filterMap.forEach(({ id, key }) => {

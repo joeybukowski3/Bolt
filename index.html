@@ -108,7 +108,6 @@
         #panel-overview > .metrics-strip,
         #panel-overview > #card-analysis,
         #panel-overview > #card-how-it-works,
-        #panel-overview > #card-item-notes { grid-column: 1 / -1; }
         #panel-overview > .card { margin-bottom: 0; }
         @media (max-width: 700px) { #panel-overview.active { grid-template-columns: 1fr; } }
 
@@ -404,6 +403,10 @@
         .compare-table td { padding: 0.4rem 0.7rem; border-bottom: 1px solid var(--border-color); color: var(--text-mid); vertical-align: top; }
         .compare-table tr:last-child td { border-bottom: none; }
         .compare-table td.compare-col-entered { background: rgba(255,251,235,0.4); }
+        .compare-quality { display: inline-flex; align-items: center; justify-content: center; width: 1.05rem; font-weight: 800; margin-right: 0.2rem; }
+        .compare-quality-bad { color: #dc2626; }
+        .compare-quality-ok { color: #16a34a; }
+        .compare-quality-good { color: #ca8a04; }
         .lkq-verdict { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.18rem 0.6rem; border-radius: 999px; font-size: 0.72rem; font-weight: 700; }
         .lkq-match { background: #dcfce7; color: #15803d; }
         .lkq-close { background: #fef3c7; color: #92400e; }
@@ -706,10 +709,8 @@
                 <span class="section-filters-label">Include in report:</span>
                 <div class="section-filter-list">
                     <label class="section-filter-chip is-checked"><input type="checkbox" id="sec-how-it-works" checked> How It Works</label>
-                    <label class="section-filter-chip is-checked"><input type="checkbox" id="sec-item-notes" checked> Item Notes</label>
                     <label class="section-filter-chip is-checked"><input type="checkbox" id="sec-replacements" checked> Replacement Options</label>
                     <label class="section-filter-chip is-checked"><input type="checkbox" id="sec-diagnostics" checked> Diagnostics &amp; Repair</label>
-                    <label class="section-filter-chip is-checked"><input type="checkbox" id="sec-technical" checked> Technical Details</label>
                     <label class="section-filter-chip is-checked"><input type="checkbox" id="sec-valuation" checked> Valuation &amp; Depreciation</label>
                 </div>
             </div>
@@ -742,7 +743,6 @@
                     <button class="tab-btn active" role="tab" id="tab-overview" aria-selected="true" aria-controls="panel-overview">Overview</button>
                     <button class="tab-btn" role="tab" id="tab-replacements" aria-selected="false" aria-controls="panel-replacements">Replacement Options</button>
                     <button class="tab-btn" role="tab" id="tab-diagnostics" aria-selected="false" aria-controls="panel-diagnostics">Diagnostics &amp; Repair</button>
-                    <button class="tab-btn" role="tab" id="tab-technical" aria-selected="false" aria-controls="panel-technical">Technical Details</button>
                 </div>
 
                 <div id="estimation-banner" class="estimation-banner hidden">
@@ -871,20 +871,10 @@
                         </ul>
                     </div>
 
-                    <div class="card" id="card-item-notes">
-                        <div class="card-title"><span class="title-number">5</span> Item Notes <span class="title-icon">&#128203;</span></div>
-                        <div class="card-accent-stripe"></div>
-                        <div id="item-notes-content">
-                            <div class="skeleton-line med"></div>
-                            <div class="skeleton-line full"></div>
-                            <div class="skeleton-line short"></div>
-                        </div>
-                    </div>
                     <div class="panel-nav no-print">
                         <span class="panel-nav-label">Jump to:</span>
                         <button class="panel-nav-btn" data-tab="tab-replacements">Replacement Options</button>
                         <button class="panel-nav-btn" data-tab="tab-diagnostics">Diagnostics &amp; Repair</button>
-                        <button class="panel-nav-btn" data-tab="tab-technical">Technical Details</button>
                     </div>
                 </div><!-- /panel-overview -->
 
@@ -893,7 +883,7 @@
                     <div class="card" id="card-table" style="overflow-x: auto;">
                         <div class="card-title"><span class="title-number">6</span> Current Replacement Options <span class="title-icon">&#128260;</span></div>
                         <div class="card-accent-stripe"></div>
-                        <div id="what-to-consider" class="hidden"></div>
+                        <div id="lkq-evaluator-guidance" class="hidden"></div>
                         <div id="table-note" class="table-note hidden"></div>
                         <div id="table-loading" class="section-spinner">Loading replacement options...</div>
                         <table id="r-table" class="data-table hidden">
@@ -907,12 +897,12 @@
                             <p id="narrow-results-tip"></p>
                         </div>
                         <div id="compare-trigger-row" class="compare-trigger-row hidden">
-                            <button id="compare-toggle-btn" class="compare-toggle-btn">&#128270; Compare a Replacement Option</button>
+                            <button id="compare-toggle-btn" class="compare-toggle-btn">&#128270; Compare Your Own Replacement Option</button>
                         </div>
                         <div id="compare-panel" class="compare-panel hidden">
                             <div class="compare-panel-header">
                                 <span class="compare-panel-icon">&#128270;</span>
-                                <span class="compare-panel-title">Compare a Replacement Option</span>
+                                <span class="compare-panel-title">Compare Your Own Replacement Option</span>
                                 <button class="compare-panel-close" id="compare-panel-close">&times;</button>
                             </div>
                             <div class="compare-input-row">
@@ -932,7 +922,6 @@
                         <span class="panel-nav-label">Jump to:</span>
                         <button class="panel-nav-btn" data-tab="tab-overview">Overview</button>
                         <button class="panel-nav-btn" data-tab="tab-diagnostics">Diagnostics &amp; Repair</button>
-                        <button class="panel-nav-btn" data-tab="tab-technical">Technical Details</button>
                     </div>
                 </div><!-- /panel-replacements -->
 
@@ -950,14 +939,9 @@
                         <div id="error-codes-content"><div class="section-spinner">Loading...</div></div>
                     </div>
                     <div class="card" id="card-failures">
-                        <div class="card-title"><span class="title-number">9</span> Common Reported Failures <span class="title-icon">&#128295;</span></div>
+                        <div class="card-title"><span class="title-number">9</span> Common Reported Failures &amp; Parts <span class="title-icon">&#128295;</span></div>
                         <div class="card-accent-stripe"></div>
                         <div id="failures-content"><div class="section-spinner">Loading...</div></div>
-                    </div>
-                    <div class="card" id="card-parts">
-                        <div class="card-title">&#128270; Repair Parts <span class="title-icon">&#128269;</span></div>
-                        <div class="card-accent-stripe"></div>
-                        <div id="parts-content"><div class="section-spinner">Loading...</div></div>
                     </div>
                     <div class="card" id="card-troubleshooting">
                         <div class="card-title"><span class="title-number">10</span> Troubleshooting &amp; Repair <span class="title-icon">&#128736;</span></div>
@@ -973,24 +957,8 @@
                         <span class="panel-nav-label">Jump to:</span>
                         <button class="panel-nav-btn" data-tab="tab-overview">Overview</button>
                         <button class="panel-nav-btn" data-tab="tab-replacements">Replacement Options</button>
-                        <button class="panel-nav-btn" data-tab="tab-technical">Technical Details</button>
                     </div>
                 </div><!-- /panel-diagnostics -->
-
-                <!-- Technical Details Tab -->
-                <div id="panel-technical" class="tab-panel" role="tabpanel" aria-labelledby="tab-technical">
-                    <div class="card" id="card-technical">
-                        <div class="card-title">Technical Details <span class="title-icon">&#9881;</span></div>
-                        <div class="card-accent-stripe"></div>
-                        <div id="tech-panel-content"><div class="section-spinner">Loading...</div></div>
-                    </div>
-                    <div class="panel-nav no-print">
-                        <span class="panel-nav-label">Jump to:</span>
-                        <button class="panel-nav-btn" data-tab="tab-overview">Overview</button>
-                        <button class="panel-nav-btn" data-tab="tab-replacements">Replacement Options</button>
-                        <button class="panel-nav-btn" data-tab="tab-diagnostics">Diagnostics &amp; Repair</button>
-                    </div>
-                </div><!-- /panel-technical -->
 
                 <footer class="no-print" style="text-align: center; padding: 2rem 0; opacity: 0.5; font-size: 0.75rem; color: var(--text-muted-dark);">
                     <p>Results are generated for informational purposes. Always verify critical data independently.</p>
