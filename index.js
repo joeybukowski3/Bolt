@@ -468,6 +468,8 @@ function normalizeItemTypeKey(value) {
   if (s.includes("range") || s.includes("oven") || s.includes("stove") || s.includes("cooktop")) return "range";
   if (s.includes("water heater")) return "water_heater";
   if (s.includes("hvac") || s.includes("air conditioner") || s.includes("furnace") || s.includes("heat pump")) return "hvac";
+  if (s.includes("iphone") || s.includes("galaxy") || s.includes("pixel")) return "phone";
+  if (s.includes("cell phone") || s.includes("mobile phone")) return "phone";
   if (s.includes("laptop")) return "laptop";
   if (s.includes("computer") || s.includes("desktop")) return "computer";
   if (s.includes("phone") || s.includes("smartphone") || s.includes("mobile")) return "phone";
@@ -560,24 +562,29 @@ const SPEC_TEMPLATE_BY_TYPE = {
     { label: "Smart Features", keys: ["smart features", "wifi", "app"] }
   ],
   laptop: [
-    { label: "Display Size", keys: ["display size", "screen size"] },
-    { label: "Processor", keys: ["processor", "cpu"] },
-    { label: "Memory", keys: ["memory", "ram"] },
+    { label: "Screen Size", keys: ["display size", "screen size"] },
+    { label: "CPU", keys: ["processor", "cpu"] },
+    { label: "RAM", keys: ["memory", "ram"] },
     { label: "Storage", keys: ["storage", "ssd"] },
-    { label: "Graphics", keys: ["graphics", "gpu"] }
+    { label: "GPU", keys: ["graphics", "gpu"] },
+    { label: "OS", keys: ["operating system", "os"] }
   ],
   computer: [
-    { label: "Processor", keys: ["processor", "cpu"] },
-    { label: "Memory", keys: ["memory", "ram"] },
+    { label: "CPU", keys: ["processor", "cpu"] },
+    { label: "RAM", keys: ["memory", "ram"] },
     { label: "Storage", keys: ["storage", "ssd"] },
-    { label: "Graphics", keys: ["graphics", "gpu"] },
-    { label: "Operating System", keys: ["operating system", "os"] }
+    { label: "GPU", keys: ["graphics", "gpu"] },
+    { label: "OS", keys: ["operating system", "os"] },
+    { label: "Screen Size", keys: ["screen size", "display size"] }
   ],
   phone: [
-    { label: "Display Size", keys: ["display size", "screen size"] },
+    { label: "Display", keys: ["display", "display type", "display size", "screen size"] },
+    { label: "Chipset", keys: ["chipset", "processor", "soc", "cpu"] },
     { label: "Storage", keys: ["storage"] },
+    { label: "RAM", keys: ["ram", "memory"] },
     { label: "Camera", keys: ["camera"] },
-    { label: "Connectivity", keys: ["connectivity", "5g", "wifi"] },
+    { label: "Connectivity", keys: ["connectivity", "5g", "wifi", "bluetooth"] },
+    { label: "OS", keys: ["operating system", "os"] },
     { label: "Battery", keys: ["battery"] }
   ],
   general: [
@@ -588,6 +595,213 @@ const SPEC_TEMPLATE_BY_TYPE = {
     { label: "Energy/Performance", keys: ["energy", "efficiency", "performance"] }
   ]
 };
+
+function inferItemTypeFromAttrs(obj) {
+  const text = [
+    obj && obj.brand,
+    obj && obj.model,
+    obj && obj.summary,
+    obj && obj.description
+  ].map((v) => String(v || "").toLowerCase()).join(" ");
+
+  const specs = (obj && obj.keySpecs) || {};
+  const hasPhoneSignals = /iphone|galaxy|pixel|phone|smartphone/.test(text)
+    || specs.camera || specs.display || specs.connectivity || /5g/.test(text);
+  const hasComputerSignals = specs.cpu || specs.gpu || specs.ram || /cpu|gpu|desktop|laptop|computer/.test(text);
+
+  if (hasPhoneSignals && !hasComputerSignals) return "phone";
+  if (hasComputerSignals && !hasPhoneSignals) return "computer";
+  if (hasPhoneSignals && hasComputerSignals) return /iphone|galaxy|pixel|phone|smartphone/.test(text) ? "phone" : "computer";
+  return "general";
+}
+
+function findRowContaining(table, needle) {
+  if (!Array.isArray(table)) return null;
+  const n = String(needle || "").toLowerCase();
+  return table.find((r) => String(r?.label || "").toLowerCase().includes(n)) || null;
+}
+
+function getRowValueByColumn(table, needle, colKey) {
+  const row = findRowContaining(table, needle);
+  if (!row) return "N/A";
+  return safeText(colKey ? row[colKey] : (row.original || row.value || row.default), "N/A");
+}
+
+function normalizeSpecKey(label) {
+  const raw = String(label || "").toLowerCase().trim();
+  if (!raw) return "";
+  const direct = {
+    "display": "display",
+    "display type": "display",
+    "display size": "display",
+    "screen size": "screenSize",
+    "chipset": "chipset",
+    "processor": "cpu",
+    "cpu": "cpu",
+    "gpu": "gpu",
+    "graphics": "gpu",
+    "memory": "ram",
+    "ram": "ram",
+    "storage": "storage",
+    "camera": "camera",
+    "connectivity": "connectivity",
+    "operating system": "os",
+    "os": "os",
+    "battery": "battery"
+  };
+  if (direct[raw]) return direct[raw];
+  if (raw.includes("display")) return "display";
+  if (raw.includes("screen")) return "screenSize";
+  if (raw.includes("processor") || raw.includes("chipset") || raw.includes("cpu")) return raw.includes("chipset") ? "chipset" : "cpu";
+  if (raw.includes("gpu") || raw.includes("graphics")) return "gpu";
+  if (raw.includes("ram") || raw.includes("memory")) return "ram";
+  if (raw.includes("storage")) return "storage";
+  if (raw.includes("camera")) return "camera";
+  if (raw.includes("connect") || raw.includes("5g") || raw.includes("wifi")) return "connectivity";
+  if (raw === "os" || raw.includes("operating system")) return "os";
+  if (raw.includes("battery")) return "battery";
+  return raw.replace(/[^a-z0-9]+/g, "_");
+}
+
+function collectKeySpecsForSide(fast, detailTable, colKey) {
+  const specs = {};
+  const analysis = fast?.analysis || {};
+  const topSpecs = Array.isArray(analysis.topSpecs) ? analysis.topSpecs : [];
+  topSpecs.forEach((spec) => {
+    const key = normalizeSpecKey(spec?.label);
+    if (!key) return;
+    specs[key] = safeText(spec?.value, "N/A");
+  });
+
+  if (Array.isArray(detailTable)) {
+    detailTable.forEach((row) => {
+      const label = String(row?.label || "");
+      const key = normalizeSpecKey(label);
+      if (!key) return;
+      const val = colKey ? row[colKey] : (row.original || row.value || row.default);
+      const safe = safeText(val, "N/A");
+      if (safe !== "N/A") specs[key] = safe;
+    });
+  }
+  return specs;
+}
+
+function buildFallbackSpecTemplate(typeKey) {
+  const base = getSpecTemplateForType(typeKey);
+  return base.map((s) => ({ key: normalizeSpecKey(s.label), label: s.label, major: true }));
+}
+
+function getComparisonFeatureList(typeKey) {
+  if (typeKey === "phone") {
+    return [
+      { key: "display", label: "Display", major: true },
+      { key: "chipset", label: "Chipset", major: true },
+      { key: "storage", label: "Storage", major: true },
+      { key: "ram", label: "RAM", major: true },
+      { key: "camera", label: "Camera", major: true },
+      { key: "connectivity", label: "Connectivity", major: true },
+      { key: "os", label: "OS", major: false },
+      { key: "battery", label: "Battery", major: false }
+    ];
+  }
+  if (typeKey === "computer" || typeKey === "laptop") {
+    return [
+      { key: "cpu", label: "CPU", major: true },
+      { key: "ram", label: "RAM", major: true },
+      { key: "storage", label: "Storage", major: true },
+      { key: "gpu", label: "GPU", major: true },
+      { key: "os", label: "OS", major: true },
+      { key: "screenSize", label: "Screen Size", major: false }
+    ];
+  }
+  return buildFallbackSpecTemplate(typeKey);
+}
+
+function normalizeForComparison(params) {
+  const fast = params?.fast || {};
+  const detail = params?.detail || {};
+  const analysis = fast.analysis || {};
+  const detailTable = Array.isArray(detail.table) ? detail.table : [];
+  const colKey = params?.colKey || "";
+
+  const model = safeText(
+    colKey
+      ? getRowValueByColumn(detailTable, "model", colKey)
+      : (analysis.estimatedModel || getRowValueByColumn(detailTable, "model")),
+    "N/A"
+  );
+  const brand = safeText(
+    colKey
+      ? getRowValueByColumn(detailTable, "brand", colKey)
+      : (getRowValueByColumn(detailTable, "brand") !== "N/A" ? getRowValueByColumn(detailTable, "brand") : (analysis.quickSummary || "").split(" ")[0]),
+    "N/A"
+  );
+
+  const keySpecs = collectKeySpecsForSide(fast, detailTable, colKey);
+  const summary = analysis.quickSummary || "";
+  const description = analysis.itemDescription || "";
+
+  let rawType = "";
+  if (params?.isOriginal) {
+    rawType = analysis.itemType || analysis.category || "";
+  } else if (colKey) {
+    rawType = getRowValueByColumn(detailTable, "item type", colKey);
+    if (rawType === "N/A") rawType = analysis.itemType || analysis.category || "";
+  } else {
+    rawType = analysis.itemType || analysis.category || getRowValueByColumn(detailTable, "item type");
+  }
+
+  let itemType = normalizeItemTypeKey(rawType);
+  if (itemType === "general" && params?.isOriginal) {
+    const inferred = inferItemTypeFromAttrs({ brand, model, summary, description, keySpecs });
+    if (inferred !== "general") {
+      itemType = inferred;
+      console.warn("[compare] Inferred original itemType from original attributes:", inferred);
+    }
+  }
+
+  const releaseYear = (() => {
+    const r = fast.releaseDate || {};
+    const text = `${r.productionEra || ""} ${r.estimatedAge || ""}`;
+    const m = text.match(/\b(19|20)\d{2}\b/);
+    return m ? m[0] : "N/A";
+  })();
+
+  const marketValue = safeText(
+    colKey
+      ? (getRowValueByColumn(detailTable, "market", colKey) !== "N/A"
+          ? getRowValueByColumn(detailTable, "market", colKey)
+          : getRowValueByColumn(detailTable, "current", colKey))
+      : (analysis.currentMarketPrice || getRowValueByColumn(detailTable, "market") || getRowValueByColumn(detailTable, "current")),
+    "N/A"
+  );
+  const msrp = safeText(
+    colKey
+      ? (getRowValueByColumn(detailTable, "msrp", colKey) !== "N/A"
+          ? getRowValueByColumn(detailTable, "msrp", colKey)
+          : getRowValueByColumn(detailTable, "retail", colKey))
+      : (analysis.launchMsrp || getRowValueByColumn(detailTable, "msrp") || getRowValueByColumn(detailTable, "retail")),
+    "N/A"
+  );
+  const replacementCost = safeText(
+    colKey ? getRowValueByColumn(detailTable, "replacement", colKey) : getRowValueByColumn(detailTable, "replacement"),
+    marketValue
+  );
+
+  return {
+    itemType,
+    brand,
+    model,
+    tier: inferTierFromData(brand, model, summary, description, marketValue || msrp),
+    releaseYear,
+    keySpecs,
+    value: {
+      msrp,
+      marketValue,
+      replacementCost
+    }
+  };
+}
 
 const LKQ_PRIORITY_WEIGHTS = {
   tv: { "Display Type": 3.5, "Resolution": 3.5, "Screen Size": 2.5, "Refresh Rate": 2, "HDR Format": 1.5, "Smart Platform": 1, "HDMI Inputs": 1, "OLED/QLED Technology": 2.5 },
@@ -655,7 +869,7 @@ function scoreSpecMatch(origValue, candidateValue, weight) {
 
 function deriveLkqGrade(origCtx, candCtx, specRows, typeKey) {
   if (!origCtx || !candCtx) return "LKQ";
-  if (!sameItemType(origCtx.itemTypeRaw, candCtx.itemTypeRaw)) return "BELOW LKQ";
+  if (!sameItemType(origCtx.itemType, candCtx.itemType)) return "BELOW LKQ";
 
   let earned = 0;
   let possible = 0;
@@ -666,8 +880,8 @@ function deriveLkqGrade(origCtx, candCtx, specRows, typeKey) {
     possible += result.possible;
   });
 
-  const oPrice = parseFirstNumber(origCtx.currentMarketValue);
-  const cPrice = parseFirstNumber(candCtx.currentMarketValue);
+  const oPrice = parseFirstNumber(origCtx?.value?.marketValue);
+  const cPrice = parseFirstNumber(candCtx?.value?.marketValue);
   if (Number.isFinite(oPrice) && Number.isFinite(cPrice) && oPrice > 0) {
     const ratio = cPrice / oPrice;
     if (ratio >= 1.2) earned += 0.8;
@@ -1339,11 +1553,10 @@ function buildCompareSummary(origFast, entFast, verdict, enteredQuery) {
 }
 
 function renderCompareTable(entFast, entDetail, includeExisting) {
-  const origTable = (detailData && detailData.table) || [];
-  const entTable  = (entDetail  && entDetail.table)  || [];
-
+  const origDetail = detailData || {};
+  const entDetailSafe = entDetail || {};
   const entModelName = escapeHtml(
-    (entFast && entFast.analysis && (entFast.analysis.estimatedModel || entFast.analysis.entered)) ||
+    (entFast?.analysis?.estimatedModel || entFast?.analysis?.entered) ||
     (byId("compare-input") && byId("compare-input").value.trim()) || "Entered Model"
   );
 
@@ -1362,146 +1575,126 @@ function renderCompareTable(entFast, entDetail, includeExisting) {
   }
   cols.push({ key: "entered", label: entModelName, entered: true, source: "entered" });
 
-  const fa = (fastData && fastData.analysis) || {};
-  const ea = (entFast  && entFast.analysis)  || {};
-  const originalTypeRaw = safeText(fa.category || getTableVal(origTable, "item type"), "N/A");
-  const originalTypeKey = normalizeItemTypeKey(originalTypeRaw);
-  const specTemplate = getSpecTemplateForType(originalTypeKey);
-
-  const columnContexts = {};
+  const normalizedByCol = {};
   cols.forEach((col) => {
-    let itemTypeRaw = "N/A";
-    let brand = "N/A";
-    let model = "N/A";
-    let currentMarketValue = "N/A";
-    let originalMsrp = "N/A";
-    let summary = "";
-    let description = "";
-
     if (col.source === "original") {
-      itemTypeRaw = safeText(fa.category || getTableVal(origTable, "item type"), "N/A");
-      brand = safeText(getTableVal(origTable, "brand") !== "—" ? getTableVal(origTable, "brand") : (fa.quickSummary || "").split(" ")[0], "N/A");
-      model = safeText(fa.estimatedModel || getTableVal(origTable, "model"), "N/A");
-      currentMarketValue = safeText(fa.currentMarketPrice || getTableVal(origTable, "market") || getTableVal(origTable, "current"), "N/A");
-      originalMsrp = safeText(fa.launchMsrp || getTableVal(origTable, "retail") || getTableVal(origTable, "msrp"), "N/A");
-      summary = fa.quickSummary || "";
-      description = fa.itemDescription || "";
+      normalizedByCol[col.key] = normalizeForComparison({ fast: fastData, detail: origDetail, isOriginal: true });
     } else if (col.source === "entered") {
-      itemTypeRaw = safeText(ea.category || getTableVal(entTable, "item type"), "N/A");
-      brand = safeText(getTableVal(entTable, "brand") !== "—" ? getTableVal(entTable, "brand") : (ea.quickSummary || "").split(" ")[0], "N/A");
-      model = safeText(ea.estimatedModel || getTableVal(entTable, "model"), "N/A");
-      currentMarketValue = safeText(ea.currentMarketPrice || getTableVal(entTable, "market") || getTableVal(entTable, "current"), "N/A");
-      originalMsrp = safeText(ea.launchMsrp || getTableVal(entTable, "retail") || getTableVal(entTable, "msrp"), "N/A");
-      summary = ea.quickSummary || "";
-      description = ea.itemDescription || "";
+      normalizedByCol[col.key] = normalizeForComparison({ fast: entFast, detail: entDetailSafe });
     } else {
-      itemTypeRaw = safeText(getTableColVal(origTable, "item type", col.key) || fa.category, "N/A");
-      brand = safeText(getTableColVal(origTable, "brand", col.key), "N/A");
-      model = safeText(getTableColVal(origTable, "model", col.key), "N/A");
-      currentMarketValue = safeText(
-        getTableColVal(origTable, "market", col.key) !== "—"
-          ? getTableColVal(origTable, "market", col.key)
-          : getTableColVal(origTable, "current", col.key),
-        "N/A"
-      );
-      originalMsrp = safeText(
-        getTableColVal(origTable, "retail", col.key) !== "—"
-          ? getTableColVal(origTable, "retail", col.key)
-          : getTableColVal(origTable, "msrp", col.key),
-        "N/A"
-      );
+      normalizedByCol[col.key] = normalizeForComparison({ fast: fastData, detail: origDetail, colKey: col.key });
     }
-
-    columnContexts[col.key] = {
-      itemTypeRaw,
-      itemTypeKey: normalizeItemTypeKey(itemTypeRaw),
-      brand,
-      model,
-      currentMarketValue,
-      originalMsrp,
-      tier: inferTierFromData(brand, model, summary, description, currentMarketValue || originalMsrp)
-    };
   });
 
-  const specRows = specTemplate.map((spec) => {
-    const original = getDetailValueForKeys(origTable, spec.keys);
-    const row = {
-      label: spec.label,
-      values: { original },
-      isSpec: true
-    };
-    cols.forEach((col) => {
-      if (col.key === "original") return;
-      const ctx = columnContexts[col.key];
-      if (!sameItemType(originalTypeRaw, ctx.itemTypeRaw)) {
-        row.values[col.key] = "N/A";
-        return;
-      }
-      if (col.source === "entered") {
-        row.values[col.key] = getDetailValueForKeys(entTable, spec.keys);
-      } else {
-        row.values[col.key] = getOrigColValueForKeys(origTable, spec.keys, col.key);
-      }
-    });
-    return row;
+  const originalSide = normalizedByCol.original;
+  const originalTypeKey = normalizeItemTypeKey(originalSide.itemType);
+  const featureSchema = getComparisonFeatureList(originalTypeKey);
+
+  const categoryMismatchValues = {};
+  let hasAnyMismatch = false;
+  cols.forEach((col) => {
+    if (col.key === "original") {
+      categoryMismatchValues[col.key] = "—";
+      return;
+    }
+    const candidateType = normalizedByCol[col.key].itemType;
+    if (!sameItemType(originalSide.itemType, candidateType)) {
+      hasAnyMismatch = true;
+      categoryMismatchValues[col.key] = `Category mismatch: original is ${String(originalSide.itemType).toUpperCase()}, replacement is ${String(candidateType).toUpperCase()} (check query).`;
+    } else {
+      categoryMismatchValues[col.key] = "—";
+    }
   });
 
   const rows = [
     {
       label: "Item Type",
-      values: Object.fromEntries(cols.map((col) => [col.key, safeText(columnContexts[col.key].itemTypeRaw, "N/A")])),
-      isHtml: false
+      values: Object.fromEntries(cols.map((col) => [col.key, safeText(normalizedByCol[col.key].itemType, "N/A")])),
+      isHtml: false,
+      mandatory: true
     },
     {
       label: "Brand & Tier",
       values: Object.fromEntries(cols.map((col) => {
-        const c = columnContexts[col.key];
-        return [col.key, `${safeText(c.brand, "N/A")} (${safeText(c.tier, "Average")})`];
+        const n = normalizedByCol[col.key];
+        return [col.key, `${safeText(n.brand, "N/A")} (${safeText(n.tier, "Average")})`];
       })),
-      isHtml: false
+      isHtml: false,
+      mandatory: true
     },
     {
       label: "Model Number",
-      values: Object.fromEntries(cols.map((col) => [col.key, safeText(columnContexts[col.key].model, "N/A")])),
-      isHtml: false
-    },
-    ...specRows.map((r) => ({ label: r.label, values: r.values, isHtml: false, isSpec: true })),
-    {
-      label: "Current Market Value",
-      values: Object.fromEntries(cols.map((col) => [col.key, safeText(columnContexts[col.key].currentMarketValue, "N/A")])),
-      isHtml: false
-    },
-    {
-      label: "Original MSRP",
-      values: Object.fromEntries(cols.map((col) => [col.key, safeText(columnContexts[col.key].originalMsrp, "N/A")])),
-      isHtml: false
+      values: Object.fromEntries(cols.map((col) => [col.key, safeText(normalizedByCol[col.key].model, "N/A")])),
+      isHtml: false,
+      mandatory: true
     }
   ];
 
-  const lkqRow = { label: "LKQ Grade", values: {}, isHtml: true };
+  if (hasAnyMismatch) {
+    rows.push({
+      label: "Category Check",
+      values: categoryMismatchValues,
+      isHtml: false,
+      mandatory: true
+    });
+  }
+
+  const specRows = featureSchema.map((feature) => {
+    const values = {};
+    cols.forEach((col) => {
+      const n = normalizedByCol[col.key];
+      values[col.key] = safeText(n.keySpecs?.[feature.key], "N/A");
+    });
+    return {
+      label: feature.label,
+      values,
+      isHtml: false,
+      isSpec: true,
+      major: !!feature.major
+    };
+  });
+
+  const visibleSpecRows = specRows.filter((row) => {
+    const allNA = cols.every((col) => String(row.values[col.key] || "").toUpperCase() === "N/A");
+    return !allNA;
+  });
+
+  rows.push(...visibleSpecRows);
+
+  rows.push(
+    {
+      label: "Current Market Value",
+      values: Object.fromEntries(cols.map((col) => [col.key, safeText(normalizedByCol[col.key].value?.marketValue, "N/A")])),
+      isHtml: false,
+      mandatory: true
+    },
+    {
+      label: "Original MSRP",
+      values: Object.fromEntries(cols.map((col) => [col.key, safeText(normalizedByCol[col.key].value?.msrp, "N/A")])),
+      isHtml: false,
+      mandatory: true
+    }
+  );
+
+  const lkqRow = { label: "LKQ Grade", values: {}, isHtml: true, mandatory: true };
   cols.forEach((col) => {
     if (col.key === "original") {
       lkqRow.values[col.key] = lkqGradeHtml("LKQ");
       return;
     }
-    const candidateSpecRows = specRows.map((r) => ({
+    const candidateSpecRows = visibleSpecRows.map((r) => ({
       label: r.label,
       original: r.values.original,
       candidate: r.values[col.key]
     }));
-    const grade = deriveLkqGrade(columnContexts.original, columnContexts[col.key], candidateSpecRows, originalTypeKey);
+    const grade = deriveLkqGrade(originalSide, normalizedByCol[col.key], candidateSpecRows, originalTypeKey);
     lkqRow.values[col.key] = lkqGradeHtml(grade);
   });
   rows.push(lkqRow);
 
-  const enteredGrade = (() => {
-    const enteredSpecRows = specRows.map((r) => ({
-      label: r.label,
-      original: r.values.original,
-      candidate: r.values.entered
-    }));
-    return deriveLkqGrade(columnContexts.original, columnContexts.entered, enteredSpecRows, originalTypeKey);
-  })();
+  const DEFAULT_SPEC_ROWS = 4;
+  let shownSpecCount = 0;
+  let hasHiddenRows = false;
 
   let thead = "<tr><th>Feature</th>";
   cols.forEach((col) => {
@@ -1510,24 +1703,45 @@ function renderCompareTable(entFast, entDetail, includeExisting) {
   thead += "</tr>";
 
   let tbody = rows.map((row) => {
-    let tr = `<tr><td>${escapeHtml(row.label)}</td>`;
+    let collapsed = false;
+    if (row.isSpec) {
+      shownSpecCount += 1;
+      if (shownSpecCount > DEFAULT_SPEC_ROWS) {
+        collapsed = true;
+        hasHiddenRows = true;
+      }
+    }
+    const trClass = collapsed ? ' class="compare-extra-row hidden"' : "";
+    let tr = `<tr${trClass}><td>${escapeHtml(row.label)}</td>`;
     cols.forEach((col) => {
       const val = row.values[col.key];
       const cellClass = col.entered ? ' class="compare-col-entered"' : "";
-      const content   = row.isHtml ? (val || "N/A") : escapeHtml(val || "N/A");
+      const content = row.isHtml ? (val || "N/A") : escapeHtml(val || "N/A");
       tr += `<td${cellClass}>${content}</td>`;
     });
     tr += "</tr>";
     return tr;
   }).join("");
 
-  const summaryText = buildCompareSummary(fastData, entFast, enteredGrade, (byId("compare-input") || {}).value || "");
+  const enteredGrade = (() => {
+    const enteredSpecRows = visibleSpecRows.map((r) => ({
+      label: r.label,
+      original: r.values.original,
+      candidate: r.values.entered
+    }));
+    return deriveLkqGrade(originalSide, normalizedByCol.entered, enteredSpecRows, originalTypeKey);
+  })();
 
+  const summaryText = buildCompareSummary(fastData, entFast, enteredGrade, (byId("compare-input") || {}).value || "");
   _compareBlock = {
     key: "comparison",
     title: "Replacement Comparison",
     text: `Comparing original vs. ${(entFast && entFast.analysis && entFast.analysis.estimatedModel) || "entered model"}\nLKQ Grade: ${enteredGrade}\n${summaryText}`
   };
+
+  const fullToggleBtn = hasHiddenRows
+    ? `<button class="compare-add-btn" id="compare-show-full-btn" style="margin-top:0.5rem">Show full comparison</button>`
+    : "";
 
   return `
     <div class="compare-table-wrap">
@@ -1536,6 +1750,7 @@ function renderCompareTable(entFast, entDetail, includeExisting) {
         <tbody>${tbody}</tbody>
       </table>
     </div>
+    ${fullToggleBtn}
     <div class="compare-summary">${escapeHtml(summaryText)}</div>
     <button class="compare-add-btn" id="compare-add-btn">&#128196; Add This Comparison to Report Summary</button>`;
 }
@@ -1582,6 +1797,13 @@ async function runComparison() {
     if (resultEl) {
       resultEl.innerHTML = renderCompareTable(entFast, entDetail, includeExisting);
       resultEl.classList.remove("hidden");
+      const fullBtn = byId("compare-show-full-btn");
+      if (fullBtn) {
+        fullBtn.addEventListener("click", () => {
+          resultEl.querySelectorAll(".compare-extra-row").forEach((row) => row.classList.remove("hidden"));
+          fullBtn.remove();
+        });
+      }
       const addBtn = byId("compare-add-btn");
       if (addBtn) {
         addBtn.addEventListener("click", () => {
