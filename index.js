@@ -420,6 +420,14 @@ function buildModelLink(modelText) {
   return `<a class="model-link" href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(text)}</a>`;
 }
 
+function buildGoogleSearchLink(termText) {
+  const text = (termText || "").trim();
+  if (!text || text === "N/A") return escapeHtml(text || "N/A");
+  const q = encodeURIComponent(text).replace(/%20/g, "+");
+  const url = `https://www.google.com/search?q=${q}`;
+  return `<a class="model-link" href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(text)}</a>`;
+}
+
 function buildRetailerLinks(retailerCsv, searchQuery) {
   const filter = getRetailerFilter(currentCategory);
 
@@ -447,6 +455,237 @@ function buildRetailerLinks(retailerCsv, searchQuery) {
   }
 
   return `<span class="retailer-links">${links.join("")}</span>`;
+}
+
+function normalizeItemTypeKey(value) {
+  const s = String(value || "").toLowerCase();
+  if (!s) return "general";
+  if (s.includes("tv") || s.includes("television")) return "tv";
+  if (s.includes("refrigerator") || s.includes("fridge")) return "refrigerator";
+  if (s.includes("washer") || s.includes("washing machine")) return "washer";
+  if (s.includes("dryer")) return "dryer";
+  if (s.includes("dishwasher")) return "dishwasher";
+  if (s.includes("range") || s.includes("oven") || s.includes("stove") || s.includes("cooktop")) return "range";
+  if (s.includes("water heater")) return "water_heater";
+  if (s.includes("hvac") || s.includes("air conditioner") || s.includes("furnace") || s.includes("heat pump")) return "hvac";
+  if (s.includes("laptop")) return "laptop";
+  if (s.includes("computer") || s.includes("desktop")) return "computer";
+  if (s.includes("phone") || s.includes("smartphone") || s.includes("mobile")) return "phone";
+  return "general";
+}
+
+function sameItemType(a, b) {
+  return normalizeItemTypeKey(a) === normalizeItemTypeKey(b);
+}
+
+function parseFirstNumber(value) {
+  const m = String(value || "").match(/([0-9]+(?:\.[0-9]+)?)/);
+  return m ? Number(m[1]) : null;
+}
+
+function inferTierFromData(brand, model, summary, description, price) {
+  const text = [brand, model, summary, description].map((v) => String(v || "")).join(" ").toLowerCase();
+  if (/\b(luxury|ultra\s*premium|signature|professional|elite|flagship)\b/.test(text)) return "Luxury";
+  if (/\b(premium|pro|plus|oled|mini[-\s]?led|qled|studio|high[-\s]?end)\b/.test(text)) return "Premium";
+  if (/\b(budget|basic|value|entry)\b/.test(text)) return "Budget";
+  const n = parseFirstNumber(price);
+  if (Number.isFinite(n)) {
+    if (n >= 3000) return "Luxury";
+    if (n >= 1200) return "Premium";
+    if (n <= 400) return "Budget";
+  }
+  return "Average";
+}
+
+const SPEC_TEMPLATE_BY_TYPE = {
+  tv: [
+    { label: "Display Type", keys: ["display type", "panel type", "screen type"] },
+    { label: "Resolution", keys: ["resolution"] },
+    { label: "Screen Size", keys: ["screen size", "size"] },
+    { label: "Refresh Rate", keys: ["refresh rate"] },
+    { label: "HDR Format", keys: ["hdr format", "hdr"] },
+    { label: "Smart Platform", keys: ["smart platform", "smart tv", "operating system", "os"] },
+    { label: "HDMI Inputs", keys: ["hdmi inputs", "hdmi"] },
+    { label: "OLED/QLED Technology", keys: ["oled", "qled", "display technology"] }
+  ],
+  refrigerator: [
+    { label: "Total Capacity", keys: ["total capacity", "capacity"] },
+    { label: "Configuration", keys: ["configuration", "style"] },
+    { label: "Ice Maker", keys: ["ice maker"] },
+    { label: "Water Dispenser", keys: ["water dispenser"] },
+    { label: "Depth Type", keys: ["depth type", "counter depth", "standard depth"] },
+    { label: "Number of Doors", keys: ["number of doors", "doors"] },
+    { label: "Compressor Type", keys: ["compressor type", "compressor"] }
+  ],
+  washer: [
+    { label: "Capacity", keys: ["capacity"] },
+    { label: "Load Type", keys: ["load type", "front load", "top load"] },
+    { label: "Wash Cycles", keys: ["wash cycles", "cycles"] },
+    { label: "Steam", keys: ["steam"] },
+    { label: "Smart Features", keys: ["smart features", "wifi", "app"] }
+  ],
+  water_heater: [
+    { label: "Capacity", keys: ["capacity"] },
+    { label: "Fuel Type", keys: ["fuel type", "fuel"] },
+    { label: "First Hour Rating", keys: ["first hour rating"] },
+    { label: "Energy Factor", keys: ["energy factor", "uef", "efficiency"] },
+    { label: "Dimensions", keys: ["dimensions", "dimension"] }
+  ],
+  dryer: [
+    { label: "Capacity", keys: ["capacity"] },
+    { label: "Fuel Type", keys: ["fuel type", "fuel"] },
+    { label: "Dry Cycles", keys: ["dry cycles", "cycles"] },
+    { label: "Steam", keys: ["steam"] },
+    { label: "Smart Features", keys: ["smart features", "wifi", "app"] }
+  ],
+  dishwasher: [
+    { label: "Capacity", keys: ["capacity", "place settings"] },
+    { label: "Wash Cycles", keys: ["wash cycles", "cycles"] },
+    { label: "Sound Level", keys: ["sound level", "noise"] },
+    { label: "Drying System", keys: ["drying system", "dry"] },
+    { label: "Smart Features", keys: ["smart features", "wifi", "app"] }
+  ],
+  range: [
+    { label: "Fuel Type", keys: ["fuel type", "fuel"] },
+    { label: "Configuration", keys: ["configuration", "style"] },
+    { label: "Oven Capacity", keys: ["oven capacity", "capacity"] },
+    { label: "Cooktop Elements/Burners", keys: ["burners", "elements", "cooktop"] },
+    { label: "Convection", keys: ["convection"] }
+  ],
+  hvac: [
+    { label: "Type", keys: ["type", "system type"] },
+    { label: "Capacity", keys: ["capacity", "tonnage", "tons"] },
+    { label: "Efficiency Rating", keys: ["seer", "seer2", "afue", "hspf", "efficiency"] },
+    { label: "Compressor Type", keys: ["compressor type", "compressor"] },
+    { label: "Smart Features", keys: ["smart features", "wifi", "app"] }
+  ],
+  laptop: [
+    { label: "Display Size", keys: ["display size", "screen size"] },
+    { label: "Processor", keys: ["processor", "cpu"] },
+    { label: "Memory", keys: ["memory", "ram"] },
+    { label: "Storage", keys: ["storage", "ssd"] },
+    { label: "Graphics", keys: ["graphics", "gpu"] }
+  ],
+  computer: [
+    { label: "Processor", keys: ["processor", "cpu"] },
+    { label: "Memory", keys: ["memory", "ram"] },
+    { label: "Storage", keys: ["storage", "ssd"] },
+    { label: "Graphics", keys: ["graphics", "gpu"] },
+    { label: "Operating System", keys: ["operating system", "os"] }
+  ],
+  phone: [
+    { label: "Display Size", keys: ["display size", "screen size"] },
+    { label: "Storage", keys: ["storage"] },
+    { label: "Camera", keys: ["camera"] },
+    { label: "Connectivity", keys: ["connectivity", "5g", "wifi"] },
+    { label: "Battery", keys: ["battery"] }
+  ],
+  general: [
+    { label: "Capacity/Size", keys: ["capacity", "size"] },
+    { label: "Configuration", keys: ["configuration", "type", "style"] },
+    { label: "Core Feature 1", keys: ["feature", "spec"] },
+    { label: "Core Feature 2", keys: ["feature", "spec"] },
+    { label: "Energy/Performance", keys: ["energy", "efficiency", "performance"] }
+  ]
+};
+
+const LKQ_PRIORITY_WEIGHTS = {
+  tv: { "Display Type": 3.5, "Resolution": 3.5, "Screen Size": 2.5, "Refresh Rate": 2, "HDR Format": 1.5, "Smart Platform": 1, "HDMI Inputs": 1, "OLED/QLED Technology": 2.5 },
+  refrigerator: { "Total Capacity": 3.5, "Configuration": 3.5, "Ice Maker": 1.5, "Water Dispenser": 1.5, "Depth Type": 2, "Number of Doors": 2, "Compressor Type": 1.5 }
+};
+
+function getSpecTemplateForType(typeKey) {
+  return SPEC_TEMPLATE_BY_TYPE[typeKey] || SPEC_TEMPLATE_BY_TYPE.general;
+}
+
+function getSpecWeight(typeKey, label) {
+  const map = LKQ_PRIORITY_WEIGHTS[typeKey];
+  if (map && Number.isFinite(map[label])) return map[label];
+  return 1.5;
+}
+
+function getRowByKeys(table, keys) {
+  if (!Array.isArray(table) || !Array.isArray(keys) || !keys.length) return null;
+  return table.find((r) => {
+    const lbl = String(r && r.label ? r.label : "").toLowerCase();
+    return keys.some((k) => lbl.includes(String(k).toLowerCase()));
+  }) || null;
+}
+
+function getDetailValueForKeys(table, keys) {
+  const row = getRowByKeys(table, keys);
+  if (!row) return "N/A";
+  const v = row.original || row.value || row.default || "";
+  return safeText(v, "N/A");
+}
+
+function getOrigColValueForKeys(table, keys, colKey) {
+  const row = getRowByKeys(table, keys);
+  if (!row) return "N/A";
+  return safeText(row[colKey], "N/A");
+}
+
+function scoreSpecMatch(origValue, candidateValue, weight) {
+  const o = String(origValue || "").trim().toLowerCase();
+  const c = String(candidateValue || "").trim().toLowerCase();
+  if (!o || o === "n/a") return { earned: 0, possible: weight };
+  if (!c || c === "n/a") return { earned: 0, possible: weight };
+
+  const on = parseFirstNumber(o);
+  const cn = parseFirstNumber(c);
+  if (Number.isFinite(on) && Number.isFinite(cn)) {
+    const diff = Math.abs(on - cn) / Math.max(on, cn);
+    if (diff <= 0.05) return { earned: weight, possible: weight };
+    if (diff <= 0.12) return { earned: weight * 0.75, possible: weight };
+    if (diff <= 0.20) return { earned: weight * 0.45, possible: weight };
+    return { earned: 0, possible: weight };
+  }
+
+  if (o === c) return { earned: weight, possible: weight };
+  if (o.includes(c) || c.includes(o)) return { earned: weight * 0.75, possible: weight };
+  const ot = o.split(/[^a-z0-9]+/).filter(Boolean);
+  const ct = new Set(c.split(/[^a-z0-9]+/).filter(Boolean));
+  const overlap = ot.filter((t) => ct.has(t)).length;
+  if (!ot.length) return { earned: 0, possible: weight };
+  const ratio = overlap / ot.length;
+  if (ratio >= 0.6) return { earned: weight * 0.6, possible: weight };
+  if (ratio >= 0.3) return { earned: weight * 0.3, possible: weight };
+  return { earned: 0, possible: weight };
+}
+
+function deriveLkqGrade(origCtx, candCtx, specRows, typeKey) {
+  if (!origCtx || !candCtx) return "LKQ";
+  if (!sameItemType(origCtx.itemTypeRaw, candCtx.itemTypeRaw)) return "BELOW LKQ";
+
+  let earned = 0;
+  let possible = 0;
+  specRows.forEach((r) => {
+    const w = getSpecWeight(typeKey, r.label);
+    const result = scoreSpecMatch(r.original, r.candidate, w);
+    earned += result.earned;
+    possible += result.possible;
+  });
+
+  const oPrice = parseFirstNumber(origCtx.currentMarketValue);
+  const cPrice = parseFirstNumber(candCtx.currentMarketValue);
+  if (Number.isFinite(oPrice) && Number.isFinite(cPrice) && oPrice > 0) {
+    const ratio = cPrice / oPrice;
+    if (ratio >= 1.2) earned += 0.8;
+    if (ratio <= 0.8) earned -= 0.8;
+    possible += 0.8;
+  }
+
+  if (possible <= 0) return "LKQ";
+  const pct = earned / possible;
+  if (pct >= 0.9) return "WELL ABOVE LKQ";
+  if (pct >= 0.6) return "LKQ";
+  return "BELOW LKQ";
+}
+
+function lkqGradeHtml(grade) {
+  if (grade === "WELL ABOVE LKQ") return '<span class="lkq-verdict" style="color:#1f6feb;font-weight:700">WELL ABOVE LKQ</span>';
+  if (grade === "LKQ") return '<span class="lkq-verdict" style="color:#1a7f37;font-weight:700">LKQ</span>';
+  return '<span class="lkq-verdict" style="color:#cf222e;font-weight:700">BELOW LKQ</span>';
 }
 
 // ── Spec pill renderer ───────────────────────────────────────────────────────
@@ -774,14 +1013,18 @@ function renderDetail(data) {
           .map((row) => {
             const isRetailers = (row.label || "").toLowerCase().includes("retailer");
             const isModel     = (row.label || "").toLowerCase() === "model";
+            const isRecommendedReplacement = (row.label || "").toLowerCase().includes("recommended replacement");
             const elCell = isRetailers ? buildRetailerLinks(row.entryLevel, colSearch.entryLevel) : isModel ? buildModelLink(row.entryLevel) : escapeHtml(row.entryLevel || "N/A");
             const mgCell = isRetailers ? buildRetailerLinks(row.midGrade,   colSearch.midGrade)   : isModel ? buildModelLink(row.midGrade)   : escapeHtml(row.midGrade   || "N/A");
             const prCell = isRetailers ? buildRetailerLinks(row.premium,    colSearch.premium)    : isModel ? buildModelLink(row.premium)    : escapeHtml(row.premium    || "N/A");
+            const elFinal = isRecommendedReplacement ? buildGoogleSearchLink(row.entryLevel) : elCell;
+            const mgFinal = isRecommendedReplacement ? buildGoogleSearchLink(row.midGrade) : mgCell;
+            const prFinal = isRecommendedReplacement ? buildGoogleSearchLink(row.premium) : prCell;
             return `<tr>
               <td>${escapeHtml(row.label || "")}</td>
-              <td>${elCell}</td>
-              <td>${mgCell}</td>
-              <td>${prCell}</td>
+              <td>${elFinal}</td>
+              <td>${mgFinal}</td>
+              <td>${prFinal}</td>
             </tr>`;
           })
           .join("");
@@ -790,16 +1033,21 @@ function renderDetail(data) {
           .map((row) => {
             const isRetailers = (row.label || "").toLowerCase().includes("retailer");
             const isModel     = (row.label || "").toLowerCase() === "model";
+            const isRecommendedReplacement = (row.label || "").toLowerCase().includes("recommended replacement");
             const origCell = isRetailers ? buildRetailerLinks(row.original,   colSearch.original)   : isModel ? buildModelLink(row.original)   : escapeHtml(row.original   || "N/A");
             const bmCell   = isRetailers ? buildRetailerLinks(row.brandMatch, colSearch.brandMatch) : isModel ? buildModelLink(row.brandMatch) : escapeHtml(row.brandMatch || "N/A");
             const o1Cell   = isRetailers ? buildRetailerLinks(row.option1,    colSearch.option1)    : isModel ? buildModelLink(row.option1)    : escapeHtml(row.option1    || "N/A");
             const o2Cell   = isRetailers ? buildRetailerLinks(row.option2,    colSearch.option2)    : isModel ? buildModelLink(row.option2)    : escapeHtml(row.option2    || "N/A");
+            const origFinal = isRecommendedReplacement ? buildGoogleSearchLink(row.original) : origCell;
+            const bmFinal = isRecommendedReplacement ? buildGoogleSearchLink(row.brandMatch) : bmCell;
+            const o1Final = isRecommendedReplacement ? buildGoogleSearchLink(row.option1) : o1Cell;
+            const o2Final = isRecommendedReplacement ? buildGoogleSearchLink(row.option2) : o2Cell;
             return `<tr>
               <td>${escapeHtml(row.label || "")}</td>
-              <td>${origCell}</td>
-              <td class="brand-match">${bmCell}</td>
-              <td>${o1Cell}</td>
-              <td>${o2Cell}</td>
+              <td>${origFinal}</td>
+              <td class="brand-match">${bmFinal}</td>
+              <td>${o1Final}</td>
+              <td>${o2Final}</td>
             </tr>`;
           })
           .join("");
@@ -808,7 +1056,10 @@ function renderDetail(data) {
       tableEl.classList.remove("hidden");
       // Reveal compare trigger when table has data
       const compareTriggerEl = byId("compare-trigger-row");
-      if (compareTriggerEl) compareTriggerEl.classList.remove("hidden");
+      if (compareTriggerEl) {
+        if (tableEl.parentElement) tableEl.parentElement.insertBefore(compareTriggerEl, tableEl);
+        compareTriggerEl.classList.remove("hidden");
+      }
     }
   }
 
@@ -1070,36 +1321,6 @@ function getTableColVal(table, label, col) {
   return row ? (row[col] || "—") : "—";
 }
 
-function deriveLkqVerdict(origFast, entFast, origDetail, entDetail) {
-  const origCat = ((origFast && origFast.analysis && origFast.analysis.category) || "").toLowerCase().trim();
-  const entCat  = ((entFast  && entFast.analysis  && entFast.analysis.category)  || "").toLowerCase().trim();
-  if (!origCat || !entCat) return "CLOSE MATCH";
-
-  const catMatch = origCat === entCat
-    || origCat.includes(entCat) || entCat.includes(origCat)
-    || origCat.split(/\s+/).some((w) => w.length > 3 && entCat.includes(w));
-  if (!catMatch) return "NOT LKQ";
-
-  const origCapStr = getTableVal(origDetail && origDetail.table, "capacity") !== "—"
-    ? getTableVal(origDetail && origDetail.table, "capacity")
-    : getTableVal(origDetail && origDetail.table, "size");
-  const entCapStr = getTableVal(entDetail && entDetail.table, "capacity") !== "—"
-    ? getTableVal(entDetail && entDetail.table, "capacity")
-    : getTableVal(entDetail && entDetail.table, "size");
-
-  if (origCapStr !== "—" && entCapStr !== "—") {
-    const origNum = parseFloat(origCapStr.replace(/[^0-9.]/g, ""));
-    const entNum  = parseFloat(entCapStr.replace(/[^0-9.]/g, ""));
-    if (origNum && entNum) {
-      const diff = Math.abs(origNum - entNum) / Math.max(origNum, entNum);
-      if (diff <= 0.08) return "MATCH";
-      if (diff <= 0.22) return "CLOSE MATCH";
-      return "NOT LKQ";
-    }
-  }
-  return "CLOSE MATCH";
-}
-
 function buildCompareSummary(origFast, entFast, verdict, enteredQuery) {
   const origDesc  = (origFast && origFast.analysis && (origFast.analysis.quickSummary || origFast.analysis.estimatedModel)) || "the original item";
   const entDesc   = (entFast  && entFast.analysis  && (entFast.analysis.quickSummary  || entFast.analysis.estimatedModel))  || enteredQuery || "the entered model";
@@ -1108,116 +1329,179 @@ function buildCompareSummary(origFast, entFast, verdict, enteredQuery) {
   const origPrice = (origFast && origFast.analysis && (origFast.analysis.currentMarketPrice || origFast.analysis.launchMsrp)) || "—";
   const entPrice  = (entFast  && entFast.analysis  && (entFast.analysis.currentMarketPrice  || entFast.analysis.launchMsrp))  || "—";
 
-  if (verdict === "MATCH") {
-    return `${entDesc} is a ${entCat} in the same category as ${origDesc}, with comparable specifications that meet LKQ standards. Current market pricing: Original ${origPrice}; Entered model ${entPrice}. This replacement option appears to qualify as like-kind and quality.`;
+  if (verdict === "WELL ABOVE LKQ") {
+    return `${entDesc} is a ${entCat} that significantly exceeds ${origDesc} (${origCat}) on weighted LKQ criteria. Current market values — Original: ${origPrice}; Entered model: ${entPrice}.`;
   }
-  if (verdict === "CLOSE MATCH") {
-    return `${entDesc} is a ${entCat} in the same general category as ${origDesc}, though specifications may differ in some areas. Current market values — Original: ${origPrice}; Entered model: ${entPrice}. This replacement may qualify as LKQ depending on the specific claims criteria applied; independent verification is recommended.`;
+  if (verdict === "LKQ") {
+    return `${entDesc} is a ${entCat} that meets like-kind and quality expectations compared with ${origDesc}. Current market values — Original: ${origPrice}; Entered model: ${entPrice}.`;
   }
-  return `${entDesc} (${entCat}) does not appear to be like-kind and quality compared to ${origDesc} (${origCat}). The item categories or specifications differ significantly. Current market values — Original: ${origPrice}; Entered model: ${entPrice}. Independent verification is required before using this item as a replacement.`;
+  return `${entDesc} (${entCat}) falls below like-kind and quality expectations compared with ${origDesc} (${origCat}) on weighted category-critical specs. Current market values — Original: ${origPrice}; Entered model: ${entPrice}.`;
 }
 
 function renderCompareTable(entFast, entDetail, includeExisting) {
   const origTable = (detailData && detailData.table) || [];
   const entTable  = (entDetail  && entDetail.table)  || [];
 
-  const verdict = deriveLkqVerdict(fastData, entFast, detailData, entDetail);
-
-  const verdictHtml = verdict === "MATCH"
-    ? '<span class="lkq-verdict lkq-match">&#10003; MATCH</span>'
-    : verdict === "CLOSE MATCH"
-      ? '<span class="lkq-verdict lkq-close">&#9888; CLOSE MATCH</span>'
-      : '<span class="lkq-verdict lkq-no-match">&#10007; NOT LKQ</span>';
-
   const entModelName = escapeHtml(
     (entFast && entFast.analysis && (entFast.analysis.estimatedModel || entFast.analysis.entered)) ||
     (byId("compare-input") && byId("compare-input").value.trim()) || "Entered Model"
   );
 
-  const cols = [{ key: "original", label: "Original Item", entered: false }];
+  const cols = [{ key: "original", label: "Original Item", entered: false, source: "original" }];
   if (includeExisting) {
-    cols.push({ key: "brandMatch", label: "Brand Match", entered: false });
-    cols.push({ key: "option1",    label: "Option 1",    entered: false });
+    const isTiered = detailData && detailData.tableMode === "tiered";
+    if (isTiered) {
+      cols.push({ key: "entryLevel", label: "Entry Level", entered: false, source: "orig-col" });
+      cols.push({ key: "midGrade", label: "Mid-Grade", entered: false, source: "orig-col" });
+      cols.push({ key: "premium", label: "Premium", entered: false, source: "orig-col" });
+    } else {
+      cols.push({ key: "brandMatch", label: "Brand Match", entered: false, source: "orig-col" });
+      cols.push({ key: "option1", label: "Option 1", entered: false, source: "orig-col" });
+      cols.push({ key: "option2", label: "Option 2", entered: false, source: "orig-col" });
+    }
   }
-  cols.push({ key: "entered", label: entModelName, entered: true });
+  cols.push({ key: "entered", label: entModelName, entered: true, source: "entered" });
 
   const fa = (fastData && fastData.analysis) || {};
   const ea = (entFast  && entFast.analysis)  || {};
+  const originalTypeRaw = safeText(fa.category || getTableVal(origTable, "item type"), "N/A");
+  const originalTypeKey = normalizeItemTypeKey(originalTypeRaw);
+  const specTemplate = getSpecTemplateForType(originalTypeKey);
+
+  const columnContexts = {};
+  cols.forEach((col) => {
+    let itemTypeRaw = "N/A";
+    let brand = "N/A";
+    let model = "N/A";
+    let currentMarketValue = "N/A";
+    let originalMsrp = "N/A";
+    let summary = "";
+    let description = "";
+
+    if (col.source === "original") {
+      itemTypeRaw = safeText(fa.category || getTableVal(origTable, "item type"), "N/A");
+      brand = safeText(getTableVal(origTable, "brand") !== "—" ? getTableVal(origTable, "brand") : (fa.quickSummary || "").split(" ")[0], "N/A");
+      model = safeText(fa.estimatedModel || getTableVal(origTable, "model"), "N/A");
+      currentMarketValue = safeText(fa.currentMarketPrice || getTableVal(origTable, "market") || getTableVal(origTable, "current"), "N/A");
+      originalMsrp = safeText(fa.launchMsrp || getTableVal(origTable, "retail") || getTableVal(origTable, "msrp"), "N/A");
+      summary = fa.quickSummary || "";
+      description = fa.itemDescription || "";
+    } else if (col.source === "entered") {
+      itemTypeRaw = safeText(ea.category || getTableVal(entTable, "item type"), "N/A");
+      brand = safeText(getTableVal(entTable, "brand") !== "—" ? getTableVal(entTable, "brand") : (ea.quickSummary || "").split(" ")[0], "N/A");
+      model = safeText(ea.estimatedModel || getTableVal(entTable, "model"), "N/A");
+      currentMarketValue = safeText(ea.currentMarketPrice || getTableVal(entTable, "market") || getTableVal(entTable, "current"), "N/A");
+      originalMsrp = safeText(ea.launchMsrp || getTableVal(entTable, "retail") || getTableVal(entTable, "msrp"), "N/A");
+      summary = ea.quickSummary || "";
+      description = ea.itemDescription || "";
+    } else {
+      itemTypeRaw = safeText(getTableColVal(origTable, "item type", col.key) || fa.category, "N/A");
+      brand = safeText(getTableColVal(origTable, "brand", col.key), "N/A");
+      model = safeText(getTableColVal(origTable, "model", col.key), "N/A");
+      currentMarketValue = safeText(
+        getTableColVal(origTable, "market", col.key) !== "—"
+          ? getTableColVal(origTable, "market", col.key)
+          : getTableColVal(origTable, "current", col.key),
+        "N/A"
+      );
+      originalMsrp = safeText(
+        getTableColVal(origTable, "retail", col.key) !== "—"
+          ? getTableColVal(origTable, "retail", col.key)
+          : getTableColVal(origTable, "msrp", col.key),
+        "N/A"
+      );
+    }
+
+    columnContexts[col.key] = {
+      itemTypeRaw,
+      itemTypeKey: normalizeItemTypeKey(itemTypeRaw),
+      brand,
+      model,
+      currentMarketValue,
+      originalMsrp,
+      tier: inferTierFromData(brand, model, summary, description, currentMarketValue || originalMsrp)
+    };
+  });
+
+  const specRows = specTemplate.map((spec) => {
+    const original = getDetailValueForKeys(origTable, spec.keys);
+    const row = {
+      label: spec.label,
+      values: { original },
+      isSpec: true
+    };
+    cols.forEach((col) => {
+      if (col.key === "original") return;
+      const ctx = columnContexts[col.key];
+      if (!sameItemType(originalTypeRaw, ctx.itemTypeRaw)) {
+        row.values[col.key] = "N/A";
+        return;
+      }
+      if (col.source === "entered") {
+        row.values[col.key] = getDetailValueForKeys(entTable, spec.keys);
+      } else {
+        row.values[col.key] = getOrigColValueForKeys(origTable, spec.keys, col.key);
+      }
+    });
+    return row;
+  });
 
   const rows = [
     {
       label: "Item Type",
-      original:   fa.category   || "—",
-      brandMatch: getTableColVal(origTable, "item type", "brandMatch") || fa.category || "—",
-      option1:    getTableColVal(origTable, "item type", "option1")    || fa.category || "—",
-      entered:    ea.category   || "—",
+      values: Object.fromEntries(cols.map((col) => [col.key, safeText(columnContexts[col.key].itemTypeRaw, "N/A")])),
       isHtml: false
     },
     {
-      label: "Brand",
-      original:   getTableVal(origTable, "brand") !== "—" ? getTableVal(origTable, "brand") : ((fa.quickSummary || "").split(" ")[0] || "—"),
-      brandMatch: getTableColVal(origTable, "brand", "brandMatch"),
-      option1:    getTableColVal(origTable, "brand", "option1"),
-      entered:    getTableVal(entTable, "brand")  !== "—" ? getTableVal(entTable, "brand")  : ((ea.quickSummary || "").split(" ")[0] || "—"),
+      label: "Brand & Tier",
+      values: Object.fromEntries(cols.map((col) => {
+        const c = columnContexts[col.key];
+        return [col.key, `${safeText(c.brand, "N/A")} (${safeText(c.tier, "Average")})`];
+      })),
       isHtml: false
     },
     {
       label: "Model Number",
-      original:   fa.estimatedModel || getTableVal(origTable, "model") || "—",
-      brandMatch: getTableColVal(origTable, "model", "brandMatch"),
-      option1:    getTableColVal(origTable, "model", "option1"),
-      entered:    ea.estimatedModel || getTableVal(entTable,  "model") || "—",
+      values: Object.fromEntries(cols.map((col) => [col.key, safeText(columnContexts[col.key].model, "N/A")])),
       isHtml: false
     },
-    {
-      label: "Capacity / Size",
-      original:   getTableVal(origTable, "capacity") !== "—" ? getTableVal(origTable, "capacity") : getTableVal(origTable, "size"),
-      brandMatch: getTableColVal(origTable, "capacity", "brandMatch") !== "—" ? getTableColVal(origTable, "capacity", "brandMatch") : getTableColVal(origTable, "size", "brandMatch"),
-      option1:    getTableColVal(origTable, "capacity", "option1")    !== "—" ? getTableColVal(origTable, "capacity", "option1")    : getTableColVal(origTable, "size", "option1"),
-      entered:    getTableVal(entTable,  "capacity")  !== "—" ? getTableVal(entTable,  "capacity")  : getTableVal(entTable,  "size"),
-      isHtml: false
-    },
-    {
-      label: "Key Specifications",
-      original:   fa.keyDetails || "—",
-      brandMatch: getTableColVal(origTable, "key", "brandMatch") || "—",
-      option1:    getTableColVal(origTable, "key", "option1")    || "—",
-      entered:    ea.keyDetails || "—",
-      isHtml: false
-    },
-    {
-      label: "Original Retail Price",
-      original:   fa.launchMsrp || "—",
-      brandMatch: getTableColVal(origTable, "retail", "brandMatch") || getTableColVal(origTable, "msrp", "brandMatch") || "—",
-      option1:    getTableColVal(origTable, "retail", "option1")    || getTableColVal(origTable, "msrp", "option1")    || "—",
-      entered:    ea.launchMsrp || "—",
-      isHtml: false
-    },
+    ...specRows.map((r) => ({ label: r.label, values: r.values, isHtml: false, isSpec: true })),
     {
       label: "Current Market Value",
-      original:   fa.currentMarketPrice || "—",
-      brandMatch: getTableColVal(origTable, "market", "brandMatch") || getTableColVal(origTable, "current", "brandMatch") || "—",
-      option1:    getTableColVal(origTable, "market", "option1")    || getTableColVal(origTable, "current", "option1")    || "—",
-      entered:    ea.currentMarketPrice || "—",
+      values: Object.fromEntries(cols.map((col) => [col.key, safeText(columnContexts[col.key].currentMarketValue, "N/A")])),
       isHtml: false
     },
     {
-      label: "Energy Efficiency",
-      original:   getTableVal(origTable, "energy"),
-      brandMatch: getTableColVal(origTable, "energy", "brandMatch"),
-      option1:    getTableColVal(origTable, "energy", "option1"),
-      entered:    getTableVal(entTable,  "energy"),
+      label: "Original MSRP",
+      values: Object.fromEntries(cols.map((col) => [col.key, safeText(columnContexts[col.key].originalMsrp, "N/A")])),
       isHtml: false
-    },
-    {
-      label: "LKQ Assessment",
-      original:   '<span class="lkq-verdict lkq-match" style="font-size:0.7rem">&#10003; Original</span>',
-      brandMatch: "—",
-      option1:    "—",
-      entered:    verdictHtml,
-      isHtml: true
     }
   ];
+
+  const lkqRow = { label: "LKQ Grade", values: {}, isHtml: true };
+  cols.forEach((col) => {
+    if (col.key === "original") {
+      lkqRow.values[col.key] = lkqGradeHtml("LKQ");
+      return;
+    }
+    const candidateSpecRows = specRows.map((r) => ({
+      label: r.label,
+      original: r.values.original,
+      candidate: r.values[col.key]
+    }));
+    const grade = deriveLkqGrade(columnContexts.original, columnContexts[col.key], candidateSpecRows, originalTypeKey);
+    lkqRow.values[col.key] = lkqGradeHtml(grade);
+  });
+  rows.push(lkqRow);
+
+  const enteredGrade = (() => {
+    const enteredSpecRows = specRows.map((r) => ({
+      label: r.label,
+      original: r.values.original,
+      candidate: r.values.entered
+    }));
+    return deriveLkqGrade(columnContexts.original, columnContexts.entered, enteredSpecRows, originalTypeKey);
+  })();
 
   let thead = "<tr><th>Feature</th>";
   cols.forEach((col) => {
@@ -1228,24 +1512,21 @@ function renderCompareTable(entFast, entDetail, includeExisting) {
   let tbody = rows.map((row) => {
     let tr = `<tr><td>${escapeHtml(row.label)}</td>`;
     cols.forEach((col) => {
-      const val = col.key === "entered" ? row.entered
-        : col.key === "brandMatch" ? row.brandMatch
-        : col.key === "option1"    ? row.option1
-        : row.original;
+      const val = row.values[col.key];
       const cellClass = col.entered ? ' class="compare-col-entered"' : "";
-      const content   = row.isHtml ? (val || "—") : escapeHtml(val || "—");
+      const content   = row.isHtml ? (val || "N/A") : escapeHtml(val || "N/A");
       tr += `<td${cellClass}>${content}</td>`;
     });
     tr += "</tr>";
     return tr;
   }).join("");
 
-  const summaryText = buildCompareSummary(fastData, entFast, verdict, (byId("compare-input") || {}).value || "");
+  const summaryText = buildCompareSummary(fastData, entFast, enteredGrade, (byId("compare-input") || {}).value || "");
 
   _compareBlock = {
     key: "comparison",
     title: "Replacement Comparison",
-    text: `Comparing original vs. ${(entFast && entFast.analysis && entFast.analysis.estimatedModel) || "entered model"}\nLKQ Verdict: ${verdict}\n${summaryText}`
+    text: `Comparing original vs. ${(entFast && entFast.analysis && entFast.analysis.estimatedModel) || "entered model"}\nLKQ Grade: ${enteredGrade}\n${summaryText}`
   };
 
   return `
@@ -1325,6 +1606,21 @@ function toggleComparePanel() {
   const isOpen = !panel.classList.contains("hidden");
   panel.classList.toggle("hidden", isOpen);
   btn.classList.toggle("active", !isOpen);
+}
+
+function applyCompareIncludeLabelText() {
+  const targetText = "Include loaded Brand Match & Replacement Options in this comparison";
+  const cb = byId("compare-include-existing");
+  if (!cb) return;
+  const labelByFor = document.querySelector('label[for="compare-include-existing"]');
+  if (labelByFor) {
+    labelByFor.textContent = targetText;
+    return;
+  }
+  const parentLabel = cb.closest("label");
+  if (parentLabel) {
+    parentLabel.textContent = targetText;
+  }
 }
 
 // ── Summary Modal ─────────────────────────────────────────────────────────────
@@ -1766,6 +2062,7 @@ document.addEventListener("DOMContentLoaded", () => {
   byId("compare-panel-close")?.addEventListener("click", toggleComparePanel);
   byId("compare-submit")?.addEventListener("click", runComparison);
   byId("compare-input")?.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); runComparison(); } });
+  applyCompareIncludeLabelText();
 
   // Section filter checkboxes
   const filterMap = [
