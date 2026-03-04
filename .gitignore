@@ -1,1 +1,7 @@
 .vercel
+node_modules/
+.tmp-*
+*.log
+.claude/
+package-lock.json
+Layout Design.png
