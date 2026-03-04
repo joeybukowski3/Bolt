@@ -1098,6 +1098,12 @@ function enhanceHeaderBranding() {
     logoWrap.onclick = function() { window.location.href = '/'; };
   }
 
+  var logoMain = header.querySelector('.brt-nav-logo');
+  if (logoMain) {
+    logoMain.style.cursor = 'pointer';
+    logoMain.onclick = function() { window.location.href = '/'; };
+  }
+
   var navLinks = header.querySelector('.brt-nav-links-wrap');
   if (navLinks) {
     navLinks.innerHTML = '' +

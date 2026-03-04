@@ -1199,7 +1199,7 @@ function renderDetail(data) {
     const typeKey = normalizeItemTypeKey(fastData?.analysis?.itemType || fastData?.analysis?.category || currentCategory);
     
     // Header labels
-    const label = "LKQ Considerations";
+    const label = "LKQ considerations";
     const subLabel = "These are important specifications to consider when determining a valid replacement option";
 
     // Generate checklist from topSpecs (Claimed Item Values)
@@ -1674,10 +1674,10 @@ function renderCompareTable(entFast, entDetail, includeExisting) {
       mandatory: true
     },
     {
-      label: "Brand & Tier",
+      label: "Tier",
       values: Object.fromEntries(cols.map((col) => {
         const n = normalizedByCol[col.key];
-        return [col.key, `${safeText(n.brand, "N/A")} \u2014 ${normalizeTierLabel(n.tier)}`];
+        return [col.key, normalizeTierLabel(n.tier)];
       })),
       isHtml: false,
       mandatory: true
