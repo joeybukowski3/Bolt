@@ -261,8 +261,16 @@ function byId(id) {
   return document.getElementById(id);
 }
 
+function decodeUnicodeEscapes(str) {
+  if (typeof str !== 'string') return str;
+  return str.replace(/\\u([0-9a-fA-F]{4})/g, function(_, code) {
+    return String.fromCharCode(parseInt(code, 16));
+  });
+}
+
 function safeText(value, fallback = "N/A") {
-  const text = String(value ?? "").trim();
+  let text = String(value ?? "").trim();
+  text = decodeUnicodeEscapes(text);
   return text || fallback;
 }
 
@@ -273,7 +281,9 @@ function setText(id, value, fallback = "N/A") {
 }
 
 function escapeHtml(value) {
-  return String(value ?? "")
+  let s = String(value ?? "");
+  s = decodeUnicodeEscapes(s);
+  return s
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")

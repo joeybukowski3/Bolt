@@ -197,6 +197,13 @@
     document.getElementById('age-result').classList.add('hidden');
   }
 
+  function decodeUnicodeEscapes(str) {
+    if (typeof str !== 'string') return str;
+    return str.replace(/\\u([0-9a-fA-F]{4})/g, function(_, code) {
+      return String.fromCharCode(parseInt(code, 16));
+    });
+  }
+
   async function performAgeLookup(method) {
     const brandSelect = document.getElementById('brand-serial');
     const brand = brandSelect.value;
@@ -223,7 +230,7 @@
       const a = data.analysis || {};
       const rd = data.releaseDate || {};
 
-      document.getElementById('result-title').innerText = `${brand !== 'Other' ? brand : ''} Serial Research: ${serial}`;
+      document.getElementById('result-title').innerText = decodeUnicodeEscapes(`${brand !== 'Other' ? brand : ''} Serial Research: ${serial}`);
       let body = '';
       if (rd.estimatedAge) body += `Estimated Age: ${rd.estimatedAge}\n`;
       else if (a.age) body += `Estimated Age: ${a.age}\n`;
@@ -234,7 +241,7 @@
         if (a.decodingMethod.details) body += `\n${a.decodingMethod.details}`;
       }
       
-      document.getElementById('result-body').innerText = body.trim();
+      document.getElementById('result-body').innerText = decodeUnicodeEscapes(body.trim());
       document.getElementById('age-loading').classList.add('hidden');
       document.getElementById('age-result').classList.remove('hidden');
     } catch (e) {

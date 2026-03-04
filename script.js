@@ -317,10 +317,10 @@ var TOP_BRANDS_BY_CATEGORY = {
   'water-heaters': ['rheem', 'a_o_smith', 'bradford_white', 'state_industries', 'whirlpool_water_heaters', 'ruud', 'richmond']
 };
 var SIDEBAR_CATEGORY_LABELS = {
-  'appliances': '\uD83D\uDEE0\uFE0F Appliances',
-  'hvac': '\uD83C\uDF21\uFE0F HVAC',
-  'electronics': '\uD83D\uDCFA Electronics',
-  'water-heaters': '\uD83D\uDEBF Water Heaters'
+  'appliances': '🛠️ Appliances',
+  'hvac': '🌡️ HVAC',
+  'electronics': '📺 Electronics',
+  'water-heaters': '🚿 Water Heaters'
 };
 var BRAND_SLUG_OVERRIDES = {
   'whirlpool_water_heaters': 'whirlpool',
@@ -4543,8 +4543,16 @@ function clickSuggestion(modelNum) {
 }
 
 // ===== UTILITY =====
+function decodeUnicodeEscapes(str) {
+  if (typeof str !== 'string') return str;
+  return str.replace(/\\u([0-9a-fA-F]{4})/g, function(_, code) {
+    return String.fromCharCode(parseInt(code, 16));
+  });
+}
+
 function esc(s) {
   if (!s) return '';
+  s = decodeUnicodeEscapes(String(s));
   var div = document.createElement('div');
   div.textContent = s;
   return div.innerHTML;
