@@ -50,13 +50,13 @@
         .circuit-bg::after { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 0%, rgba(234,179,8,0.05) 0%, transparent 55%); }
 
         /* ── Mascot loader ── */
-        @keyframes bounceBolt { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(20px); } }
+        @keyframes bounceBolt { 0%, 100% { transform: translate(-50%, -50%); } 50% { transform: translate(-50%, -70%); } }
         @keyframes pulse-glow { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
-        .mascot-area { text-align: center; margin-bottom: 0.75rem; display: none; }
+        .mascot-area { text-align: center; margin-bottom: 0.75rem; display: none; width: 100%; max-width: 660px; margin-left: auto; margin-right: auto; }
         .mascot-area.brt-loading { display: block; }
-        #loader-track { width: 400px; max-width: 90vw; overflow: hidden; margin: 0 auto 0.5rem; position: relative; height: 4.5rem; }
-        #loader-dog { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 60px; height: 60px; font-size: 40px; display: flex; align-items: center; justify-content: center; }
-        #loader-dog.running { animation: bounceBolt 1s ease-in-out infinite; }
+        #loader-track { width: 100%; overflow: hidden; margin: 0 auto 0.5rem; position: relative; height: 80px; }
+        #loader-dog { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; height: 60px; font-size: 44px; display: flex; align-items: center; justify-content: center; line-height: 1; }
+        #loader-dog.running { animation: bounceBolt 1.2s ease-in-out infinite; }
         .loader-text { color: rgba(255,255,255,0.78); font-style: italic; font-size: 0.9rem; display: none; }
         .loader-text.visible { display: block; animation: pulse-glow 2s ease-in-out infinite; }
 

@@ -300,7 +300,63 @@ function show(elOrId, shouldShow) {
 // ── ACV calculation ──────────────────────────────────────────────────────────
 
 function fmtDollars(n) {
-  return "$" + Math.round(n).toLocaleString("en-US");
+  return formatUSD(n);
+}
+
+function formatUSD(value) {
+  if (value === null || value === undefined || value === "" || value === "N/A" || value === "—") {
+    return "Not available";
+  }
+  const num = typeof value === "number" ? value : parseFloat(String(value).replace(/[^0-9.]/g, ""));
+  if (isNaN(num)) return "Not available";
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    maximumFractionDigits: 0
+  }).format(num);
+}
+
+const EXCHANGE_RATES = {
+  "EUR": 1.08, "GBP": 1.27, "JPY": 0.0067, "CAD": 0.74, "AUD": 0.65,
+  "€": 1.08, "£": 1.27, "¥": 0.0067, "C$": 0.74, "A$": 0.65
+};
+
+function convertToUSD(val) {
+  if (typeof val === "number") return val;
+  if (!val || typeof val !== "string" || val === "N/A" || val === "—") return null;
+  
+  const clean = val.trim().toUpperCase();
+  let rate = 1.0;
+  for (const [symbol, r] of Object.entries(EXCHANGE_RATES)) {
+    if (clean.includes(symbol)) {
+      rate = r;
+      break;
+    }
+  }
+
+  const match = val.match(/[0-9,.]+/);
+  if (!match) return null;
+  const num = parseFloat(match[0].replace(/,/g, ""));
+  return isNaN(num) ? null : num * rate;
+}
+
+function standardizePrice(val) {
+  if (!val || val === "N/A" || val === "—") return "Not available";
+  
+  // Handle ranges
+  if (val.includes("–") || (val.includes("-") && !val.startsWith("-"))) {
+    const parts = val.split(/[–-]/);
+    if (parts.length === 2) {
+      const v1 = convertToUSD(parts[0].trim());
+      const v2 = convertToUSD(parts[1].trim());
+      if (v1 !== null && v2 !== null) {
+        return `${formatUSD(v1)} – ${formatUSD(v2)}`;
+      }
+    }
+  }
+
+  const numeric = convertToUSD(val);
+  return numeric !== null ? formatUSD(numeric) : "Not available";
 }
 
 function calcACV(msrp, age, category) {
@@ -529,7 +585,7 @@ function sameItemType(a, b) {
 }
 
 function parseFirstNumber(value) {
-  const m = String(value || "").match(/([0-9]+(?:\.[0-9]+)?)/);
+  const m = String(value || "").replace(/,/g, "").match(/([0-9]+(?:\.[0-9]+)?)/);
   return m ? Number(m[1]) : null;
 }
 
@@ -538,7 +594,7 @@ function inferTierFromData(brand, model, summary, description, price) {
   if (/\b(luxury|ultra\s*premium|signature|professional|elite|flagship)\b/.test(text)) return "Luxury";
   if (/\b(premium|pro|plus|oled|mini[-\s]?led|qled|studio|high[-\s]?end)\b/.test(text)) return "Premium";
   if (/\b(budget|basic|value|entry)\b/.test(text)) return "Budget";
-  const n = parseFirstNumber(price);
+  const n = convertToUSD(price);
   if (Number.isFinite(n)) {
     if (n >= 3000) return "Luxury";
     if (n >= 1200) return "Premium";
@@ -1116,11 +1172,11 @@ function renderFast(data) {
 
   // Section 4: MSRP + ACV (tier 3+ only)
   if (searchTier >= 3) {
-    const msrp = analysis.launchMsrpNumeric || 0;
+    const msrp = analysis.launchMsrpNumeric || convertToUSD(analysis.launchMsrp) || 0;
     const age = releaseDate.ageNumeric || 0;
 
-    setText("r-launch-msrp", analysis.launchMsrp || "Not available");
-    setText("r-market-price", analysis.currentMarketPrice || "Not available");
+    setText("r-launch-msrp", standardizePrice(analysis.launchMsrp));
+    setText("r-market-price", standardizePrice(analysis.currentMarketPrice));
     const noteEl = byId("r-market-price-note");
     if (noteEl) noteEl.textContent = analysis.currentMarketPriceNote || "";
 
@@ -1128,7 +1184,7 @@ function renderFast(data) {
       acvData = { msrp, age };
       const ageInput = byId("acv-age-input");
       if (ageInput) ageInput.value = String(age);
-      setText("m-msrp", analysis.launchMsrp || "—");
+      setText("m-msrp", standardizePrice(analysis.launchMsrp));
       renderACVDisplay(msrp, age, currentCategory);
       const recalcBtn = byId("recalc-btn");
       if (recalcBtn) recalcBtn.disabled = false;
@@ -1552,8 +1608,8 @@ function buildCompareSummary(origFast, entFast, verdict, enteredQuery) {
   const entDesc   = (entFast  && entFast.analysis  && (entFast.analysis.quickSummary  || entFast.analysis.estimatedModel))  || enteredQuery || "the entered model";
   const origCat   = (origFast && origFast.analysis && origFast.analysis.category) || "item";
   const entCat    = (entFast  && entFast.analysis  && entFast.analysis.category)  || "item";
-  const origPrice = (origFast && origFast.analysis && (origFast.analysis.currentMarketPrice || origFast.analysis.launchMsrp)) || "—";
-  const entPrice  = (entFast  && entFast.analysis  && (entFast.analysis.currentMarketPrice  || entFast.analysis.launchMsrp))  || "—";
+  const origPrice = standardizePrice((origFast && origFast.analysis && (origFast.analysis.currentMarketPrice || origFast.analysis.launchMsrp)));
+  const entPrice  = standardizePrice((entFast  && entFast.analysis  && (entFast.analysis.currentMarketPrice  || entFast.analysis.launchMsrp)));
 
   if (verdict === "WELL ABOVE LKQ") {
     return `${entDesc} is a ${entCat} that significantly exceeds ${origDesc} (${origCat}) on weighted LKQ criteria. Current market values — Original: ${origPrice}; Entered model: ${entPrice}.`;
@@ -1734,13 +1790,13 @@ function renderCompareTable(entFast, entDetail, includeExisting) {
   rows.push(
     {
       label: "Current Market Value",
-      values: Object.fromEntries(cols.map((col) => [col.key, safeText(normalizedByCol[col.key].value?.marketValue, "N/A")])),
+      values: Object.fromEntries(cols.map((col) => [col.key, standardizePrice(normalizedByCol[col.key].value?.marketValue)])),
       isHtml: false,
       mandatory: true
     },
     {
       label: "Original MSRP",
-      values: Object.fromEntries(cols.map((col) => [col.key, safeText(normalizedByCol[col.key].value?.msrp, "N/A")])),
+      values: Object.fromEntries(cols.map((col) => [col.key, standardizePrice(normalizedByCol[col.key].value?.msrp)])),
       isHtml: false,
       mandatory: true
     }
@@ -1916,7 +1972,7 @@ function openSummaryModal() {
       `Item: ${a.quickSummary || a.entered || "—"}`,
       `Model: ${a.estimatedModel || a.entered || "—"}`,
       `Age: ${rd.estimatedAge || "—"}`,
-      `Launch MSRP: ${a.launchMsrp || "—"} | Current Market: ${a.currentMarketPrice || "—"}`,
+      `Launch MSRP: ${standardizePrice(a.launchMsrp)} | Current Market: ${standardizePrice(a.currentMarketPrice)}`,
       `Est. ACV: ${acvStr}`,
       `Availability: ${fastData.availability || "—"}`
     ].join("\n")
