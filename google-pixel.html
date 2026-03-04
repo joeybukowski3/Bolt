@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon-bolt.svg?v=1">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5946778263750869" crossorigin="anonymous"></script>
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Pixel Serial Number Decoder | Find Manufacture Date & Age</title>
+    <meta name="description" content="Decode your Google Pixel phone serial number to find the manufacture date and production week. Covers all Pixel models from 2016 onward. Free instant results.">
+    <link rel="canonical" href="https://www.decodemyitem.com/google-pixel.html">
+    <link rel="stylesheet" href="global.css">
+    
+</head>
+<body>
+    <div class="circuit-bg"></div>
+    <div class="circuit-nodes">
+        <div class="node"></div><div class="node"></div><div class="node"></div><div class="node"></div>
+        <div class="node"></div><div class="node"></div><div class="node"></div><div class="node"></div>
+    </div>
+        <aside class="sidebar">
+        <div class="sidebar-header">
+            <a class="sidebar-logo" href="/"><img class="ia-sidebar-logo" src="/assets/item-assist-logo.png" width="150" height="150" alt="Item Assist logo"></a>
+        </div>
+        <div class="sidebar-section">
+            <div class="sidebar-title">Categories</div>
+            <button class="cat-tab active" data-cat="appliances" onclick="selectCategory('appliances', this)">Appliances</button>
+            <button class="cat-tab" data-cat="waterHeaters" onclick="selectCategory('waterHeaters', this)">Water Heaters</button>
+            <button class="cat-tab" data-cat="hvac" onclick="selectCategory('hvac', this)">HVAC</button>
+            <button class="cat-tab" data-cat="electronics" onclick="selectCategory('electronics', this)">Electronics</button>
+        </div>
+        <div class="sidebar-section">
+            <div class="sidebar-title">Brands</div>
+            <a class="sidebar-link" href="/goodman">Goodman</a>
+            <a class="sidebar-link" href="/carrier">Carrier</a>
+            <a class="sidebar-link" href="/rheem">Rheem</a>
+            <a class="sidebar-link" href="/trane">Trane</a>
+            <a class="sidebar-link" href="/whirlpool">Whirlpool</a>
+            <a class="sidebar-link" href="/ge">GE</a>
+            <a class="sidebar-link" href="/samsung">Samsung</a>
+            <a class="sidebar-link" href="/lg">LG</a>
+            <a class="sidebar-link" href="/sony">Sony</a>
+            <a class="sidebar-link" href="/bosch">Bosch</a>
+            <a class="sidebar-link" href="/maytag">Maytag</a>
+            <a class="sidebar-link" href="/frigidaire">Frigidaire</a>
+            <a class="sidebar-link" href="/kenmore">Kenmore</a>
+            <a class="sidebar-link" href="/apple">Apple</a>
+            <a class="sidebar-link" href="/hp">HP</a>
+            <a class="sidebar-link" href="/asus">ASUS</a>
+            <a class="sidebar-link" href="/google-pixel">Google Pixel</a>
+            <a class="sidebar-link" href="/vizio">Vizio</a>
+            <a class="sidebar-link" href="/panasonic">Panasonic</a>
+        </div>
+        <div class="sidebar-section">
+            <div class="sidebar-title">Resources</div>
+            <a class="sidebar-link" href="/smart-lookup">Smart Lookup</a>
+            <a class="sidebar-link" href="/methodology">Methodology</a>
+            <a class="sidebar-link" href="/disclaimer">Disclaimer</a>
+            <a class="sidebar-link" href="/contact">Contact</a>
+        </div>
+    </aside>
+    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+    <div class="ad-zone"><div class="ad-label">Data Partner</div></div>
+    <div class="page-shell">
+    <div class="app-container content-wrapper container">
+
+        <div class="header">
+            <button class="sidebar-toggle" onclick="toggleSidebar()" aria-label="Toggle navigation">&#9776;</button>
+            <div class="header-brand">
+                <p class="header-logo"><a href="/"><span class="accent">&#9889;</span> Serial Number <span class="accent">Decoder</span></a></p>
+                <p class="subtitle">Professional Equipment Age Dating</p>
+            </div>
+            
+        </div>
+        <!-- Search Form -->
+<div class="main-card decoder-card">
+            <!-- Category Tabs -->
+            
+
+            <!-- Form -->
+            <div class="form-area">
+                <div class="form-group">
+                    <div class="step-label">Select Brand</div>
+                    <select id="brand" class="form-select">
+                        <option value="">-- Select Brand --</option>
+                    </select>
+                </div>
+
+                <!-- Era Dropdown -->
+                <div class="form-group era-group hidden" id="eraGroup">
+                    <div class="step-label">
+                        Manufacture Era
+                        <span class="info-icon" title="Manufacturer serial formats often repeat every 20 years; selecting the era ensures accuracy.">ⓘ</span>
+                    </div>
+                    <select id="eraSelect" class="form-select">
+                        <option value="">-- Select Era --</option>
+                        <option value="post">Post-2006 (manufactured after 2006)</option>
+                        <option value="pre">Pre-2006 (manufactured before 2006)</option>
+                    </select>
+                    <p class="era-note">Manufacturers often recycle serial formats every 20 years. Selecting the era ensures the decoding logic matches your specific unit.</p>
+                </div>
+
+                <div class="form-group">
+                    <div class="step-label">Enter Serial Number</div>
+                    <input type="text" id="serial" class="form-input" placeholder="Enter serial number (e.g., CB2501800)" autofocus>
+                    <div class="helper-text">Enter the serial number exactly as shown on the product label</div>
+                </div>
+
+                <button id="decodeBtn" class="decode-btn" disabled onclick="decodeSerial()">Decode Serial Number</button>
+            </div>
+        </div>
+
+        <div class="smart-lookup-standalone">
+            <div class="smart-lookup-standalone-header"><span class="ai-icon">&#10024;</span> No Serial? Use Smart Lookup</div>
+            <div id="altSection" class="alt-section open">
+                <div class="alt-inner">
+                    <div class="alt-divider"><span>Smart Lookup</span></div>
+                    <div class="form-group">
+                        <div class="step-label">Model Number or Description</div>
+                        <input type="text" id="smart-lookup-input" class="form-input" placeholder="Search model number...">
+                        <div class="helper-text">Enter a model number, brand + model, or description to estimate the age</div>
+                    </div>
+                    <p class="alt-scope-note">&#128268; Works for appliances, water heaters, <strong>and electronics</strong> — TVs, computers, phones, and any brand not listed in the tabs above.</p>
+                    <p class="alt-disclaimer hidden">Note: Serial numbers are the most reliable way to date an item. This tool estimates age ranges using online research data—the more specific your info, the better the results. Keep in mind that general search terms may yield broader date ranges for long-running models.</p>
+                    <button class="decode-btn" onclick="estimateAge()">Estimate Age</button>
+                </div>
+            </div>
+        </div>
+
+<!-- Loading -->
+<div id="ageLoading" class="results-card hidden">
+            <div class="loading-inner">
+                <span class="loading-emoji lightning" id="loadingEmoji">🌩️</span>
+                <div class="loading-text" id="loadingText">Researching product information...</div>
+            </div>
+        </div>
+
+        <!-- Serial Decode Results -->
+        <div id="serialResults" class="results-card hidden">
+            <div class="results-header">
+                <h3>&#128202; Decoded Results</h3>
+                <div class="brand-logo-wrap" id="serialBrandLogo"></div>
+            </div>
+            <div class="results-body">
+                <div class="result-row result-row--primary">
+                    <span class="result-label">Manufacture Date</span>
+                    <span class="result-value" id="resultYear"></span>
+                </div>
+                <div class="result-row" id="resultMonthRow">
+                    <span class="result-label">Month / Period</span>
+                    <span class="result-value" id="resultMonth"></span>
+                </div>
+                <div class="result-row">
+                    <span class="result-label">Brand</span>
+                    <span class="result-value" id="resultBrand"></span>
+                </div>
+                <div class="result-row">
+                    <span class="result-label">Estimated Age</span>
+                    <span class="result-value" id="resultEstimatedAge">—</span>
+                </div>
+                <div class="info-block method">
+                    <h4>Decoding Method</h4>
+                    <p id="resultMethod"></p>
+                </div>
+                <div class="info-block notes">
+                    <h4>Important Notes</h4>
+                    <p id="resultNotes"></p>
+                </div>
+                <details class="determination-details">
+                    <summary>How this was determined</summary>
+                    <div class="determination-body">
+                        We use manufacturer serial format rules and published industry references to extract manufacture date information from serial numbers. Some brands reuse year codes across decades, which is why multiple valid years may appear. When two years are shown, the correct decade can typically be confirmed using physical condition, purchase records, or known installation dates.
+                    </div>
+                </details>
+            </div>
+            <div class="results-footer">
+                <button class="copy-btn" onclick="copyClaimFile()">Copy Information</button>
+                <button class="decode-again-btn" onclick="decodeAnotherItem()">Decode Another Item</button>
+                <button class="error-btn" onclick="openFeedbackModal()">&#9888; Possible Error? Let Us Know</button>
+            </div>
+            <div class="more-options-section">
+                <button class="more-options-toggle" onclick="toggleMoreOptions()">
+                    <span class="more-options-arrow" id="moreOptionsArrow">&#9654;</span> More options
+                </button>
+                <div class="more-options-body hidden" id="moreOptionsBody">
+                    <details class="options-drawer">
+                        <summary>Replacement Options</summary>
+                        <div class="options-drawer-body">
+                            <p class="placeholder-note">This section loads on demand.</p>
+                            <p class="placeholder-hint">Find current-market replacement units for this brand and product type.</p>
+                            <button class="ai-generate-btn" onclick="generateAISection('replacements', this)">&#128161; Generate (uses AI)</button>
+                            <div class="ai-generate-result hidden" id="ai-result-replacements"></div>
+                        </div>
+                    </details>
+                    <details class="options-drawer">
+                        <summary>Detailed Specifications</summary>
+                        <div class="options-drawer-body">
+                            <p class="placeholder-note">This section loads on demand.</p>
+                            <p class="placeholder-hint">Technical specifications and features for this product class.</p>
+                            <button class="ai-generate-btn" onclick="generateAISection('specs', this)">&#128161; Generate (uses AI)</button>
+                            <div class="ai-generate-result hidden" id="ai-result-specs"></div>
+                        </div>
+                    </details>
+                    <details class="options-drawer">
+                        <summary>Market Data</summary>
+                        <div class="options-drawer-body">
+                            <p class="placeholder-note">This section loads on demand.</p>
+                            <p class="placeholder-hint">Current pricing and market availability for this product category.</p>
+                            <button class="ai-generate-btn" onclick="generateAISection('market', this)">&#128161; Generate (uses AI)</button>
+                            <div class="ai-generate-result hidden" id="ai-result-market"></div>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+
+        <!-- Age Estimate Results -->
+        <div id="ageResults" class="results-card hidden">
+            <div class="results-header">
+                <h3>&#128337; Estimated Age</h3>
+                <div class="brand-logo-wrap" id="ageBrandLogo"></div>
+            </div>
+            <div class="results-body" id="smart-lookup-results"></div>
+            <div class="results-footer">
+                <button class="decode-again-btn" onclick="decodeAnotherItem()">Decode Another Item</button>
+                <button class="error-btn" onclick="openFeedbackModal()">&#9888; Possible Error? Let Us Know</button>
+            </div>
+        </div>
+
+<div class="static-card">
+            <div class="static-card-header">
+                <h1>Google Pixel Serial Number Age Decoder</h1>
+                <p>Find the manufacture date and production week of your Google Pixel phone or tablet.</p>
+            </div>
+            <div class="static-card-body">
+
+                <div class="cta-block">
+                    <h2>Decode Your Google Pixel Serial Number Now</h2>
+                    <p>Select Google Pixel in the Electronics tab and enter your serial number for an instant manufacture date result.</p>
+                    <a href="index.html?brand=google_pixel&cat=electronics" class="cta-btn">&#9889; Open Google Pixel Decoder</a>
+                </div>
+
+                <div class="static-section">
+                    <h2>Tag Location Guide</h2>
+                    <p>Google Pixel equipment typically displays the model and serial data tag on a manufacturer rating plate. Look for a label that lists "Model" and "Serial" and check common locations by product type: inside doors, behind access panels, on the back panel, or near the compressor / condenser area.</p>
+                    
+                </div>
+
+                <div class="static-section">
+                    <h2>How Google Pixel Encodes Manufacture Dates</h2>
+                    <p>Google Pixel serial numbers encode the manufacture date in the first three characters. The <strong>first character</strong> represents the last digit of the manufacture year, and <strong>characters 2 and 3</strong> represent the production week as a two-digit number (01 to 53).</p>
+                    <p>For example, a serial beginning with <strong>408</strong> decodes to year digit <strong>4</strong> (2024) and week <strong>08</strong> (approximately late February 2024). Because only the final digit of the year is stored, a year code of <strong>6</strong> could theoretically represent 2016 or 2026. In practice, the Pixel model number — Pixel 6, 7, 8, 9, etc. — provides the clearest confirmation of the manufacture era.</p>
+                    <p>Google launched the original Pixel in 2016, so year digits 6 through 9 correspond to 2016–2019, and digits 0 through 5 correspond to 2020–2025. This mapping is reliable for all Pixel phones and Pixel Tablet devices.</p>
+                </div>
+
+                <div class="static-section">
+                    <h2>Where to Find Your Google Pixel Serial Number</h2>
+                    <ul>
+                        <li><strong>On the device:</strong> Settings &rarr; About phone &rarr; Serial number</li>
+                        <li><strong>Physical label:</strong> On the SIM tray slot (use a SIM ejector to check the slot area) or on the original retail box</li>
+                        <li><strong>Google account:</strong> myaccount.google.com &rarr; Devices &rarr; select your Pixel &rarr; device details</li>
+                        <li><strong>Retail packaging:</strong> Barcode label on the box includes the serial number</li>
+                    </ul>
+                </div>
+
+                <div class="static-section">
+                    <h2>Common Mistakes When Decoding Pixel Serials</h2>
+                    <p><strong>Decade ambiguity for recent digits.</strong> The digit <strong>6</strong> could represent 2016 (an original Pixel) or 2026 (a future device). If your phone is a Pixel 6 series, it was released in 2021 and manufactured in 2021–2022, not 2016. Use the Pixel model number to resolve any ambiguity.</p>
+                    <p><strong>Week number out of range.</strong> If the two-digit week code is greater than 53 or is 00, the serial may not follow the standard Pixel format. Some refurbished or carrier-specific units use modified serial strings.</p>
+                    <p><strong>Pixel Tablet vs. Pixel Phone.</strong> Google Pixel Tablet (released 2023) uses the same serial format as Pixel phones. The year and week decode method is identical across all Pixel-branded devices.</p>
+                </div>
+
+                <div class="static-section" style="margin-top:1.5rem">
+                    <h2>Decode Other Brands</h2>
+                    <div class="related-brands">
+                        <a href="/apple" class="related-brand-link">Apple</a>
+                        <a href="/samsung" class="related-brand-link">Samsung</a>
+                        <a href="/hp" class="related-brand-link">HP</a>
+                        <a href="/asus" class="related-brand-link">ASUS</a>
+                        <a href="/sony" class="related-brand-link">Sony</a>
+                        <a href="/lg" class="related-brand-link">LG</a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="footer">
+            <p class="footer-tagline">Built for fast, reliable equipment age lookups.</p>
+            <div class="footer-links">
+                <a href="/methodology">Methodology</a>
+                <span class="footer-sep">|</span>
+                <a href="/disclaimer">Disclaimer</a>
+                <span class="footer-sep">|</span>
+                <a href="/contact">Contact</a>
+                            <span class="footer-sep">|</span>
+                <a href="/privacy-policy">Privacy Policy</a>
+            </div>
+            <p class="footer-verify">Database Last Verified: February 2026. All decoding logic is cross-referenced with manufacturer technical bulletins.</p>
+            <p>&copy; 2026 Serial Number Decoder. Always verify results for accuracy.</p>
+            <p class="footer-db">Database updated February 2026 &nbsp;&middot;&nbsp; Sources: Manufacturer documentation and authorized publications</p>
+        </div>
+
+    </div><!-- /app-container -->
+    </div><!-- /page-shell -->
+
+    <!-- Feedback Modal -->
+<div id="feedbackModal" class="modal-overlay hidden" onclick="if(event.target===this)closeFeedbackModal()">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>&#9888; Report an Issue</h3>
+                <button class="modal-close" onclick="closeFeedbackModal()">&#x2715;</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-field">
+                    <label>Brand</label>
+                    <input type="text" id="fbBrand" class="form-input" readonly>
+                </div>
+                <div class="modal-field">
+                    <label>Serial Number / Search Query</label>
+                    <input type="text" id="fbSerial" class="form-input" readonly>
+                </div>
+                <div class="modal-field">
+                    <label>Issue Type</label>
+                    <select id="fbType" class="form-select">
+                        <option value="">-- Select issue type --</option>
+                        <option value="wrong_year">Wrong year / date</option>
+                        <option value="wrong_month">Wrong month</option>
+                        <option value="wrong_brand">Wrong brand identified</option>
+                        <option value="format_error">Format / decode error</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="modal-field">
+                    <label>Details (optional)</label>
+                    <textarea id="fbDetails" class="form-input" rows="3" placeholder="What seems wrong? What is the correct date if known?"></textarea>
+                </div>
+                <div id="fbThanks" class="fb-thanks hidden">&#10003; Thank you! Your feedback helps improve this tool.</div>
+                <div id="fbActions" class="modal-actions">
+                    <button class="decode-btn" onclick="submitFeedback()">Submit Feedback</button>
+                    <button class="cancel-btn" onclick="closeFeedbackModal()">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="decoder-data.js"></script>
+    <script src="script.js"></script>
+    <script src="smart-lookup.js"></script>
+
+    <script type="application/ld+json">
+    [
+      {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[
+        {"@type":"ListItem","position":1,"name":"Home","item":"https://www.decodemyitem.com/"},
+        {"@type":"ListItem","position":2,"name":"Google Pixel Serial Number Decoder","item":"https://www.decodemyitem.com/google-pixel.html"}
+      ]}
+    ]
+    </script>
+    </body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
