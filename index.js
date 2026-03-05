@@ -1263,36 +1263,148 @@ function renderDetail(data) {
   if (wtcEl) {
     const topSpecs = Array.isArray(fastData?.analysis?.topSpecs) ? fastData.analysis.topSpecs : [];
     const typeKey = normalizeItemTypeKey(fastData?.analysis?.itemType || fastData?.analysis?.category || currentCategory);
-    
-    // Header labels
-    const label = "LKQ considerations";
-    const subLabel = "These are important specifications to consider when determining a valid replacement option";
 
-    // Generate checklist from topSpecs (Claimed Item Values)
-    const checklistHtml = topSpecs.map(s => {
-      return `<li style="margin-bottom:0.4rem; display:flex; align-items:baseline; gap:0.6rem; color:var(--text-dark); font-weight:600; font-size:0.88rem;">
-        <span style="color:var(--accent); font-size:1.1rem; font-weight:900; line-height:1;">☐</span>
-        <span>${escapeHtml(s.label)}: <span style="font-weight:400; color:var(--text-mid);">${escapeHtml(s.value)}</span></span>
-      </li>`;
-    }).join("");
+    const queryText = String(fastData?.analysis?.entered || "").toLowerCase();
+    const modelText = String(fastData?.analysis?.estimatedModel || "").toLowerCase();
+    const descText = String(fastData?.analysis?.itemDescription || "").toLowerCase();
+    const statusText = String(fastData?.analysis?.status || "").toLowerCase();
+    const discText = String(fastData?.releaseDate?.discontinuation || "").toLowerCase();
+    const availText = String(fastData?.availability || "").toLowerCase();
+    const combinedText = [queryText, modelText, descText, statusText, discText, availText].join(" ");
 
-    // Availability Note (short, single sentence)
-    const availStatus = fastData?.availability || "";
-    const availNote = availStatus ? `<div style="margin-top:0.75rem; font-size:0.75rem; color:var(--text-muted-dark); border-top:1px solid rgba(0,0,0,0.05); padding-top:0.6rem;">
-      <strong>Note:</strong> ${escapeHtml(availStatus)}
-    </div>` : "";
+    const unsafePanelTerms = [
+      "federal pacific",
+      "fpe",
+      "zinsco",
+      "sylvania zinsco",
+      "pushmatic",
+      "bulldog pushmatic",
+      "unsafe panel",
+      "obsolete panel"
+    ];
+    const statusTerms = ["discontinued", "obsolete", "unsafe", "no longer available", "replacement only"];
 
-    wtcEl.className = "wtc-box wtc-general"; // Light blue ghost-white style
-    wtcEl.innerHTML = `
-      <div class="wtc-label" style="border-bottom:1px solid rgba(0,0,0,0.05); padding-bottom:0.4rem; margin-bottom:0.75rem; display:flex; align-items:baseline; gap:0.75rem; flex-wrap:wrap;">
-        <span style="white-space:nowrap;">${escapeHtml(label)}</span>
-        <span style="font-size:0.7rem; font-weight:400; color:var(--text-muted-dark); text-transform:none; letter-spacing:normal;">${escapeHtml(subLabel)}</span>
-      </div>
-      <ul class="wtc-list" style="list-style:none; padding-left:0; margin:0;">
-        ${checklistHtml || '<li style="font-size:0.85rem; color:var(--text-muted);">No technical specifications identified for this model.</li>'}
-      </ul>
-      ${availNote}
-    `;
+    const hasUnsafePanelSignal = unsafePanelTerms.some((term) => combinedText.includes(term));
+    const hasObsoleteSignal = statusTerms.some((term) => combinedText.includes(term));
+    const isPanelLike = combinedText.includes("panel") || combinedText.includes("load center") || combinedText.includes("breaker");
+    const isSafetyDrivenReplacement = Boolean((hasUnsafePanelSignal && isPanelLike) || (hasObsoleteSignal && isPanelLike));
+    const lkqFlags = {
+      isObsolete: isSafetyDrivenReplacement,
+      isSafetyDrivenReplacement,
+      replacementMustBeModernCodeCompliant: isSafetyDrivenReplacement
+    };
+
+    const getSpecValue = (needleList) => {
+      const row = topSpecs.find((s) => {
+        const label = String(s?.label || "").toLowerCase();
+        return needleList.some((needle) => label.includes(needle));
+      });
+      return String(row?.value || "").trim();
+    };
+    const parseAmp = (text) => {
+      if (!text) return null;
+      const m = String(text).match(/(\d{2,4})\s*a\b/i);
+      return m ? Number(m[1]) : null;
+    };
+    const parseCount = (text) => {
+      if (!text) return null;
+      const m = String(text).match(/(\d{1,3})/);
+      return m ? Number(m[1]) : null;
+    };
+
+    const serviceRatingRaw = getSpecValue(["service rating", "amperage", "main rating", "main breaker", "amp"]);
+    const spacesRaw = getSpecValue(["spaces", "breaker spaces", "circuit capacity", "circuits", "slots"]);
+    const serviceAmp = parseAmp(serviceRatingRaw);
+    const existingCircuits = parseCount(spacesRaw);
+    const recommendedSpaces = existingCircuits ? Math.max(existingCircuits + 2, Math.ceil(existingCircuits * 1.25)) : null;
+    const ampLine = serviceAmp
+      ? `Existing panel rating: ${serviceAmp}A -> Replacement must be ${serviceAmp}A or greater.`
+      : "Confirm existing service rating (A) before selecting replacement; replacement main rating must be equal or greater.";
+    const circuitLine = existingCircuits && recommendedSpaces
+      ? `Existing circuits/spaces: ${existingCircuits} -> Select at least ${recommendedSpaces}+ spaces (includes ~20-30% spare capacity).`
+      : "Count existing circuits/spaces; select a load center with equal/greater capacity plus ~20-30% spare spaces.";
+
+    const renderChecklistItem = (text, whyText) => (
+      `<li style="margin-bottom:0.5rem; display:flex; align-items:flex-start; gap:0.6rem; color:var(--text-dark); font-size:0.87rem;">
+        <span style="color:var(--accent); font-size:1.05rem; font-weight:900; line-height:1;">☐</span>
+        <span><strong>${escapeHtml(text)}</strong><br><span style="color:var(--text-mid);">Why: ${escapeHtml(whyText)}</span></span>
+      </li>`
+    );
+    const renderBullet = (text) => (
+      `<li style="margin-bottom:0.4rem; display:flex; align-items:flex-start; gap:0.6rem; color:var(--text-dark); font-size:0.87rem;">
+        <span style="color:var(--accent); font-size:1.05rem; font-weight:900; line-height:1;">•</span>
+        <span>${escapeHtml(text)}</span>
+      </li>`
+    );
+
+    if (lkqFlags.isSafetyDrivenReplacement) {
+      const label = "Replacement requirements & rationale";
+      const subLabel = "Safety-driven replacement checklist (obsolete/discontinued equipment)";
+      const baseline = "This panel line is discontinued and associated with documented safety concerns. Any current-day UL-listed load center from a reputable manufacturer will generally meet or exceed the original panel's quality and safety performance. LKQ selection should focus on correct sizing and capacity rather than matching outdated brand/tier.";
+      const mustMatch = [
+        renderChecklistItem(
+          `Service Rating (Amperage): ${ampLine}`,
+          "Prevents undersizing and utility/code conflicts."
+        ),
+        renderChecklistItem(
+          `Circuit Capacity / Spaces: ${circuitLine}`,
+          "Avoids overcrowding, tandem misuse, and future capacity limits."
+        ),
+        renderChecklistItem(
+          "Form Factor / Installation Type: Match indoor vs outdoor (NEMA), main breaker vs main lug, and surface vs flush requirements.",
+          "Ensures proper fit and correct environmental protection."
+        ),
+        renderChecklistItem(
+          "Code Compliance: Replacement must be UL-listed, support proper grounding/bonding, and comply with current NEC/local code.",
+          "Required for safe and valid replacement selection."
+        )
+      ].join("");
+      const shouldMatch = [
+        renderBullet("Prefer modern reputable manufacturers (Square D, Eaton, Siemens, GE, etc.); do not attempt unsafe legacy brand equivalence."),
+        renderBullet("Prefer features that improve safety and claims outcomes when feasible: AFCI/GFCI compatibility, surge protection readiness, and clear circuit labeling.")
+      ].join("");
+      const docNote = "Because the original equipment is obsolete/unsafe, LKQ is satisfied by a modern code-compliant replacement that meets or exceeds capacity and rating requirements. Document existing service rating and circuit count to support sizing.";
+
+      wtcEl.className = "wtc-box wtc-general";
+      wtcEl.innerHTML = `
+        <div class="wtc-label" style="border-bottom:1px solid rgba(0,0,0,0.05); padding-bottom:0.4rem; margin-bottom:0.75rem; display:flex; align-items:baseline; gap:0.75rem; flex-wrap:wrap;">
+          <span style="white-space:nowrap;">${escapeHtml(label)}</span>
+          <span style="font-size:0.7rem; font-weight:400; color:var(--text-muted-dark); text-transform:none; letter-spacing:normal;">${escapeHtml(subLabel)}</span>
+        </div>
+        <div style="font-size:0.83rem; color:var(--text-mid); margin-bottom:0.7rem;"><strong>Replacement baseline:</strong> ${escapeHtml(baseline)}</div>
+        <div style="font-size:0.78rem; font-weight:700; color:var(--text-muted-dark); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.35rem;">Must-Match Requirements</div>
+        <ul class="wtc-list" style="list-style:none; padding-left:0; margin:0 0 0.65rem 0;">${mustMatch}</ul>
+        <div style="font-size:0.78rem; font-weight:700; color:var(--text-muted-dark); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.35rem;">Should-Match Preferences</div>
+        <ul class="wtc-list" style="list-style:none; padding-left:0; margin:0 0 0.65rem 0;">${shouldMatch}</ul>
+        <div style="font-size:0.8rem; color:var(--text-mid); border-top:1px solid rgba(0,0,0,0.05); padding-top:0.55rem;"><strong>Notes for claims documentation:</strong> ${escapeHtml(docNote)}</div>
+      `;
+    } else {
+      const label = "LKQ considerations";
+      const subLabel = "Match or exceed these specifications to maintain equivalent replacement utility";
+      const checklistHtml = topSpecs.map((s) => {
+        const itemText = `${s.label}: Match ${s.value} or better where it materially affects function, capacity, safety, or user utility.`;
+        return `<li style="margin-bottom:0.4rem; display:flex; align-items:flex-start; gap:0.6rem; color:var(--text-dark); font-size:0.87rem;">
+          <span style="color:var(--accent); font-size:1.05rem; font-weight:900; line-height:1;">☐</span>
+          <span>${escapeHtml(itemText)}</span>
+        </li>`;
+      }).join("");
+      const availStatus = fastData?.availability || "";
+      const availNote = availStatus ? `<div style="margin-top:0.75rem; font-size:0.75rem; color:var(--text-muted-dark); border-top:1px solid rgba(0,0,0,0.05); padding-top:0.6rem;">
+        <strong>Replacement context:</strong> ${escapeHtml(availStatus)}. Prioritize options that are currently available new and meet/exceed required specs.
+      </div>` : "";
+
+      wtcEl.className = "wtc-box wtc-general";
+      wtcEl.innerHTML = `
+        <div class="wtc-label" style="border-bottom:1px solid rgba(0,0,0,0.05); padding-bottom:0.4rem; margin-bottom:0.75rem; display:flex; align-items:baseline; gap:0.75rem; flex-wrap:wrap;">
+          <span style="white-space:nowrap;">${escapeHtml(label)}</span>
+          <span style="font-size:0.7rem; font-weight:400; color:var(--text-muted-dark); text-transform:none; letter-spacing:normal;">${escapeHtml(subLabel)}</span>
+        </div>
+        <ul class="wtc-list" style="list-style:none; padding-left:0; margin:0;">
+          ${checklistHtml || '<li style="font-size:0.85rem; color:var(--text-muted);">Confirm key capacity/performance specs and match or exceed them for LKQ-valid replacement selection.</li>'}
+        </ul>
+        ${availNote}
+      `;
+    }
   }
 
   const tableMode = data.tableMode || "standard";
