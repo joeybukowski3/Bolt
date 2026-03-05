@@ -4,6 +4,7 @@ let detailData = null;
 let currentCategory = "general";
 let acvData = { msrp: 0, age: 0 };
 let _compareBlock = null;
+let activeSearchToken = 0;
 
 // ── Section filter state ──────────────────────────────────────────────────────
 
@@ -1257,6 +1258,11 @@ function renderDetail(data) {
     // Hide the table elements when section is off
     const tl = byId("table-loading"); if (tl) tl.classList.add("hidden");
     const te = byId("r-table"); if (te) te.classList.add("hidden");
+    const wtc = byId("lkq-evaluator-guidance");
+    if (wtc) {
+      wtc.innerHTML = "";
+      wtc.className = "hidden";
+    }
   } else {
   // ─ LKQ Considerations Checklist ─
   const wtcEl = byId("lkq-evaluator-guidance");
@@ -2255,6 +2261,115 @@ function resetCompareTool() {
   _compareBlock = null;
 }
 
+function resetResultsUI() {
+  // Clear in-memory state used by result rendering.
+  fastData = null;
+  detailData = null;
+  currentCategory = "general";
+  acvData = { msrp: 0, age: 0 };
+  _compareBlock = null;
+  _summaryState = {};
+
+  // Hide overall results wrapper immediately to avoid mixed old/new UI.
+  const resultsEl = byId("results");
+  if (resultsEl) resultsEl.classList.add("hidden");
+
+  // Reset tabs to default without triggering scroll.
+  activeTab = "tab-overview";
+  TAB_IDS.forEach((id) => {
+    const panel = byId(id.replace("tab-", "panel-"));
+    if (panel) panel.classList.toggle("active", id === "tab-overview");
+  });
+  renderReportSectionTabs();
+
+  // Clear dynamic containers.
+  [
+    "lkq-evaluator-guidance",
+    "table-body",
+    "r-top-specs-pills",
+    "refinement-chips",
+    "r-variation-chips",
+    "r-field-ref-wrap",
+    "manual-content",
+    "manufacturer-page-content",
+    "error-codes-content",
+    "failures-content",
+    "troubleshooting-content",
+    "recalls-content",
+    "compare-result",
+    "summary-sections"
+  ].forEach((id) => {
+    const el = byId(id);
+    if (el) el.innerHTML = "";
+  });
+
+  // Remove any stale replacement rationale blocks if they exist outside expected roots.
+  document.querySelectorAll("#replacement-requirements-rationale, .replacement-requirements-rationale, .lkq-considerations-block").forEach((el) => el.remove());
+
+  // Reset field text.
+  [
+    "r-overview",
+    "r-search-query",
+    "r-assumptions",
+    "r-item-desc",
+    "r-production-era",
+    "r-discontinuation",
+    "r-estimated-age",
+    "r-service-life",
+    "r-launch-msrp",
+    "r-market-price",
+    "r-market-price-note",
+    "r-acv",
+    "r-acv-formula",
+    "r-acv-note"
+  ].forEach((id) => setText(id, "", ""));
+  setText("m-age", "—");
+  setText("m-msrp", "—");
+  setText("m-acv", "—");
+  setText("m-availability", "—");
+
+  // Reset/hide transient blocks.
+  show("model-number-hint", false);
+  show("refine-tip", false);
+  show("estimation-banner", false);
+  show("age-advisory", false);
+  show("parts-available-note", false);
+  show("r-variations", false);
+  show("table-note", false);
+  show("narrow-results", false);
+  show("lkq-evaluator-guidance", false);
+  const snInputLi = byId("sn-input-li");
+  const snResultLi = byId("sn-result-li");
+  if (snInputLi) snInputLi.style.display = "none";
+  if (snResultLi) snResultLi.style.display = "none";
+  const snResultText = byId("sn-result-text");
+  if (snResultText) snResultText.innerHTML = "";
+
+  // Reset replacement table and compare tool state.
+  const tableHeadRow = byId("table-head-row");
+  if (tableHeadRow) {
+    tableHeadRow.innerHTML = `<th>Feature</th><th>Original Item</th><th class="highlight">Brand Match</th><th>Option 1</th><th>Option 2</th>`;
+  }
+  const tableLoading = byId("table-loading");
+  const tableEl = byId("r-table");
+  if (tableLoading) tableLoading.classList.remove("hidden");
+  if (tableEl) tableEl.classList.add("hidden");
+
+  // Reset valuation controls.
+  const acvSteps = byId("r-acv-steps");
+  if (acvSteps) {
+    acvSteps.style.display = "none";
+    acvSteps.textContent = "";
+  }
+  const ageInput = byId("acv-age-input");
+  if (ageInput) ageInput.value = "0";
+  const recalcBtn = byId("recalc-btn");
+  if (recalcBtn) recalcBtn.disabled = true;
+
+  // Ensure summary modal does not carry old state into the next search.
+  closeSummaryModal();
+}
+
 // ── performSearch ─────────────────────────────────────────────────────────────
 
 async function performSearch() {
@@ -2263,7 +2378,8 @@ async function performSearch() {
   const query = queryInput.value.trim();
   if (!query) return;
 
-  resetCompareTool();
+  const searchToken = ++activeSearchToken;
+  resetResultsUI();
 
   // Check sessionStorage cache first
   const cacheKey = `bolt_v6_${query.toLowerCase()}`;
@@ -2272,8 +2388,7 @@ async function performSearch() {
     if (cached) {
       const { fast, detail } = JSON.parse(cached);
       if (fast) {
-        fastData = null;
-        detailData = null;
+        if (searchToken !== activeSearchToken) return;
         renderFast(fast);
         if (detail) renderDetail(detail);
         return;
@@ -2329,26 +2444,6 @@ async function performSearch() {
   const tableHeadRow = byId("table-head-row");
   if (tableHeadRow) tableHeadRow.innerHTML = `<th>Feature</th><th>Original Item</th><th class="highlight">Brand Match</th><th>Option 1</th><th>Option 2</th>`;
 
-  // Reset metrics strip
-  setText("m-age", "—");
-  setText("m-msrp", "—");
-  setText("m-acv", "—");
-  setText("m-availability", "—");
-
-  fastData = null;
-  detailData = null;
-  _compareBlock = null;
-
-  // Reset compare tool
-  const compareTrigger = byId("compare-trigger-row");
-  const comparePanel   = byId("compare-panel");
-  const compareResult  = byId("compare-result");
-  const compareToggle  = byId("compare-toggle-btn");
-  if (compareTrigger) compareTrigger.classList.add("hidden");
-  if (comparePanel)   comparePanel.classList.add("hidden");
-  if (compareResult)  { compareResult.classList.add("hidden"); compareResult.innerHTML = ""; }
-  if (compareToggle)  compareToggle.classList.remove("active");
-
   // Kick off both fetches simultaneously (skip detail if all detail sections are off)
   const fastPromise = fetch(`/api/search?mode=research-fast&query=${encodeURIComponent(query)}`)
     .then((r) => r.json())
@@ -2362,6 +2457,7 @@ async function performSearch() {
 
   // Render fast when ready — stops the loader
   fastPromise.then((fast) => {
+    if (searchToken !== activeSearchToken) return;
     if (loaderDog) loaderDog.classList.remove("running");
     if (loaderText) loaderText.classList.remove("visible");
     byId("mascot-wrapper")?.classList.remove("brt-loading");
@@ -2381,6 +2477,7 @@ async function performSearch() {
 
   // Render detail when ready
   detailPromise.then((detail) => {
+    if (searchToken !== activeSearchToken) return;
     if (detail && typeof detail === "object" && !detail.error) {
       renderDetail(detail);
     }
@@ -2388,6 +2485,7 @@ async function performSearch() {
 
   // Save both to sessionStorage when both complete
   Promise.all([fastPromise, detailPromise]).then(([fast, detail]) => {
+    if (searchToken !== activeSearchToken) return;
     if (fast && detail) {
       try {
         sessionStorage.setItem(cacheKey, JSON.stringify({ fast, detail }));
@@ -2406,9 +2504,19 @@ document.addEventListener("DOMContentLoaded", () => {
   const recalcBtn = byId("recalc-btn");
 
   if (searchBtn) searchBtn.addEventListener("click", performSearch);
+  const queryForm = queryInput ? queryInput.closest("form") : null;
+  if (queryForm) {
+    queryForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      performSearch();
+    });
+  }
   if (queryInput) {
     queryInput.addEventListener("keydown", (event) => {
-      if (event.key === "Enter") performSearch();
+      if (event.key === "Enter") {
+        event.preventDefault();
+        performSearch();
+      }
     });
   }
   if (copyBtn) copyBtn.addEventListener("click", openSummaryModal);
