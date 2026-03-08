@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon-bolt.svg?v=1">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feedback & Bugs — Bolt Item Research Tool</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="shared.css">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg-primary: #0f1629;
+            --bg-secondary: #161d35;
+            --bg-card: #ffffff;
+            --bg-card-alt: #f8fafc;
+            --bg-input: rgba(255,255,255,0.06);
+            --border-color: #e2e8f0;
+            --border-accent: rgba(234,179,8,0.4);
+            --text-dark: #1e293b;
+            --text-mid: #475569;
+            --text-light: #94a3b8;
+            --text-white: #f1f5f9;
+            --text-muted-dark: #64748b;
+            --accent: #eab308;
+            --accent-hover: #facc15;
+            --accent-dim: rgba(234,179,8,0.1);
+            --accent-dim-dark: rgba(234,179,8,0.15);
+            --blue: #3b82f6;
+            --red: #ef4444;
+            --green: #22c55e;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-white);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .circuit-bg { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+        .circuit-bg::before {
+            content: ''; position: absolute; inset: 0;
+            background:
+                linear-gradient(90deg, transparent 49.5%, rgba(234,179,8,0.04) 49.5%, rgba(234,179,8,0.04) 50.5%, transparent 50.5%),
+                linear-gradient(0deg, transparent 49.5%, rgba(234,179,8,0.04) 49.5%, rgba(234,179,8,0.04) 50.5%, transparent 50.5%);
+            background-size: 60px 60px;
+        }
+        .circuit-bg::after {
+            content: ''; position: absolute; inset: 0;
+            background: radial-gradient(ellipse at 50% 0%, rgba(234,179,8,0.06) 0%, transparent 60%),
+                        radial-gradient(ellipse at 50% 100%, rgba(59,130,246,0.04) 0%, transparent 60%);
+        }
+
+        .app-container { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 0 1.5rem; }
+
+        /* Navigation */
+        .nav { display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 0; }
+        .nav-left { display: flex; align-items: center; gap: 0.75rem; }
+        .nav-brand { display: flex; align-items: center; gap: 0.3rem; font-size: 1.3rem; font-weight: 800; color: var(--text-white); text-decoration: none; white-space: nowrap; }
+        .nav-brand .bolt-icon { color: var(--accent); }
+        .nav-links { display: flex; align-items: center; gap: 0.5rem; }
+        .nav-link { color: var(--text-light); text-decoration: none; font-size: 0.875rem; font-weight: 500; padding: 0.5rem 1rem; border-radius: 8px; transition: all 0.2s; white-space: nowrap; }
+        .nav-link:hover { color: var(--text-white); background: rgba(255,255,255,0.06); }
+        .nav-link.active { background: var(--accent); color: #000; font-weight: 600; }
+        .nav-link.active:hover { background: var(--accent-hover); }
+
+        /* Content Zone */
+        .content-zone { background: #ffffff; border-radius: 24px 24px 0 0; margin: 2rem -1.5rem 0; padding: 3rem 2rem 4rem; min-height: 60vh; }
+        .content-inner { max-width: 800px; margin: 0 auto; }
+
+        /* Page Hero */
+        .page-hero { text-align: center; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); margin-bottom: 2rem; }
+        .page-hero h1 { font-size: 2rem; font-weight: 800; color: var(--text-dark); line-height: 1.2; margin-bottom: 0.5rem; }
+        .page-hero .subheadline { font-size: 1rem; color: var(--text-mid); max-width: 500px; margin: 0 auto; }
+
+        /* Form Container */
+        .form-wrap { max-width: 560px; margin: 0 auto; }
+
+        /* Form Fields */
+        .field-group { margin-bottom: 1.25rem; }
+        .field-label { display: block; font-size: 0.82rem; font-weight: 600; color: var(--text-dark); margin-bottom: 0.4rem; }
+        .field-label .optional { font-weight: 400; color: var(--text-muted-dark); margin-left: 0.3rem; }
+        .field-input,
+        .field-select,
+        .field-textarea {
+            width: 100%;
+            font-family: inherit;
+            font-size: 0.9rem;
+            color: var(--text-dark);
+            background: #fff;
+            border: 1.5px solid var(--border-color);
+            border-radius: 10px;
+            padding: 0.7rem 0.9rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            outline: none;
+            appearance: none;
+        }
+        .field-input:focus,
+        .field-select:focus,
+        .field-textarea:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(234,179,8,0.12);
+        }
+        .field-select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2394a3b8' stroke-width='1.8' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.9rem center;
+            padding-right: 2.5rem;
+            cursor: pointer;
+        }
+        .field-textarea { resize: vertical; min-height: 120px; line-height: 1.6; }
+
+        /* Submit Button */
+        .submit-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: var(--accent);
+            color: #000;
+            font-family: inherit;
+            font-size: 0.92rem;
+            font-weight: 700;
+            border: none;
+            border-radius: 10px;
+            padding: 0.75rem 1.75rem;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.15s;
+            margin-top: 0.25rem;
+        }
+        .submit-btn:hover { background: var(--accent-hover); transform: translateY(-1px); }
+        .submit-btn:active { transform: translateY(0); }
+        .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+        /* Messages */
+        .msg-success {
+            background: #f0fdf4;
+            border: 1.5px solid #86efac;
+            border-radius: 14px;
+            padding: 2rem;
+            text-align: center;
+            color: #166534;
+        }
+        .msg-success .msg-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+        .msg-success h3 { font-size: 1.15rem; font-weight: 700; margin-bottom: 0.4rem; }
+        .msg-success p { font-size: 0.9rem; color: #166534; opacity: 0.85; }
+
+        .msg-error {
+            background: #fef2f2;
+            border: 1.5px solid #fca5a5;
+            border-radius: 10px;
+            padding: 0.85rem 1rem;
+            color: #991b1b;
+            font-size: 0.875rem;
+            margin-top: 1rem;
+            display: none;
+        }
+        .msg-error.visible { display: block; }
+
+        /* Footer */
+        .footer { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color); text-align: center; }
+        .footer-tagline { font-size: 0.8rem; color: var(--text-muted-dark); margin-bottom: 0.5rem; }
+        .footer-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.25rem 0; font-size: 0.78rem; margin-bottom: 0.5rem; }
+        .footer-links a { color: var(--text-muted-dark); text-decoration: none; padding: 0 0.4rem; }
+        .footer-links a:hover { color: var(--text-dark); }
+        .footer-sep { color: #cbd5e1; }
+        .footer p { font-size: 0.75rem; color: var(--text-light); }
+
+        @media (max-width: 640px) {
+            .nav-links { gap: 0.25rem; }
+            .nav-link { padding: 0.4rem 0.6rem; font-size: 0.75rem; }
+            .content-zone { padding: 2rem 1rem 3rem; border-radius: 16px 16px 0 0; }
+            .page-hero h1 { font-size: 1.6rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="circuit-bg"></div>
+    <div class="app-container">
+
+        <nav class="nav">
+            <div class="nav-left">
+                <a class="nav-brand" href="index.html">Bolt <span class="bolt-icon">&#9889;</span></a>
+            </div>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Item Lookup</a>
+                <a href="item-age.html" class="nav-link">Serial Number Decoder</a>
+                <a href="field-reference.html" class="nav-link">Field Reference</a>
+                <a href="why-bolt.html" class="nav-link">Why Bolt?</a>
+                <a href="feedback.html" class="nav-link active">Feedback & Bugs</a>
+            </div>
+        </nav>
+
+        <div class="content-zone">
+            <div class="content-inner">
+
+                <div class="page-hero">
+                    <h1>Feedback & Bugs</h1>
+                    <p class="subheadline">Help improve Bolt — report an issue, suggest a feature, or share what you think.</p>
+                </div>
+
+                <div class="form-wrap">
+
+                    <!-- Success message (hidden until submission) -->
+                    <div class="msg-success" id="success-msg" style="display:none;">
+                        <div class="msg-icon">&#10003;</div>
+                        <h3>Thanks — got it.</h3>
+                        <p>Your feedback has been received. If you left an email address we'll follow up if needed.</p>
+                    </div>
+
+                    <!-- Feedback form -->
+                    <form id="feedback-form" novalidate>
+
+                        <div class="field-group">
+                            <label class="field-label" for="fb_type">Type <span style="color:#ef4444;">*</span></label>
+                            <select class="field-select" id="fb_type" name="fb_type" required>
+                                <option value="" disabled selected>Select a type…</option>
+                                <option value="Bug Report">Bug Report</option>
+                                <option value="Feature Request">Feature Request</option>
+                                <option value="General Feedback">General Feedback</option>
+                                <option value="Search Result Issue">Search Result Issue</option>
+                                <option value="Report Quality Issue">Report Quality Issue</option>
+                                <option value="Field Reference Issue">Field Reference Issue</option>
+                            </select>
+                        </div>
+
+                        <div class="field-group">
+                            <label class="field-label" for="fb_page">Page / Area <span class="optional">(optional)</span></label>
+                            <select class="field-select" id="fb_page" name="fb_page">
+                                <option value="" selected>Not sure / General</option>
+                                <option value="Item Lookup">Item Lookup</option>
+                                <option value="Serial Number Decoder">Serial Number Decoder</option>
+                                <option value="Field Reference">Field Reference</option>
+                                <option value="Why Bolt?">Why Bolt?</option>
+                                <option value="General / Other">General / Other</option>
+                            </select>
+                        </div>
+
+                        <div class="field-group">
+                            <label class="field-label" for="fb_message">Message <span style="color:#ef4444;">*</span></label>
+                            <textarea class="field-textarea" id="fb_message" name="fb_message" required placeholder="Describe the issue or suggestion in as much detail as you can…"></textarea>
+                        </div>
+
+                        <div class="field-group">
+                            <label class="field-label" for="fb_email">Your email <span class="optional">— only if you'd like a response</span></label>
+                            <input class="field-input" type="email" id="fb_email" name="fb_email" placeholder="you@example.com" autocomplete="email">
+                        </div>
+
+                        <div class="msg-error" id="error-msg"></div>
+
+                        <button type="submit" class="submit-btn" id="submit-btn">
+                            Send Feedback
+                        </button>
+
+                    </form>
+
+                </div>
+
+                <div class="footer">
+                    <p class="footer-tagline">Built for fast, accurate insurance product research and age verification.</p>
+                    <div class="footer-links">
+                        <a href="disclaimer.html">Disclaimer</a>
+                        <span class="footer-sep">|</span>
+                        <a href="contact.html">Contact</a>
+                        <span class="footer-sep">|</span>
+                        <a href="privacy-policy.html">Privacy Policy</a>
+                        <span class="footer-sep">|</span>
+                        <a href="security.html">Security</a>
+                        <span class="footer-sep">|</span>
+                        <a href="data-protection.html">Data Protection</a>
+                        <span class="footer-sep">|</span>
+                        <a href="terms.html">Terms of Use</a>
+                    </div>
+                    <p>&copy; 2026 Bolt Research Team. Internal use only.</p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- EmailJS SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script>
+        // ─────────────────────────────────────────────────────
+        // EmailJS configuration — set these to match your
+        // EmailJS dashboard (Public Key, Service ID, Template ID)
+        // ─────────────────────────────────────────────────────
+        var EMAILJS_PUBLIC_KEY  = 'YOUR_PUBLIC_KEY';
+        var EMAILJS_SERVICE_ID  = 'YOUR_SERVICE_ID';
+        var EMAILJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID';
+
+        emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+
+        document.getElementById('feedback-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            var form       = document.getElementById('feedback-form');
+            var submitBtn  = document.getElementById('submit-btn');
+            var errorMsg   = document.getElementById('error-msg');
+            var successMsg = document.getElementById('success-msg');
+
+            // Basic validation
+            var type    = document.getElementById('fb_type').value;
+            var message = document.getElementById('fb_message').value.trim();
+
+            errorMsg.classList.remove('visible');
+
+            if (!type) {
+                errorMsg.textContent = 'Please select a feedback type.';
+                errorMsg.classList.add('visible');
+                document.getElementById('fb_type').focus();
+                return;
+            }
+            if (!message) {
+                errorMsg.textContent = 'Please enter a message before submitting.';
+                errorMsg.classList.add('visible');
+                document.getElementById('fb_message').focus();
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Sending…';
+
+            emailjs.sendForm(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, form)
+                .then(function() {
+                    form.style.display = 'none';
+                    successMsg.style.display = 'block';
+                })
+                .catch(function(err) {
+                    console.error('EmailJS error:', err);
+                    errorMsg.textContent = 'Something went wrong — please try again or reach out directly.';
+                    errorMsg.classList.add('visible');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Send Feedback';
+                });
+        });
+    </script>
+</body>
+</html>
