@@ -281,19 +281,7 @@
         </div>
     </div>
 
-    <!-- EmailJS SDK -->
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <script>
-        // ─────────────────────────────────────────────────────
-        // EmailJS configuration — set these to match your
-        // EmailJS dashboard (Public Key, Service ID, Template ID)
-        // ─────────────────────────────────────────────────────
-        var EMAILJS_PUBLIC_KEY  = 'YOUR_PUBLIC_KEY';
-        var EMAILJS_SERVICE_ID  = 'YOUR_SERVICE_ID';
-        var EMAILJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID';
-
-        emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
-
         document.getElementById('feedback-form').addEventListener('submit', function(e) {
             e.preventDefault();
 
@@ -302,9 +290,10 @@
             var errorMsg   = document.getElementById('error-msg');
             var successMsg = document.getElementById('success-msg');
 
-            // Basic validation
             var type    = document.getElementById('fb_type').value;
+            var page    = document.getElementById('fb_page').value;
             var message = document.getElementById('fb_message').value.trim();
+            var email   = document.getElementById('fb_email').value.trim();
 
             errorMsg.classList.remove('visible');
 
@@ -324,18 +313,28 @@
             submitBtn.disabled = true;
             submitBtn.textContent = 'Sending…';
 
-            emailjs.sendForm(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, form)
-                .then(function() {
-                    form.style.display = 'none';
-                    successMsg.style.display = 'block';
+            fetch('/api/send-feedback', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    fb_type:    type,
+                    fb_page:    page,
+                    fb_message: message,
+                    fb_email:   email
                 })
-                .catch(function(err) {
-                    console.error('EmailJS error:', err);
-                    errorMsg.textContent = 'Something went wrong — please try again or reach out directly.';
-                    errorMsg.classList.add('visible');
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = 'Send Feedback';
-                });
+            })
+            .then(function(res) {
+                if (!res.ok) throw new Error('Server error ' + res.status);
+                form.style.display = 'none';
+                successMsg.style.display = 'block';
+            })
+            .catch(function(err) {
+                console.error('Feedback error:', err);
+                errorMsg.textContent = 'Something went wrong — please try again or reach out directly.';
+                errorMsg.classList.add('visible');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Send Feedback';
+            });
         });
     </script>
 </body>
