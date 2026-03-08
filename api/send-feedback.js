@@ -45,7 +45,7 @@ export default async function handler(req, res) {
       // boltresearchteam.com is verified in your Resend dashboard.
       // Verified sender: 'Bolt Feedback <feedback@boltresearchteam.com>'
       from:    'Bolt Feedback <onboarding@resend.dev>',
-      to:      ['joeybukowski3@gmail.com'],
+      to:      ['joeybuk03@gmail.com'],
       subject: `[Bolt Feedback] ${fb_type}${fb_page ? ' — ' + fb_page : ''}`,
       text:    bodyText,
     };
