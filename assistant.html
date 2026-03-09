@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon-bolt.svg?v=1">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bolt AI Assist — Item Research Tool</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="shared.css">
+    <link rel="stylesheet" href="components/chat/bolt-chat.css">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg-primary: #0f1629;
+            --bg-secondary: #161d35;
+            --bg-card: #ffffff;
+            --bg-card-alt: #f8fafc;
+            --border-color: #e2e8f0;
+            --border-accent: rgba(234,179,8,0.4);
+            --text-dark: #1e293b;
+            --text-mid: #475569;
+            --text-light: #94a3b8;
+            --text-white: #f1f5f9;
+            --text-muted-dark: #64748b;
+            --accent: #eab308;
+            --accent-hover: #facc15;
+            --accent-dim: rgba(234,179,8,0.1);
+        }
+
+        html, body { height: 100%; overflow: hidden; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-white);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .circuit-bg { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+        .circuit-bg::before {
+            content: ''; position: absolute; inset: 0;
+            background:
+                linear-gradient(90deg, transparent 49.5%, rgba(234,179,8,0.03) 49.5%, rgba(234,179,8,0.03) 50.5%, transparent 50.5%),
+                linear-gradient(0deg, transparent 49.5%, rgba(234,179,8,0.03) 49.5%, rgba(234,179,8,0.03) 50.5%, transparent 50.5%);
+            background-size: 60px 60px;
+        }
+        .circuit-bg::after {
+            content: ''; position: absolute; inset: 0;
+            background: radial-gradient(ellipse at 50% 0%, rgba(234,179,8,0.05) 0%, transparent 55%);
+        }
+
+        .app-container {
+            position: relative;
+            z-index: 1;
+            max-width: 1100px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-height: 0;
+        }
+
+        /* Navigation */
+        .nav { display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 0; flex-shrink: 0; }
+        .nav-left { display: flex; align-items: center; gap: 0.75rem; }
+        .nav-brand { display: flex; align-items: center; gap: 0.3rem; font-size: 1.3rem; font-weight: 800; color: var(--text-white); text-decoration: none; white-space: nowrap; }
+        .nav-brand .bolt-icon { color: var(--accent); }
+        .nav-links { display: flex; align-items: center; gap: 0.5rem; }
+        .nav-link { color: var(--text-light); text-decoration: none; font-size: 0.875rem; font-weight: 500; padding: 0.5rem 1rem; border-radius: 8px; transition: all 0.2s; white-space: nowrap; }
+        .nav-link:hover { color: var(--text-white); background: rgba(255,255,255,0.06); }
+        .nav-link.active { background: var(--accent); color: #000; font-weight: 600; }
+        .nav-link.active:hover { background: var(--accent-hover); }
+
+        /* Content zone — fills remaining height */
+        .content-zone {
+            background: #ffffff;
+            border-radius: 24px 24px 0 0;
+            margin: 1rem -1.5rem 0;
+            padding: 1.25rem 1.5rem 0;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .content-inner {
+            max-width: 1000px;
+            width: 100%;
+            margin: 0 auto;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+
+        /* Page sub-header */
+        .assistant-page-header {
+            display: flex;
+            align-items: baseline;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+        }
+
+        .assistant-page-header h1 {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            line-height: 1;
+        }
+
+        .assistant-page-header p {
+            font-size: 0.82rem;
+            color: var(--text-muted-dark);
+        }
+
+        @media (max-width: 640px) {
+            .nav-links { gap: 0.25rem; }
+            .nav-link { padding: 0.4rem 0.6rem; font-size: 0.75rem; }
+            html, body { overflow: auto; }
+            .content-zone { min-height: 100vh; overflow: visible; }
+        }
+    </style>
+</head>
+<body>
+    <div class="circuit-bg"></div>
+    <div class="app-container">
+
+        <nav class="nav">
+            <div class="nav-left">
+                <a class="nav-brand" href="index.html">Bolt <span class="bolt-icon">&#9889;</span></a>
+            </div>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Item Lookup</a>
+                <a href="item-age.html" class="nav-link">Serial Decoder</a>
+                <a href="field-reference.html" class="nav-link">Field Reference</a>
+                <a href="why-bolt.html" class="nav-link">Why Bolt?</a>
+                <a href="assistant.html" class="nav-link active">Bolt AI</a>
+                <a href="feedback.html" class="nav-link">Feedback &amp; Bugs</a>
+            </div>
+        </nav>
+
+        <div class="content-zone">
+            <div class="content-inner">
+
+                <div class="assistant-page-header">
+                    <h1>&#9889; Bolt AI Assist</h1>
+                    <p>Specialized research assistant for insurance professionals</p>
+                </div>
+
+                <div class="assistant-layout">
+
+                    <!-- Sidebar -->
+                    <div class="assistant-sidebar">
+                        <button class="assistant-new-btn" id="new-chat-btn">+ New Chat</button>
+                        <button class="assistant-clear-btn" id="clear-chat-btn">Clear History</button>
+
+                        <div>
+                            <div class="assistant-sidebar-label">Quick Prompts</div>
+                            <div class="assistant-quick-list">
+                                <button class="assistant-quick-btn" data-prompt="How do I decode a Carrier air conditioner serial number to find the manufacture date?">&#128269; Carrier serial decode</button>
+                                <button class="assistant-quick-btn" data-prompt="What is the typical lifespan of a residential HVAC system?">&#9201; HVAC life expectancy</button>
+                                <button class="assistant-quick-btn" data-prompt="What are the specs for a standard 40-gallon residential gas water heater?">&#128167; Water heater specs</button>
+                                <button class="assistant-quick-btn" data-prompt="How do I decode a Whirlpool appliance serial number to find the manufacture date?">&#128269; Whirlpool serial decode</button>
+                                <button class="assistant-quick-btn" data-prompt="What is the average replacement cost for a 3-ton residential central air conditioner?">&#128176; AC replacement cost</button>
+                                <button class="assistant-quick-btn" data-prompt="What are the life expectancy estimates for common household appliances like washers, dryers, and refrigerators?">&#128203; Appliance life expectancy</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Main chat -->
+                    <div class="assistant-main">
+                        <div class="assistant-chat-header">
+                            <span class="assistant-chat-header-icon">&#9889;</span>
+                            <span class="assistant-chat-header-title">Bolt AI Assist</span>
+                            <span class="assistant-chat-header-sub">Powered by Gemini</span>
+                        </div>
+
+                        <div class="assistant-messages" id="assistant-messages">
+                            <!-- Populated by JS -->
+                        </div>
+
+                        <div class="assistant-input-area">
+                            <div class="assistant-input-row">
+                                <textarea
+                                    id="assistant-input"
+                                    class="assistant-input"
+                                    placeholder="Ask about any equipment, serial number, or insurance claim…"
+                                    rows="1"
+                                    autocomplete="off"
+                                ></textarea>
+                                <button class="assistant-send-btn" id="assistant-send">
+                                    Send &#10148;
+                                </button>
+                            </div>
+                            <div class="assistant-input-hint">Enter to send &nbsp;&middot;&nbsp; Shift+Enter for new line</div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- marked.js for markdown rendering in model messages -->
+    <script src="https://cdn.jsdelivr.net/npm/marked@9/marked.min.js"></script>
+    <!-- BoltChatService (localStorage + /api/chat proxy) -->
+    <script src="components/chat/gemini-service.js"></script>
+
+    <script>
+        (function() {
+            'use strict';
+
+            var history = BoltChatService.loadHistory();
+            var isLoading = false;
+
+            var messagesEl = document.getElementById('assistant-messages');
+            var inputEl    = document.getElementById('assistant-input');
+            var sendBtn    = document.getElementById('assistant-send');
+
+            /* ── Markdown rendering ────────────────────────────── */
+
+            function renderMarkdown(text) {
+                if (typeof marked !== 'undefined') {
+                    try {
+                        return marked.parse(text, { breaks: true, gfm: true });
+                    } catch (_) {}
+                }
+                var d = document.createElement('div');
+                d.textContent = text;
+                return d.innerHTML.replace(/\n/g, '<br>');
+            }
+
+            function escHtml(str) {
+                var d = document.createElement('div');
+                d.appendChild(document.createTextNode(str));
+                return d.innerHTML.replace(/\n/g, '<br>');
+            }
+
+            /* ── Render conversation ───────────────────────────── */
+
+            function renderMessages() {
+                if (history.length === 0) {
+                    messagesEl.innerHTML =
+                        '<div class="assistant-welcome">' +
+                        '  <div class="assistant-welcome-icon">&#9889;</div>' +
+                        '  <h3>Bolt AI Assist</h3>' +
+                        '  <p>Ask me anything about equipment age, serial numbers, technical specifications, life expectancy, or replacement values — built for insurance professionals.</p>' +
+                        '</div>';
+                    return;
+                }
+
+                messagesEl.innerHTML = history.map(function(msg) {
+                    var isUser = msg.role === 'user';
+                    var content = isUser
+                        ? escHtml(msg.text)
+                        : renderMarkdown(msg.text);
+                    return (
+                        '<div class="bolt-msg-full bolt-msg-full-' + msg.role + '">' +
+                        '  <div class="bolt-msg-full-label">' + (isUser ? 'You' : 'Bolt AI') + '</div>' +
+                        '  <div class="bolt-msg-full-bubble">' + content + '</div>' +
+                        '</div>'
+                    );
+                }).join('');
+
+                messagesEl.scrollTop = messagesEl.scrollHeight;
+            }
+
+            function appendMessage(msg) {
+                var isUser = msg.role === 'user';
+                var content = isUser
+                    ? escHtml(msg.text)
+                    : renderMarkdown(msg.text);
+
+                // Remove welcome state if present
+                var welcome = messagesEl.querySelector('.assistant-welcome');
+                if (welcome) welcome.parentNode.removeChild(welcome);
+
+                var el = document.createElement('div');
+                el.className = 'bolt-msg-full bolt-msg-full-' + msg.role;
+                el.innerHTML =
+                    '<div class="bolt-msg-full-label">' + (isUser ? 'You' : 'Bolt AI') + '</div>' +
+                    '<div class="bolt-msg-full-bubble">' + content + '</div>';
+                messagesEl.appendChild(el);
+                messagesEl.scrollTop = messagesEl.scrollHeight;
+            }
+
+            function showTyping() {
+                var welcome = messagesEl.querySelector('.assistant-welcome');
+                if (welcome) welcome.parentNode.removeChild(welcome);
+
+                var el = document.createElement('div');
+                el.id = 'assistant-typing';
+                el.className = 'bolt-typing-full';
+                el.innerHTML =
+                    '<div class="bolt-msg-full-label">Bolt AI</div>' +
+                    '<div class="bolt-msg-full-bubble">' +
+                    '  <div class="bolt-typing-dots"><span></span><span></span><span></span></div>' +
+                    '</div>';
+                messagesEl.appendChild(el);
+                messagesEl.scrollTop = messagesEl.scrollHeight;
+            }
+
+            function hideTyping() {
+                var el = document.getElementById('assistant-typing');
+                if (el) el.parentNode.removeChild(el);
+            }
+
+            /* ── Send ──────────────────────────────────────────── */
+
+            async function send() {
+                var text = (inputEl.value || '').trim();
+                if (!text || isLoading) return;
+
+                inputEl.value = '';
+                inputEl.style.height = 'auto';
+                isLoading = true;
+                sendBtn.disabled = true;
+
+                var userMsg = { role: 'user', text: text };
+                history.push(userMsg);
+                BoltChatService.saveHistory(history);
+                appendMessage(userMsg);
+                showTyping();
+
+                try {
+                    var reply = await BoltChatService.sendMessage(history);
+                    hideTyping();
+                    var modelMsg = { role: 'model', text: reply };
+                    history.push(modelMsg);
+                    BoltChatService.saveHistory(history);
+                    appendMessage(modelMsg);
+                } catch (err) {
+                    console.error('[BoltAI]', err);
+                    hideTyping();
+                    var errMsg = { role: 'model', text: 'Something went wrong. Please check your connection and try again.' };
+                    history.push(errMsg);
+                    BoltChatService.saveHistory(history);
+                    appendMessage(errMsg);
+                }
+
+                isLoading = false;
+                sendBtn.disabled = false;
+                inputEl.focus();
+            }
+
+            /* ── Events ────────────────────────────────────────── */
+
+            sendBtn.addEventListener('click', send);
+
+            inputEl.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    send();
+                }
+            });
+
+            inputEl.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = Math.min(this.scrollHeight, 140) + 'px';
+            });
+
+            document.getElementById('new-chat-btn').addEventListener('click', function() {
+                history = [];
+                BoltChatService.clearHistory();
+                renderMessages();
+                inputEl.focus();
+            });
+
+            document.getElementById('clear-chat-btn').addEventListener('click', function() {
+                history = [];
+                BoltChatService.clearHistory();
+                renderMessages();
+            });
+
+            document.querySelectorAll('.assistant-quick-btn').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    var prompt = btn.getAttribute('data-prompt');
+                    if (prompt) {
+                        inputEl.value = prompt;
+                        inputEl.dispatchEvent(new Event('input'));
+                        inputEl.focus();
+                    }
+                });
+            });
+
+            /* ── Init ──────────────────────────────────────────── */
+            renderMessages();
+            inputEl.focus();
+
+        })();
+    </script>
+</body>
+</html>
