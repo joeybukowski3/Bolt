@@ -154,28 +154,72 @@
                     <p>Specialized research assistant for insurance professionals</p>
                 </div>
 
+                <!-- Mobile sidebar toggle (hidden on desktop) -->
+                <button class="conv-mobile-toggle" id="conv-mobile-toggle">&#9776; Conversations</button>
+
+                <!-- Mobile overlay -->
+                <div class="conv-overlay" id="conv-overlay"></div>
+
                 <div class="assistant-layout">
 
-                    <!-- Sidebar -->
-                    <div class="assistant-sidebar">
-                        <button class="assistant-new-btn" id="new-chat-btn">+ New Chat</button>
-                        <button class="assistant-clear-btn" id="clear-chat-btn">Clear History</button>
-
-                        <div>
-                            <div class="assistant-sidebar-label">Quick Prompts</div>
-                            <div class="assistant-quick-list">
-                                <button class="assistant-quick-btn" data-prompt="How do I decode a Carrier air conditioner serial number to find the manufacture date?">&#128269; Carrier serial decode</button>
-                                <button class="assistant-quick-btn" data-prompt="What is the typical lifespan of a residential HVAC system?">&#9201; HVAC life expectancy</button>
-                                <button class="assistant-quick-btn" data-prompt="What are the specs for a standard 40-gallon residential gas water heater?">&#128167; Water heater specs</button>
-                                <button class="assistant-quick-btn" data-prompt="How do I decode a Whirlpool appliance serial number to find the manufacture date?">&#128269; Whirlpool serial decode</button>
-                                <button class="assistant-quick-btn" data-prompt="What is the average replacement cost for a 3-ton residential central air conditioner?">&#128176; AC replacement cost</button>
-                                <button class="assistant-quick-btn" data-prompt="What are the life expectancy estimates for common household appliances like washers, dryers, and refrigerators?">&#128203; Appliance life expectancy</button>
-                            </div>
+                    <!-- Conversation Sidebar -->
+                    <div class="conv-sidebar" id="conv-sidebar">
+                        <div class="conv-sidebar-hd">
+                            Conversations
+                            <button class="conv-sidebar-close-btn" id="conv-sidebar-close" aria-label="Close sidebar">&#10005;</button>
                         </div>
-                    </div>
+
+                        <div class="conv-sidebar-body">
+
+                            <!-- Recent Conversations -->
+                            <div class="conv-section">
+                                <div class="conv-section-label">Recent</div>
+                                <div id="conv-recent-list" class="conv-list"></div>
+                            </div>
+
+                            <!-- Saved Conversations -->
+                            <div class="conv-section">
+                                <div class="conv-section-label">Saved</div>
+                                <div id="conv-saved-list" class="conv-list"></div>
+                            </div>
+
+                            <!-- Quick Prompts (existing) -->
+                            <div class="conv-section">
+                                <div class="conv-section-label">Quick Prompts</div>
+                                <div class="assistant-quick-list">
+                                    <button class="assistant-quick-btn" data-prompt="How do I decode a Carrier air conditioner serial number to find the manufacture date?">&#128269; Carrier serial decode</button>
+                                    <button class="assistant-quick-btn" data-prompt="What is the typical lifespan of a residential HVAC system?">&#9201; HVAC life expectancy</button>
+                                    <button class="assistant-quick-btn" data-prompt="What are the specs for a standard 40-gallon residential gas water heater?">&#128167; Water heater specs</button>
+                                    <button class="assistant-quick-btn" data-prompt="How do I decode a Whirlpool appliance serial number to find the manufacture date?">&#128269; Whirlpool serial decode</button>
+                                    <button class="assistant-quick-btn" data-prompt="What is the average replacement cost for a 3-ton residential central air conditioner?">&#128176; AC replacement cost</button>
+                                    <button class="assistant-quick-btn" data-prompt="What are the life expectancy estimates for common household appliances like washers, dryers, and refrigerators?">&#128203; Appliance life expectancy</button>
+                                </div>
+                            </div>
+
+                        </div><!-- /.conv-sidebar-body -->
+
+                        <div class="conv-sidebar-ft">
+                            <button class="assistant-clear-btn" id="clear-chat-btn">Clear Active Chat</button>
+                            <button class="conv-new-chat-btn" id="new-chat-btn">+ New Chat</button>
+                        </div>
+                    </div><!-- /.conv-sidebar -->
 
                     <!-- Main chat -->
                     <div class="assistant-main">
+
+                        <!-- Past conversation view banner -->
+                        <div id="conv-view-banner" class="conv-view-banner conv-view-banner-hidden">
+                            <div class="conv-view-banner-inner">
+                                <div class="conv-view-banner-text">
+                                    Viewing past conversation &mdash; <strong id="conv-view-banner-title"></strong>
+                                </div>
+                                <div class="conv-view-banner-btns">
+                                    <button id="conv-resume-btn" class="conv-banner-btn-primary">Resume This Chat</button>
+                                    <button id="conv-new-from-view-btn" class="conv-banner-btn-secondary">Start New Chat</button>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="assistant-chat-header">
                             <span class="assistant-chat-header-icon">&#9889;</span>
                             <span class="assistant-chat-header-title">Bolt AI Assist</span>
@@ -199,11 +243,21 @@
                                     Send &#10148;
                                 </button>
                             </div>
+                            <!-- New Context Question -->
+                            <div class="new-context-row">
+                                <label class="new-context-label" id="new-context-label-el">
+                                    <input type="checkbox" id="new-context-checkbox" class="new-context-checkbox">
+                                    New Context Question
+                                </label>
+                                <span class="new-context-info-icon" title="Sends your next message without prior conversation context. Useful for switching to a new claim or item.">&#9432;</span>
+                                <span id="new-context-hint" class="new-context-hint" style="display:none;">Your next message will be answered without context from this conversation.</span>
+                            </div>
                             <div class="assistant-input-hint">Enter to send &nbsp;&middot;&nbsp; Shift+Enter for new line</div>
                         </div>
-                    </div>
 
-                </div>
+                    </div><!-- /.assistant-main -->
+
+                </div><!-- /.assistant-layout -->
 
             </div>
         </div>
@@ -215,187 +269,556 @@
     <script src="components/chat/gemini-service.js"></script>
 
     <script>
-        (function() {
-            'use strict';
+    (function() {
+        'use strict';
 
-            var history = BoltChatService.loadHistory();
-            var isLoading = false;
+        /* ── Constants ─────────────────────────────────────── */
+        var CONV_PREFIX   = 'bolt_conversation_';
+        var SAVED_KEY     = 'bolt_saved_convs';
+        var MAX_TOTAL     = 20;
+        var MAX_RECENT_UI = 5;
+        var MAX_SAVED_UI  = 3;
 
-            var messagesEl = document.getElementById('assistant-messages');
-            var inputEl    = document.getElementById('assistant-input');
-            var sendBtn    = document.getElementById('assistant-send');
+        /* ── State ─────────────────────────────────────────── */
+        var history          = BoltChatService.loadHistory(); // current context segment
+        var displayItems     = [];  // { type:'msg', msg:{} } | { type:'divider' }
+        var isLoading        = false;
+        var isViewingPast    = false;
+        var viewingConvId    = null;
+        var newContextPending = false;
 
-            /* ── Markdown rendering ────────────────────────────── */
+        // Init displayItems from loaded history
+        history.forEach(function(msg) {
+            displayItems.push({ type: 'msg', msg: msg });
+        });
 
-            function renderMarkdown(text) {
-                if (typeof marked !== 'undefined') {
-                    try {
-                        return marked.parse(text, { breaks: true, gfm: true });
-                    } catch (_) {}
+        /* ── DOM refs ──────────────────────────────────────── */
+        var messagesEl         = document.getElementById('assistant-messages');
+        var inputEl            = document.getElementById('assistant-input');
+        var sendBtn            = document.getElementById('assistant-send');
+        var newChatBtn         = document.getElementById('new-chat-btn');
+        var clearChatBtn       = document.getElementById('clear-chat-btn');
+        var newContextChk      = document.getElementById('new-context-checkbox');
+        var newContextHint     = document.getElementById('new-context-hint');
+        var newContextLabelEl  = document.getElementById('new-context-label-el');
+        var convViewBanner     = document.getElementById('conv-view-banner');
+        var convViewBannerTitle= document.getElementById('conv-view-banner-title');
+        var convResumeBtn      = document.getElementById('conv-resume-btn');
+        var convNewFromViewBtn = document.getElementById('conv-new-from-view-btn');
+        var convRecentList     = document.getElementById('conv-recent-list');
+        var convSavedList      = document.getElementById('conv-saved-list');
+        var convSidebar        = document.getElementById('conv-sidebar');
+        var convOverlay        = document.getElementById('conv-overlay');
+        var convMobileToggle   = document.getElementById('conv-mobile-toggle');
+        var convSidebarClose   = document.getElementById('conv-sidebar-close');
+
+        /* ── Storage helpers ───────────────────────────────── */
+        function getAllConvs() {
+            var convs = [];
+            for (var i = 0; i < localStorage.length; i++) {
+                var k = localStorage.key(i);
+                if (k && k.startsWith(CONV_PREFIX)) {
+                    try { convs.push(JSON.parse(localStorage.getItem(k))); } catch(e) {}
                 }
-                var d = document.createElement('div');
-                d.textContent = text;
-                return d.innerHTML.replace(/\n/g, '<br>');
+            }
+            return convs.sort(function(a, b) { return b.timestamp - a.timestamp; });
+        }
+
+        function getSavedIds() {
+            try { return JSON.parse(localStorage.getItem(SAVED_KEY)) || []; } catch(e) { return []; }
+        }
+
+        function setSavedIds(ids) {
+            localStorage.setItem(SAVED_KEY, JSON.stringify(ids));
+        }
+
+        function storeConv(conv) {
+            localStorage.setItem(CONV_PREFIX + conv.id, JSON.stringify(conv));
+            enforceCap();
+        }
+
+        function deleteConv(id) {
+            localStorage.removeItem(CONV_PREFIX + id);
+            var ids = getSavedIds();
+            var idx = ids.indexOf(id);
+            if (idx !== -1) { ids.splice(idx, 1); setSavedIds(ids); }
+        }
+
+        function enforceCap() {
+            var convs  = getAllConvs();
+            var savedIds = getSavedIds();
+            var unsaved = convs.filter(function(c) { return !savedIds.includes(c.id); });
+            while (unsaved.length > MAX_TOTAL) {
+                localStorage.removeItem(CONV_PREFIX + unsaved[unsaved.length - 1].id);
+                unsaved.pop();
+            }
+        }
+
+        /* ── Title generation (async, non-blocking) ────────── */
+        function generateTitleAsync(messages, convId) {
+            var titleHistory = messages.filter(function(m) { return m.role !== 'divider'; }).slice();
+            titleHistory.push({
+                role: 'user',
+                text: 'Summarize this conversation in 4-6 words as a title. Be specific to the item or topic discussed. Examples: "Samsung TV LKQ Evaluation", "Roof Damage Cause of Loss", "GE Refrigerator Age Decode". Return only the title, nothing else.'
+            });
+            BoltChatService.sendMessage(titleHistory).then(function(title) {
+                title = (title || '').trim().replace(/^["'`\s]+|["'`\s]+$/g, '').slice(0, 60);
+                if (!title) return;
+                var raw = localStorage.getItem(CONV_PREFIX + convId);
+                if (!raw) return;
+                try {
+                    var c = JSON.parse(raw);
+                    c.title = title;
+                    localStorage.setItem(CONV_PREFIX + convId, JSON.stringify(c));
+                    renderSidebar();
+                } catch(e) {}
+            }).catch(function() {});
+        }
+
+        /* ── Save current segment to Recent ────────────────── */
+        function saveSegmentToRecent(messages) {
+            if (!messages || messages.length === 0) return;
+            var firstUserMsg = messages.find(function(m) { return m.role === 'user'; });
+            var fallback = firstUserMsg ? firstUserMsg.text.slice(0, 40) : 'Conversation';
+            var id = Date.now();
+            storeConv({ id: id, title: fallback, messages: messages.slice(), timestamp: id });
+            renderSidebar();
+            generateTitleAsync(messages, id);
+        }
+
+        /* ── Conv icon detection ───────────────────────────── */
+        function getConvIcon(messages) {
+            var text = (messages || []).map(function(m) { return (m.text || '').toLowerCase(); }).join(' ');
+            if (/serial|decode|manufactur/.test(text)) return '&#128269;';
+            if (/cost|price|replacement|value|estimate/.test(text)) return '&#128176;';
+            if (/life expectan|lifespan/.test(text)) return '&#128197;';
+            return '&#128172;';
+        }
+
+        /* ── Relative time ─────────────────────────────────── */
+        function relTime(ts) {
+            var diff = Date.now() - ts;
+            var day  = 86400000;
+            if (diff < day) return 'Today';
+            if (diff < 2 * day) return 'Yesterday';
+            var d = new Date(ts);
+            var mo = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+            return mo[d.getMonth()] + ' ' + d.getDate();
+        }
+
+        function escS(str) {
+            return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        /* ── Sidebar render ────────────────────────────────── */
+        function renderSidebar() {
+            var convs    = getAllConvs();
+            var savedIds = getSavedIds();
+            var recent   = convs.slice(0, MAX_RECENT_UI);
+            var saved    = convs.filter(function(c) { return savedIds.includes(c.id); }).slice(0, MAX_SAVED_UI);
+
+            // Recent list
+            if (recent.length === 0) {
+                convRecentList.innerHTML = '<div class="conv-empty">No recent conversations</div>';
+            } else {
+                convRecentList.innerHTML = recent.map(function(c) {
+                    var isSaved  = savedIds.includes(c.id);
+                    var isActive = c.id === viewingConvId;
+                    return (
+                        '<div class="conv-entry' + (isActive ? ' conv-entry-active' : '') + '" data-conv-id="' + c.id + '">' +
+                        '<span class="conv-entry-icon">' + getConvIcon(c.messages) + '</span>' +
+                        '<div class="conv-entry-body">' +
+                          '<div class="conv-entry-title">' + escS(c.title || 'Conversation') + '</div>' +
+                          '<div class="conv-entry-time">' + relTime(c.timestamp) + '</div>' +
+                        '</div>' +
+                        '<div class="conv-entry-actions">' +
+                          '<button class="conv-action-btn conv-action-star' + (isSaved ? ' conv-action-star-active' : '') + '" data-action="star" data-conv-id="' + c.id + '" title="' + (isSaved ? 'Remove from saved' : 'Save conversation') + '">' + (isSaved ? '&#9733;' : '&#9734;') + '</button>' +
+                          '<button class="conv-action-btn conv-action-delete" data-action="delete" data-conv-id="' + c.id + '" title="Delete">&#10005;</button>' +
+                        '</div>' +
+                        '</div>'
+                    );
+                }).join('');
             }
 
-            function escHtml(str) {
-                var d = document.createElement('div');
-                d.appendChild(document.createTextNode(str));
-                return d.innerHTML.replace(/\n/g, '<br>');
+            // Saved list
+            if (saved.length === 0) {
+                convSavedList.innerHTML = '<div class="conv-empty">No saved conversations</div>';
+            } else {
+                convSavedList.innerHTML = saved.map(function(c) {
+                    var isActive = c.id === viewingConvId;
+                    return (
+                        '<div class="conv-entry' + (isActive ? ' conv-entry-active' : '') + '" data-conv-id="' + c.id + '">' +
+                        '<span class="conv-entry-icon">&#9733;</span>' +
+                        '<div class="conv-entry-body">' +
+                          '<div class="conv-entry-title">' + escS(c.title || 'Conversation') + '</div>' +
+                          '<div class="conv-entry-time">' + relTime(c.timestamp) + '</div>' +
+                        '</div>' +
+                        '<div class="conv-entry-actions">' +
+                          '<button class="conv-action-btn conv-action-star conv-action-star-active" data-action="star" data-conv-id="' + c.id + '" title="Remove from saved">&#9733;</button>' +
+                        '</div>' +
+                        '</div>'
+                    );
+                }).join('');
+            }
+        }
+
+        /* ── Markdown / HTML helpers ───────────────────────── */
+        function renderMarkdown(text) {
+            if (typeof marked !== 'undefined') {
+                try { return marked.parse(text, { breaks: true, gfm: true }); } catch(_) {}
+            }
+            var d = document.createElement('div');
+            d.textContent = text;
+            return d.innerHTML.replace(/\n/g, '<br>');
+        }
+
+        function escHtml(str) {
+            var d = document.createElement('div');
+            d.appendChild(document.createTextNode(str));
+            return d.innerHTML.replace(/\n/g, '<br>');
+        }
+
+        /* ── Message rendering ─────────────────────────────── */
+        function renderMessages() {
+            if (displayItems.length === 0) {
+                messagesEl.innerHTML =
+                    '<div class="assistant-welcome">' +
+                    '  <div class="assistant-welcome-icon">&#9889;</div>' +
+                    '  <h3>Bolt AI Assist</h3>' +
+                    '  <p>Ask me anything about equipment age, serial numbers, technical specifications, life expectancy, or replacement values — built for insurance professionals.</p>' +
+                    '</div>';
+                return;
+            }
+            messagesEl.innerHTML = displayItems.map(function(item) {
+                if (item.type === 'divider') {
+                    return '<div class="conv-ctx-divider"><span>New Context</span></div>';
+                }
+                var msg = item.msg;
+                var isUser = msg.role === 'user';
+                var content = isUser ? escHtml(msg.text) : renderMarkdown(msg.text);
+                return (
+                    '<div class="bolt-msg-full bolt-msg-full-' + msg.role + '">' +
+                    '  <div class="bolt-msg-full-label">' + (isUser ? 'You' : 'Bolt AI') + '</div>' +
+                    '  <div class="bolt-msg-full-bubble">' + content + '</div>' +
+                    '</div>'
+                );
+            }).join('');
+            messagesEl.scrollTop = messagesEl.scrollHeight;
+        }
+
+        function appendMessage(msg) {
+            var isUser = msg.role === 'user';
+            var content = isUser ? escHtml(msg.text) : renderMarkdown(msg.text);
+            var welcome = messagesEl.querySelector('.assistant-welcome');
+            if (welcome) welcome.parentNode.removeChild(welcome);
+            var el = document.createElement('div');
+            el.className = 'bolt-msg-full bolt-msg-full-' + msg.role;
+            el.innerHTML =
+                '<div class="bolt-msg-full-label">' + (isUser ? 'You' : 'Bolt AI') + '</div>' +
+                '<div class="bolt-msg-full-bubble">' + content + '</div>';
+            messagesEl.appendChild(el);
+            messagesEl.scrollTop = messagesEl.scrollHeight;
+        }
+
+        function appendDivider() {
+            var el = document.createElement('div');
+            el.className = 'conv-ctx-divider';
+            el.innerHTML = '<span>New Context</span>';
+            messagesEl.appendChild(el);
+            messagesEl.scrollTop = messagesEl.scrollHeight;
+        }
+
+        function showTyping() {
+            var welcome = messagesEl.querySelector('.assistant-welcome');
+            if (welcome) welcome.parentNode.removeChild(welcome);
+            var el = document.createElement('div');
+            el.id = 'assistant-typing';
+            el.className = 'bolt-typing-full';
+            el.innerHTML =
+                '<div class="bolt-msg-full-label">Bolt AI</div>' +
+                '<div class="bolt-msg-full-bubble">' +
+                '  <div class="bolt-typing-dots"><span></span><span></span><span></span></div>' +
+                '</div>';
+            messagesEl.appendChild(el);
+            messagesEl.scrollTop = messagesEl.scrollHeight;
+        }
+
+        function hideTyping() {
+            var el = document.getElementById('assistant-typing');
+            if (el) el.parentNode.removeChild(el);
+        }
+
+        /* ── Send ──────────────────────────────────────────── */
+        async function send() {
+            var text = (inputEl.value || '').trim();
+            if (!text || isLoading || isViewingPast) return;
+
+            var isNewCtx = newContextPending;
+
+            inputEl.value = '';
+            inputEl.style.height = 'auto';
+            isLoading = true;
+            sendBtn.disabled = true;
+
+            // Reset checkbox
+            if (newContextPending) {
+                newContextPending = false;
+                newContextChk.checked = false;
+                newContextHint.style.display = 'none';
+                newContextLabelEl.classList.remove('new-context-active');
             }
 
-            /* ── Render conversation ───────────────────────────── */
+            // If new context: save current segment to Recent, add divider
+            if (isNewCtx && history.length > 0) {
+                saveSegmentToRecent(history.slice());
+                displayItems.push({ type: 'divider' });
+                appendDivider();
+                history = [];
+                BoltChatService.saveHistory(history);
+            }
 
-            function renderMessages() {
-                if (history.length === 0) {
-                    messagesEl.innerHTML =
-                        '<div class="assistant-welcome">' +
-                        '  <div class="assistant-welcome-icon">&#9889;</div>' +
-                        '  <h3>Bolt AI Assist</h3>' +
-                        '  <p>Ask me anything about equipment age, serial numbers, technical specifications, life expectancy, or replacement values — built for insurance professionals.</p>' +
-                        '</div>';
-                    return;
-                }
+            var userMsg = { role: 'user', text: text };
+            history.push(userMsg);
+            displayItems.push({ type: 'msg', msg: userMsg });
+            BoltChatService.saveHistory(history);
+            appendMessage(userMsg);
+            showTyping();
 
-                messagesEl.innerHTML = history.map(function(msg) {
+            try {
+                var reply = await BoltChatService.sendMessage(history.slice());
+                hideTyping();
+                var modelMsg = { role: 'model', text: reply };
+                history.push(modelMsg);
+                displayItems.push({ type: 'msg', msg: modelMsg });
+                BoltChatService.saveHistory(history);
+                appendMessage(modelMsg);
+            } catch(err) {
+                console.error('[BoltAI]', err);
+                hideTyping();
+                var errMsg = { role: 'model', text: 'Something went wrong. Please check your connection and try again.' };
+                history.push(errMsg);
+                displayItems.push({ type: 'msg', msg: errMsg });
+                BoltChatService.saveHistory(history);
+                appendMessage(errMsg);
+            }
+
+            isLoading = false;
+            sendBtn.disabled = false;
+            inputEl.focus();
+        }
+
+        /* ── New Chat ──────────────────────────────────────── */
+        function startNewChat() {
+            if (history.length > 0) {
+                saveSegmentToRecent(history.slice());
+            }
+            history = [];
+            displayItems = [];
+            viewingConvId = null;
+            isViewingPast = false;
+            BoltChatService.clearHistory();
+            hideBanner();
+            setInputDisabled(false);
+            renderMessages();
+            renderSidebar();
+            inputEl.focus();
+        }
+
+        /* ── Load past conversation ────────────────────────── */
+        function loadConversation(id) {
+            var raw = localStorage.getItem(CONV_PREFIX + id);
+            if (!raw) return;
+            try {
+                var conv = JSON.parse(raw);
+                viewingConvId = id;
+                isViewingPast = true;
+                var msgs = conv.messages || [];
+                messagesEl.innerHTML = msgs.map(function(msg) {
                     var isUser = msg.role === 'user';
-                    var content = isUser
-                        ? escHtml(msg.text)
-                        : renderMarkdown(msg.text);
+                    var content = isUser ? escHtml(msg.text) : renderMarkdown(msg.text);
                     return (
                         '<div class="bolt-msg-full bolt-msg-full-' + msg.role + '">' +
                         '  <div class="bolt-msg-full-label">' + (isUser ? 'You' : 'Bolt AI') + '</div>' +
                         '  <div class="bolt-msg-full-bubble">' + content + '</div>' +
                         '</div>'
                     );
-                }).join('');
-
+                }).join('') || '<div class="assistant-welcome"><div class="assistant-welcome-icon">&#9889;</div><h3>Empty Conversation</h3></div>';
                 messagesEl.scrollTop = messagesEl.scrollHeight;
-            }
+                showBanner(conv.title || 'Past Conversation');
+                setInputDisabled(true);
+                renderSidebar();
+            } catch(e) { console.error('[BoltAI] loadConversation', e); }
+        }
 
-            function appendMessage(msg) {
-                var isUser = msg.role === 'user';
-                var content = isUser
-                    ? escHtml(msg.text)
-                    : renderMarkdown(msg.text);
+        function showBanner(title) {
+            convViewBannerTitle.textContent = title;
+            convViewBanner.classList.remove('conv-view-banner-hidden');
+        }
+        function hideBanner() {
+            convViewBanner.classList.add('conv-view-banner-hidden');
+        }
 
-                // Remove welcome state if present
-                var welcome = messagesEl.querySelector('.assistant-welcome');
-                if (welcome) welcome.parentNode.removeChild(welcome);
+        function setInputDisabled(disabled) {
+            inputEl.disabled = disabled;
+            sendBtn.disabled = disabled;
+            inputEl.placeholder = disabled
+                ? 'Select "Resume This Chat" or "Start New Chat" to continue…'
+                : 'Ask about any equipment, serial number, or insurance claim…';
+        }
 
-                var el = document.createElement('div');
-                el.className = 'bolt-msg-full bolt-msg-full-' + msg.role;
-                el.innerHTML =
-                    '<div class="bolt-msg-full-label">' + (isUser ? 'You' : 'Bolt AI') + '</div>' +
-                    '<div class="bolt-msg-full-bubble">' + content + '</div>';
-                messagesEl.appendChild(el);
-                messagesEl.scrollTop = messagesEl.scrollHeight;
-            }
-
-            function showTyping() {
-                var welcome = messagesEl.querySelector('.assistant-welcome');
-                if (welcome) welcome.parentNode.removeChild(welcome);
-
-                var el = document.createElement('div');
-                el.id = 'assistant-typing';
-                el.className = 'bolt-typing-full';
-                el.innerHTML =
-                    '<div class="bolt-msg-full-label">Bolt AI</div>' +
-                    '<div class="bolt-msg-full-bubble">' +
-                    '  <div class="bolt-typing-dots"><span></span><span></span><span></span></div>' +
-                    '</div>';
-                messagesEl.appendChild(el);
-                messagesEl.scrollTop = messagesEl.scrollHeight;
-            }
-
-            function hideTyping() {
-                var el = document.getElementById('assistant-typing');
-                if (el) el.parentNode.removeChild(el);
-            }
-
-            /* ── Send ──────────────────────────────────────────── */
-
-            async function send() {
-                var text = (inputEl.value || '').trim();
-                if (!text || isLoading) return;
-
-                inputEl.value = '';
-                inputEl.style.height = 'auto';
-                isLoading = true;
-                sendBtn.disabled = true;
-
-                var userMsg = { role: 'user', text: text };
-                history.push(userMsg);
+        /* ── Resume past conversation ──────────────────────── */
+        function resumeConversation() {
+            if (!viewingConvId) return;
+            var raw = localStorage.getItem(CONV_PREFIX + viewingConvId);
+            if (!raw) return;
+            try {
+                var conv = JSON.parse(raw);
+                if (history.length > 0) saveSegmentToRecent(history.slice());
+                history = (conv.messages || []).slice();
+                displayItems = history.map(function(msg) { return { type: 'msg', msg: msg }; });
                 BoltChatService.saveHistory(history);
-                appendMessage(userMsg);
-                showTyping();
-
-                try {
-                    var reply = await BoltChatService.sendMessage(history);
-                    hideTyping();
-                    var modelMsg = { role: 'model', text: reply };
-                    history.push(modelMsg);
-                    BoltChatService.saveHistory(history);
-                    appendMessage(modelMsg);
-                } catch (err) {
-                    console.error('[BoltAI]', err);
-                    hideTyping();
-                    var errMsg = { role: 'model', text: 'Something went wrong. Please check your connection and try again.' };
-                    history.push(errMsg);
-                    BoltChatService.saveHistory(history);
-                    appendMessage(errMsg);
-                }
-
-                isLoading = false;
-                sendBtn.disabled = false;
+                viewingConvId = null;
+                isViewingPast = false;
+                hideBanner();
+                setInputDisabled(false);
+                renderMessages();
+                renderSidebar();
                 inputEl.focus();
+            } catch(e) {}
+        }
+
+        /* ── Save / Unsave ─────────────────────────────────── */
+        var saveLimitTimer = null;
+        function showSaveLimit() {
+            var el = document.getElementById('conv-save-limit-msg');
+            if (!el) {
+                el = document.createElement('div');
+                el.id = 'conv-save-limit-msg';
+                el.className = 'conv-save-limit-msg';
+                el.textContent = 'You have reached the maximum of 3 saved conversations. Remove a saved conversation to add a new one.';
+                convSavedList.insertAdjacentElement('afterend', el);
             }
+            el.style.display = 'block';
+            clearTimeout(saveLimitTimer);
+            saveLimitTimer = setTimeout(function() { el.style.display = 'none'; }, 5000);
+        }
 
-            /* ── Events ────────────────────────────────────────── */
+        function saveConv(id) {
+            var ids = getSavedIds();
+            if (ids.length >= MAX_SAVED_UI && !ids.includes(id)) { showSaveLimit(); return; }
+            if (!ids.includes(id)) { ids.push(id); setSavedIds(ids); }
+            renderSidebar();
+        }
 
-            sendBtn.addEventListener('click', send);
+        function unsaveConv(id) {
+            var ids = getSavedIds();
+            var idx = ids.indexOf(id);
+            if (idx !== -1) { ids.splice(idx, 1); setSavedIds(ids); }
+            renderSidebar();
+        }
 
-            inputEl.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    send();
+        /* ── Sidebar event delegation ───────────────────────── */
+        function handleSidebarClick(e) {
+            var btn = e.target.closest('[data-action]');
+            if (btn) {
+                e.stopPropagation();
+                var action = btn.getAttribute('data-action');
+                var id = parseInt(btn.getAttribute('data-conv-id'), 10);
+                if (action === 'star') {
+                    var ids = getSavedIds();
+                    if (ids.includes(id)) unsaveConv(id); else saveConv(id);
+                    return;
+                }
+                if (action === 'delete') {
+                    var savedIds = getSavedIds();
+                    var isSaved = savedIds.includes(id);
+                    if (isSaved) {
+                        if (!confirm('This will also remove it from Saved. Continue?')) return;
+                    }
+                    deleteConv(id);
+                    if (viewingConvId === id) {
+                        viewingConvId = null;
+                        isViewingPast = false;
+                        hideBanner();
+                        setInputDisabled(false);
+                        renderMessages();
+                    }
+                    renderSidebar();
+                    return;
+                }
+            }
+            var entry = e.target.closest('.conv-entry');
+            if (entry) {
+                var eid = parseInt(entry.getAttribute('data-conv-id'), 10);
+                if (eid) { loadConversation(eid); closeMobileSidebar(); }
+            }
+        }
+
+        /* ── Mobile sidebar ────────────────────────────────── */
+        function openMobileSidebar()  { convSidebar.classList.add('conv-sidebar-open'); convOverlay.classList.add('conv-overlay-visible'); }
+        function closeMobileSidebar() { convSidebar.classList.remove('conv-sidebar-open'); convOverlay.classList.remove('conv-overlay-visible'); }
+
+        /* ── Events ────────────────────────────────────────── */
+        sendBtn.addEventListener('click', send);
+
+        inputEl.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
+        });
+
+        inputEl.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 140) + 'px';
+        });
+
+        newChatBtn.addEventListener('click', startNewChat);
+
+        clearChatBtn.addEventListener('click', function() {
+            history = [];
+            displayItems = [];
+            BoltChatService.clearHistory();
+            renderMessages();
+        });
+
+        newContextChk.addEventListener('change', function() {
+            newContextPending = this.checked;
+            newContextHint.style.display = this.checked ? 'block' : 'none';
+            if (this.checked) newContextLabelEl.classList.add('new-context-active');
+            else newContextLabelEl.classList.remove('new-context-active');
+        });
+
+        convRecentList.addEventListener('click', handleSidebarClick);
+        convSavedList.addEventListener('click', handleSidebarClick);
+
+        convResumeBtn.addEventListener('click', resumeConversation);
+        convNewFromViewBtn.addEventListener('click', function() {
+            viewingConvId = null;
+            isViewingPast = false;
+            hideBanner();
+            startNewChat();
+        });
+
+        convMobileToggle.addEventListener('click', openMobileSidebar);
+        convSidebarClose.addEventListener('click', closeMobileSidebar);
+        convOverlay.addEventListener('click', closeMobileSidebar);
+
+        document.querySelectorAll('.assistant-quick-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var prompt = btn.getAttribute('data-prompt');
+                if (prompt) {
+                    inputEl.value = prompt;
+                    inputEl.dispatchEvent(new Event('input'));
+                    inputEl.focus();
+                    closeMobileSidebar();
                 }
             });
+        });
 
-            inputEl.addEventListener('input', function() {
-                this.style.height = 'auto';
-                this.style.height = Math.min(this.scrollHeight, 140) + 'px';
-            });
+        /* ── Init ──────────────────────────────────────────── */
+        renderMessages();
+        renderSidebar();
+        inputEl.focus();
 
-            document.getElementById('new-chat-btn').addEventListener('click', function() {
-                history = [];
-                BoltChatService.clearHistory();
-                renderMessages();
-                inputEl.focus();
-            });
-
-            document.getElementById('clear-chat-btn').addEventListener('click', function() {
-                history = [];
-                BoltChatService.clearHistory();
-                renderMessages();
-            });
-
-            document.querySelectorAll('.assistant-quick-btn').forEach(function(btn) {
-                btn.addEventListener('click', function() {
-                    var prompt = btn.getAttribute('data-prompt');
-                    if (prompt) {
-                        inputEl.value = prompt;
-                        inputEl.dispatchEvent(new Event('input'));
-                        inputEl.focus();
-                    }
-                });
-            });
-
-            /* ── Init ──────────────────────────────────────────── */
-            renderMessages();
-            inputEl.focus();
-
-        })();
+    })();
     </script>
 </body>
 </html>
