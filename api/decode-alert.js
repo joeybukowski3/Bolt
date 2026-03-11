@@ -46,9 +46,9 @@ export default async function handler(req, res) {
     await resend.emails.send({
       from:    'onboarding@resend.dev',
       to:      alertTo,
-      subject: 'Decodemyitem decoder fallback triggered',
+      subject: 'Bolt Research Team decoder fallback triggered',
       text: [
-        'Decodemyitem Decoder Fallback Alert',
+        'Bolt Research Team Decoder Fallback Alert',
         '',
         'Brand:     ' + String(brand),
         'Serial:    ' + String(serial),

@@ -64,14 +64,14 @@ export default async function handler(req, res) {
     await resend.emails.send({
       from:    'onboarding@resend.dev',
       to:      alertTo,
-      subject: 'Decodemyitem Smart Lookup usage alert',
+      subject: 'Bolt Research Team Smart Lookup usage alert',
       text: [
-        'Decodemyitem Smart Lookup Usage Alert',
+        'Bolt Research Team Smart Lookup Usage Alert',
         '',
         'Date: ' + today,
         'Usage count: ' + (usageCount !== null ? String(usageCount) : 'unavailable'),
         '',
-        'High usage detected for Smart Lookup on decodemyitem.com.',
+        'High usage detected for Smart Lookup on boltresearchteam.com.',
         'Please review current traffic and capacity as needed.',
         '',
         'This alert will not repeat until tomorrow.',

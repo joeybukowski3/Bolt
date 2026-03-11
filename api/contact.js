@@ -24,7 +24,7 @@ export default async function handler(req, res) {
     `Message:`,
     message,
     '',
-    'Submitted via decodemyitem.com contact form.',
+    'Submitted via boltresearchteam.com contact form.',
   ].join('\n');
 
   try {
