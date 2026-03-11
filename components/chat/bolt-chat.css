@@ -21,26 +21,49 @@
     align-items: flex-end;
     gap: 0.75rem;
     /* width matches the button so the abs-positioned window is anchored correctly */
-    width: 56px;
+    width: 220px;
 }
 
 #bolt-bubble-btn {
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
+    min-width: 220px;
+    min-height: 74px;
+    padding: 0.85rem 1rem 0.85rem 1.15rem;
+    border-radius: 999px;
     background: #1a202c;
     border: 2px solid rgba(234, 179, 8, 0.5);
     color: #eab308;
-    font-size: 1.4rem;
     cursor: pointer;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
+    gap: 0.9rem;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
     transition: transform 0.2s, box-shadow 0.2s, background 0.2s, border-color 0.2s;
     position: relative;
     flex-shrink: 0;
     line-height: 1;
+}
+
+.bolt-bubble-label {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #f8fafc;
+    text-align: left;
+    line-height: 1.25;
+}
+
+.bolt-bubble-icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(234, 179, 8, 0.14);
+    color: #eab308;
+    font-size: 1.9rem;
+    flex-shrink: 0;
 }
 
 #bolt-bubble-btn:hover {
@@ -58,8 +81,8 @@
 
 .bolt-unread-badge {
     position: absolute;
-    top: -3px;
-    right: -3px;
+    top: 6px;
+    right: 6px;
     width: 16px;
     height: 16px;
     border-radius: 50%;
@@ -1001,13 +1024,25 @@
     #bolt-bubble-wrap {
         bottom: 1rem;
         right: 1rem;
-        width: 50px;
+        width: calc(100vw - 2rem);
+        max-width: 220px;
     }
 
     #bolt-bubble-btn {
-        width: 50px;
-        height: 50px;
-        font-size: 1.2rem;
+        min-width: 0;
+        width: 100%;
+        min-height: 66px;
+        padding: 0.75rem 0.9rem 0.75rem 1rem;
+    }
+
+    .bolt-bubble-label {
+        font-size: 0.82rem;
+    }
+
+    .bolt-bubble-icon {
+        width: 42px;
+        height: 42px;
+        font-size: 1.7rem;
     }
 
     /* On mobile the window breaks out of the fixed parent */

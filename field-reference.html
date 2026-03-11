@@ -88,7 +88,7 @@
         .global-search-icon { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted-dark); font-size: 1.1rem; pointer-events: none; }
 
         /* Primary Tabs - Centered & Colorful */
-        .primary-tabs { display: flex; justify-content: center; gap: 1rem; margin-bottom: 1.5rem; padding: 0.25rem; border-radius: 100px; }
+        .primary-tabs { display: flex; justify-content: center; gap: 1rem; margin-bottom: 1.5rem; padding: 0.25rem; border-radius: 100px; flex-wrap: wrap; }
         .primary-tab { padding: 0.65rem 1.5rem; font-size: 0.9rem; font-weight: 700; color: var(--text-mid); background: #f1f5f9; border: 2px solid var(--border-color); border-radius: 100px; cursor: pointer; white-space: nowrap; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); display: flex; align-items: center; gap: 0.5rem; letter-spacing: -0.01em; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         .primary-tab:hover { background: #e2e8f0; color: var(--text-dark); border-color: #cbd5e1; transform: translateY(-1px); }
         .primary-tab.active { background: var(--accent); color: #000; border-color: var(--accent); box-shadow: 0 6px 15px rgba(234,179,8,0.3); transform: translateY(-2px); }
@@ -212,6 +212,8 @@
         .no-results { text-align: center; padding: 4rem 1rem; color: var(--text-muted-dark); font-style: italic; display: none; }
         .no-results.visible { display: block; }
 
+        .search-hidden { display: none; }
+
         @media (max-width: 640px) {
             .content-zone { padding: 2rem 1rem 3rem; margin: 1rem -1rem 0; }
             .reference-grid { grid-template-columns: 1fr; }
@@ -222,7 +224,7 @@
         }
 
         /* ===== CAUSE OF LOSS OVERVIEW SECTION ===== */
-        .col-section { margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 2px solid var(--border-color); }
+        .col-section { margin-bottom: 2rem; }
         .col-section-title { font-size: 1.5rem; font-weight: 800; color: var(--text-dark); margin-bottom: 0.3rem; }
         .col-section-subtitle { font-size: 0.925rem; color: var(--text-mid); margin-bottom: 1.25rem; max-width: 680px; }
 
@@ -360,7 +362,7 @@
                     <div class="col-card-grid" id="col-card-grid"></div>
                 </div>
 
-                <div class="global-search-wrap">
+                <div class="global-search-wrap" id="global-search-wrap">
                     <span class="global-search-icon">&#128269;</span>
                     <input type="text" id="global-search" class="global-search-input" placeholder="Search for a term, component, or item..." autocomplete="off">
                 </div>
@@ -370,6 +372,7 @@
                     <button class="primary-tab active" data-tab="terms">Technical Terms</button>
                     <button class="primary-tab" data-tab="categories">Testing Procedures</button>
                     <button class="primary-tab" data-tab="items">Item Diagnostics</button>
+                    <button class="primary-tab" data-tab="cause-loss">Cause of Loss</button>
                 </div>
 
                 <div id="terms-pane" class="tab-content-pane active">
@@ -381,6 +384,7 @@
                 <div id="items-pane" class="tab-content-pane">
                     <div class="reference-grid" id="items-grid"></div>
                 </div>
+                <div id="cause-loss-pane" class="tab-content-pane"></div>
 
                 <div class="no-results" id="no-results">No technical matches found. Try a different term.</div>
                 <div class="detail-panel hidden" id="detail-panel"></div>
@@ -1155,14 +1159,235 @@
         }
     };
 
+    var COL_DATA = {
+        'hvac-system': {
+            title: 'HVAC Systems',
+            icon: '\u2744\ufe0f',
+            causes: ['wt', 'water', 'surge', 'smoke'],
+            sections: {
+                wt: {
+                    label: 'Wear & Tear / Mechanical Failure',
+                    bullets: [
+                        'Compressor humming with locked-rotor amp draw or repeated thermal overload trips.',
+                        'Indoor blower or condenser fan bearings grinding, seizing, or overheating.',
+                        'Oil staining at joints without evidence of sudden impact often points to age-related refrigerant leakage.'
+                    ]
+                },
+                water: {
+                    label: 'Water / Flood Damage',
+                    bullets: [
+                        'Mud lines, silt, or corrosion at the base pan, blower housing, or control compartment.',
+                        'Water intrusion into ECM motors and control boards commonly leaves mineral residue on pins and traces.',
+                        'Insulation on cabinet liners may remain damp or deformed after standing water exposure.'
+                    ]
+                },
+                surge: {
+                    label: 'High Voltage Surge / Lightning',
+                    bullets: [
+                        'Pitted contactors, ruptured capacitors, and visibly damaged control boards support electrical event damage.',
+                        'Megger failure to ground on compressor windings after a storm is a strong surge indicator.',
+                        'Nearby electronics or other appliances failing at the same time helps corroborate the event.'
+                    ]
+                },
+                smoke: {
+                    label: 'Smoke & Fire Exposure',
+                    bullets: [
+                        'Soot accumulation on blower wheels, evaporator fins, and exposed wiring harnesses.',
+                        'Heat-warped wire insulation or melted low-voltage terminals indicates direct thermal exposure.',
+                        'Odor embedded in insulation and duct-adjacent components may justify cleaning vs. replacement review.'
+                    ]
+                }
+            }
+        },
+        'water-heater': {
+            title: 'Water Heaters',
+            icon: '\ud83d\udebf',
+            causes: ['wt', 'water', 'surge', 'smoke'],
+            sections: {
+                wt: {
+                    label: 'Wear & Tear / Mechanical Failure',
+                    bullets: [
+                        'Tank seepage at lower seams, rust trails, and age-related sediment noise usually indicate end-of-life failure.',
+                        'Failed heating elements or thermostats without outside event evidence are typically maintenance items.',
+                        'Continuous T&P discharge can point to expansion or control issues rather than sudden covered loss.'
+                    ]
+                },
+                water: {
+                    label: 'Water / Flood Damage',
+                    bullets: [
+                        'Submerged gas controls, wet insulation blankets, and sediment inside the burner chamber indicate flood exposure.',
+                        'Standing water often contaminates lower electric elements and junction boxes.',
+                        'Document the waterline against gas valve height and electrical access cover height.'
+                    ]
+                },
+                surge: {
+                    label: 'High Voltage Surge / Lightning',
+                    bullets: [
+                        'Electronic control modules, powered dampers, and smart recirculation controls are the usual surge failure points.',
+                        'Burn marks or split board components matter more than a simple no-heat complaint.',
+                        'Standard non-electronic tank failure is rarely caused by surge absent damaged controls.'
+                    ]
+                },
+                smoke: {
+                    label: 'Smoke & Fire Exposure',
+                    bullets: [
+                        'Soot inside burner compartments or on draft hoods can impair combustion and safety devices.',
+                        'Melted wire insulation at ignition controls or gas valve harnesses indicates significant heat exposure.',
+                        'Corrosive smoke residue on control boards may create delayed failure risk even if unit runs initially.'
+                    ]
+                }
+            }
+        },
+        'appliances-electronics': {
+            title: 'Appliances and Electronics',
+            icon: '\ud83d\udcbb',
+            causes: ['wt', 'water', 'surge', 'smoke'],
+            sections: {
+                wt: {
+                    label: 'Wear & Tear / Mechanical Failure',
+                    bullets: [
+                        'Worn drive systems, seized motors, failed door switches, and open heating elements are common non-covered failures.',
+                        'Long-term gasket leaks, rust bleed, and repetitive thermal fatigue usually support gradual deterioration.',
+                        'Look for age-consistent wear patterns instead of isolated event damage.'
+                    ]
+                },
+                water: {
+                    label: 'Water / Flood Damage',
+                    bullets: [
+                        'Mineral residue on main boards, oxidized connectors, and staining inside lower cabinets are strong water indicators.',
+                        'Televisions and consumer electronics often show corrosion at HDMI ports, speakers, and ribbon cable contacts.',
+                        'Document whether exposure was direct submersion, overhead leak, or high humidity/condensation.'
+                    ]
+                },
+                surge: {
+                    label: 'High Voltage Surge / Lightning',
+                    bullets: [
+                        'No-power condition with burnt power supply boards, cracked MOVs, or blown line fuses fits surge damage.',
+                        'Multiple devices on the same branch circuit failing at once materially strengthens causation.',
+                        'Confirm outlet voltage and polarity before attributing all failures to the appliance alone.'
+                    ]
+                },
+                smoke: {
+                    label: 'Smoke & Fire Exposure',
+                    bullets: [
+                        'Sticky soot films on boards, fan blades, and optical sensors can impair operation even without visible melting.',
+                        'Corrosive smoke residue is especially problematic for laptops, TVs, and control-heavy appliances.',
+                        'Differentiate cosmetic surface soot from internal contamination that affects safe operation.'
+                    ]
+                }
+            }
+        },
+        'plumbing-fixtures': {
+            title: 'Plumbing Fixtures and Piping',
+            icon: '\ud83d\udee0\ufe0f',
+            causes: ['wt', 'water', 'smoke'],
+            sections: {
+                wt: {
+                    label: 'Wear & Tear / Mechanical Failure',
+                    bullets: [
+                        'Corroded supply lines, failed seals, and brittle shutoff valves often present as age-related leakage.',
+                        'Pinholes in copper and stress cracking in plastic fittings usually develop over time.',
+                        'Mineral buildup at aerators and cartridges supports long-term deterioration rather than sudden loss.'
+                    ]
+                },
+                water: {
+                    label: 'Water / Flood Damage',
+                    bullets: [
+                        'Backflow contamination, silt inside traps, and floodline staining on vanities or cabinets indicate external water exposure.',
+                        'Document whether the fixture failed first or was itself damaged by a separate water event.',
+                        'Wet wall cavities or swollen cabinet bases help establish spread and duration.'
+                    ]
+                },
+                smoke: {
+                    label: 'Smoke & Fire Exposure',
+                    bullets: [
+                        'Heat can deform plastic escutcheons, supply lines, and trap components near the fire area.',
+                        'Soot contamination on exposed chrome or acrylic surfaces may be cleanable or permanent depending on etching.',
+                        'Check concealed cavities if nearby fire suppression introduced secondary moisture damage.'
+                    ]
+                }
+            }
+        }
+    };
+
     var activeTab = 'terms';
     var activeId = null;
     var detailTab = 'how-it-works';
+    var activeColFilter = 'all';
 
     function renderGrids() {
         renderGrid('terms', FR_REF_DATA.terms);
         renderGrid('categories', FR_REF_DATA.categories);
         renderGrid('items', FR_REF_DATA.items);
+    }
+
+    function ensureCauseLossPane() {
+        var pane = document.getElementById('cause-loss-pane');
+        var section = document.getElementById('col-section');
+        if (pane && section && section.parentNode !== pane) {
+            pane.appendChild(section);
+        }
+    }
+
+    function renderCauseLossCards() {
+        var grid = document.getElementById('col-card-grid');
+        if (!grid) return;
+
+        var html = '';
+        Object.keys(COL_DATA).forEach(function(id) {
+            var item = COL_DATA[id];
+            var hidden = activeColFilter !== 'all' && item.causes.indexOf(activeColFilter) === -1;
+            html += '<article class="col-card' + (hidden ? ' col-card-hidden' : '') + '" data-col-card="' + id + '">' +
+                '<div class="col-card-header">' +
+                '<span class="col-card-icon">' + item.icon + '</span>' +
+                '<div class="col-card-title">' + item.title + '</div>' +
+                '<div class="col-badges">' + item.causes.map(function(cause) {
+                    return '<span class="col-badge col-badge-' + cause + '"></span>';
+                }).join('') + '</div>' +
+                '</div>' +
+                '<div class="col-card-body">' + item.causes.map(function(cause) {
+                    var section = item.sections[cause];
+                    if (!section) return '';
+                    var open = activeColFilter === 'all' ? cause === item.causes[0] : cause === activeColFilter;
+                    return '<div class="col-subsection' + ((activeColFilter !== 'all' && cause !== activeColFilter) ? ' col-sub-hidden' : '') + '">' +
+                        '<button class="col-subsection-toggle" type="button" data-cause="' + cause + '">' +
+                        '<span class="col-subsection-label col-label-' + cause + '">' + section.label + '</span>' +
+                        '<span class="col-chevron' + (open ? ' open' : '') + '">&#9662;</span>' +
+                        '</button>' +
+                        '<div class="col-subsection-content' + (open ? ' open' : '') + '">' +
+                        '<ul class="col-sub-bullets">' + section.bullets.map(function(bullet) {
+                            return '<li>' + bullet + '</li>';
+                        }).join('') + '</ul>' +
+                        '</div>' +
+                        '</div>';
+                }).join('') + '</div>' +
+                '</article>';
+        });
+
+        grid.innerHTML = html;
+
+        grid.querySelectorAll('.col-subsection-toggle').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var subsection = btn.parentNode;
+                var content = subsection.querySelector('.col-subsection-content');
+                var chevron = subsection.querySelector('.col-chevron');
+                var isOpen = content.classList.contains('open');
+                content.classList.toggle('open', !isOpen);
+                chevron.classList.toggle('open', !isOpen);
+            });
+        });
+    }
+
+    function initCauseLossFilters() {
+        document.querySelectorAll('.col-filter-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                activeColFilter = btn.dataset.col;
+                document.querySelectorAll('.col-filter-btn').forEach(function(filterBtn) {
+                    filterBtn.classList.toggle('active', filterBtn.dataset.col === activeColFilter);
+                });
+                renderCauseLossCards();
+            });
+        });
     }
 
     function renderGrid(type, data) {
@@ -1369,6 +1594,10 @@
             p.classList.toggle('active', active);
         });
         activeTab = tabId;
+        var searchWrap = document.getElementById('global-search-wrap');
+        var noResults = document.getElementById('no-results');
+        if (searchWrap) searchWrap.classList.toggle('search-hidden', tabId === 'cause-loss');
+        if (noResults && tabId === 'cause-loss') noResults.classList.remove('visible');
     }
 
     function initTabs() {
@@ -1382,8 +1611,11 @@
 
     document.addEventListener('DOMContentLoaded', function() { 
         FR_REF_DATA = decodeObject(FR_REF_DATA);
+        ensureCauseLossPane();
         renderGrids(); 
+        renderCauseLossCards();
         initSearch(); 
+        initCauseLossFilters();
         initTabs();
         handleDeepLinking();
     });

@@ -1,17 +1,10 @@
 /**
- * Bolt AI Assist — Floating Chat Bubble
- * Self-contained; no external dependencies required at runtime.
- *
- * Injects a persistent ⚡ bubble in the bottom-right of every page
- * except /assistant. Chat history is persisted to localStorage so
- * clicking "Expand to Full View" seamlessly continues the conversation
- * on assistant.html.
+ * Bolt AI Assist - Floating chat bubble
  */
 
 (function() {
     'use strict';
 
-    // Don't render on the assistant page itself
     var path = window.location.pathname;
     if (path.indexOf('assistant') !== -1) return;
 
@@ -20,25 +13,27 @@
     var isOpen = false;
     var isLoading = false;
 
-    /* ── Storage helpers ─────────────────────────────────────────── */
-
     function loadHistory() {
         try {
             var raw = localStorage.getItem(STORAGE_KEY);
             return raw ? JSON.parse(raw) : [];
-        } catch (e) { return []; }
+        } catch (e) {
+            return [];
+        }
     }
 
     function saveHistory() {
-        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(history)); } catch (e) {}
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+        } catch (e) {}
     }
 
     function clearHistory() {
         history = [];
-        try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+        try {
+            localStorage.removeItem(STORAGE_KEY);
+        } catch (e) {}
     }
-
-    /* ── DOM build ───────────────────────────────────────────────── */
 
     function buildBubble() {
         var wrap = document.createElement('div');
@@ -50,34 +45,34 @@
         win.innerHTML =
             '<div class="boltcw-header">' +
             '  <div class="boltcw-title">' +
-            '    <span class="boltcw-title-icon">⚡</span>' +
+            '    <span class="boltcw-title-icon">&#9889;</span>' +
             '    <span>Bolt AI Assist</span>' +
             '  </div>' +
             '  <div class="boltcw-actions">' +
-            '    <button class="boltcw-action-btn boltcw-expand-btn" id="boltcw-expand" title="Open full assistant">⤢ Full View</button>' +
-            '    <button class="boltcw-action-btn" id="boltcw-clear" title="Clear conversation">↺</button>' +
-            '    <button class="boltcw-action-btn" id="boltcw-close" title="Close">✕</button>' +
+            '    <button class="boltcw-action-btn boltcw-expand-btn" id="boltcw-expand" title="Open full assistant">&#10530; Full View</button>' +
+            '    <button class="boltcw-action-btn" id="boltcw-clear" title="Clear conversation">&#8634;</button>' +
+            '    <button class="boltcw-action-btn" id="boltcw-close" title="Close">&#10005;</button>' +
             '  </div>' +
             '</div>' +
             '<div class="boltcw-messages" id="boltcw-messages"></div>' +
             '<div class="boltcw-input-area">' +
-            '  <textarea class="boltcw-input" id="boltcw-input" placeholder="Ask about any equipment…" rows="1" autocomplete="off"></textarea>' +
-            '  <button class="boltcw-send-btn" id="boltcw-send" title="Send">➤</button>' +
+            '  <textarea class="boltcw-input" id="boltcw-input" placeholder="Ask about any equipment..." rows="1" autocomplete="off"></textarea>' +
+            '  <button class="boltcw-send-btn" id="boltcw-send" title="Send">&#10148;</button>' +
             '</div>';
 
         var btn = document.createElement('button');
         btn.id = 'bolt-bubble-btn';
+        btn.type = 'button';
         btn.title = 'Bolt AI Assist';
         btn.innerHTML =
-            '<span>⚡</span>' +
-            '<span class="bolt-unread-badge" id="bolt-unread" style="display:none;">•</span>';
+            '<span class="bolt-bubble-label">Chat with Bolt AI</span>' +
+            '<span class="bolt-bubble-icon">&#9889;</span>' +
+            '<span class="bolt-unread-badge" id="bolt-unread" style="display:none;">&bull;</span>';
 
         wrap.appendChild(win);
         wrap.appendChild(btn);
         document.body.appendChild(wrap);
     }
-
-    /* ── Render helpers ──────────────────────────────────────────── */
 
     function escHtml(str) {
         var d = document.createElement('div');
@@ -92,7 +87,7 @@
         if (history.length === 0) {
             el.innerHTML =
                 '<div class="boltcw-welcome">' +
-                '  <div class="boltcw-welcome-icon">⚡</div>' +
+                '  <div class="boltcw-welcome-icon">&#9889;</div>' +
                 '  <h4>Bolt AI Assist</h4>' +
                 '  <p>Ask me about serial numbers, equipment age, specifications, or replacement values.</p>' +
                 '</div>';
@@ -111,20 +106,18 @@
     function showTyping() {
         var el = document.getElementById('boltcw-messages');
         if (!el) return;
-        var t = document.createElement('div');
-        t.id = 'bolt-typing-ind';
-        t.className = 'bolt-msg bolt-msg-typing';
-        t.innerHTML = '<div class="bolt-typing-dots"><span></span><span></span><span></span></div>';
-        el.appendChild(t);
+        var typing = document.createElement('div');
+        typing.id = 'bolt-typing-ind';
+        typing.className = 'bolt-msg bolt-msg-typing';
+        typing.innerHTML = '<div class="bolt-typing-dots"><span></span><span></span><span></span></div>';
+        el.appendChild(typing);
         el.scrollTop = el.scrollHeight;
     }
 
     function hideTyping() {
-        var t = document.getElementById('bolt-typing-ind');
-        if (t) t.parentNode.removeChild(t);
+        var typing = document.getElementById('bolt-typing-ind');
+        if (typing) typing.parentNode.removeChild(typing);
     }
-
-    /* ── Open / close ────────────────────────────────────────────── */
 
     function openChat() {
         isOpen = true;
@@ -133,8 +126,8 @@
         document.getElementById('bolt-unread').style.display = 'none';
         renderMessages();
         setTimeout(function() {
-            var inp = document.getElementById('boltcw-input');
-            if (inp) inp.focus();
+            var input = document.getElementById('boltcw-input');
+            if (input) input.focus();
         }, 80);
     }
 
@@ -144,9 +137,10 @@
         document.getElementById('bolt-bubble-btn').classList.remove('is-open');
     }
 
-    function toggleChat() { if (isOpen) closeChat(); else openChat(); }
-
-    /* ── Send message ────────────────────────────────────────────── */
+    function toggleChat() {
+        if (isOpen) closeChat();
+        else openChat();
+    }
 
     async function submit() {
         var inputEl = document.getElementById('boltcw-input');
@@ -172,7 +166,10 @@
             });
 
             var data = {};
-            try { data = await res.json(); } catch (_) {}
+            try {
+                data = await res.json();
+            } catch (_) {}
+
             hideTyping();
 
             if (!res.ok) throw new Error(data.error || 'Server error ' + res.status);
@@ -183,7 +180,10 @@
 
             if (!isOpen) {
                 var badge = document.getElementById('bolt-unread');
-                if (badge) { badge.textContent = '•'; badge.style.display = 'flex'; }
+                if (badge) {
+                    badge.innerHTML = '&bull;';
+                    badge.style.display = 'flex';
+                }
             }
         } catch (err) {
             console.error('[BoltAI]', err);
@@ -195,11 +195,8 @@
 
         isLoading = false;
         sendBtn.disabled = false;
-        var inp = document.getElementById('boltcw-input');
-        if (inp) inp.focus();
+        if (inputEl) inputEl.focus();
     }
-
-    /* ── Wire up events ──────────────────────────────────────────── */
 
     function init() {
         history = loadHistory();
@@ -231,10 +228,12 @@
             this.style.height = Math.min(this.scrollHeight, 100) + 'px';
         });
 
-        // Show badge if prior history exists
         if (history.length > 0) {
             var badge = document.getElementById('bolt-unread');
-            if (badge) { badge.textContent = '•'; badge.style.display = 'flex'; }
+            if (badge) {
+                badge.innerHTML = '&bull;';
+                badge.style.display = 'flex';
+            }
         }
     }
 
@@ -243,5 +242,4 @@
     } else {
         init();
     }
-
 })();
