@@ -6,6 +6,7 @@ let acvData = { msrp: 0, age: 0 };
 let _compareBlock = null;
 let activeSearchToken = 0;
 let lkqModeActive = false;
+let activeReportType = null;
 
 // ── Section filter state ──────────────────────────────────────────────────────
 
@@ -76,6 +77,32 @@ function toggleFullReportPicker(forceOpen = null) {
   picker.setAttribute("aria-hidden", willOpen ? "false" : "true");
   if (trigger) trigger.setAttribute("aria-expanded", willOpen ? "true" : "false");
   return willOpen;
+}
+
+function syncReportActionButtons() {
+  const lkqBtn = byId("lkq-report-btn");
+  const fullBtn = byId("full-report-btn");
+  if (!lkqBtn || !fullBtn) return;
+
+  lkqBtn.classList.remove("report-btn--active", "report-btn--inactive");
+  fullBtn.classList.remove("report-btn--active", "report-btn--inactive");
+
+  if (activeReportType === "lkq") {
+    lkqBtn.classList.add("report-btn--active");
+    fullBtn.classList.add("report-btn--inactive");
+  } else if (activeReportType === "full") {
+    fullBtn.classList.add("report-btn--active");
+    lkqBtn.classList.add("report-btn--inactive");
+  }
+}
+
+function setActiveReportType(type) {
+  if (type !== "lkq" && type !== "full") {
+    activeReportType = null;
+  } else {
+    activeReportType = type;
+  }
+  syncReportActionButtons();
 }
 
 // ── Serial Number Decode ──────────────────────────────────────────────────────
@@ -377,6 +404,38 @@ function resolveRetailerSearchUrl(retailerName, searchQuery, brandHint = "") {
     return builder(brandHint, query);
   }
   return builder(query);
+}
+
+function isMissingBrandValue(value) {
+  const text = String(value || "").trim().toLowerCase();
+  if (!text) return true;
+  return text === "n/a" || text === "na" || text === "unknown" || text === "generic";
+}
+
+function isDiscontinuedValue(value) {
+  if (typeof value === "boolean") return value;
+  const text = String(value || "").trim().toLowerCase();
+  if (!text) return false;
+  return text === "true" || text === "yes" || text.includes("discontinued") || text.includes("no longer manufactured");
+}
+
+function getRetailerSuppressionMessage(meta = {}) {
+  const hasBrandField = Boolean(meta.hasBrandField) || Object.prototype.hasOwnProperty.call(meta, "brand");
+  if (hasBrandField && isMissingBrandValue(meta.brand)) {
+    return "No brand match available";
+  }
+  const discontinued =
+    isDiscontinuedValue(meta.discontinued) ||
+    String(meta.availability || "").toLowerCase().includes("discontinued") ||
+    String(meta.availability || "").toLowerCase().includes("no longer manufactured");
+  if (discontinued) {
+    return "Product line discontinued by manufacturer";
+  }
+  return "";
+}
+
+function renderRetailerSuppressionMessage(message) {
+  return `<span class="retailer-link-muted">${escapeHtml(message)}</span>`;
 }
 
 const ELECTRONICS_ONLY = new Set(["Best Buy", "Walmart", "Target", "B&H", "Manufacturer"]);
@@ -752,15 +811,30 @@ function lkqBuildAgeText() {
 }
 
 function lkqBuildRetailerLinks(retailerText, modelText) {
+  return lkqBuildRetailerLinksWithMeta(retailerText, modelText, {});
+}
+
+function lkqBuildRetailerLinksWithMeta(retailerText, modelText, meta) {
+  const suppressedMessage = getRetailerSuppressionMessage(meta);
+  if (suppressedMessage) return `<span class="retailer-link-muted">${lkqEscapeHtml(suppressedMessage)}</span>`;
+
   const retailers = lkqCleanStr(retailerText).split(",").map((s) => lkqCleanStr(s)).filter(Boolean).slice(0, 4);
   if (!retailers.length) return "-";
   const q = lkqCleanStr(modelText) || lkqInlineState.query;
-  const brandHint = lkqCleanStr(lkqInlineState.fast?.analysis?.brand);
+  const brandHint = lkqCleanStr(meta?.brand || lkqInlineState.fast?.analysis?.brand);
   const html = retailers.map((name) => {
     const url = resolveRetailerSearchUrl(name, q, brandHint);
     return `<a class="repair-link" href="${lkqEscapeHtml(url)}" target="_blank" rel="noopener noreferrer">${lkqEscapeHtml(name)}</a>`;
   }).join(" ");
   return html || "-";
+}
+
+function lkqGetRowValueAnyLabel(rows, labels, key) {
+  for (const label of labels) {
+    const value = lkqGetRowValue(rows, label, key);
+    if (lkqCleanStr(value)) return value;
+  }
+  return "";
 }
 
 function lkqGetRowValue(rows, label, key) {
@@ -874,20 +948,27 @@ function renderLkqInline() {
     const modelRow = rows.find((r) => lkqCleanStr(r?.label).toLowerCase() === "model") || {};
     const priceRow = rows.find((r) => lkqCleanStr(r?.label).toLowerCase() === "price range (new)") || {};
     const retailerRow = rows.find((r) => lkqCleanStr(r?.label).toLowerCase() === "retailers") || {};
+    const brandRow = rows.find((r) => lkqCleanStr(r?.label).toLowerCase() === "brand") || {};
+    const availabilityRow = rows.find((r) => lkqCleanStr(r?.label).toLowerCase() === "availability") || {};
+    const discontinuedRow = rows.find((r) => lkqCleanStr(r?.label).toLowerCase() === "discontinued") || {};
+    const hasBrandField = Object.keys(brandRow).length > 0;
     candidates = [
-      { key: "entryLevel", tier: "Budget", model: lkqCleanStr(modelRow.entryLevel) || "-", price: lkqCleanStr(priceRow.entryLevel) || "-", retailers: retailerRow.entryLevel || "" },
-      { key: "midGrade", tier: "LKQ", model: lkqCleanStr(modelRow.midGrade) || "-", price: lkqCleanStr(priceRow.midGrade) || "-", retailers: retailerRow.midGrade || "" },
-      { key: "premium", tier: "Premium Upgrade", model: lkqCleanStr(modelRow.premium) || "-", price: lkqCleanStr(priceRow.premium) || "-", retailers: retailerRow.premium || "" }
+      { key: "entryLevel", tier: "Budget", model: lkqCleanStr(modelRow.entryLevel) || "-", price: lkqCleanStr(priceRow.entryLevel) || "-", retailers: retailerRow.entryLevel || "", hasBrandField, brand: lkqCleanStr(brandRow.entryLevel), availability: lkqCleanStr(availabilityRow.entryLevel), discontinued: discontinuedRow.entryLevel },
+      { key: "midGrade", tier: "LKQ", model: lkqCleanStr(modelRow.midGrade) || "-", price: lkqCleanStr(priceRow.midGrade) || "-", retailers: retailerRow.midGrade || "", hasBrandField, brand: lkqCleanStr(brandRow.midGrade), availability: lkqCleanStr(availabilityRow.midGrade), discontinued: discontinuedRow.midGrade },
+      { key: "premium", tier: "Premium Upgrade", model: lkqCleanStr(modelRow.premium) || "-", price: lkqCleanStr(priceRow.premium) || "-", retailers: retailerRow.premium || "", hasBrandField, brand: lkqCleanStr(brandRow.premium), availability: lkqCleanStr(availabilityRow.premium), discontinued: discontinuedRow.premium }
     ];
   } else {
     const modelRow = rows.find((r) => lkqCleanStr(r?.label).toLowerCase() === "model") || {};
     const priceRow = rows.find((r) => lkqCleanStr(r?.label).toLowerCase() === "price (new)") || {};
     const retailerRow = rows.find((r) => lkqCleanStr(r?.label).toLowerCase() === "retailers") || {};
+    const availabilityRow = rows.find((r) => lkqCleanStr(r?.label).toLowerCase() === "availability") || {};
+    const discontinuedRow = rows.find((r) => lkqCleanStr(r?.label).toLowerCase() === "discontinued") || {};
+    const hasBrandField = rows.some((r) => ["brand", "manufacturer"].includes(lkqCleanStr(r?.label).toLowerCase()));
     candidates = [
-      { key: "brandMatch", tier: "Best Match", model: lkqCleanStr(modelRow.brandMatch) || "-", price: lkqCleanStr(priceRow.brandMatch) || "-", retailers: retailerRow.brandMatch || "" },
-      { key: "option1", tier: "LKQ", model: lkqCleanStr(modelRow.option1) || "-", price: lkqCleanStr(priceRow.option1) || "-", retailers: retailerRow.option1 || "" },
-      { key: "original", tier: "Budget", model: lkqCleanStr(modelRow.original) || "-", price: lkqCleanStr(priceRow.original) || "-", retailers: retailerRow.original || "" },
-      { key: "option2", tier: "Premium Upgrade", model: lkqCleanStr(modelRow.option2) || "-", price: lkqCleanStr(priceRow.option2) || "-", retailers: retailerRow.option2 || "" }
+      { key: "brandMatch", tier: "Best Match", model: lkqCleanStr(modelRow.brandMatch) || "-", price: lkqCleanStr(priceRow.brandMatch) || "-", retailers: retailerRow.brandMatch || "", hasBrandField, brand: lkqGetRowValueAnyLabel(rows, ["Brand", "Manufacturer"], "brandMatch"), availability: lkqCleanStr(availabilityRow.brandMatch), discontinued: discontinuedRow.brandMatch },
+      { key: "option1", tier: "LKQ", model: lkqCleanStr(modelRow.option1) || "-", price: lkqCleanStr(priceRow.option1) || "-", retailers: retailerRow.option1 || "", hasBrandField, brand: lkqGetRowValueAnyLabel(rows, ["Brand", "Manufacturer"], "option1"), availability: lkqCleanStr(availabilityRow.option1), discontinued: discontinuedRow.option1 },
+      { key: "original", tier: "Budget", model: lkqCleanStr(modelRow.original) || "-", price: lkqCleanStr(priceRow.original) || "-", retailers: retailerRow.original || "", hasBrandField, brand: lkqGetRowValueAnyLabel(rows, ["Brand", "Manufacturer"], "original"), availability: lkqCleanStr(availabilityRow.original), discontinued: discontinuedRow.original },
+      { key: "option2", tier: "Premium Upgrade", model: lkqCleanStr(modelRow.option2) || "-", price: lkqCleanStr(priceRow.option2) || "-", retailers: retailerRow.option2 || "", hasBrandField, brand: lkqGetRowValueAnyLabel(rows, ["Brand", "Manufacturer"], "option2"), availability: lkqCleanStr(availabilityRow.option2), discontinued: discontinuedRow.option2 }
     ];
   }
 
@@ -898,7 +979,7 @@ function renderLkqInline() {
       <td>${lkqEscapeHtml(c.tier)}</td>
       <td>${specs.length ? `<ul style="margin:0; padding-left:1rem;">${specs.map((s) => `<li>${lkqEscapeHtml(s)}</li>`).join("")}</ul>` : "-"}</td>
       <td>${lkqEscapeHtml(c.price)}</td>
-      <td>${lkqBuildRetailerLinks(c.retailers, c.model)}</td>
+      <td>${lkqBuildRetailerLinksWithMeta(c.retailers, c.model, { hasBrandField: c.hasBrandField, brand: c.brand, availability: c.availability, discontinued: c.discontinued })}</td>
     </tr>`;
   }).join("");
 
@@ -929,6 +1010,7 @@ function renderLkqInline() {
   root.classList.remove("hidden");
 
   byId("lkq-inline-full-report-btn")?.addEventListener("click", () => {
+    setActiveReportType("full");
     const qInput = byId("query");
     if (qInput) qInput.value = lkqInlineState.query;
     const u = new URL(window.location.href);
@@ -992,6 +1074,7 @@ async function performLkqInlineSearch() {
   const query = lkqCleanStr(qInput?.value);
   if (!query) return;
 
+  setActiveReportType("lkq");
   lkqModeActive = true;
   lkqInlineState = {
     query,
@@ -1291,7 +1374,39 @@ function buildGoogleSearchLink(termText) {
   return `<a class="model-link" href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(text)}</a>`;
 }
 
-function buildRetailerLinks(retailerCsv, searchQuery) {
+function getColumnMetaValue(metaMap, key, field) {
+  return metaMap?.[key]?.[field];
+}
+
+function buildReplacementColumnMeta(allRows, keys) {
+  const out = {};
+  keys.forEach((k) => {
+    out[k] = {};
+  });
+  allRows.forEach((row) => {
+    const label = String(row?.label || "").trim().toLowerCase();
+    keys.forEach((key) => {
+      if (label === "brand" || label === "manufacturer") {
+        out[key].hasBrandField = true;
+        out[key].brand = row?.[key];
+      }
+      if (label === "availability") {
+        out[key].availability = row?.[key];
+      }
+      if (label === "discontinued") {
+        out[key].discontinued = row?.[key];
+      }
+    });
+  });
+  return out;
+}
+
+function buildRetailerLinks(retailerCsv, searchQuery, meta = null) {
+  const suppressedMessage = getRetailerSuppressionMessage(meta || {});
+  if (suppressedMessage) {
+    return renderRetailerSuppressionMessage(suppressedMessage);
+  }
+
   const filter = getRetailerFilter(currentCategory);
 
   // Parse API-provided names; fallback to category defaults when empty/N/A
@@ -2220,6 +2335,10 @@ function renderDetail(data) {
   const tbody = byId("table-body");
   if (tbody && tableLoading && tableEl) {
     const allRows = [...(data.table || []), ...(data.dynamicRows || [])];
+    const columnMeta = buildReplacementColumnMeta(
+      allRows,
+      isTiered ? ["entryLevel", "midGrade", "premium"] : ["original", "brandMatch", "option1", "option2"]
+    );
     if (allRows.length) {
       if (isTiered) {
         tbody.innerHTML = allRows
@@ -2227,9 +2346,9 @@ function renderDetail(data) {
             const isRetailers = (row.label || "").toLowerCase().includes("retailer");
             const isModel     = (row.label || "").toLowerCase() === "model";
             const isRecommendedReplacement = (row.label || "").toLowerCase().includes("recommended replacement");
-            const elCell = isRetailers ? buildRetailerLinks(row.entryLevel, colSearch.entryLevel) : isModel ? buildModelLink(row.entryLevel) : escapeHtml(row.entryLevel || "N/A");
-            const mgCell = isRetailers ? buildRetailerLinks(row.midGrade,   colSearch.midGrade)   : isModel ? buildModelLink(row.midGrade)   : escapeHtml(row.midGrade   || "N/A");
-            const prCell = isRetailers ? buildRetailerLinks(row.premium,    colSearch.premium)    : isModel ? buildModelLink(row.premium)    : escapeHtml(row.premium    || "N/A");
+            const elCell = isRetailers ? buildRetailerLinks(row.entryLevel, colSearch.entryLevel, { hasBrandField: Boolean(getColumnMetaValue(columnMeta, "entryLevel", "hasBrandField")), brand: getColumnMetaValue(columnMeta, "entryLevel", "brand"), availability: getColumnMetaValue(columnMeta, "entryLevel", "availability"), discontinued: getColumnMetaValue(columnMeta, "entryLevel", "discontinued") }) : isModel ? buildModelLink(row.entryLevel) : escapeHtml(row.entryLevel || "N/A");
+            const mgCell = isRetailers ? buildRetailerLinks(row.midGrade,   colSearch.midGrade,   { hasBrandField: Boolean(getColumnMetaValue(columnMeta, "midGrade", "hasBrandField")), brand: getColumnMetaValue(columnMeta, "midGrade", "brand"), availability: getColumnMetaValue(columnMeta, "midGrade", "availability"), discontinued: getColumnMetaValue(columnMeta, "midGrade", "discontinued") }) : isModel ? buildModelLink(row.midGrade)   : escapeHtml(row.midGrade   || "N/A");
+            const prCell = isRetailers ? buildRetailerLinks(row.premium,    colSearch.premium,    { hasBrandField: Boolean(getColumnMetaValue(columnMeta, "premium", "hasBrandField")), brand: getColumnMetaValue(columnMeta, "premium", "brand"), availability: getColumnMetaValue(columnMeta, "premium", "availability"), discontinued: getColumnMetaValue(columnMeta, "premium", "discontinued") }) : isModel ? buildModelLink(row.premium)    : escapeHtml(row.premium    || "N/A");
             const elFinal = isRecommendedReplacement ? buildGoogleSearchLink(row.entryLevel) : elCell;
             const mgFinal = isRecommendedReplacement ? buildGoogleSearchLink(row.midGrade) : mgCell;
             const prFinal = isRecommendedReplacement ? buildGoogleSearchLink(row.premium) : prCell;
@@ -2247,10 +2366,10 @@ function renderDetail(data) {
             const isRetailers = (row.label || "").toLowerCase().includes("retailer");
             const isModel     = (row.label || "").toLowerCase() === "model";
             const isRecommendedReplacement = (row.label || "").toLowerCase().includes("recommended replacement");
-            const origCell = isRetailers ? buildRetailerLinks(row.original,   colSearch.original)   : isModel ? buildModelLink(row.original)   : escapeHtml(row.original   || "N/A");
-            const bmCell   = isRetailers ? buildRetailerLinks(row.brandMatch, colSearch.brandMatch) : isModel ? buildModelLink(row.brandMatch) : escapeHtml(row.brandMatch || "N/A");
-            const o1Cell   = isRetailers ? buildRetailerLinks(row.option1,    colSearch.option1)    : isModel ? buildModelLink(row.option1)    : escapeHtml(row.option1    || "N/A");
-            const o2Cell   = isRetailers ? buildRetailerLinks(row.option2,    colSearch.option2)    : isModel ? buildModelLink(row.option2)    : escapeHtml(row.option2    || "N/A");
+            const origCell = isRetailers ? buildRetailerLinks(row.original,   colSearch.original,   { hasBrandField: Boolean(getColumnMetaValue(columnMeta, "original", "hasBrandField")), brand: getColumnMetaValue(columnMeta, "original", "brand"), availability: getColumnMetaValue(columnMeta, "original", "availability"), discontinued: getColumnMetaValue(columnMeta, "original", "discontinued") }) : isModel ? buildModelLink(row.original)   : escapeHtml(row.original   || "N/A");
+            const bmCell   = isRetailers ? buildRetailerLinks(row.brandMatch, colSearch.brandMatch, { hasBrandField: Boolean(getColumnMetaValue(columnMeta, "brandMatch", "hasBrandField")), brand: getColumnMetaValue(columnMeta, "brandMatch", "brand"), availability: getColumnMetaValue(columnMeta, "brandMatch", "availability"), discontinued: getColumnMetaValue(columnMeta, "brandMatch", "discontinued") }) : isModel ? buildModelLink(row.brandMatch) : escapeHtml(row.brandMatch || "N/A");
+            const o1Cell   = isRetailers ? buildRetailerLinks(row.option1,    colSearch.option1,    { hasBrandField: Boolean(getColumnMetaValue(columnMeta, "option1", "hasBrandField")), brand: getColumnMetaValue(columnMeta, "option1", "brand"), availability: getColumnMetaValue(columnMeta, "option1", "availability"), discontinued: getColumnMetaValue(columnMeta, "option1", "discontinued") }) : isModel ? buildModelLink(row.option1)    : escapeHtml(row.option1    || "N/A");
+            const o2Cell   = isRetailers ? buildRetailerLinks(row.option2,    colSearch.option2,    { hasBrandField: Boolean(getColumnMetaValue(columnMeta, "option2", "hasBrandField")), brand: getColumnMetaValue(columnMeta, "option2", "brand"), availability: getColumnMetaValue(columnMeta, "option2", "availability"), discontinued: getColumnMetaValue(columnMeta, "option2", "discontinued") }) : isModel ? buildModelLink(row.option2)    : escapeHtml(row.option2    || "N/A");
             const origFinal = isRecommendedReplacement ? buildGoogleSearchLink(row.original) : origCell;
             const bmFinal = isRecommendedReplacement ? buildGoogleSearchLink(row.brandMatch) : bmCell;
             const o1Final = isRecommendedReplacement ? buildGoogleSearchLink(row.option1) : o1Cell;
@@ -3268,6 +3387,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const runDefaultFullReport = () => {
     const query = String(queryInput?.value || "").trim();
     if (!query) return;
+    // FULL REPORT BRANCH: default Search/Enter always executes full performSearch flow.
+    setActiveReportType("full");
+    console.info("[ReportMode] Full technical research report branch");
     setAllFullReportSectionsChecked(true);
     applyFullReportSectionSelections();
     toggleFullReportPicker(false);
@@ -3294,6 +3416,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (lkqReportBtn) {
     lkqReportBtn.addEventListener("click", () => {
+      // LKQ REPORT BRANCH: runs dedicated inline LKQ fast+detail render path, not performSearch().
+      setActiveReportType("lkq");
+      console.info("[ReportMode] LKQ report branch");
       toggleFullReportPicker(false);
       clearLkqInlineView();
       performLkqInlineSearch();
@@ -3302,6 +3427,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (fullReportBtn) {
     fullReportBtn.addEventListener("click", () => {
+      setActiveReportType("full");
       toggleFullReportPicker();
     });
   }
@@ -3310,6 +3436,8 @@ document.addEventListener("DOMContentLoaded", () => {
     fullReportRunBtn.addEventListener("click", () => {
       const query = String(queryInput?.value || "").trim();
       if (!query) return;
+      setActiveReportType("full");
+      console.info("[ReportMode] Full technical research report branch (picker run)");
       applyFullReportSectionSelections();
       toggleFullReportPicker(false);
       clearLkqInlineView();
@@ -3360,7 +3488,7 @@ document.addEventListener("DOMContentLoaded", () => {
         examplesList.classList.remove("open");
         examplesToggle.setAttribute("aria-expanded", "false");
         if (examplesChevron) examplesChevron.classList.remove("open");
-        performSearch();
+        runDefaultFullReport();
       });
     });
   }
@@ -3399,7 +3527,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!v) return;
       const mainInput = byId("query");
       if (mainInput) mainInput.value = v;
-      performSearch();
+      runDefaultFullReport();
     });
   }
   if (queryCta) {
@@ -3409,7 +3537,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!v) return;
       const mainInput = byId("query");
       if (mainInput) mainInput.value = v;
-      performSearch();
+      runDefaultFullReport();
     });
   }
 
@@ -3420,7 +3548,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!q) return;
       const input = byId("query");
       if (input) input.value = q;
-      performSearch();
+      runDefaultFullReport();
     });
   });
 
@@ -3440,6 +3568,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Full report section picker defaults
   setAllFullReportSectionsChecked(true);
   applyFullReportSectionSelections();
+  setActiveReportType(null);
 
   const initialQuery = new URLSearchParams(window.location.search).get("query");
   if (initialQuery && queryInput) {

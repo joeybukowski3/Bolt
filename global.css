@@ -3831,3 +3831,27 @@ img.ia-sidebar-logo {
     }
 
 }
+
+.report-action-btn.report-btn--active {
+    background: #f59e0b !important;
+    color: #000 !important;
+    border-color: #f59e0b !important;
+    opacity: 1;
+    font-weight: 800;
+    box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.22);
+}
+
+.report-action-btn.report-btn--inactive {
+    opacity: 0.56;
+    border-color: rgba(255, 255, 255, 0.16) !important;
+    color: rgba(255, 255, 255, 0.62) !important;
+}
+
+.report-action-btn.report-btn--inactive:hover {
+    opacity: 0.72;
+}
+
+.retailer-link-muted {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+}
