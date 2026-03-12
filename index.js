@@ -5,6 +5,7 @@ let currentCategory = "general";
 let acvData = { msrp: 0, age: 0 };
 let _compareBlock = null;
 let activeSearchToken = 0;
+let lkqModeActive = false;
 
 // ── Section filter state ──────────────────────────────────────────────────────
 
@@ -419,6 +420,508 @@ async function handleImageSearch(file) {
   } catch (err) {
     console.error("Image search error:", err);
     setImageSearchStatus(err?.message || "Network error. Please try again.", "error");
+  }
+}
+
+// Inline LKQ report mode (kept separate from full report renderFast/renderDetail pipeline)
+const LKQ_SERVICE_LIFE_BY_CATEGORY = {
+  tv: "7-10 years",
+  refrigerator: "10-15 years",
+  washer: "10-14 years",
+  dryer: "10-14 years",
+  dishwasher: "9-12 years",
+  hvac: "12-20 years",
+  water_heater: "8-12 years",
+  computer: "4-7 years",
+  small_appliance: "5-10 years",
+  general: "Varies by item type"
+};
+
+const LKQ_SN_YEAR_W = {'L':2021,'M':2022,'P':2023,'R':2024,'S':2025,'T':2006,'U':2007,'W':2008,'X':2009,'Y':2010,'A':2011,'B':2012,'C':2013,'D':2014,'E':2015,'F':2016,'G':2017,'H':2018,'J':2019,'K':2020};
+const LKQ_SN_YEAR_S = {'B':2011,'C':2012,'D':2013,'F':2014,'G':2015,'H':2016,'J':2017,'K':2018,'M':2019,'N':2020,'R':2021,'T':2022,'W':2023,'X':2024,'Y':2025};
+const LKQ_SN_YEAR_GE = {'L':2022,'M':2023,'R':2024,'S':2025,'T':2014,'V':2015,'Z':2016,'A':2017,'D':2018,'F':2019,'G':2020,'H':2021};
+const LKQ_SN_MONTHS_FULL = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const LKQ_SN_MONTH_GE = {'A':'January','B':'February','D':'March','F':'April','G':'May','H':'June','L':'July','M':'August','R':'September','S':'October','T':'November','V':'December'};
+
+const LKQ_SN_DATA = {
+  Appliances: {
+    'Samsung':   { decode: s => { if (s.length < 10) return null; const yc = s.length >= 15 ? s[7] : s[s.length-3]; const mc = s.length >= 15 ? s[8] : s[s.length-2]; const yr = LKQ_SN_YEAR_S[yc]; const mo = {'1':'Jan','2':'Feb','3':'Mar','4':'Apr','5':'May','6':'Jun','7':'Jul','8':'Aug','9':'Sep','A':'Oct','B':'Nov','C':'Dec'}[mc]; return yr && mo ? {month:mo, year:yr} : null; } },
+    'Whirlpool': { decode: s => { const yr=LKQ_SN_YEAR_W[s[2]]; const wk=parseInt(s.substring(3,5),10); return yr&&!isNaN(wk)?{week:wk,year:yr}:null; } },
+    'GE':        { decode: s => { const yr=LKQ_SN_YEAR_GE[s[1]]; const mo=LKQ_SN_MONTH_GE[s[0]]; return yr&&mo?{month:mo,year:yr}:null; } },
+    'LG':        { decode: s => { const yd=parseInt(s[0],10); if(isNaN(yd)) return null; const mo=LKQ_SN_MONTHS_FULL[parseInt(s.substring(1,3),10)-1]; const yr=2000+yd+(yd<5?20:10); return mo?{month:mo,year:yr}:null; } }
+  },
+  HVAC: {
+    'Carrier': { decode: s => { const wk=parseInt(s.substring(0,2),10); const yr=2000+parseInt(s.substring(2,4),10); return !isNaN(wk)&&!isNaN(yr)?{week:wk,year:yr}:null; } },
+    'Bryant':  { decode: s => { const wk=parseInt(s.substring(0,2),10); const yr=2000+parseInt(s.substring(2,4),10); return !isNaN(wk)&&!isNaN(yr)?{week:wk,year:yr}:null; } },
+    'Lennox':  { decode: s => { const wk=parseInt(s.substring(0,2),10); const yr=2000+parseInt(s.substring(2,4),10); return !isNaN(wk)&&!isNaN(yr)?{week:wk,year:yr}:null; } },
+    'York':    { decode: s => { const wk=parseInt(s.substring(0,2),10); const yr=2000+parseInt(s.substring(2,4),10); return !isNaN(wk)&&!isNaN(yr)?{week:wk,year:yr}:null; } },
+    'Trane':   { decode: s => { const yr=2000+parseInt(s.substring(2,4),10); return !isNaN(yr)?{year:yr}:null; } },
+    'Goodman': { decode: s => { const yr=2000+parseInt(s.substring(0,2),10); const mo=parseInt(s.substring(2,4),10); return !isNaN(yr)&&mo<=12?{month:LKQ_SN_MONTHS_FULL[mo-1],year:yr}:null; } }
+  },
+  Electronics: {
+    'Google Pixel': { decode: s => { const yr=2010+parseInt(s[0],10); return !isNaN(yr)?{year:yr}:null; } }
+  }
+};
+
+let lkqInlineState = {
+  query: "",
+  fast: null,
+  detail: null,
+  modelLabel: "",
+  isSpecificModel: false,
+  serialAgeOverride: ""
+};
+
+function lkqCleanStr(v) {
+  return String(v ?? "").trim();
+}
+
+function lkqAsArray(v) {
+  return Array.isArray(v) ? v : [];
+}
+
+function lkqEscapeHtml(value) {
+  return String(value || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function lkqEnsureRoot() {
+  const inner = document.querySelector("#results .results-inner");
+  if (!inner) return null;
+  let root = byId("lkq-inline-root");
+  if (!root) {
+    root = document.createElement("div");
+    root.id = "lkq-inline-root";
+    root.className = "hidden";
+    root.style.marginTop = "0.85rem";
+    inner.insertBefore(root, inner.firstChild);
+  }
+  return root;
+}
+
+function lkqToggleFullReportChrome(showFull) {
+  const selectors = [
+    "#results .results-header",
+    "#model-number-hint",
+    "#report-tabs-top",
+    "#estimation-banner",
+    "#refine-tip",
+    "#panel-overview",
+    "#panel-replacements",
+    "#panel-diagnostics",
+    "#report-tabs-bottom",
+    "#results .results-inner > footer"
+  ];
+  selectors.forEach((sel) => {
+    const el = document.querySelector(sel);
+    if (!el) return;
+    el.classList.toggle("hidden", !showFull);
+  });
+}
+
+function clearLkqInlineView() {
+  lkqModeActive = false;
+  lkqToggleFullReportChrome(true);
+  const root = byId("lkq-inline-root");
+  if (root) {
+    root.classList.add("hidden");
+    root.innerHTML = "";
+  }
+}
+
+function lkqModelSpecific(fast, enteredQuery) {
+  const searchTier = Number(fast?.searchTier || 0);
+  const analysis = fast?.analysis || {};
+  const model = lkqCleanStr(analysis.model || analysis.estimatedModel);
+  const entered = lkqCleanStr(analysis.entered || enteredQuery);
+  if (!model) return false;
+  if (searchTier === 4) return true;
+  if (model.toLowerCase() === entered.toLowerCase() && searchTier < 4) return false;
+  return /[a-z]+\d|\d+[a-z]/i.test(model) || /\d{2,}/.test(model);
+}
+
+function lkqExtractYear(text) {
+  const s = lkqCleanStr(text);
+  if (!s) return null;
+  const m = s.match(/\b(19|20)\d{2}\b/);
+  if (m) return Number(m[0]);
+  const d = s.match(/\b(19|20)\d0s\b/i);
+  if (d) {
+    const decade = Number(String(d[0]).slice(0, 4));
+    if (/mid/i.test(s)) return decade + 5;
+    if (/late/i.test(s)) return decade + 8;
+    return decade;
+  }
+  return null;
+}
+
+function lkqExtractAgeYears(text) {
+  const s = lkqCleanStr(text).toLowerCase();
+  if (!s) return null;
+  const m = s.match(/approximately\s+(\d+)/) || s.match(/\b(\d+)\s+years?\s+old\b/);
+  if (!m) return null;
+  return Number(m[1]);
+}
+
+function lkqProductionRange(fast) {
+  const nowYear = new Date().getFullYear();
+  const rd = fast?.releaseDate || {};
+  const availability = lkqCleanStr(fast?.availability).toLowerCase();
+  const discText = lkqCleanStr(rd.discontinuation);
+
+  let introducedYear = null;
+  if (typeof rd.ageNumeric === "number" && Number.isFinite(rd.ageNumeric)) {
+    introducedYear = Math.max(1900, nowYear - Math.max(0, Math.round(rd.ageNumeric)));
+  }
+  if (!introducedYear) {
+    const ageFromText = lkqExtractAgeYears(rd.estimatedAge);
+    if (Number.isFinite(ageFromText)) introducedYear = Math.max(1900, nowYear - ageFromText);
+  }
+  if (!introducedYear) introducedYear = lkqExtractYear(rd.estimatedAge);
+  if (!introducedYear) introducedYear = lkqExtractYear(rd.productionEra);
+
+  let discontinuedYear = lkqExtractYear(discText);
+  const activeSignals = [
+    "currently available",
+    "in production",
+    "available new from manufacturer",
+    "major retailers"
+  ];
+  const isActive = activeSignals.some((sig) => availability.includes(sig));
+
+  if (!introducedYear && discontinuedYear) return `${discontinuedYear} - ${discontinuedYear}`;
+  if (!introducedYear && !discontinuedYear) return lkqCleanStr(rd.productionEra) || "Unknown";
+  if (isActive) return `${introducedYear} - Present`;
+  if (discontinuedYear) return `${introducedYear} - ${discontinuedYear}`;
+  return `${introducedYear} - Present`;
+}
+
+function lkqServiceLife(category, detailServiceLife) {
+  const explicit = lkqCleanStr(detailServiceLife);
+  if (explicit) return explicit;
+  const key = lkqCleanStr(category).toLowerCase();
+  return LKQ_SERVICE_LIFE_BY_CATEGORY[key] || LKQ_SERVICE_LIFE_BY_CATEGORY.general;
+}
+
+function lkqBuildAgeText() {
+  if (lkqInlineState.serialAgeOverride) return lkqInlineState.serialAgeOverride;
+  if (!lkqInlineState.isSpecificModel) return "Provide a model number for exact age";
+  const rd = lkqInlineState.fast?.releaseDate || {};
+  const est = lkqCleanStr(rd.estimatedAge);
+  if (est) return est;
+  if (typeof rd.ageNumeric === "number" && Number.isFinite(rd.ageNumeric)) {
+    return `Approximately ${Math.max(0, Math.round(rd.ageNumeric))} years old.`;
+  }
+  return "Age estimate unavailable";
+}
+
+function lkqBuildRetailerLinks(retailerText, modelText) {
+  const retailers = lkqCleanStr(retailerText).split(",").map((s) => lkqCleanStr(s)).filter(Boolean).slice(0, 4);
+  if (!retailers.length) return "-";
+  const q = lkqCleanStr(modelText) || lkqInlineState.query;
+  const html = retailers.map((name) => {
+    const fn = RETAILER_SEARCH_URLS[name] || ((x) => `https://www.google.com/search?q=${encodeURIComponent(name + " " + x)}`);
+    return `<a class="repair-link" href="${lkqEscapeHtml(fn(q))}" target="_blank" rel="noopener noreferrer">${lkqEscapeHtml(name)}</a>`;
+  }).join(" ");
+  return html || "-";
+}
+
+function lkqGetRowValue(rows, label, key) {
+  const row = rows.find((r) => lkqCleanStr(r?.label).toLowerCase() === lkqCleanStr(label).toLowerCase());
+  return row ? lkqCleanStr(row[key]) : "";
+}
+
+function lkqCollectSpecs(rows, key) {
+  const excluded = new Set(["model", "recommended replacement", "price (new)", "price range (new)", "retailers", "availability", "notes"]);
+  const out = [];
+  rows.forEach((row) => {
+    const label = lkqCleanStr(row?.label);
+    const value = lkqCleanStr(row?.[key]);
+    if (!label || !value || /^n\/?a$/i.test(value) || excluded.has(label.toLowerCase())) return;
+    if (out.length < 3) out.push(`${label}: ${value}`);
+  });
+  if (!out.length) {
+    const size = lkqGetRowValue(rows, "Size / Capacity", key);
+    if (size) out.push(`Size / Capacity: ${size}`);
+  }
+  return out.slice(0, 3);
+}
+
+function lkqMonthIdx(m) {
+  if (!m) return -1;
+  const f = LKQ_SN_MONTHS_FULL.indexOf(m);
+  if (f !== -1) return f;
+  const short = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return short.indexOf(m);
+}
+
+function lkqContextBrand(modelText) {
+  const text = lkqCleanStr(modelText).toLowerCase();
+  if (!text) return null;
+  const brands = [];
+  for (const cat of Object.values(LKQ_SN_DATA)) brands.push(...Object.keys(cat));
+  brands.sort((a, b) => b.length - a.length);
+  for (const b of brands) { if (text.includes(b.toLowerCase())) return b; }
+  return null;
+}
+
+function lkqTryDecodeSerial(serial, modelText) {
+  const s = lkqCleanStr(serial).replace(/\s+/g, "").toUpperCase();
+  if (!s) return { type: "unknown" };
+  const hits = [];
+  const ctx = lkqContextBrand(modelText);
+  if (ctx) {
+    for (const cat of Object.values(LKQ_SN_DATA)) {
+      if (!cat[ctx]) continue;
+      try { const r = cat[ctx].decode(s); if (r && r.year) hits.push({ priority: true, ...r }); } catch (_) {}
+      break;
+    }
+  }
+  if (!hits.length) {
+    for (const cat of Object.values(LKQ_SN_DATA)) {
+      for (const entry of Object.values(cat)) {
+        try { const r = entry.decode(s); if (r && r.year) hits.push({ ...r }); } catch (_) {}
+      }
+    }
+  }
+  if (!hits.length) return { type: "unknown" };
+  hits.sort((a, b) => ((b.priority ? 1 : 0) + (b.month ? 2 : b.week ? 1 : 0)) - ((a.priority ? 1 : 0) + (a.month ? 2 : a.week ? 1 : 0)));
+  const best = hits[0];
+  const now = new Date();
+  const curYear = now.getFullYear();
+  const curMonth = now.getMonth();
+  if (best.month) {
+    const mIdx = lkqMonthIdx(best.month);
+    const diffM = (curYear - best.year) * 12 + (curMonth - (mIdx !== -1 ? mIdx : curMonth));
+    const ageYears = Math.max(0, Math.round(diffM / 12 * 10) / 10);
+    return { type: "exact", text: `Manufactured ${best.month} ${best.year} - approximately ${ageYears} years old.` };
+  }
+  if (best.week) {
+    const curWeek = Math.ceil((now - new Date(curYear, 0, 1)) / (7 * 24 * 3600 * 1000));
+    const diffW = (curYear - best.year) * 52 + (curWeek - best.week);
+    const ageYears = Math.max(0, Math.round(diffW / 52 * 10) / 10);
+    return { type: "exact", text: `Manufactured Week ${best.week}, ${best.year} - approximately ${ageYears} years old.` };
+  }
+  return { type: "range", text: `Manufactured in ${best.year} - approximately ${curYear - best.year}-${curYear - best.year + 1} years old.` };
+}
+
+function renderLkqInline() {
+  const root = lkqEnsureRoot();
+  if (!root) return;
+  const fast = lkqInlineState.fast || {};
+  const detail = lkqInlineState.detail || {};
+  const analysis = fast.analysis || {};
+  const rows = lkqAsArray(detail.table);
+  const mode = lkqCleanStr(detail.tableMode || "standard");
+  const productionRange = lkqProductionRange(fast);
+  const ageText = lkqBuildAgeText();
+  const serviceLife = lkqServiceLife(analysis.category, detail.serviceLife);
+  const serialSection = lkqInlineState.isSpecificModel ? `
+    <div class="card" style="margin-top:0.8rem;">
+      <div class="card-title"><span class="title-number">2</span> Serial Number Decode</div>
+      <div style="display:flex; gap:0.5rem; flex-wrap:wrap; align-items:center;">
+        <label for="lkq-inline-serial-input" style="font-size:0.85rem; color:var(--text-mid); font-weight:600;">Have a serial number? Enter it for exact age:</label>
+        <input id="lkq-inline-serial-input" type="text" style="flex:1; min-width:180px; padding:0.48rem 0.6rem; border:1px solid var(--border-color); border-radius:8px;">
+        <button id="lkq-inline-serial-btn" class="recalc-btn" type="button">Decode</button>
+      </div>
+      <p id="lkq-inline-serial-result" style="margin-top:0.55rem; font-size:0.82rem; color:#0f766e;"></p>
+      <details id="lkq-inline-evidence-wrap" class="hidden" style="margin-top:0.5rem;">
+        <summary style="cursor:pointer; font-size:0.82rem; font-weight:600; color:var(--text-mid);">How we determined this</summary>
+        <ul id="lkq-inline-evidence-list" style="margin:0.45rem 0 0 1rem; color:var(--text-mid); font-size:0.82rem;"></ul>
+      </details>
+    </div>
+  ` : "";
+
+  let candidates = [];
+  if (mode === "tiered") {
+    const modelRow = rows.find((r) => lkqCleanStr(r?.label).toLowerCase() === "model") || {};
+    const priceRow = rows.find((r) => lkqCleanStr(r?.label).toLowerCase() === "price range (new)") || {};
+    const retailerRow = rows.find((r) => lkqCleanStr(r?.label).toLowerCase() === "retailers") || {};
+    candidates = [
+      { key: "entryLevel", tier: "Budget", model: lkqCleanStr(modelRow.entryLevel) || "-", price: lkqCleanStr(priceRow.entryLevel) || "-", retailers: retailerRow.entryLevel || "" },
+      { key: "midGrade", tier: "LKQ", model: lkqCleanStr(modelRow.midGrade) || "-", price: lkqCleanStr(priceRow.midGrade) || "-", retailers: retailerRow.midGrade || "" },
+      { key: "premium", tier: "Premium Upgrade", model: lkqCleanStr(modelRow.premium) || "-", price: lkqCleanStr(priceRow.premium) || "-", retailers: retailerRow.premium || "" }
+    ];
+  } else {
+    const modelRow = rows.find((r) => lkqCleanStr(r?.label).toLowerCase() === "model") || {};
+    const priceRow = rows.find((r) => lkqCleanStr(r?.label).toLowerCase() === "price (new)") || {};
+    const retailerRow = rows.find((r) => lkqCleanStr(r?.label).toLowerCase() === "retailers") || {};
+    candidates = [
+      { key: "brandMatch", tier: "Best Match", model: lkqCleanStr(modelRow.brandMatch) || "-", price: lkqCleanStr(priceRow.brandMatch) || "-", retailers: retailerRow.brandMatch || "" },
+      { key: "option1", tier: "LKQ", model: lkqCleanStr(modelRow.option1) || "-", price: lkqCleanStr(priceRow.option1) || "-", retailers: retailerRow.option1 || "" },
+      { key: "original", tier: "Budget", model: lkqCleanStr(modelRow.original) || "-", price: lkqCleanStr(priceRow.original) || "-", retailers: retailerRow.original || "" },
+      { key: "option2", tier: "Premium Upgrade", model: lkqCleanStr(modelRow.option2) || "-", price: lkqCleanStr(priceRow.option2) || "-", retailers: retailerRow.option2 || "" }
+    ];
+  }
+
+  const tableHtml = candidates.map((c) => {
+    const specs = lkqCollectSpecs(rows, c.key);
+    return `<tr>
+      <td>${lkqEscapeHtml(c.model)}</td>
+      <td>${lkqEscapeHtml(c.tier)}</td>
+      <td>${specs.length ? `<ul style="margin:0; padding-left:1rem;">${specs.map((s) => `<li>${lkqEscapeHtml(s)}</li>`).join("")}</ul>` : "-"}</td>
+      <td>${lkqEscapeHtml(c.price)}</td>
+      <td>${lkqBuildRetailerLinks(c.retailers, c.model)}</td>
+    </tr>`;
+  }).join("");
+
+  root.innerHTML = `
+    <div class="card" style="margin-bottom:0.8rem;">
+      <div class="card-title"><span class="title-number">1</span> LKQ Report Summary</div>
+      <div class="metrics-strip">
+        <div class="metric-card"><span class="metric-label">Production Era</span><span class="metric-value">${lkqEscapeHtml(productionRange)}</span></div>
+        <div class="metric-card"><span class="metric-label">Estimated Age</span><span class="metric-value ${lkqInlineState.isSpecificModel ? "" : "metric-sub"}">${lkqEscapeHtml(ageText)}</span></div>
+        <div class="metric-card"><span class="metric-label">Service Life</span><span class="metric-value">${lkqEscapeHtml(serviceLife)}</span></div>
+        <div class="metric-card"><span class="metric-label">Mode</span><span class="metric-value" style="font-size:0.88rem;">LKQ Only</span></div>
+      </div>
+    </div>
+    ${serialSection}
+    <div class="card">
+      <div class="card-title"><span class="title-number">3</span> LKQ Replacement Options</div>
+      <table class="data-table">
+        <thead><tr><th>Item / Model</th><th>Tier</th><th>Key Specs</th><th>Est. Price / ACV</th><th>Retailer Links</th></tr></thead>
+        <tbody>${tableHtml || `<tr><td colspan="5">No replacement options available.</td></tr>`}</tbody>
+      </table>
+      ${lkqCleanStr(detail.tableNote) ? `<div class="table-note" style="display:block; margin-top:0.6rem;"><strong>Note:</strong> ${lkqEscapeHtml(detail.tableNote)}</div>` : ""}
+      ${lkqAsArray(detail.whatToConsider).length ? `<div style="margin-top:0.75rem;"><strong style="font-size:0.82rem; color:var(--text-mid);">What to consider</strong><ul style="margin:0.35rem 0 0 1rem; color:var(--text-mid); font-size:0.82rem;">${lkqAsArray(detail.whatToConsider).map((x) => `<li>${lkqEscapeHtml(lkqCleanStr(x))}</li>`).join("")}</ul></div>` : ""}
+      <div style="margin-top:0.85rem; text-align:right;">
+        <button id="lkq-inline-full-report-btn" class="print-btn" type="button">Generate Full Item Report</button>
+      </div>
+    </div>
+  `;
+  root.classList.remove("hidden");
+
+  byId("lkq-inline-full-report-btn")?.addEventListener("click", () => {
+    const qInput = byId("query");
+    if (qInput) qInput.value = lkqInlineState.query;
+    const lkqChk = byId("lkq-only-checkbox");
+    if (lkqChk) lkqChk.checked = false;
+    const u = new URL(window.location.href);
+    u.searchParams.set("query", lkqInlineState.query);
+    window.history.replaceState({}, "", u.toString());
+    clearLkqInlineView();
+    performSearch();
+  });
+
+  byId("lkq-inline-serial-btn")?.addEventListener("click", async () => {
+    const serial = lkqCleanStr(byId("lkq-inline-serial-input")?.value);
+    const resultEl = byId("lkq-inline-serial-result");
+    const wrap = byId("lkq-inline-evidence-wrap");
+    const list = byId("lkq-inline-evidence-list");
+    if (!serial) {
+      if (resultEl) { resultEl.textContent = "Enter a serial number to decode."; resultEl.style.color = "#b91c1c"; }
+      return;
+    }
+    if (resultEl) { resultEl.textContent = "Decoding serial number..."; resultEl.style.color = "#0f766e"; }
+
+    const local = lkqTryDecodeSerial(serial, lkqInlineState.modelLabel);
+    if (local.type !== "unknown") {
+      lkqInlineState.serialAgeOverride = local.text;
+      if (wrap) wrap.classList.add("hidden");
+      if (list) list.innerHTML = "";
+      renderLkqInline();
+      const rs = byId("lkq-inline-serial-result");
+      if (rs) rs.textContent = "Serial decoded locally.";
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/age-lookup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query: `${serial} ${lkqInlineState.modelLabel || lkqInlineState.query}`.trim() })
+      });
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(payload?.error || payload?.message || "Serial decode failed.");
+      const y = lkqCleanStr(payload?.estimatedYear);
+      const r = lkqCleanStr(payload?.yearRange);
+      lkqInlineState.serialAgeOverride = r || y || "Exact age unavailable";
+      renderLkqInline();
+      const rs = byId("lkq-inline-serial-result");
+      if (rs) rs.textContent = "Serial decoded using smart lookup.";
+      const ev = lkqAsArray(payload?.evidence).filter((e) => e && (lkqCleanStr(e.detail) || lkqCleanStr(e.source)));
+      const w2 = byId("lkq-inline-evidence-wrap");
+      const l2 = byId("lkq-inline-evidence-list");
+      if (ev.length && w2 && l2) {
+        l2.innerHTML = ev.map((e) => `<li><strong>${lkqEscapeHtml(lkqCleanStr(e.source) || "Evidence")}</strong>: ${lkqEscapeHtml(lkqCleanStr(e.detail))}</li>`).join("");
+        w2.classList.remove("hidden");
+      }
+    } catch (err) {
+      if (resultEl) { resultEl.textContent = err?.message || "Serial decode failed."; resultEl.style.color = "#b91c1c"; }
+    }
+  });
+}
+
+async function performLkqInlineSearch() {
+  const qInput = byId("query");
+  const query = lkqCleanStr(qInput?.value);
+  if (!query) return;
+
+  lkqModeActive = true;
+  lkqInlineState = {
+    query,
+    fast: null,
+    detail: null,
+    modelLabel: "",
+    isSpecificModel: false,
+    serialAgeOverride: ""
+  };
+
+  lkqToggleFullReportChrome(false);
+  const root = lkqEnsureRoot();
+  if (!root) return;
+  root.classList.remove("hidden");
+  root.innerHTML = `<div class="card"><div class="section-spinner">Loading LKQ report...</div></div>`;
+
+  const results = byId("results");
+  if (results) {
+    results.classList.remove("hidden");
+    results.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  try {
+    const [fastRes, detailRes] = await Promise.all([
+      fetch(`/api/search?mode=research-fast&query=${encodeURIComponent(query)}`),
+      fetch(`/api/search?mode=research-detail&query=${encodeURIComponent(query)}`)
+    ]);
+    const fast = await fastRes.json().catch(() => ({}));
+    const detail = await detailRes.json().catch(() => ({}));
+    if (!fastRes.ok) throw new Error(lkqCleanStr(fast?.error) || "Fast report request failed.");
+    if (!detailRes.ok) throw new Error(lkqCleanStr(detail?.error) || "Detail report request failed.");
+
+    lkqInlineState.fast = {
+      searchTier: Number(fast?.searchTier || 0),
+      availability: lkqCleanStr(fast?.availability),
+      analysis: {
+        model: lkqCleanStr(fast?.analysis?.model || fast?.analysis?.estimatedModel),
+        entered: lkqCleanStr(fast?.analysis?.entered),
+        category: lkqCleanStr(fast?.analysis?.category),
+        specs: lkqAsArray(fast?.analysis?.topSpecs)
+      },
+      releaseDate: {
+        productionEra: lkqCleanStr(fast?.releaseDate?.productionEra),
+        estimatedAge: lkqCleanStr(fast?.releaseDate?.estimatedAge),
+        ageNumeric: typeof fast?.releaseDate?.ageNumeric === "number" ? fast.releaseDate.ageNumeric : null,
+        discontinuation: lkqCleanStr(fast?.releaseDate?.discontinuation)
+      }
+    };
+    lkqInlineState.detail = {
+      table: lkqAsArray(detail?.table),
+      tableMode: lkqCleanStr(detail?.tableMode || "standard"),
+      serviceLife: lkqCleanStr(detail?.serviceLife),
+      whatToConsider: lkqAsArray(detail?.whatToConsider),
+      tableNote: lkqCleanStr(detail?.tableNote)
+    };
+    lkqInlineState.modelLabel = lkqInlineState.fast.analysis.model;
+    lkqInlineState.isSpecificModel = lkqModelSpecific(fast, query);
+
+    renderLkqInline();
+  } catch (err) {
+    root.innerHTML = `<div class="card"><p style="color:#b91c1c; font-size:0.85rem;">${lkqEscapeHtml(err?.message || "Could not generate LKQ report.")}</p></div>`;
   }
 }
 
@@ -2501,6 +3004,7 @@ async function performSearch() {
   if (!queryInput) return;
   const query = queryInput.value.trim();
   if (!query) return;
+  if (lkqModeActive) clearLkqInlineView();
 
   const searchToken = ++activeSearchToken;
   resetResultsUI();
@@ -2632,9 +3136,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const query = String(queryInput?.value || "").trim();
     if (!query) return;
     if (lkqOnlyCheckbox?.checked) {
-      window.location.href = `/lkq-report.html?query=${encodeURIComponent(query)}`;
+      performLkqInlineSearch();
       return;
     }
+    clearLkqInlineView();
     performSearch();
   };
 
