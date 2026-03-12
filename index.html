@@ -115,7 +115,14 @@
         .tab-btn:hover:not(.active) { color: var(--text-dark); background: rgba(255,255,255,0.5); }
         .tab-panel { display: none; }
         .tab-panel.active { display: block; }
-
+        #results.results-single-page .report-tabs-container { display: none !important; }
+        #results.results-single-page .tab-panel.active { display: block; }
+        #results.results-single-page #panel-overview.active { display: block; }
+        #results.results-single-page #panel-overview > .metrics-strip,
+        #results.results-single-page #panel-overview > #card-analysis,
+        #results.results-single-page #panel-overview > .card { grid-column: auto; margin-bottom: 1rem; }
+        #results.results-single-page #panel-replacements,
+        #results.results-single-page #panel-diagnostics { margin-top: 1rem; }
         /* ── Overview panel grid ── */
         #panel-overview.active { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
         #panel-overview > .metrics-strip,
@@ -1233,3 +1240,4 @@
     </script>
 </body>
 </html>
+

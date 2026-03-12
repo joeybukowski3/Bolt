@@ -7,6 +7,7 @@ let _compareBlock = null;
 let activeSearchToken = 0;
 let lkqModeActive = false;
 let activeReportType = null;
+let singlePageResultsMode = false;
 
 // ── Section filter state ──────────────────────────────────────────────────────
 
@@ -103,6 +104,75 @@ function setActiveReportType(type) {
     activeReportType = type;
   }
   syncReportActionButtons();
+}
+
+function hasOverviewSectionSelection() {
+  return selectedSections.overviewMetrics ||
+         selectedSections.currentAnalysis ||
+         selectedSections.howItWorks ||
+         selectedSections.variations ||
+         selectedSections.valuation;
+}
+
+function hasDiagnosticsSectionSelection() {
+  return selectedSections.diagnostics && (
+    selectedSections.manualMfr ||
+    selectedSections.recalls ||
+    selectedSections.errorFailures ||
+    selectedSections.troubleshooting
+  );
+}
+
+function isFullReportSelection() {
+  return selectedSections.overviewMetrics &&
+         selectedSections.currentAnalysis &&
+         selectedSections.variations &&
+         selectedSections.replacements &&
+         selectedSections.valuation &&
+         selectedSections.diagnostics &&
+         selectedSections.technicalDetails &&
+         selectedSections.recalls &&
+         selectedSections.errorFailures &&
+         selectedSections.manualMfr &&
+         selectedSections.troubleshooting;
+}
+
+function applyReportLayoutMode() {
+  const results = byId("results");
+  const panelOverview = byId("panel-overview");
+  const panelReplacements = byId("panel-replacements");
+  const panelDiagnostics = byId("panel-diagnostics");
+  if (!results || !panelOverview || !panelReplacements || !panelDiagnostics) return;
+
+  singlePageResultsMode = activeReportType === "full" && !isFullReportSelection();
+  results.classList.toggle("results-single-page", singlePageResultsMode);
+
+  const showOverview = hasOverviewSectionSelection();
+  const showReplacements = selectedSections.replacements;
+  const showDiagnostics = hasDiagnosticsSectionSelection();
+
+  if (singlePageResultsMode) {
+    show("report-tabs-top", false);
+    show("report-tabs-bottom", false);
+
+    panelOverview.classList.toggle("active", showOverview);
+    panelOverview.classList.toggle("hidden", !showOverview);
+    panelReplacements.classList.toggle("active", showReplacements);
+    panelReplacements.classList.toggle("hidden", !showReplacements);
+    panelDiagnostics.classList.toggle("active", showDiagnostics);
+    panelDiagnostics.classList.toggle("hidden", !showDiagnostics);
+    return;
+  }
+
+  show("report-tabs-top", true);
+  show("report-tabs-bottom", true);
+  panelOverview.classList.remove("hidden");
+  panelReplacements.classList.remove("hidden");
+  panelDiagnostics.classList.remove("hidden");
+  TAB_IDS.forEach((id) => {
+    const panel = byId(id.replace("tab-", "panel-"));
+    if (panel) panel.classList.toggle("active", id === activeTab);
+  });
 }
 
 // ── Serial Number Decode ──────────────────────────────────────────────────────
@@ -285,11 +355,14 @@ function updateSectionVisibility() {
   const resultsEl = byId("results");
   if (!resultsEl || resultsEl.classList.contains("hidden")) return;
 
+  applyReportLayoutMode();
+
   const metricsStrip = document.querySelector("#panel-overview .metrics-strip");
   if (metricsStrip) metricsStrip.classList.toggle("hidden", !selectedSections.overviewMetrics);
 
   show("card-analysis", selectedSections.currentAnalysis);
   show("card-how-it-works", selectedSections.howItWorks);
+  show("card-release-date", selectedSections.overviewMetrics);
   show("r-variations", selectedSections.variations);
 
   const diagnosticsVisible = selectedSections.diagnostics;
@@ -305,10 +378,11 @@ function updateSectionVisibility() {
   }
 
   renderReportSectionTabs();
-
-  const activeTabKey = activeTab.replace('tab-', '');
-  if (activeTabKey !== 'overview' && !selectedSections[activeTabKey]) {
-    setActiveTab("tab-overview");
+  if (!singlePageResultsMode) {
+    const activeTabKey = activeTab.replace('tab-', '');
+    if (activeTabKey !== 'overview' && !selectedSections[activeTabKey]) {
+      setActiveTab("tab-overview");
+    }
   }
 
   if (detailData) renderDetail(detailData);
@@ -1275,6 +1349,11 @@ function renderReportSectionTabs() {
   const html = buildHtml();
   const top = byId("report-tabs-top");
   const bottom = byId("report-tabs-bottom");
+  if (singlePageResultsMode) {
+    if (top) top.innerHTML = "";
+    if (bottom) bottom.innerHTML = "";
+    return;
+  }
   if (top) top.innerHTML = html;
   if (bottom) bottom.innerHTML = html;
 
@@ -1314,6 +1393,11 @@ function setActiveTab(tabId) {
   if (!TAB_IDS.includes(tabId)) return;
   activeTab = tabId;
 
+  if (singlePageResultsMode) {
+    applyReportLayoutMode();
+    return;
+  }
+
   // Toggle panels
   TAB_IDS.forEach((id) => {
     const panel = byId(id.replace("tab-", "panel-"));
@@ -1331,6 +1415,7 @@ function setActiveTab(tabId) {
 function initTabs() {
   // Initially tabs are rendered when search completes, 
   // but we can ensure they are ready.
+  applyReportLayoutMode();
   renderReportSectionTabs();
 }
 
@@ -3255,6 +3340,7 @@ async function performSearch() {
   const query = queryInput.value.trim();
   if (!query) return;
   if (lkqModeActive) clearLkqInlineView();
+  applyReportLayoutMode();
 
   const searchToken = ++activeSearchToken;
   resetResultsUI();
@@ -3269,6 +3355,7 @@ async function performSearch() {
         if (searchToken !== activeSearchToken) return;
         renderFast(fast);
         if (detail) renderDetail(detail);
+        updateSectionVisibility();
         return;
       }
     }
@@ -3341,6 +3428,7 @@ async function performSearch() {
     byId("mascot-wrapper")?.classList.remove("brt-loading");
     if (fast && typeof fast === "object") {
       renderFast(fast);
+      updateSectionVisibility();
     } else {
       const results = byId("results");
       if (results) results.classList.remove("hidden");
@@ -3358,6 +3446,7 @@ async function performSearch() {
     if (searchToken !== activeSearchToken) return;
     if (detail && typeof detail === "object" && !detail.error) {
       renderDetail(detail);
+      updateSectionVisibility();
     }
   });
 
