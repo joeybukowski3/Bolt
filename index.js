@@ -3375,7 +3375,6 @@ async function performSearch() {
 // ── DOMContentLoaded ─────────────────────────────────────────────────────────
 
 document.addEventListener("DOMContentLoaded", () => {
-  const searchBtn = byId("btn");
   const queryInput = byId("query");
   const lkqReportBtn = byId("lkq-report-btn");
   const fullReportBtn = byId("full-report-btn");
@@ -3397,22 +3396,7 @@ document.addEventListener("DOMContentLoaded", () => {
     performSearch();
   };
 
-  if (searchBtn) searchBtn.addEventListener("click", runDefaultFullReport);
-  const queryForm = queryInput ? queryInput.closest("form") : null;
-  if (queryForm) {
-    queryForm.addEventListener("submit", (event) => {
-      event.preventDefault();
-      runDefaultFullReport();
-    });
-  }
-  if (queryInput) {
-    queryInput.addEventListener("keydown", (event) => {
-      if (event.key === "Enter") {
-        event.preventDefault();
-        runDefaultFullReport();
-      }
-    });
-  }
+  // Main search now runs only through the report buttons below the input.
 
   if (lkqReportBtn) {
     lkqReportBtn.addEventListener("click", () => {
