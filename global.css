@@ -3573,6 +3573,16 @@ background:rgba(0,180,216,0.08)
             font-size: 0.88rem; color: var(--text-mid); line-height: 1.6;
 }
 
+.bullet-list {
+            margin: 0.5rem 0 0 1.25rem;
+            color: var(--text-mid);
+            line-height: 1.7;
+}
+
+.bullet-list li {
+            margin-bottom: 0.45rem;
+}
+
 .step-num {
             flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%;
             background: var(--accent); color: #fff;
