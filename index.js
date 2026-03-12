@@ -298,6 +298,130 @@ function show(elOrId, shouldShow) {
   el.classList.toggle("hidden", !shouldShow);
 }
 
+const IMAGE_MAX_BYTES = 10 * 1024 * 1024;
+const IMAGE_ALLOWED_TYPES = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/heic",
+  "image/heif"
+]);
+
+let imagePreviewObjectUrl = null;
+
+function setImageSearchStatus(message, tone = "") {
+  const statusEl = byId("image-search-status");
+  if (!statusEl) return;
+  statusEl.textContent = message || "";
+  statusEl.classList.remove("error", "success");
+  if (tone) statusEl.classList.add(tone);
+}
+
+function clearImagePreview() {
+  const wrap = byId("image-preview-wrap");
+  const img = byId("image-preview");
+  const meta = byId("image-preview-meta");
+  if (imagePreviewObjectUrl) {
+    URL.revokeObjectURL(imagePreviewObjectUrl);
+    imagePreviewObjectUrl = null;
+  }
+  if (img) img.removeAttribute("src");
+  if (meta) meta.textContent = "";
+  if (wrap) wrap.classList.remove("active");
+}
+
+function showImagePreview(file) {
+  const wrap = byId("image-preview-wrap");
+  const img = byId("image-preview");
+  const meta = byId("image-preview-meta");
+  if (!wrap || !img || !meta) return;
+
+  if (imagePreviewObjectUrl) URL.revokeObjectURL(imagePreviewObjectUrl);
+  imagePreviewObjectUrl = URL.createObjectURL(file);
+  img.src = imagePreviewObjectUrl;
+  meta.textContent = `${file.name} (${Math.max(1, Math.round(file.size / 1024))} KB)`;
+  wrap.classList.add("active");
+}
+
+function validateImageFile(file) {
+  if (!file) return "No image selected.";
+  const lowerName = String(file.name || "").toLowerCase();
+  const hasAllowedExt = /\.(jpe?g|png|webp|heic|heif)$/.test(lowerName);
+  const hasAllowedMime = IMAGE_ALLOWED_TYPES.has(String(file.type || "").toLowerCase()) || String(file.type || "").startsWith("image/");
+
+  if (!hasAllowedMime && !hasAllowedExt) {
+    return "Invalid file type. Please use JPEG, PNG, WEBP, or HEIC.";
+  }
+  if (file.size > IMAGE_MAX_BYTES) {
+    return "Image is too large. Please upload an image under 10 MB.";
+  }
+  return null;
+}
+
+function readFileAsDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result || ""));
+    reader.onerror = () => reject(new Error("Could not read image file."));
+    reader.readAsDataURL(file);
+  });
+}
+
+async function handleImageSearch(file) {
+  const queryInput = byId("query");
+  const validationError = validateImageFile(file);
+  if (validationError) {
+    clearImagePreview();
+    setImageSearchStatus(validationError, "error");
+    return;
+  }
+
+  showImagePreview(file);
+  setImageSearchStatus("Analyzing image...");
+
+  try {
+    const imageData = await readFileAsDataUrl(file);
+    const hint = String(queryInput?.value || "").trim();
+
+    const response = await fetch("/api/image-search", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        imageData,
+        hint,
+        mimeType: file.type || null,
+        fileName: file.name || null,
+        size: file.size
+      })
+    });
+
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw new Error(payload?.error || "Image analysis failed.");
+    }
+
+    const lowConfidence = payload?.lowConfidence === true ||
+      (typeof payload?.confidence === "number" && payload.confidence < 0.45);
+
+    const proposedQuery = String(payload?.queryString || "").trim() || hint || "Unknown item (image)";
+    if (queryInput) queryInput.value = proposedQuery;
+
+    if (lowConfidence) {
+      setImageSearchStatus(
+        "We couldn't confidently recognize this item. Try adding a short description and searching again.",
+        "error"
+      );
+    } else {
+      setImageSearchStatus("Image analyzed. Running search...", "success");
+    }
+
+    performSearch();
+  } catch (err) {
+    console.error("Image search error:", err);
+    setImageSearchStatus(err?.message || "Network error. Please try again.", "error");
+  }
+}
+
 // ── ACV calculation ──────────────────────────────────────────────────────────
 
 function fmtDollars(n) {
@@ -2499,24 +2623,46 @@ async function performSearch() {
 document.addEventListener("DOMContentLoaded", () => {
   const searchBtn = byId("btn");
   const queryInput = byId("query");
+  const lkqOnlyCheckbox = byId("lkq-only-checkbox");
   const copyBtn = byId("copy-btn");
   const printBtn = byId("print-btn");
   const recalcBtn = byId("recalc-btn");
 
-  if (searchBtn) searchBtn.addEventListener("click", performSearch);
+  const runMainSearchAction = () => {
+    const query = String(queryInput?.value || "").trim();
+    if (!query) return;
+    if (lkqOnlyCheckbox?.checked) {
+      window.location.href = `/lkq-report.html?query=${encodeURIComponent(query)}`;
+      return;
+    }
+    performSearch();
+  };
+
+  if (searchBtn) searchBtn.addEventListener("click", runMainSearchAction);
   const queryForm = queryInput ? queryInput.closest("form") : null;
   if (queryForm) {
     queryForm.addEventListener("submit", (event) => {
       event.preventDefault();
-      performSearch();
+      runMainSearchAction();
     });
   }
   if (queryInput) {
     queryInput.addEventListener("keydown", (event) => {
       if (event.key === "Enter") {
         event.preventDefault();
-        performSearch();
+        runMainSearchAction();
       }
+    });
+  }
+  const imageSearchBtn = byId("image-search-btn");
+  const imageSearchInput = byId("image-search-input");
+  if (imageSearchBtn && imageSearchInput) {
+    imageSearchBtn.addEventListener("click", () => imageSearchInput.click());
+    imageSearchInput.addEventListener("change", async () => {
+      const file = imageSearchInput.files && imageSearchInput.files[0] ? imageSearchInput.files[0] : null;
+      if (!file) return;
+      await handleImageSearch(file);
+      imageSearchInput.value = "";
     });
   }
   if (copyBtn) copyBtn.addEventListener("click", openSummaryModal);
@@ -2646,4 +2792,10 @@ document.addEventListener("DOMContentLoaded", () => {
       updateSectionVisibility();
     });
   });
+
+  const initialQuery = new URLSearchParams(window.location.search).get("query");
+  if (initialQuery && queryInput) {
+    queryInput.value = initialQuery;
+    performSearch();
+  }
 });

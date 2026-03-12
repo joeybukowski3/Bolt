@@ -1,0 +1,91 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bolt LKQ Report</title>
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon-bolt.svg?v=1">
+  <link rel="stylesheet" href="shared.css">
+  <link rel="stylesheet" href="global.css">
+  <link rel="stylesheet" href="lkq-report.css">
+</head>
+<body>
+  <div class="lkq-shell">
+    <header class="lkq-header">
+      <a class="lkq-back-link" href="/index.html">← Back to Search</a>
+      <h1 class="lkq-title">LKQ Report</h1>
+      <p class="lkq-subtitle">Focused replacement and age summary.</p>
+    </header>
+
+    <section class="lkq-query-bar card">
+      <div class="lkq-query-row">
+        <input id="lkq-query-input" class="lkq-query-input" type="text" placeholder="Enter item, model, or brand">
+        <button id="lkq-query-btn" class="lkq-query-btn" type="button">Run LKQ Report</button>
+      </div>
+      <p id="lkq-inline-message" class="lkq-inline-message" aria-live="polite"></p>
+    </section>
+
+    <section id="lkq-loading" class="lkq-loading card hidden">Loading LKQ report...</section>
+
+    <section id="lkq-content" class="lkq-content hidden">
+      <div class="lkq-card-grid">
+        <article class="lkq-metric-card card">
+          <h2>Production Era</h2>
+          <p id="lkq-production-era" class="lkq-metric-value">—</p>
+        </article>
+        <article class="lkq-metric-card card">
+          <h2>Estimated Age</h2>
+          <p id="lkq-estimated-age" class="lkq-metric-value">—</p>
+        </article>
+        <article class="lkq-metric-card card">
+          <h2>Service Life</h2>
+          <p id="lkq-service-life" class="lkq-metric-value">—</p>
+        </article>
+      </div>
+
+      <section id="lkq-serial-section" class="lkq-serial card hidden">
+        <form id="lkq-serial-form" class="lkq-serial-row">
+          <label for="lkq-serial-input" class="lkq-serial-label">Have a serial number? Enter it for exact age:</label>
+          <input id="lkq-serial-input" class="lkq-serial-input" type="text" placeholder="Serial number" autocomplete="off">
+          <button class="lkq-serial-btn" type="submit">Decode</button>
+        </form>
+        <p id="lkq-serial-result" class="lkq-serial-result" aria-live="polite"></p>
+        <details id="lkq-evidence" class="lkq-evidence hidden">
+          <summary>How we determined this</summary>
+          <ul id="lkq-evidence-list"></ul>
+        </details>
+      </section>
+
+      <section class="lkq-table-card card">
+        <h2 class="lkq-section-title">LKQ Replacement Options</h2>
+        <div class="lkq-table-scroll">
+          <table class="lkq-table">
+            <thead>
+              <tr>
+                <th>Item / Model</th>
+                <th>Tier</th>
+                <th>Key Specs</th>
+                <th>Est. Price / ACV</th>
+                <th>Retailer Links</th>
+              </tr>
+            </thead>
+            <tbody id="lkq-table-body"></tbody>
+          </table>
+        </div>
+        <p id="lkq-table-note" class="lkq-table-note hidden"></p>
+
+        <div id="lkq-consider" class="lkq-consider hidden">
+          <h3>What to consider</h3>
+          <ul id="lkq-consider-list"></ul>
+        </div>
+      </section>
+
+      <div class="lkq-actions">
+        <button id="lkq-full-report-btn" class="lkq-full-report-btn" type="button">Generate Full Item Report</button>
+      </div>
+    </section>
+  </div>
+
+  <script src="lkq-report.js" defer></script>
+</body>
+</html>

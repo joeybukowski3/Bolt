@@ -480,9 +480,20 @@
 
         /* ── Hero search bar ── */
         .brt-search-wrapper { max-width: 660px; margin: 0 auto 16px; position: relative; }
-        .brt-search-bar { width: 100%; padding: 18px 150px 18px 22px; background: rgba(255,255,255,0.07); border: 1.5px solid #2d3f60; border-radius: 12px; font-size: 15px; color: #fff; font-family: inherit; outline: none; transition: border-color 0.2s; }
+        .brt-search-bar { width: 100%; padding: 18px 205px 18px 22px; background: rgba(255,255,255,0.07); border: 1.5px solid #2d3f60; border-radius: 12px; font-size: 15px; color: #fff; font-family: inherit; outline: none; transition: border-color 0.2s; }
         .brt-search-bar::placeholder { color: rgba(255,255,255,0.38); }
         .brt-search-bar:focus { border-color: #f59e0b; box-shadow: 0 0 0 3px rgba(245,158,11,0.12); }
+        .brt-search-camera-btn { position: absolute; right: 112px; top: 50%; transform: translateY(-50%); width: 40px; height: 40px; border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.12); color: #fff; border-radius: 8px; cursor: pointer; font-size: 18px; line-height: 1; display: inline-flex; align-items: center; justify-content: center; transition: border-color 0.15s, background 0.15s; }
+        .brt-search-camera-btn:hover { border-color: rgba(245,158,11,0.7); background: rgba(245,158,11,0.2); }
+        .brt-search-camera-btn:focus-visible { outline: 2px solid #f59e0b; outline-offset: 2px; }
+        .brt-image-input { display: none; }
+        .brt-image-status { margin-top: 0.6rem; font-size: 0.82rem; color: rgba(255,255,255,0.85); min-height: 1.2em; }
+        .brt-image-status.error { color: #fca5a5; }
+        .brt-image-status.success { color: #86efac; }
+        .brt-image-preview-wrap { margin-top: 0.6rem; display: none; align-items: center; gap: 0.65rem; justify-content: center; }
+        .brt-image-preview-wrap.active { display: flex; }
+        .brt-image-preview { width: 54px; height: 54px; object-fit: cover; border-radius: 8px; border: 1px solid rgba(255,255,255,0.35); }
+        .brt-image-preview-meta { font-size: 0.74rem; color: rgba(255,255,255,0.72); text-align: left; }
         .brt-search-btn { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); background: #f59e0b; color: #000; border: none; padding: 11px 22px; border-radius: 8px; font-weight: 700; font-size: 14px; font-family: inherit; cursor: pointer; transition: background 0.15s; white-space: nowrap; }
         .brt-search-btn:hover { background: #fbbf24; }
 
@@ -622,7 +633,8 @@
             .brt-hero { padding: 56px 20px 52px; }
             .brt-hero-h1 { font-size: 34px; }
             .brt-hero-p { font-size: 15px; }
-            .brt-search-bar { padding: 15px 130px 15px 16px; font-size: 14px; }
+            .brt-search-bar { padding: 15px 182px 15px 16px; font-size: 14px; }
+            .brt-search-camera-btn { right: 96px; width: 42px; height: 42px; font-size: 19px; }
             .brt-trust-strip { padding: 14px 20px; gap: 20px; }
             .brt-section { padding: 52px 20px; }
             .brt-sample-section { padding: 52px 20px; }
@@ -688,7 +700,20 @@
             <!-- Main search bar (IDs preserved for JS) -->
             <div class="brt-search-wrapper">
                 <input type="text" id="query" class="brt-search-bar" placeholder='Try "Generac 22kW generator" or "Federal Pacific panel"' autocomplete="off">
+                <button type="button" id="image-search-btn" class="brt-search-camera-btn" aria-label="Search by image" title="Search by image">&#128247;</button>
+                <input type="file" id="image-search-input" class="brt-image-input" accept="image/*,.heic,.heif" capture="environment">
                 <button id="btn" class="brt-search-btn">&#9889; Search</button>
+            </div>
+            <div id="image-search-status" class="brt-image-status" aria-live="polite"></div>
+            <div id="image-preview-wrap" class="brt-image-preview-wrap">
+                <img id="image-preview" class="brt-image-preview" alt="Selected image preview">
+                <div id="image-preview-meta" class="brt-image-preview-meta"></div>
+            </div>
+            <div class="section-filters" style="margin-top: 0.65rem;">
+                <label class="section-filter-chip" for="lkq-only-checkbox">
+                    <input type="checkbox" id="lkq-only-checkbox">
+                    Generate LKQ Report Only
+                </label>
             </div>
 
             <!-- Mascot loader (shown only during search via JS) -->
