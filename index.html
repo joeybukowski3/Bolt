@@ -496,6 +496,21 @@
         .brt-image-preview-meta { font-size: 0.74rem; color: rgba(255,255,255,0.72); text-align: left; }
         .brt-search-btn { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); background: #f59e0b; color: #000; border: none; padding: 11px 22px; border-radius: 8px; font-weight: 700; font-size: 14px; font-family: inherit; cursor: pointer; transition: background 0.15s; white-space: nowrap; }
         .brt-search-btn:hover { background: #fbbf24; }
+        .report-action-row { max-width: 700px; margin: 0.8rem auto 0; display: flex; gap: 0.65rem; justify-content: center; align-items: center; flex-wrap: wrap; }
+        .report-action-btn { border: 1px solid transparent; border-radius: 9px; padding: 0.62rem 0.95rem; font-size: 0.84rem; font-weight: 700; font-family: inherit; cursor: pointer; white-space: nowrap; transition: all 0.18s; }
+        .report-action-btn.primary { background: #f59e0b; color: #000; border-color: #f59e0b; }
+        .report-action-btn.primary:hover { background: #fbbf24; border-color: #fbbf24; }
+        .report-action-btn.secondary { background: rgba(255,255,255,0.08); color: #f8fafc; border-color: rgba(255,255,255,0.26); }
+        .report-action-btn.secondary:hover { background: rgba(255,255,255,0.14); border-color: rgba(255,255,255,0.45); }
+        .full-report-picker { max-width: 760px; margin: 0.65rem auto 0; background: rgba(15, 23, 42, 0.42); border: 1px solid rgba(255,255,255,0.16); border-radius: 12px; padding: 0 0.9rem; max-height: 0; overflow: hidden; opacity: 0; transform: translateY(-8px); transition: max-height 0.24s ease, opacity 0.18s ease, transform 0.2s ease, padding 0.2s ease; }
+        .full-report-picker.open { max-height: 420px; opacity: 1; transform: translateY(0); padding: 0.85rem 0.9rem 0.95rem; }
+        .full-report-picker-title { font-size: 0.8rem; color: rgba(255,255,255,0.92); font-weight: 700; margin-bottom: 0.65rem; letter-spacing: 0.02em; }
+        .full-report-picker-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.4rem 0.55rem; margin-bottom: 0.8rem; }
+        .full-report-picker-chip { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.78rem; font-weight: 500; color: rgba(255,255,255,0.9); background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.14); border-radius: 999px; padding: 0.36rem 0.7rem 0.36rem 0.52rem; cursor: pointer; }
+        .full-report-picker-chip input[type="checkbox"] { width: 13px; height: 13px; accent-color: #f59e0b; margin: 0; }
+        .full-report-picker-actions { display: flex; justify-content: flex-end; }
+        .full-report-run-btn { border: none; border-radius: 8px; background: #f59e0b; color: #000; padding: 0.56rem 0.95rem; font-size: 0.8rem; font-weight: 700; font-family: inherit; cursor: pointer; }
+        .full-report-run-btn:hover { background: #fbbf24; }
 
         /* ── Example pills ── */
         .brt-example-pills { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 10px; }
@@ -635,6 +650,9 @@
             .brt-hero-p { font-size: 15px; }
             .brt-search-bar { padding: 15px 182px 15px 16px; font-size: 14px; }
             .brt-search-camera-btn { right: 96px; width: 42px; height: 42px; font-size: 19px; }
+            .report-action-row { flex-direction: column; align-items: stretch; max-width: 420px; }
+            .report-action-btn { width: 100%; }
+            .full-report-picker-list { grid-template-columns: 1fr; }
             .brt-trust-strip { padding: 14px 20px; gap: 20px; }
             .brt-section { padding: 52px 20px; }
             .brt-sample-section { padding: 52px 20px; }
@@ -709,11 +727,28 @@
                 <img id="image-preview" class="brt-image-preview" alt="Selected image preview">
                 <div id="image-preview-meta" class="brt-image-preview-meta"></div>
             </div>
-            <div class="section-filters" style="margin-top: 0.65rem;">
-                <label class="section-filter-chip" for="lkq-only-checkbox">
-                    <input type="checkbox" id="lkq-only-checkbox">
-                    Generate LKQ Report Only
-                </label>
+            <div class="report-action-row">
+                <button id="lkq-report-btn" class="report-action-btn primary" type="button">Generate LKQ Report</button>
+                <button id="full-report-btn" class="report-action-btn secondary" type="button" aria-expanded="false" aria-controls="full-report-picker">Generate Full Technical Research Report</button>
+            </div>
+            <div id="full-report-picker" class="full-report-picker" aria-hidden="true">
+                <div class="full-report-picker-title">Select sections to include in your report:</div>
+                <div class="full-report-picker-list">
+                    <label class="full-report-picker-chip"><input type="checkbox" id="full-sec-overview" checked> Overview &amp; Key Metrics</label>
+                    <label class="full-report-picker-chip"><input type="checkbox" id="full-sec-analysis" checked> Current Item Analysis</label>
+                    <label class="full-report-picker-chip"><input type="checkbox" id="full-sec-variations" checked> Variations</label>
+                    <label class="full-report-picker-chip"><input type="checkbox" id="full-sec-replacements" checked> Replacement Options</label>
+                    <label class="full-report-picker-chip"><input type="checkbox" id="full-sec-valuation" checked> Valuation &amp; Depreciation</label>
+                    <label class="full-report-picker-chip"><input type="checkbox" id="full-sec-diagnostics" checked> Diagnostics &amp; Repair</label>
+                    <label class="full-report-picker-chip"><input type="checkbox" id="full-sec-technical" checked> Technical Details</label>
+                    <label class="full-report-picker-chip"><input type="checkbox" id="full-sec-recalls" checked> Recall Notices</label>
+                    <label class="full-report-picker-chip"><input type="checkbox" id="full-sec-errors-failures" checked> Error Codes &amp; Failure Modes</label>
+                    <label class="full-report-picker-chip"><input type="checkbox" id="full-sec-manual-mfr" checked> Owner's Manual &amp; Manufacturer Page</label>
+                    <label class="full-report-picker-chip"><input type="checkbox" id="full-sec-troubleshooting" checked> Troubleshooting &amp; Repair Resources</label>
+                </div>
+                <div class="full-report-picker-actions">
+                    <button id="full-report-run-btn" class="full-report-run-btn" type="button">Run Report</button>
+                </div>
             </div>
 
             <!-- Mascot loader (shown only during search via JS) -->
@@ -724,17 +759,6 @@
                     </div>
                 </div>
                 <span id="loader-text" class="loader-text">Consulting live market data and technical records...</span>
-            </div>
-
-            <!-- Section filters -->
-            <div class="section-filters" role="group" aria-label="Report sections to include" style="margin-top: 1.5rem;">
-                <span class="section-filters-label">Include in report:</span>
-                <div class="section-filter-list">
-                    <label class="section-filter-chip is-checked"><input type="checkbox" id="sec-how-it-works" checked> How It Works</label>
-                    <label class="section-filter-chip is-checked"><input type="checkbox" id="sec-replacements" checked> Replacement Options</label>
-                    <label class="section-filter-chip is-checked"><input type="checkbox" id="sec-diagnostics" checked> Diagnostics &amp; Repair</label>
-                    <label class="section-filter-chip is-checked"><input type="checkbox" id="sec-valuation" checked> Valuation &amp; Depreciation</label>
-                </div>
             </div>
 
             <!-- Search Examples -->

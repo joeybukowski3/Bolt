@@ -13,8 +13,70 @@ const selectedSections = {
   howItWorks:   true,
   replacements: true,
   diagnostics:  true,
-  valuation:    true
+  valuation:    true,
+  overviewMetrics: true,
+  currentAnalysis: true,
+  variations: true,
+  technicalDetails: true,
+  recalls: true,
+  errorFailures: true,
+  manualMfr: true,
+  troubleshooting: true
 };
+
+const FULL_REPORT_SECTION_IDS = [
+  "full-sec-overview",
+  "full-sec-analysis",
+  "full-sec-variations",
+  "full-sec-replacements",
+  "full-sec-valuation",
+  "full-sec-diagnostics",
+  "full-sec-technical",
+  "full-sec-recalls",
+  "full-sec-errors-failures",
+  "full-sec-manual-mfr",
+  "full-sec-troubleshooting"
+];
+
+function setAllFullReportSectionsChecked(checked) {
+  FULL_REPORT_SECTION_IDS.forEach((id) => {
+    const el = byId(id);
+    if (el) el.checked = checked;
+  });
+}
+
+function applyFullReportSectionSelections() {
+  const get = (id, fallback = true) => {
+    const el = byId(id);
+    return el ? Boolean(el.checked) : fallback;
+  };
+
+  selectedSections.overviewMetrics = get("full-sec-overview");
+  selectedSections.currentAnalysis = get("full-sec-analysis");
+  selectedSections.variations = get("full-sec-variations");
+  selectedSections.replacements = get("full-sec-replacements");
+  selectedSections.valuation = get("full-sec-valuation");
+  selectedSections.technicalDetails = get("full-sec-technical");
+  selectedSections.recalls = get("full-sec-recalls");
+  selectedSections.errorFailures = get("full-sec-errors-failures");
+  selectedSections.manualMfr = get("full-sec-manual-mfr");
+  selectedSections.troubleshooting = get("full-sec-troubleshooting");
+
+  const diagnosticsMaster = get("full-sec-diagnostics");
+  selectedSections.diagnostics = diagnosticsMaster;
+  selectedSections.howItWorks = selectedSections.technicalDetails;
+}
+
+function toggleFullReportPicker(forceOpen = null) {
+  const picker = byId("full-report-picker");
+  const trigger = byId("full-report-btn");
+  if (!picker) return false;
+  const willOpen = forceOpen === null ? !picker.classList.contains("open") : Boolean(forceOpen);
+  picker.classList.toggle("open", willOpen);
+  picker.setAttribute("aria-hidden", willOpen ? "false" : "true");
+  if (trigger) trigger.setAttribute("aria-expanded", willOpen ? "true" : "false");
+  return willOpen;
+}
 
 // ── Serial Number Decode ──────────────────────────────────────────────────────
 // Maps and helpers mirror item-age.js (not loaded on this page)
@@ -196,28 +258,34 @@ function updateSectionVisibility() {
   const resultsEl = byId("results");
   if (!resultsEl || resultsEl.classList.contains("hidden")) return;
 
-  // Cards inside the Overview panel
+  const metricsStrip = document.querySelector("#panel-overview .metrics-strip");
+  if (metricsStrip) metricsStrip.classList.toggle("hidden", !selectedSections.overviewMetrics);
+
+  show("card-analysis", selectedSections.currentAnalysis);
   show("card-how-it-works", selectedSections.howItWorks);
-  // Valuation only exists at tier 3+ — don't override tier-based hiding
+  show("r-variations", selectedSections.variations);
+
+  const diagnosticsVisible = selectedSections.diagnostics;
+  show("card-manual-mfr", diagnosticsVisible && selectedSections.manualMfr);
+  show("card-recalls", diagnosticsVisible && selectedSections.recalls);
+  const showErrorFailures = diagnosticsVisible && selectedSections.errorFailures;
+  show("card-error-codes", showErrorFailures);
+  show("card-failures", showErrorFailures);
+  show("card-troubleshooting", diagnosticsVisible && selectedSections.troubleshooting);
+
   if (fastData && Number(fastData.searchTier) >= 3) {
     show("card-valuation", selectedSections.valuation);
   }
 
-  // Re-render both tab bars to sync visibility settings
   renderReportSectionTabs();
 
-  // If the active tab is being hidden, redirect to overview
   const activeTabKey = activeTab.replace('tab-', '');
   if (activeTabKey !== 'overview' && !selectedSections[activeTabKey]) {
     setActiveTab("tab-overview");
   }
 
-  // If detail data is already loaded, re-render so newly-enabled sections populate
   if (detailData) renderDetail(detailData);
 }
-
-// ── Depreciation schedules ───────────────────────────────────────────────────
-
 const CATEGORY_DEPRECIATION = {
   tv:              { rate: 0.15, floor: 0.10, label: "Electronics / TV" },
   electronics:     { rate: 0.15, floor: 0.10, label: "Electronics" },
@@ -239,6 +307,7 @@ const CATEGORY_DEPRECIATION = {
 const RETAILER_URLS = {
   "Best Buy":    (q) => `https://www.bestbuy.com/site/searchpage.jsp?st=${encodeURIComponent(q)}`,
   "Walmart":     (q) => `https://www.walmart.com/search?q=${encodeURIComponent(q)}`,
+  "Amazon":      (q) => `https://www.amazon.com/s?k=${encodeURIComponent(q)}`,
   "Home Depot":  (q) => `https://www.homedepot.com/s/${encodeURIComponent(q)}`,
   "Lowe's":      (q) => `https://www.lowes.com/search?searchTerm=${encodeURIComponent(q)}`,
   "AJ Madison":  (q) => `https://www.ajmadison.com/cgi-bin/ajmadison/search.html?query=${encodeURIComponent(q)}`,
@@ -246,6 +315,69 @@ const RETAILER_URLS = {
   "B&H":         (q) => `https://www.bhphotovideo.com/c/search?Ntt=${encodeURIComponent(q)}`,
   "Manufacturer":(q) => `https://www.google.com/search?q=${encodeURIComponent(q + " official site")}`
 };
+
+const RETAILER_SEARCH_URLS = {
+  bestbuy: (q) => `https://www.bestbuy.com/site/searchpage.jsp?st=${encodeURIComponent(q)}`,
+  amazon: (q) => `https://www.amazon.com/s?k=${encodeURIComponent(q)}`,
+  walmart: (q) => `https://www.walmart.com/search?q=${encodeURIComponent(q)}`,
+  homedepot: (q) => `https://www.homedepot.com/s/${encodeURIComponent(q)}`,
+  lowes: (q) => `https://www.lowes.com/search?searchTerm=${encodeURIComponent(q)}`,
+  ajmadison: (q) => `https://www.ajmadison.com/cgi-bin/ajmadison/search.html?query=${encodeURIComponent(q)}`,
+  target: (q) => `https://www.target.com/s?searchTerm=${encodeURIComponent(q)}`,
+  bh: (q) => `https://www.bhphotovideo.com/c/search?Ntt=${encodeURIComponent(q)}`,
+  manufacturer: (brand, q) => {
+    const normalizedBrand = String(brand || "")
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, "");
+    if (!normalizedBrand) {
+      return `https://www.google.com/search?q=${encodeURIComponent(q + " official site")}`;
+    }
+    return `https://www.${normalizedBrand}.com/search?q=${encodeURIComponent(q)}`;
+  }
+};
+
+function normalizeRetailerKey(name) {
+  const key = String(name || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, "");
+  if (!key) return "";
+
+  const aliases = {
+    bestbuy: "bestbuy",
+    amazon: "amazon",
+    walmart: "walmart",
+    homedepot: "homedepot",
+    lowes: "lowes",
+    ajmadison: "ajmadison",
+    target: "target",
+    bh: "bh",
+    bhphotovideo: "bh",
+    manufacturer: "manufacturer",
+    official: "manufacturer",
+    manufacturersite: "manufacturer"
+  };
+  return aliases[key] || key;
+}
+
+function buildFallbackRetailerSearchUrl(retailerName, searchQuery) {
+  const combined = [retailerName, searchQuery].map((v) => String(v || "").trim()).filter(Boolean).join(" ");
+  const query = combined || String(searchQuery || "").trim() || "item";
+  return `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+}
+
+function resolveRetailerSearchUrl(retailerName, searchQuery, brandHint = "") {
+  const key = normalizeRetailerKey(retailerName);
+  const query = String(searchQuery || "").trim();
+  if (!key || !query) return buildFallbackRetailerSearchUrl(retailerName, searchQuery);
+
+  const builder = RETAILER_SEARCH_URLS[key];
+  if (!builder) return buildFallbackRetailerSearchUrl(retailerName, searchQuery);
+
+  if (key === "manufacturer") {
+    return builder(brandHint, query);
+  }
+  return builder(query);
+}
 
 const ELECTRONICS_ONLY = new Set(["Best Buy", "Walmart", "Target", "B&H", "Manufacturer"]);
 const HVAC_ONLY = new Set(["Home Depot", "Lowe's", "AJ Madison", "Manufacturer", "Walmart"]);
@@ -623,9 +755,10 @@ function lkqBuildRetailerLinks(retailerText, modelText) {
   const retailers = lkqCleanStr(retailerText).split(",").map((s) => lkqCleanStr(s)).filter(Boolean).slice(0, 4);
   if (!retailers.length) return "-";
   const q = lkqCleanStr(modelText) || lkqInlineState.query;
+  const brandHint = lkqCleanStr(lkqInlineState.fast?.analysis?.brand);
   const html = retailers.map((name) => {
-    const fn = RETAILER_SEARCH_URLS[name] || ((x) => `https://www.google.com/search?q=${encodeURIComponent(name + " " + x)}`);
-    return `<a class="repair-link" href="${lkqEscapeHtml(fn(q))}" target="_blank" rel="noopener noreferrer">${lkqEscapeHtml(name)}</a>`;
+    const url = resolveRetailerSearchUrl(name, q, brandHint);
+    return `<a class="repair-link" href="${lkqEscapeHtml(url)}" target="_blank" rel="noopener noreferrer">${lkqEscapeHtml(name)}</a>`;
   }).join(" ");
   return html || "-";
 }
@@ -798,8 +931,6 @@ function renderLkqInline() {
   byId("lkq-inline-full-report-btn")?.addEventListener("click", () => {
     const qInput = byId("query");
     if (qInput) qInput.value = lkqInlineState.query;
-    const lkqChk = byId("lkq-only-checkbox");
-    if (lkqChk) lkqChk.checked = false;
     const u = new URL(window.location.href);
     u.searchParams.set("query", lkqInlineState.query);
     window.history.replaceState({}, "", u.toString());
@@ -1174,9 +1305,9 @@ function buildRetailerLinks(retailerCsv, searchQuery) {
 
   const links = filtered
     .map((name) => {
-      const urlFn = RETAILER_URLS[name];
-      if (!urlFn) return null;
-      return `<a href="${escapeHtml(urlFn(searchQuery))}" target="_blank" rel="noopener noreferrer">${escapeHtml(name)}</a>`;
+      const url = resolveRetailerSearchUrl(name, searchQuery);
+      if (!url) return null;
+      return `<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(name)}</a>`;
     })
     .filter(Boolean);
 
@@ -1833,7 +1964,7 @@ function renderFast(data) {
   const variationChips = byId("r-variation-chips");
   const variations = Array.isArray(data.variations) ? data.variations : [];
   if (variationsSection && variationChips) {
-    if (variations.length) {
+    if (selectedSections.variations && variations.length) {
       variationChips.innerHTML = variations
         .map(
           (v) =>
@@ -3127,36 +3258,62 @@ async function performSearch() {
 document.addEventListener("DOMContentLoaded", () => {
   const searchBtn = byId("btn");
   const queryInput = byId("query");
-  const lkqOnlyCheckbox = byId("lkq-only-checkbox");
+  const lkqReportBtn = byId("lkq-report-btn");
+  const fullReportBtn = byId("full-report-btn");
+  const fullReportRunBtn = byId("full-report-run-btn");
   const copyBtn = byId("copy-btn");
   const printBtn = byId("print-btn");
   const recalcBtn = byId("recalc-btn");
 
-  const runMainSearchAction = () => {
+  const runDefaultFullReport = () => {
     const query = String(queryInput?.value || "").trim();
     if (!query) return;
-    if (lkqOnlyCheckbox?.checked) {
-      performLkqInlineSearch();
-      return;
-    }
+    setAllFullReportSectionsChecked(true);
+    applyFullReportSectionSelections();
+    toggleFullReportPicker(false);
     clearLkqInlineView();
     performSearch();
   };
 
-  if (searchBtn) searchBtn.addEventListener("click", runMainSearchAction);
+  if (searchBtn) searchBtn.addEventListener("click", runDefaultFullReport);
   const queryForm = queryInput ? queryInput.closest("form") : null;
   if (queryForm) {
     queryForm.addEventListener("submit", (event) => {
       event.preventDefault();
-      runMainSearchAction();
+      runDefaultFullReport();
     });
   }
   if (queryInput) {
     queryInput.addEventListener("keydown", (event) => {
       if (event.key === "Enter") {
         event.preventDefault();
-        runMainSearchAction();
+        runDefaultFullReport();
       }
+    });
+  }
+
+  if (lkqReportBtn) {
+    lkqReportBtn.addEventListener("click", () => {
+      toggleFullReportPicker(false);
+      clearLkqInlineView();
+      performLkqInlineSearch();
+    });
+  }
+
+  if (fullReportBtn) {
+    fullReportBtn.addEventListener("click", () => {
+      toggleFullReportPicker();
+    });
+  }
+
+  if (fullReportRunBtn) {
+    fullReportRunBtn.addEventListener("click", () => {
+      const query = String(queryInput?.value || "").trim();
+      if (!query) return;
+      applyFullReportSectionSelections();
+      toggleFullReportPicker(false);
+      clearLkqInlineView();
+      performSearch();
     });
   }
   const imageSearchBtn = byId("image-search-btn");
@@ -3280,23 +3437,9 @@ document.addEventListener("DOMContentLoaded", () => {
   byId("compare-input")?.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); runComparison(); } });
   applyCompareIncludeLabelText();
 
-  // Section filter checkboxes
-  const filterMap = [
-    { id: "sec-how-it-works", key: "howItWorks"   },
-    { id: "sec-replacements", key: "replacements" },
-    { id: "sec-diagnostics",  key: "diagnostics"  },
-    { id: "sec-valuation",    key: "valuation"    }
-  ];
-  filterMap.forEach(({ id, key }) => {
-    const checkbox = byId(id);
-    if (!checkbox) return;
-    const chip = checkbox.closest(".section-filter-chip");
-    checkbox.addEventListener("change", () => {
-      selectedSections[key] = checkbox.checked;
-      if (chip) chip.classList.toggle("is-checked", checkbox.checked);
-      updateSectionVisibility();
-    });
-  });
+  // Full report section picker defaults
+  setAllFullReportSectionsChecked(true);
+  applyFullReportSectionSelections();
 
   const initialQuery = new URLSearchParams(window.location.search).get("query");
   if (initialQuery && queryInput) {
