@@ -3468,6 +3468,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const lkqReportBtn = byId("lkq-report-btn");
   const fullReportBtn = byId("full-report-btn");
   const fullReportRunBtn = byId("full-report-run-btn");
+  const fullReportDeselectBtn = byId("full-report-deselect-btn");
+  const fullReportSelectBtn = byId("full-report-select-btn");
   const copyBtn = byId("copy-btn");
   const printBtn = byId("print-btn");
   const recalcBtn = byId("recalc-btn");
@@ -3515,6 +3517,20 @@ document.addEventListener("DOMContentLoaded", () => {
       toggleFullReportPicker(false);
       clearLkqInlineView();
       performSearch();
+    });
+  }
+
+  if (fullReportDeselectBtn) {
+    fullReportDeselectBtn.addEventListener("click", () => {
+      setAllFullReportSectionsChecked(false);
+      applyFullReportSectionSelections();
+    });
+  }
+
+  if (fullReportSelectBtn) {
+    fullReportSelectBtn.addEventListener("click", () => {
+      setAllFullReportSectionsChecked(true);
+      applyFullReportSectionSelections();
     });
   }
   const imageSearchBtn = byId("image-search-btn");

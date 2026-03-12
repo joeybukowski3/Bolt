@@ -516,7 +516,10 @@
         .full-report-picker-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.4rem 0.55rem; margin-bottom: 0.8rem; }
         .full-report-picker-chip { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.78rem; font-weight: 500; color: rgba(255,255,255,0.9); background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.14); border-radius: 999px; padding: 0.36rem 0.7rem 0.36rem 0.52rem; cursor: pointer; }
         .full-report-picker-chip input[type="checkbox"] { width: 13px; height: 13px; accent-color: #f59e0b; margin: 0; }
-        .full-report-picker-actions { display: flex; justify-content: flex-end; }
+        .full-report-picker-actions { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; }
+        .full-report-picker-tools { display: inline-flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; }
+        .full-report-tool-btn { border: 1px solid rgba(255,255,255,0.26); border-radius: 8px; background: rgba(255,255,255,0.08); color: #f8fafc; padding: 0.45rem 0.7rem; font-size: 0.75rem; font-weight: 700; font-family: inherit; cursor: pointer; }
+        .full-report-tool-btn:hover { background: rgba(255,255,255,0.14); border-color: rgba(255,255,255,0.45); }
         .full-report-run-btn { border: none; border-radius: 8px; background: #f59e0b; color: #000; padding: 0.56rem 0.95rem; font-size: 0.8rem; font-weight: 700; font-family: inherit; cursor: pointer; }
         .full-report-run-btn:hover { background: #fbbf24; }
 
@@ -755,6 +758,10 @@
                     <label class="full-report-picker-chip"><input type="checkbox" id="full-sec-troubleshooting" checked> Troubleshooting &amp; Repair Resources</label>
                 </div>
                 <div class="full-report-picker-actions">
+                    <div class="full-report-picker-tools">
+                        <button id="full-report-deselect-btn" class="full-report-tool-btn" type="button">Deselect All</button>
+                        <button id="full-report-select-btn" class="full-report-tool-btn" type="button">Select All</button>
+                    </div>
                     <button id="full-report-run-btn" class="full-report-run-btn" type="button">Run Report</button>
                 </div>
             </div>
