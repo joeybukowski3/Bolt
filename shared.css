@@ -5,24 +5,24 @@
 
 /* ─ New design-system variables (complement existing page vars; inline <style> overrides any conflicts) ─ */
 :root {
-  --primary:       #2563EB;
-  --bg-main:       #F8FAFC;
-  --card-bg:       #FFFFFF;
-  --text-main:     #111827;
-  --text-muted:    #475569;
+  --primary:       #3182ce;
+  --bg-main:       #f8fafc;
+  --card-bg:       #ffffff;
+  --text-main:     #173756;
+  --text-muted:    #64748b;
   --text-mid:      #475569;
-  --text-light:    #64748B;
-  --text-dark:     #111827;
-  --text-white:    #FFFFFF;
-  --border:        #E2E8F0;
-  --card-border:   #E2E8F0;
-  --bg2:           #EEF2F7;
-  --accent:        #2563EB;
-  --accent2:       #0F172A;
+  --text-light:    #94a3b8;
+  --text-dark:     #173756;
+  --text-white:    #ffffff;
+  --border:        #e2e8f0;
+  --card-border:   #e2e8f0;
+  --bg2:           #eef2f7;
+  --accent:        #3182ce;
+  --accent2:       #1a202c;
   --accent-glow:   rgba(37, 99, 235, 0.15);
-  --green:         #10B981;
+  --green:         #22c55e;
   --amber:         #f59e0b;
-  --red:           #DC2626;
+  --red:           #ef4444;
   --radius:        16px;
 }
 

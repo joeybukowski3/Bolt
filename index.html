@@ -27,36 +27,34 @@
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         :root {
-            --bg-primary: #0F172A;
-            --bg-secondary: #1E293B;
-            --bg-card: #FFFFFF;
-            --bg-card-alt: #F8FAFC;
+            --bg-primary: #0f1629;
+            --bg-secondary: #161d35;
+            --bg-card: #ffffff;
+            --bg-card-alt: #f8fafc;
             --bg-input: rgba(255,255,255,0.06);
-            --border-color: #E2E8F0;
-            --border-accent: rgba(37,99,235,0.35);
-            --text-dark: #111827;
+            --border-color: #e2e8f0;
+            --border-accent: rgba(234,179,8,0.4);
+            --text-dark: #1e293b;
             --text-mid: #475569;
-            --text-light: #64748B;
-            --text-white: #F8FAFC;
-            --text-muted-dark: #475569;
-            --accent: #2563EB;
-            --accent-hover: #1D4ED8;
-            --accent-dim: rgba(37,99,235,0.10);
-            --accent-dim-dark: rgba(37,99,235,0.16);
-            --blue: #38BDF8;
-            --blue-light: #E0F2FE;
-            --red: #DC2626;
-            --red-light: #FEF2F2;
-            --green: #10B981;
-            --green-light: #ECFDF5;
-            --warning: #F59E0B;
-            --success: #10B981;
+            --text-light: #94a3b8;
+            --text-white: #f1f5f9;
+            --text-muted-dark: #64748b;
+            --accent: #eab308;
+            --accent-hover: #facc15;
+            --accent-dim: rgba(234,179,8,0.1);
+            --accent-dim-dark: rgba(234,179,8,0.15);
+            --blue: #3b82f6;
+            --blue-light: #dbeafe;
+            --red: #ef4444;
+            --red-light: #fef2f2;
+            --green: #22c55e;
+            --green-light: #f0fdf4;
         }
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: #F8FAFC;
-            color: var(--text-dark);
+            background: #0a0e1a;
+            color: var(--text-white);
             min-height: 100vh;
             line-height: 1.6;
         }
@@ -626,228 +624,6 @@
         .brt-guide-links { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 10px; }
         .brt-guide-links a { font-size: 12px; color: #94a3b8; text-decoration: none; }
         .brt-guide-links a:hover { color: #cbd5e1; }
-
-        /* ── Enterprise UI Refresh ── */
-        .brt-nav {
-            background: #0F172A;
-            border-bottom: 1px solid rgba(148,163,184,0.25);
-        }
-        .brt-nav-cta,
-        .report-action-btn.primary,
-        .full-report-run-btn,
-        #btn-cta {
-            background: #2563EB;
-            color: #FFFFFF;
-            border-color: #2563EB;
-        }
-        .brt-nav-cta:hover,
-        .report-action-btn.primary:hover,
-        .full-report-run-btn:hover,
-        #btn-cta:hover {
-            background: #1D4ED8;
-            border-color: #1D4ED8;
-        }
-        .report-action-btn.secondary {
-            background: #FFFFFF;
-            color: #2563EB;
-            border-color: #BFDBFE;
-        }
-        .report-action-btn.secondary:hover {
-            background: #EFF6FF;
-            border-color: #93C5FD;
-        }
-        .brt-hero {
-            background: linear-gradient(180deg, #0F172A 0%, #1E293B 100%);
-            border-bottom: 1px solid rgba(148,163,184,0.24);
-            padding-bottom: 56px;
-        }
-        .brt-hero-badge {
-            background: rgba(56,189,248,0.12);
-            border-color: rgba(56,189,248,0.45);
-            color: #BAE6FD;
-        }
-        .brt-hero-h1 span { color: #38BDF8; }
-        .brt-search-wrapper { max-width: 720px; margin-bottom: 12px; }
-        .brt-search-bar,
-        .form-input,
-        .form-select,
-        .summary-notes-textarea,
-        #sn-input,
-        #compare-input {
-            border: 1px solid #CBD5E1;
-            border-radius: 10px;
-            background: #FFFFFF;
-            color: #111827;
-            font-size: 0.92rem;
-        }
-        .brt-search-bar::placeholder,
-        .form-input::placeholder,
-        #sn-input::placeholder,
-        #compare-input::placeholder { color: #64748B; }
-        .brt-search-bar:focus,
-        .form-input:focus,
-        .form-select:focus,
-        .summary-notes-textarea:focus,
-        #sn-input:focus,
-        #compare-input:focus {
-            border-color: #2563EB;
-            box-shadow: 0 0 0 3px rgba(37,99,235,0.16);
-            outline: none;
-        }
-        .report-action-note {
-            color: #E2E8F0;
-            font-weight: 700;
-            letter-spacing: 0.01em;
-        }
-        .results-zone {
-            max-width: 1140px;
-            margin: 0 auto;
-            background: #F8FAFC;
-            border-radius: 20px;
-            border: 1px solid #E2E8F0;
-            box-shadow: 0 12px 28px rgba(15,23,42,0.08);
-            padding: 2rem 1.75rem 2.5rem;
-        }
-        .results-inner { max-width: 1100px; margin: 0 auto; }
-        .results-header {
-            background: #FFFFFF;
-            border: 1px solid #E2E8F0;
-            border-radius: 12px;
-            padding: 0.85rem 1rem;
-            margin-bottom: 1rem;
-        }
-        .results-label { color: #475569; font-size: 0.68rem; }
-        .copy-btn,
-        .print-btn,
-        .recalc-btn,
-        #sn-decode-btn,
-        .compare-submit-btn {
-            background: #FFFFFF;
-            border: 1px solid #CBD5E1;
-            color: #0F172A;
-            border-radius: 9px;
-            font-weight: 700;
-        }
-        .copy-btn:hover,
-        .print-btn:hover,
-        .recalc-btn:hover,
-        #sn-decode-btn:hover,
-        .compare-submit-btn:hover {
-            border-color: #2563EB;
-            color: #1D4ED8;
-            background: #EFF6FF;
-        }
-        .tab-bar {
-            background: #E2E8F0;
-            border: 1px solid #CBD5E1;
-            border-radius: 11px;
-            margin-bottom: 1rem;
-        }
-        .tab-btn.active {
-            background: #FFFFFF;
-            color: #0F172A;
-            border: 1px solid #BFDBFE;
-            box-shadow: 0 1px 2px rgba(15,23,42,0.08);
-        }
-        .card {
-            background: #FFFFFF;
-            border: 1px solid #E2E8F0;
-            border-radius: 14px;
-            box-shadow: 0 4px 12px rgba(15,23,42,0.05);
-            padding: 1.25rem 1.25rem 1.1rem;
-            margin-bottom: 1rem;
-        }
-        .card-title {
-            color: #111827;
-            border-bottom-color: #DBEAFE;
-            font-weight: 800;
-            margin-bottom: 0.75rem;
-        }
-        .card-title .title-number {
-            background: #DBEAFE;
-            color: #1E3A8A;
-        }
-        .card-accent-stripe {
-            background: linear-gradient(90deg, #2563EB, #38BDF8);
-            opacity: 0.92;
-            margin-bottom: 0.7rem;
-        }
-        .metrics-strip { gap: 0.75rem; }
-        .metric-card {
-            border-radius: 12px;
-            border-color: #E2E8F0;
-            min-height: 78px;
-        }
-        .metric-label { color: #64748B; }
-        .metric-value { color: #0F172A; }
-        .metric-value.acv { color: #10B981; }
-        .report-list .label { color: #64748B; font-size: 0.72rem; font-weight: 700; }
-        .report-list li span:last-child { color: #111827; font-weight: 600; }
-        .data-table {
-            border-collapse: separate;
-            border-spacing: 0;
-            border: 1px solid #E2E8F0;
-            border-radius: 10px;
-            overflow: hidden;
-            font-size: 0.8rem;
-        }
-        .data-table th {
-            background: #F1F5F9;
-            color: #475569;
-            border-bottom: 1px solid #CBD5E1;
-            padding: 0.65rem 0.7rem;
-        }
-        .data-table td {
-            background: #FFFFFF;
-            padding: 0.68rem 0.7rem;
-            border-bottom: 1px solid #F1F5F9;
-            vertical-align: top;
-        }
-        .data-table tr:hover td { background: #F8FAFC; }
-        .data-table td:first-child {
-            background: #F8FAFC;
-            color: #0F172A;
-            font-weight: 700;
-        }
-        .data-table td.brand-match {
-            background: #EFF6FF;
-            color: #1E3A8A;
-            font-weight: 700;
-        }
-        .retailer-links a,
-        .repair-link {
-            color: #2563EB;
-            border: 1px solid #BFDBFE;
-            background: #EFF6FF;
-            border-radius: 7px;
-            padding: 0.18rem 0.44rem;
-        }
-        .retailer-links a:hover,
-        .repair-link:hover { background: #DBEAFE; color: #1D4ED8; }
-        .lkq-block,
-        .wtc-box,
-        .compare-panel,
-        .narrow-results {
-            border: 1px solid #E2E8F0;
-            border-radius: 12px;
-            background: #F8FAFC;
-        }
-        .estimation-banner {
-            border-color: #FDE68A;
-            background: #FFFBEB;
-            color: #92400E;
-        }
-        .parts-available-note { color: #0F766E; }
-        .brt-footer-new {
-            background: #0F172A;
-            border-top: 1px solid rgba(148,163,184,0.24);
-            padding: 1.25rem 2rem;
-        }
-        .brt-footer-new p,
-        .brt-footer-links a,
-        .brt-guide-links a { color: #CBD5E1; }
-        .brt-footer-links a:hover,
-        .brt-guide-links a:hover { color: #38BDF8; }
 
         /* ── Hide homepage sections when results are visible ── */
         #results:not(.hidden) ~ #homepage-sections { display: none; }
