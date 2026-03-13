@@ -8,6 +8,9 @@ let activeSearchToken = 0;
 let lkqModeActive = false;
 let activeReportType = null;
 let singlePageResultsMode = false;
+let disambigActive = false;
+let disambigSkip = false;
+let disambigPendingDetail = null;
 
 // ── Section filter state ──────────────────────────────────────────────────────
 
@@ -494,16 +497,16 @@ function isDiscontinuedValue(value) {
 }
 
 function getRetailerSuppressionMessage(meta = {}) {
-  const hasBrandField = Boolean(meta.hasBrandField) || Object.prototype.hasOwnProperty.call(meta, "brand");
-  if (hasBrandField && isMissingBrandValue(meta.brand)) {
-    return "No brand match available";
-  }
-  const discontinued =
-    isDiscontinuedValue(meta.discontinued) ||
-    String(meta.availability || "").toLowerCase().includes("discontinued") ||
-    String(meta.availability || "").toLowerCase().includes("no longer manufactured");
-  if (discontinued) {
-    return "Product line discontinued by manufacturer";
+  // Only suppress for the original item column when it is truly discontinued
+  // (brand-missing alone no longer suppresses — links still work with model text)
+  if (meta._isOriginalCol) {
+    const discontinued =
+      isDiscontinuedValue(meta.discontinued) ||
+      String(meta.availability || "").toLowerCase().includes("discontinued") ||
+      String(meta.availability || "").toLowerCase().includes("no longer manufactured");
+    if (discontinued) {
+      return "No Current Model Available";
+    }
   }
   return "";
 }
@@ -1048,12 +1051,35 @@ function renderLkqInline() {
 
   const tableHtml = candidates.map((c) => {
     const specs = lkqCollectSpecs(rows, c.key);
+    const isOriginalCol = c.key === "original";
+    const isBrandMatchCol = c.key === "brandMatch";
+    const noBrandMatch = isBrandMatchCol && c.hasBrandField && isMissingBrandValue(c.brand);
+    const isDiscontinuedOriginal = isOriginalCol && (
+      isDiscontinuedValue(c.discontinued) ||
+      String(c.availability || "").toLowerCase().includes("discontinued") ||
+      String(c.availability || "").toLowerCase().includes("no longer manufactured")
+    );
+
+    const modelDisplay = isDiscontinuedOriginal
+      ? `<em style="color:var(--text-mid);">No Current Model Available</em>`
+      : lkqEscapeHtml(c.model);
+    const tierDisplay = noBrandMatch
+      ? `No Brand Match — Alternative`
+      : lkqEscapeHtml(c.tier);
+
+    // Always build retailer links; pass _isOriginalCol so suppression only triggers for discontinued originals
+    const retailerCell = lkqBuildRetailerLinksWithMeta(
+      c.retailers,
+      c.model,
+      { hasBrandField: c.hasBrandField, brand: c.brand, availability: c.availability, discontinued: c.discontinued, _isOriginalCol: isOriginalCol }
+    );
+
     return `<tr>
-      <td>${lkqEscapeHtml(c.model)}</td>
-      <td>${lkqEscapeHtml(c.tier)}</td>
+      <td>${modelDisplay}</td>
+      <td>${tierDisplay}</td>
       <td>${specs.length ? `<ul style="margin:0; padding-left:1rem;">${specs.map((s) => `<li>${lkqEscapeHtml(s)}</li>`).join("")}</ul>` : "-"}</td>
       <td>${lkqEscapeHtml(c.price)}</td>
-      <td>${lkqBuildRetailerLinksWithMeta(c.retailers, c.model, { hasBrandField: c.hasBrandField, brand: c.brand, availability: c.availability, discontinued: c.discontinued })}</td>
+      <td>${retailerCell}</td>
     </tr>`;
   }).join("");
 
@@ -1070,10 +1096,12 @@ function renderLkqInline() {
     ${serialSection}
     <div class="card">
       <div class="card-title"><span class="title-number">3</span> LKQ Replacement Options</div>
-      <table class="data-table">
-        <thead><tr><th>Item / Model</th><th>Tier</th><th>Key Specs</th><th>Est. Price / ACV</th><th>Retailer Links</th></tr></thead>
-        <tbody>${tableHtml || `<tr><td colspan="5">No replacement options available.</td></tr>`}</tbody>
-      </table>
+      <div style="overflow-x:auto; -webkit-overflow-scrolling:touch;">
+        <table class="data-table" style="min-width:560px;">
+          <thead><tr><th>Item / Model</th><th>Tier</th><th>Key Specs</th><th>Est. Price / ACV</th><th>Retailer Links</th></tr></thead>
+          <tbody>${tableHtml || `<tr><td colspan="5">No replacement options available.</td></tr>`}</tbody>
+        </table>
+      </div>
       ${lkqCleanStr(detail.tableNote) ? `<div class="table-note" style="display:block; margin-top:0.6rem;"><strong>Note:</strong> ${lkqEscapeHtml(detail.tableNote)}</div>` : ""}
       ${lkqAsArray(detail.whatToConsider).length ? `<div style="margin-top:0.75rem;"><strong style="font-size:0.82rem; color:var(--text-mid);">What to consider</strong><ul style="margin:0.35rem 0 0 1rem; color:var(--text-mid); font-size:0.82rem;">${lkqAsArray(detail.whatToConsider).map((x) => `<li>${lkqEscapeHtml(lkqCleanStr(x))}</li>`).join("")}</ul></div>` : ""}
       <div style="margin-top:0.85rem; text-align:right;">
@@ -1207,6 +1235,21 @@ async function performLkqInlineSearch() {
     lkqInlineState.modelLabel = lkqInlineState.fast.analysis.model;
     lkqInlineState.isSpecificModel = lkqModelSpecific(fast, query);
 
+    const lkqVariations = Array.isArray(fast.variations) ? fast.variations : [];
+    const lkqTier = Number(fast.searchTier || 0);
+    if (!disambigSkip && lkqVariations.length > 0 && lkqTier < 4) {
+      showDisambiguation(fast, query, {
+        onVariation: () => {
+          performLkqInlineSearch();
+        },
+        onUnknown: () => {
+          showAssumedModelNotice(fast.analysis?.estimatedModel || fast.analysis?.entered || query);
+          renderLkqInline();
+        }
+      });
+      return;
+    }
+    disambigSkip = false;
     renderLkqInline();
   } catch (err) {
     root.innerHTML = `<div class="card"><p style="color:#b91c1c; font-size:0.85rem;">${lkqEscapeHtml(err?.message || "Could not generate LKQ report.")}</p></div>`;
@@ -2451,7 +2494,7 @@ function renderDetail(data) {
             const isRetailers = (row.label || "").toLowerCase().includes("retailer");
             const isModel     = (row.label || "").toLowerCase() === "model";
             const isRecommendedReplacement = (row.label || "").toLowerCase().includes("recommended replacement");
-            const origCell = isRetailers ? buildRetailerLinks(row.original,   colSearch.original,   { hasBrandField: Boolean(getColumnMetaValue(columnMeta, "original", "hasBrandField")), brand: getColumnMetaValue(columnMeta, "original", "brand"), availability: getColumnMetaValue(columnMeta, "original", "availability"), discontinued: getColumnMetaValue(columnMeta, "original", "discontinued") }) : isModel ? buildModelLink(row.original)   : escapeHtml(row.original   || "N/A");
+            const origCell = isRetailers ? buildRetailerLinks(row.original,   colSearch.original,   { hasBrandField: Boolean(getColumnMetaValue(columnMeta, "original", "hasBrandField")), brand: getColumnMetaValue(columnMeta, "original", "brand"), availability: getColumnMetaValue(columnMeta, "original", "availability"), discontinued: getColumnMetaValue(columnMeta, "original", "discontinued"), _isOriginalCol: true }) : isModel ? buildModelLink(row.original)   : escapeHtml(row.original   || "N/A");
             const bmCell   = isRetailers ? buildRetailerLinks(row.brandMatch, colSearch.brandMatch, { hasBrandField: Boolean(getColumnMetaValue(columnMeta, "brandMatch", "hasBrandField")), brand: getColumnMetaValue(columnMeta, "brandMatch", "brand"), availability: getColumnMetaValue(columnMeta, "brandMatch", "availability"), discontinued: getColumnMetaValue(columnMeta, "brandMatch", "discontinued") }) : isModel ? buildModelLink(row.brandMatch) : escapeHtml(row.brandMatch || "N/A");
             const o1Cell   = isRetailers ? buildRetailerLinks(row.option1,    colSearch.option1,    { hasBrandField: Boolean(getColumnMetaValue(columnMeta, "option1", "hasBrandField")), brand: getColumnMetaValue(columnMeta, "option1", "brand"), availability: getColumnMetaValue(columnMeta, "option1", "availability"), discontinued: getColumnMetaValue(columnMeta, "option1", "discontinued") }) : isModel ? buildModelLink(row.option1)    : escapeHtml(row.option1    || "N/A");
             const o2Cell   = isRetailers ? buildRetailerLinks(row.option2,    colSearch.option2,    { hasBrandField: Boolean(getColumnMetaValue(columnMeta, "option2", "hasBrandField")), brand: getColumnMetaValue(columnMeta, "option2", "brand"), availability: getColumnMetaValue(columnMeta, "option2", "availability"), discontinued: getColumnMetaValue(columnMeta, "option2", "discontinued") }) : isModel ? buildModelLink(row.option2)    : escapeHtml(row.option2    || "N/A");
@@ -3330,6 +3373,80 @@ function resetResultsUI() {
 
   // Ensure summary modal does not carry old state into the next search.
   closeSummaryModal();
+
+  const disambigEl = byId("disambig-container");
+  if (disambigEl) { disambigEl.classList.add("hidden"); disambigEl.innerHTML = ""; }
+  const assumedEl = byId("assumed-model-notice");
+  if (assumedEl) assumedEl.classList.add("hidden");
+  disambigActive = false;
+  // Note: disambigSkip is NOT reset here — it must survive between calls
+}
+
+// ── Disambiguation ────────────────────────────────────────────────────────────
+
+function showDisambiguation(fast, query, callbacks) {
+  disambigActive = true;
+  const results = byId("results");
+  if (results) {
+    results.classList.remove("hidden");
+    results.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  const container = byId("disambig-container");
+  if (!container) return;
+
+  const analysis = fast.analysis || {};
+  const variations = Array.isArray(fast.variations) ? fast.variations : [];
+  const estimatedModel = analysis.estimatedModel || analysis.entered || query;
+
+  container.innerHTML = `
+    <div class="card disambig-card">
+      <div class="card-title">Which "${escapeHtml(query)}" are you looking up?</div>
+      <p class="disambig-sub">We found multiple versions. Select the right one for accurate results, or choose the last option for a general overview.</p>
+      <div class="disambig-options">
+        ${variations.map((v) => `
+          <button class="disambig-btn" data-vquery="${escapeHtml(v.query)}">
+            <span class="disambig-btn-label">${escapeHtml(v.label)}</span>
+            ${v.note ? `<span class="disambig-btn-note">${escapeHtml(v.note)}</span>` : ""}
+          </button>`).join("")}
+        <button class="disambig-btn disambig-btn-unknown">
+          <span class="disambig-btn-label">&#10067; I don't know the specific model</span>
+          <span class="disambig-btn-note">Show results based on the most common/recent version (${escapeHtml(estimatedModel)})</span>
+        </button>
+      </div>
+    </div>`;
+  container.classList.remove("hidden");
+
+  container.querySelectorAll(".disambig-btn[data-vquery]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const vq = btn.dataset.vquery;
+      if (!vq) return;
+      const input = byId("query");
+      if (input) input.value = vq;
+      hideDisambiguation();
+      disambigSkip = true;
+      callbacks.onVariation(vq);
+    });
+  });
+
+  container.querySelector(".disambig-btn-unknown")?.addEventListener("click", () => {
+    hideDisambiguation();
+    disambigSkip = true;
+    callbacks.onUnknown();
+  });
+}
+
+function hideDisambiguation() {
+  disambigActive = false;
+  const container = byId("disambig-container");
+  if (container) { container.classList.add("hidden"); container.innerHTML = ""; }
+}
+
+function showAssumedModelNotice(estimatedModel) {
+  const el = byId("assumed-model-notice");
+  if (!el) return;
+  el.innerHTML = `<span>&#8505;&#65039;</span> <span>Results below are based on the <strong>${escapeHtml(estimatedModel)}</strong> — the most common or recent version. Specifications may vary for other models.</span>`;
+  el.classList.remove("hidden");
 }
 
 // ── performSearch ─────────────────────────────────────────────────────────────
@@ -3431,6 +3548,27 @@ async function performSearch() {
     if (loaderText) loaderText.classList.remove("visible");
     byId("mascot-wrapper")?.classList.remove("brt-loading");
     if (fast && typeof fast === "object") {
+      const variations = Array.isArray(fast.variations) ? fast.variations : [];
+      const tier = Number(fast.searchTier || 0);
+      if (!disambigSkip && variations.length > 0 && tier < 4) {
+        showDisambiguation(fast, query, {
+          onVariation: () => {
+            performSearch();
+          },
+          onUnknown: () => {
+            showAssumedModelNotice(fast.analysis?.estimatedModel || fast.analysis?.entered || query);
+            renderFast(fast);
+            updateSectionVisibility();
+            if (disambigPendingDetail) {
+              renderDetail(disambigPendingDetail);
+              updateSectionVisibility();
+              disambigPendingDetail = null;
+            }
+          }
+        });
+        return;
+      }
+      disambigSkip = false;
       renderFast(fast);
       updateSectionVisibility();
     } else {
@@ -3449,6 +3587,10 @@ async function performSearch() {
   detailPromise.then((detail) => {
     if (searchToken !== activeSearchToken) return;
     if (detail && typeof detail === "object" && !detail.error) {
+      if (disambigActive) {
+        disambigPendingDetail = detail;
+        return;
+      }
       renderDetail(detail);
       updateSectionVisibility();
     }
