@@ -486,11 +486,11 @@
         .brt-hero-p { font-size: 17px; color: rgba(255,255,255,0.72); max-width: 620px; margin: 0 auto 36px; line-height: 1.7; }
 
         /* ── Hero search bar ── */
-        .brt-search-wrapper { max-width: 660px; margin: 0 auto 16px; position: relative; }
-        .brt-search-bar { width: 100%; padding: 18px 68px 18px 22px; background: rgba(255,255,255,0.07); border: 1.5px solid #2d3f60; border-radius: 12px; font-size: 15px; color: #fff; font-family: inherit; outline: none; transition: border-color 0.2s; }
+        .brt-search-wrapper { max-width: 660px; margin: 0 auto 10px; display: flex; align-items: center; gap: 8px; }
+        .brt-search-bar { flex: 1; min-width: 0; padding: 18px 22px; background: rgba(255,255,255,0.07); border: 1.5px solid #2d3f60; border-radius: 12px; font-size: 15px; color: #fff; font-family: inherit; outline: none; transition: border-color 0.2s; }
         .brt-search-bar::placeholder { color: rgba(255,255,255,0.38); }
         .brt-search-bar:focus { border-color: #f59e0b; box-shadow: 0 0 0 3px rgba(245,158,11,0.12); }
-        .brt-search-camera-btn { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); width: 40px; height: 40px; border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.12); color: #fff; border-radius: 8px; cursor: pointer; font-size: 18px; line-height: 1; display: inline-flex; align-items: center; justify-content: center; transition: border-color 0.15s, background 0.15s; }
+        .brt-search-camera-btn { flex-shrink: 0; width: 40px; height: 40px; border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.12); color: #fff; border-radius: 8px; cursor: pointer; font-size: 18px; line-height: 1; display: inline-flex; align-items: center; justify-content: center; transition: border-color 0.15s, background 0.15s; }
         .brt-search-camera-btn:hover { border-color: rgba(245,158,11,0.7); background: rgba(245,158,11,0.2); }
         .brt-search-camera-btn:focus-visible { outline: 2px solid #f59e0b; outline-offset: 2px; }
         .brt-image-input { display: none; }
@@ -501,27 +501,12 @@
         .brt-image-preview-wrap.active { display: flex; }
         .brt-image-preview { width: 54px; height: 54px; object-fit: cover; border-radius: 8px; border: 1px solid rgba(255,255,255,0.35); }
         .brt-image-preview-meta { font-size: 0.74rem; color: rgba(255,255,255,0.72); text-align: left; }
-        .brt-search-btn { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); background: #f59e0b; color: #000; border: none; padding: 11px 22px; border-radius: 8px; font-weight: 700; font-size: 14px; font-family: inherit; cursor: pointer; transition: background 0.15s; white-space: nowrap; }
+        .brt-search-btn { flex-shrink: 0; background: #f59e0b; color: #000; border: none; padding: 11px 22px; border-radius: 8px; font-weight: 700; font-size: 14px; font-family: inherit; cursor: pointer; transition: background 0.15s; white-space: nowrap; }
         .brt-search-btn:hover { background: #fbbf24; }
-        .report-action-note { margin-top: 0.65rem; font-size: 0.84rem; font-weight: 600; color: rgba(255,255,255,0.86); text-align: center; }
-        .report-action-row { max-width: 700px; margin: 0.8rem auto 0; display: flex; gap: 0.65rem; justify-content: center; align-items: center; flex-wrap: wrap; }
-        .report-action-btn { border: 1px solid transparent; border-radius: 9px; padding: 0.62rem 0.95rem; font-size: 0.84rem; font-weight: 700; font-family: inherit; cursor: pointer; white-space: nowrap; transition: all 0.18s; }
-        .report-action-btn.primary { background: #f59e0b; color: #000; border-color: #f59e0b; }
-        .report-action-btn.primary:hover { background: #fbbf24; border-color: #fbbf24; }
-        .report-action-btn.secondary { background: rgba(255,255,255,0.08); color: #f8fafc; border-color: rgba(255,255,255,0.26); }
-        .report-action-btn.secondary:hover { background: rgba(255,255,255,0.14); border-color: rgba(255,255,255,0.45); }
-        .full-report-picker { max-width: 760px; margin: 0.65rem auto 0; background: rgba(15, 23, 42, 0.42); border: 1px solid rgba(255,255,255,0.16); border-radius: 12px; padding: 0 0.9rem; max-height: 0; overflow: hidden; opacity: 0; transform: translateY(-8px); transition: max-height 0.24s ease, opacity 0.18s ease, transform 0.2s ease, padding 0.2s ease; }
-        .full-report-picker.open { max-height: 420px; opacity: 1; transform: translateY(0); padding: 0.85rem 0.9rem 0.95rem; }
-        .full-report-picker-title { font-size: 0.8rem; color: rgba(255,255,255,0.92); font-weight: 700; margin-bottom: 0.65rem; letter-spacing: 0.02em; }
-        .full-report-picker-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.4rem 0.55rem; margin-bottom: 0.8rem; }
-        .full-report-picker-chip { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.78rem; font-weight: 500; color: rgba(255,255,255,0.9); background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.14); border-radius: 999px; padding: 0.36rem 0.7rem 0.36rem 0.52rem; cursor: pointer; }
-        .full-report-picker-chip input[type="checkbox"] { width: 13px; height: 13px; accent-color: #f59e0b; margin: 0; }
-        .full-report-picker-actions { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; }
-        .full-report-picker-tools { display: inline-flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; }
-        .full-report-tool-btn { border: 1px solid rgba(255,255,255,0.26); border-radius: 8px; background: rgba(255,255,255,0.08); color: #f8fafc; padding: 0.45rem 0.7rem; font-size: 0.75rem; font-weight: 700; font-family: inherit; cursor: pointer; }
-        .full-report-tool-btn:hover { background: rgba(255,255,255,0.14); border-color: rgba(255,255,255,0.45); }
-        .full-report-run-btn { border: none; border-radius: 8px; background: #f59e0b; color: #000; padding: 0.56rem 0.95rem; font-size: 0.8rem; font-weight: 700; font-family: inherit; cursor: pointer; }
-        .full-report-run-btn:hover { background: #fbbf24; }
+        .report-type-row { max-width: 660px; margin: 0 auto 14px; display: flex; gap: 1.25rem; flex-wrap: wrap; }
+        .report-type-chip { display: flex; align-items: center; gap: 0.45rem; font-size: 0.82rem; color: rgba(255,255,255,0.65); cursor: pointer; user-select: none; transition: color 0.15s; }
+        .report-type-chip:hover { color: rgba(255,255,255,0.9); }
+        .report-type-chip input[type="checkbox"] { accent-color: #f59e0b; width: 15px; height: 15px; cursor: pointer; }
 
         /* ── Example pills ── */
         .brt-example-pills { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 10px; }
@@ -612,8 +597,8 @@
         .brt-cta-section { text-align: center; padding: 80px 48px; max-width: 720px; margin: 0 auto; }
         .brt-cta-section h2 { font-size: 34px; font-weight: 800; color: #fff; margin-bottom: 14px; letter-spacing: -0.3px; }
         .brt-cta-section p { font-size: 16px; color: #94a3b8; margin-bottom: 32px; line-height: 1.7; }
-        .brt-cta-search-wrap { position: relative; max-width: 580px; margin: 0 auto; }
-        .brt-cta-search-wrap .brt-search-bar { padding-right: 140px; }
+        .brt-cta-search-wrap { display: flex; align-items: center; gap: 8px; max-width: 580px; margin: 0 auto; }
+        .brt-cta-search-wrap .brt-search-bar { flex: 1; min-width: 0; }
 
         /* ── Footer ── */
         .brt-footer-new { background: #0a0e1a; border-top: 1px solid #1e2a45; padding: 22px 48px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
@@ -659,11 +644,10 @@
             .brt-hero { padding: 56px 20px 52px; }
             .brt-hero-h1 { font-size: 34px; }
             .brt-hero-p { font-size: 15px; }
-            .brt-search-bar { padding: 15px 62px 15px 16px; font-size: 14px; }
-            .brt-search-camera-btn { right: 10px; width: 42px; height: 42px; font-size: 19px; }
-            .report-action-row { flex-direction: column; align-items: stretch; max-width: 420px; }
-            .report-action-btn { width: 100%; }
-            .full-report-picker-list { grid-template-columns: 1fr; }
+            .brt-search-bar { padding: 15px 16px; font-size: 14px; }
+            .brt-search-camera-btn { width: 38px; height: 38px; font-size: 17px; }
+            .brt-search-btn { padding: 10px 16px; border-radius: 8px; }
+            .report-type-row { gap: 0.85rem; }
             .brt-trust-strip { padding: 14px 20px; gap: 20px; }
             .brt-section { padding: 52px 20px; }
             .brt-sample-section { padding: 52px 20px; }
@@ -731,39 +715,20 @@
                 <input type="text" id="query" class="brt-search-bar" placeholder='Try "Generac 22kW generator" or "Federal Pacific panel"' autocomplete="off">
                 <button type="button" id="image-search-btn" class="brt-search-camera-btn" aria-label="Search by image" title="Search by image">&#128247;</button>
                 <input type="file" id="image-search-input" class="brt-image-input" accept="image/*,.heic,.heif" capture="environment">
+                <button id="btn" class="brt-search-btn" type="button">&#9889; Search</button>
             </div>
             <div id="image-search-status" class="brt-image-status" aria-live="polite"></div>
             <div id="image-preview-wrap" class="brt-image-preview-wrap">
                 <img id="image-preview" class="brt-image-preview" alt="Selected image preview">
                 <div id="image-preview-meta" class="brt-image-preview-meta"></div>
             </div>
-            <div class="report-action-note">Type in Your Item Information and Choose Your Report Style</div>
-            <div class="report-action-row">
-                <button id="lkq-report-btn" class="report-action-btn primary" type="button">Click to: Generate LKQ Report</button>
-                <button id="full-report-btn" class="report-action-btn primary" type="button" aria-expanded="false" aria-controls="full-report-picker">Click to: Generate Full Technical Research Report</button>
-            </div>
-            <div id="full-report-picker" class="full-report-picker" aria-hidden="true">
-                <div class="full-report-picker-title">Select sections to include in your report:</div>
-                <div class="full-report-picker-list">
-                    <label class="full-report-picker-chip"><input type="checkbox" id="full-sec-overview" checked> Overview &amp; Key Metrics</label>
-                    <label class="full-report-picker-chip"><input type="checkbox" id="full-sec-analysis" checked> Current Item Analysis</label>
-                    <label class="full-report-picker-chip"><input type="checkbox" id="full-sec-variations" checked> Variations</label>
-                    <label class="full-report-picker-chip"><input type="checkbox" id="full-sec-replacements" checked> Replacement Options</label>
-                    <label class="full-report-picker-chip"><input type="checkbox" id="full-sec-valuation" checked> Valuation &amp; Depreciation</label>
-                    <label class="full-report-picker-chip"><input type="checkbox" id="full-sec-diagnostics" checked> Diagnostics &amp; Repair</label>
-                    <label class="full-report-picker-chip"><input type="checkbox" id="full-sec-technical" checked> Technical Details</label>
-                    <label class="full-report-picker-chip"><input type="checkbox" id="full-sec-recalls" checked> Recall Notices</label>
-                    <label class="full-report-picker-chip"><input type="checkbox" id="full-sec-errors-failures" checked> Error Codes &amp; Failure Modes</label>
-                    <label class="full-report-picker-chip"><input type="checkbox" id="full-sec-manual-mfr" checked> Owner's Manual &amp; Manufacturer Page</label>
-                    <label class="full-report-picker-chip"><input type="checkbox" id="full-sec-troubleshooting" checked> Troubleshooting &amp; Repair Resources</label>
-                </div>
-                <div class="full-report-picker-actions">
-                    <div class="full-report-picker-tools">
-                        <button id="full-report-deselect-btn" class="full-report-tool-btn" type="button">Deselect All</button>
-                        <button id="full-report-select-btn" class="full-report-tool-btn" type="button">Select All</button>
-                    </div>
-                    <button id="full-report-run-btn" class="full-report-run-btn" type="button">Run Report</button>
-                </div>
+            <div class="report-type-row">
+                <label class="report-type-chip">
+                    <input type="checkbox" id="report-type-lkq"> Generate LKQ Report
+                </label>
+                <label class="report-type-chip">
+                    <input type="checkbox" id="report-type-full"> Generate Full Technical Research Report
+                </label>
             </div>
 
             <!-- Mascot loader (shown only during search via JS) -->

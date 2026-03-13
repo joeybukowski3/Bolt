@@ -3409,12 +3409,16 @@ async function performSearch() {
   const tableHeadRow = byId("table-head-row");
   if (tableHeadRow) tableHeadRow.innerHTML = `<th>Feature</th><th>Original Item</th><th class="highlight">Brand Match</th><th>Option 1</th><th>Option 2</th>`;
 
-  // Kick off both fetches simultaneously (skip detail if all detail sections are off)
+  // Determine report type from checkboxes
+  const isLkqReport = byId("report-type-lkq")?.checked;
+  const isFullReport = byId("report-type-full")?.checked;
+
+  // Kick off both fetches simultaneously (skip detail for LKQ-only mode or if all detail sections are off)
   const fastPromise = fetch(`/api/search?mode=research-fast&query=${encodeURIComponent(query)}`)
     .then((r) => r.json())
     .catch((err) => { console.error("Fast fetch error:", err); return null; });
 
-  const detailPromise = needsDetailFetch()
+  const detailPromise = (!isLkqReport && (isFullReport || needsDetailFetch()))
     ? fetch(`/api/search?mode=research-detail&query=${encodeURIComponent(query)}`)
         .then((r) => r.json())
         .catch((err) => { console.error("Detail fetch error:", err); return null; })
@@ -3474,49 +3478,41 @@ document.addEventListener("DOMContentLoaded", () => {
   const printBtn = byId("print-btn");
   const recalcBtn = byId("recalc-btn");
 
-  const runDefaultFullReport = () => {
+  // Route search based on selected report type checkbox
+  const runReport = () => {
     const query = String(queryInput?.value || "").trim();
     if (!query) return;
-    // FULL REPORT BRANCH: default Search/Enter always executes full performSearch flow.
-    setActiveReportType("full");
-    console.info("[ReportMode] Full technical research report branch");
-    setAllFullReportSectionsChecked(true);
-    applyFullReportSectionSelections();
-    toggleFullReportPicker(false);
-    clearLkqInlineView();
-    performSearch();
-  };
-
-  // Main search now runs only through the report buttons below the input.
-
-  if (lkqReportBtn) {
-    lkqReportBtn.addEventListener("click", () => {
-      // LKQ REPORT BRANCH: runs dedicated inline LKQ fast+detail render path, not performSearch().
+    const lkqChk = byId("report-type-lkq");
+    if (lkqChk?.checked) {
       setActiveReportType("lkq");
-      console.info("[ReportMode] LKQ report branch");
-      toggleFullReportPicker(false);
       clearLkqInlineView();
       performLkqInlineSearch();
-    });
-  }
-
-  if (fullReportBtn) {
-    fullReportBtn.addEventListener("click", () => {
+    } else {
       setActiveReportType("full");
-      toggleFullReportPicker();
-    });
-  }
-
-  if (fullReportRunBtn) {
-    fullReportRunBtn.addEventListener("click", () => {
-      const query = String(queryInput?.value || "").trim();
-      if (!query) return;
-      setActiveReportType("full");
-      console.info("[ReportMode] Full technical research report branch (picker run)");
+      setAllFullReportSectionsChecked(true);
       applyFullReportSectionSelections();
-      toggleFullReportPicker(false);
       clearLkqInlineView();
       performSearch();
+    }
+  };
+
+  const searchBtn = byId("btn");
+  if (searchBtn) searchBtn.addEventListener("click", runReport);
+  if (queryInput) queryInput.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); runReport(); } });
+
+  // Report type checkboxes — mutually exclusive
+  const lkqChk = byId("report-type-lkq");
+  const fullChk = byId("report-type-full");
+  if (lkqChk && fullChk) {
+    lkqChk.addEventListener("change", () => { if (lkqChk.checked) fullChk.checked = false; });
+    fullChk.addEventListener("change", () => { if (fullChk.checked) lkqChk.checked = false; });
+  }
+
+  const queryForm = queryInput ? queryInput.closest("form") : null;
+  if (queryForm) {
+    queryForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      runReport();
     });
   }
 
@@ -3577,7 +3573,7 @@ document.addEventListener("DOMContentLoaded", () => {
         examplesList.classList.remove("open");
         examplesToggle.setAttribute("aria-expanded", "false");
         if (examplesChevron) examplesChevron.classList.remove("open");
-        runDefaultFullReport();
+        runReport();
       });
     });
   }
@@ -3616,7 +3612,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!v) return;
       const mainInput = byId("query");
       if (mainInput) mainInput.value = v;
-      runDefaultFullReport();
+      runReport();
     });
   }
   if (queryCta) {
@@ -3626,7 +3622,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!v) return;
       const mainInput = byId("query");
       if (mainInput) mainInput.value = v;
-      runDefaultFullReport();
+      runReport();
     });
   }
 
@@ -3637,7 +3633,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!q) return;
       const input = byId("query");
       if (input) input.value = q;
-      runDefaultFullReport();
+      runReport();
     });
   });
 
