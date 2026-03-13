@@ -701,6 +701,38 @@
             .report-list .label { min-width: unset; }
             .disambig-options { gap: 0.5rem; }
         }
+
+        /* ── Main tab bar (Item Research / Diagnostics) ── */
+        .res-main-tab-bar { display: flex; background: #e2e8f0; border-radius: 12px; padding: 3px; gap: 3px; margin-bottom: 1.25rem; }
+        .res-main-tab { flex: 1; border: none; background: transparent; padding: 0.5rem 1rem; border-radius: 9px; font-size: 0.82rem; font-weight: 600; font-family: inherit; cursor: pointer; color: var(--text-mid); transition: all 0.18s; }
+        .res-main-tab.active { background: white; color: var(--text-dark); box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
+        .res-main-tab:hover:not(.active) { color: var(--text-dark); background: rgba(255,255,255,0.5); }
+
+        /* ── Res panels ── */
+        .res-panel { display: block; }
+        .res-panel.hidden { display: none; }
+
+        /* ── Res cards ── */
+        .res-card { margin-bottom: 1.25rem; }
+        .res-card-hdr { cursor: default; }
+
+        /* ── Skeleton placeholders in cards ── */
+        .skel-1, .skel-2, .skel-3 { padding: 0.5rem 0; }
+
+        /* ── On-demand prompt ── */
+        .ondemand-prompt { text-align: center; padding: 2rem 1rem; }
+        .ondemand-prompt p { font-size: 0.88rem; color: var(--text-mid); margin-bottom: 1rem; }
+        .ondemand-btn { background: var(--accent); color: #000; border: none; border-radius: 10px; padding: 0.75rem 1.75rem; font-size: 0.88rem; font-weight: 700; font-family: inherit; cursor: pointer; transition: background 0.2s; }
+        .ondemand-btn:hover { background: var(--accent-hover); }
+
+        /* ── Diagnostics placeholder ── */
+        .diag-placeholder { text-align: center; padding: 3rem 1rem; background: white; border: 1px solid var(--border-color); border-radius: 14px; margin-bottom: 1.25rem; }
+        .diag-placeholder p { font-size: 0.88rem; color: var(--text-mid); margin-bottom: 1rem; }
+
+        /* ── Mobile tweaks for new layout ── */
+        @media (max-width: 600px) {
+            .res-main-tab { font-size: 0.72rem; padding: 0.4rem 0.5rem; }
+        }
     </style>
 </head>
 <body>
@@ -748,15 +780,6 @@
                 <img id="image-preview" class="brt-image-preview" alt="Selected image preview">
                 <div id="image-preview-meta" class="brt-image-preview-meta"></div>
             </div>
-            <div class="report-type-row">
-                <label class="report-type-chip">
-                    <input type="checkbox" id="report-type-lkq"> Generate LKQ Report
-                </label>
-                <label class="report-type-chip">
-                    <input type="checkbox" id="report-type-full"> Generate Full Technical Research Report
-                </label>
-            </div>
-
             <!-- Mascot loader (shown only during search via JS) -->
             <div class="mascot-area" id="mascot-wrapper">
                 <div id="loader-track">
@@ -808,8 +831,6 @@
                     <span class="hint-icon">&#128161;</span>
                     <span><strong>Tip:</strong> Include a full model number for our most comprehensive report.</span>
                 </div>
-                <div id="report-tabs-top" class="report-tabs-container no-print"></div>
-
                 <div id="estimation-banner" class="estimation-banner hidden">
                     <span class="banner-icon">&#9888;</span>
                     <span id="estimation-text"></span>
@@ -821,30 +842,45 @@
                 <div id="disambig-container" class="hidden no-print"></div>
                 <div id="assumed-model-notice" class="assumed-model-notice hidden no-print"></div>
 
-                <!-- Overview Tab -->
-                <div id="panel-overview" class="tab-panel active" role="tabpanel" aria-labelledby="tab-overview">
-                    <div class="metrics-strip">
-                        <div class="metric-card">
-                            <span class="metric-label">Age</span>
-                            <span class="metric-value" id="m-age">—</span>
-                        </div>
-                        <div class="metric-card">
-                            <span class="metric-label">Launch MSRP</span>
-                            <span class="metric-value" id="m-msrp">—</span>
-                        </div>
-                        <div class="metric-card">
-                            <span class="metric-label">Est. ACV</span>
-                            <span class="metric-value acv" id="m-acv">—</span>
-                        </div>
-                        <div class="metric-card">
-                            <span class="metric-label">Availability</span>
-                            <span class="metric-value" id="m-availability" style="font-size:0.78rem; line-height:1.3;">—</span>
-                        </div>
-                    </div>
+            <!-- Main tab bar -->
+            <div class="res-main-tab-bar no-print">
+                <button class="res-main-tab active" data-panel="res-panel-research">&#128270; Item Research</button>
+                <button class="res-main-tab" data-panel="res-panel-diagnostics">&#128295; Diagnostics &amp; Repair</button>
+            </div>
 
-                    <div class="card" id="card-analysis">
-                        <div class="card-title"><span class="title-number">1</span> Current Item Analysis <span class="title-icon">&#9889;</span></div>
-                        <div class="card-accent-stripe"></div>
+            <!-- Tab 1: Item Research -->
+            <div id="res-panel-research" class="res-panel">
+
+                <div class="metrics-strip">
+                    <div class="metric-card">
+                        <span class="metric-label">Age</span>
+                        <span class="metric-value" id="m-age">—</span>
+                    </div>
+                    <div class="metric-card">
+                        <span class="metric-label">Launch MSRP</span>
+                        <span class="metric-value" id="m-msrp">—</span>
+                    </div>
+                    <div class="metric-card">
+                        <span class="metric-label">Est. ACV</span>
+                        <span class="metric-value acv" id="m-acv">—</span>
+                    </div>
+                    <div class="metric-card">
+                        <span class="metric-label">Availability</span>
+                        <span class="metric-value" id="m-availability" style="font-size:0.78rem; line-height:1.3;">—</span>
+                    </div>
+                </div>
+
+                <!-- Card 1: Current Item Analysis -->
+                <div class="card res-card" id="card-analysis">
+                    <div class="res-card-hdr card-title"><span class="title-number">1</span> Current Item Analysis <span class="title-icon">&#9889;</span></div>
+                    <div class="card-accent-stripe"></div>
+                    <div class="skel-1">
+                        <div class="skeleton-line full"></div>
+                        <div class="skeleton-line med"></div>
+                        <div class="skeleton-line full"></div>
+                        <div class="skeleton-line short"></div>
+                    </div>
+                    <div id="sec1-content" class="hidden">
                         <p class="report-overview" id="r-overview"></p>
                         <div id="r-field-ref-wrap" class="hidden no-print" style="margin-bottom:1rem;"></div>
                         <div id="parts-available-note" class="parts-available-note hidden">&#128270; Parts research available — see Diagnostics &amp; Repair section.</div>
@@ -861,18 +897,18 @@
                             <div class="variation-chips" id="r-variation-chips"></div>
                         </div>
                     </div>
+                </div>
 
-                    <div class="card" id="card-how-it-works">
-                        <div class="card-title"><span class="title-number">2</span> How It Works <span class="title-icon">&#128161;</span></div>
-                        <div class="card-accent-stripe"></div>
-                        <div id="how-it-works-content">
-                            <div class="section-spinner">Loading...</div>
-                        </div>
+                <!-- Card 2: Release Data & Age -->
+                <div class="card res-card" id="card-release-date">
+                    <div class="res-card-hdr card-title"><span class="title-number">2</span> Release Data &amp; Age <span class="title-icon">&#128197;</span></div>
+                    <div class="card-accent-stripe"></div>
+                    <div class="skel-2">
+                        <div class="skeleton-line med"></div>
+                        <div class="skeleton-line full"></div>
+                        <div class="skeleton-line short"></div>
                     </div>
-
-                    <div class="card" id="card-release-date">
-                        <div class="card-title"><span class="title-number">3</span> Release Date &amp; Age <span class="title-icon">&#128197;</span></div>
-                        <div class="card-accent-stripe"></div>
+                    <div id="sec2-content" class="hidden">
                         <ul class="report-list">
                             <li><span class="label">Production Era</span> <span id="r-production-era"></span></li>
                             <li><span class="label">Discontinuation</span> <span id="r-discontinuation"></span></li>
@@ -903,48 +939,20 @@
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <div class="card" id="card-valuation">
-                        <div class="card-title"><span class="title-number">4</span> Valuation &amp; Depreciation <span class="title-icon">&#128200;</span></div>
-                        <div class="card-accent-stripe"></div>
-                        <ul class="report-list" id="valuation-list">
-                            <li id="msrp-row">
-                                <span class="label">MSRP</span>
-                                <span>
-                                    <div class="msrp-pair">
-                                        <span class="msrp-label">Launch MSRP</span>
-                                        <span class="msrp-value" id="r-launch-msrp"></span>
-                                        <span class="msrp-label" style="margin-top:0.4rem">Current Market Price</span>
-                                        <span class="msrp-value" id="r-market-price"></span>
-                                        <span class="msrp-note" id="r-market-price-note"></span>
-                                    </div>
-                                </span>
-                            </li>
-                            <li id="acv-row">
-                                <span class="label">ACV Calculation</span>
-                                <span>
-                                    <span class="acv-value" id="r-acv"></span>
-                                    <span class="acv-formula" id="r-acv-formula" style="display:block; margin-top:0.2rem;"></span>
-                                    <div class="acv-steps" id="r-acv-steps" style="display:none;"></div>
-                                    <div class="age-input-row">
-                                        <span class="age-label">Adjust age:</span>
-                                        <input type="number" id="acv-age-input" class="age-input" min="0" max="100" value="0">
-                                        <span class="age-label">years</span>
-                                        <button class="recalc-btn" id="recalc-btn">Recalculate</button>
-                                        <button class="recalc-btn" id="generate-valuation-btn" style="display:none;">Generate Price Estimate</button>
-                                    </div>
-                                    <span class="acv-note" id="r-acv-note"></span>
-                                </span>
-                            </li>
-                        </ul>
+                <!-- Card 3: Replacement Options -->
+                <div class="card res-card" id="card-table" style="overflow-x: auto;">
+                    <div class="res-card-hdr card-title"><span class="title-number">3</span> Replacement Options <span class="title-icon">&#128260;</span></div>
+                    <div class="card-accent-stripe"></div>
+                    <div class="skel-3">
+                        <div class="skeleton-line full"></div>
+                        <div class="skeleton-line med"></div>
+                        <div class="skeleton-line full"></div>
+                        <div class="skeleton-line short"></div>
+                        <div class="skeleton-line full"></div>
                     </div>
-                </div><!-- /panel-overview -->
-
-                <!-- Replacement Options Tab -->
-                <div id="panel-replacements" class="tab-panel" role="tabpanel" aria-labelledby="tab-replacements">
-                    <div class="card" id="card-table" style="overflow-x: auto;">
-                        <div class="card-title"><span class="title-number">6</span> Current Replacement Options <span class="title-icon">&#128260;</span></div>
-                        <div class="card-accent-stripe"></div>
+                    <div id="sec3-content" class="hidden">
                         <div id="lkq-evaluator-guidance" class="hidden"></div>
                         <div id="table-note" class="table-note hidden"></div>
                         <div id="table-loading" class="section-spinner">Loading replacement options...</div>
@@ -980,43 +988,99 @@
                             <div id="compare-result" class="compare-result hidden"></div>
                         </div>
                     </div>
-                </div><!-- /panel-replacements -->
+                </div>
 
-                <!-- Diagnostics & Repair Tab -->
-                <div id="panel-diagnostics" class="tab-panel" role="tabpanel" aria-labelledby="tab-diagnostics">
-                    <div class="card" id="card-manual-mfr">
-                        <div class="card-title"><span class="title-number">7</span> Owner&apos;s Manual &amp; Manufacturer Page <span class="title-icon">&#128196;</span></div>
+                <!-- Card 4: Valuation & Depreciation (on-demand) -->
+                <div class="card res-card" id="card-valuation">
+                    <div class="res-card-hdr card-title"><span class="title-number">4</span> Valuation &amp; Depreciation <span class="title-icon">&#128200;</span></div>
+                    <div class="card-accent-stripe"></div>
+                    <div id="valuation-prompt" class="ondemand-prompt">
+                        <p>Generate ACV calculation and depreciation details for this item.</p>
+                        <button id="generate-valuation-btn" class="ondemand-btn">&#128200; Generate Valuation</button>
+                    </div>
+                    <div id="sec4-content" class="hidden">
+                        <ul class="report-list" id="valuation-list">
+                            <li id="msrp-row">
+                                <span class="label">MSRP</span>
+                                <span>
+                                    <div class="msrp-pair">
+                                        <span class="msrp-label">Launch MSRP</span>
+                                        <span class="msrp-value" id="r-launch-msrp"></span>
+                                        <span class="msrp-label" style="margin-top:0.4rem">Current Market Price</span>
+                                        <span class="msrp-value" id="r-market-price"></span>
+                                        <span class="msrp-note" id="r-market-price-note"></span>
+                                    </div>
+                                </span>
+                            </li>
+                            <li id="acv-row">
+                                <span class="label">ACV Calculation</span>
+                                <span>
+                                    <span class="acv-value" id="r-acv"></span>
+                                    <span class="acv-formula" id="r-acv-formula" style="display:block; margin-top:0.2rem;"></span>
+                                    <div class="acv-steps" id="r-acv-steps" style="display:none;"></div>
+                                    <div class="age-input-row">
+                                        <span class="age-label">Adjust age:</span>
+                                        <input type="number" id="acv-age-input" class="age-input" min="0" max="100" value="0">
+                                        <span class="age-label">years</span>
+                                        <button class="recalc-btn" id="recalc-btn">Recalculate</button>
+                                    </div>
+                                    <span class="acv-note" id="r-acv-note"></span>
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div id="lkq-inline-root"></div>
+
+            </div><!-- /res-panel-research -->
+
+            <!-- Tab 2: Diagnostics & Repair -->
+            <div id="res-panel-diagnostics" class="res-panel hidden">
+                <div id="diag-placeholder" class="diag-placeholder">
+                    <p>Diagnostics &amp; Repair analysis is generated on demand.</p>
+                    <button id="generate-diag-btn" class="ondemand-btn">&#128295; Generate Diagnostics &amp; Repair</button>
+                </div>
+                <div id="diag-sections-wrap" class="hidden">
+                    <div class="card res-card" id="card-manual-mfr">
+                        <div class="res-card-hdr card-title"><span class="title-number">5</span> Owner&apos;s Manual &amp; Manufacturer Page <span class="title-icon">&#128196;</span></div>
                         <div class="card-accent-stripe"></div>
                         <div id="manual-content"><div class="section-spinner">Loading...</div></div>
                         <div id="manufacturer-page-content" style="margin-top:0.5rem;"></div>
                     </div>
-                    <div class="card" id="card-error-codes">
-                        <div class="card-title"><span class="title-number">8</span> Error Codes <span class="title-icon">&#128308;</span></div>
+                    <div class="card res-card" id="card-error-codes">
+                        <div class="res-card-hdr card-title"><span class="title-number">6</span> Error Codes <span class="title-icon">&#128308;</span></div>
                         <div class="card-accent-stripe"></div>
                         <div id="error-codes-content"><div class="section-spinner">Loading...</div></div>
                     </div>
-                    <div class="card" id="card-failures">
-                        <div class="card-title"><span class="title-number">9</span> Common Reported Failures &amp; Parts <span class="title-icon">&#128295;</span></div>
+                    <div class="card res-card" id="card-failures">
+                        <div class="res-card-hdr card-title"><span class="title-number">7</span> Common Reported Failures &amp; Parts <span class="title-icon">&#128295;</span></div>
                         <div class="card-accent-stripe"></div>
                         <div id="failures-content"><div class="section-spinner">Loading...</div></div>
                     </div>
-                    <div class="card" id="card-troubleshooting">
-                        <div class="card-title"><span class="title-number">10</span> Troubleshooting &amp; Repair <span class="title-icon">&#128736;</span></div>
+                    <div class="card res-card" id="card-troubleshooting">
+                        <div class="res-card-hdr card-title"><span class="title-number">8</span> Troubleshooting &amp; Repair <span class="title-icon">&#128736;</span></div>
                         <div class="card-accent-stripe"></div>
                         <div id="troubleshooting-content"><div class="section-spinner">Loading...</div></div>
                     </div>
-                    <div class="card" id="card-recalls">
-                        <div class="card-title"><span class="title-number">11</span> Recall Notices or Class Action <span class="title-icon">&#9888;</span></div>
+                    <div class="card res-card" id="card-recalls">
+                        <div class="res-card-hdr card-title"><span class="title-number">9</span> Recall Notices or Class Action <span class="title-icon">&#9888;</span></div>
                         <div class="card-accent-stripe"></div>
                         <div id="recalls-content"><div class="section-spinner">Loading...</div></div>
                     </div>
-                </div><!-- /panel-diagnostics -->
+                    <div class="card res-card" id="card-how-it-works">
+                        <div class="res-card-hdr card-title"><span class="title-number">10</span> How It Works <span class="title-icon">&#128161;</span></div>
+                        <div class="card-accent-stripe"></div>
+                        <div id="how-it-works-content">
+                            <div class="section-spinner">Loading...</div>
+                        </div>
+                    </div>
+                </div>
+            </div><!-- /res-panel-diagnostics -->
 
-                <div id="report-tabs-bottom" class="report-tabs-container no-print" style="margin-top: 2rem; padding-bottom: 2rem;"></div>
-
-                <footer class="no-print" style="text-align: center; padding: 2rem 0; opacity: 0.5; font-size: 0.75rem; color: var(--text-muted-dark);">
-                    <p>Results are generated for informational purposes. Always verify critical data independently.</p>
-                </footer>
+            <footer class="no-print" style="text-align: center; padding: 2rem 0; opacity: 0.5; font-size: 0.75rem; color: var(--text-muted-dark);">
+                <p>Results are generated for informational purposes. Always verify critical data independently.</p>
+            </footer>
 
             </div>
         </div>

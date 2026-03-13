@@ -11,6 +11,7 @@ let singlePageResultsMode = false;
 let disambigActive = false;
 let disambigSkip = false;
 let disambigPendingDetail = null;
+let diagGenerated = false;
 
 // ── Section filter state ──────────────────────────────────────────────────────
 
@@ -2149,20 +2150,6 @@ function renderFast(data) {
     }
   }
 
-  // Tiered card visibility
-  // Tier 1: general term — hide valuation, item notes; tab-replacements tab shows empty state
-  // Tier 2: category only — hide valuation, item notes; show replacement table (tiered mode)
-  // Tier 3+: full report
-  const cardValuation = byId("card-valuation");
-
-  if (searchTier <= 1) {
-    show(cardValuation, false);
-  } else if (searchTier === 2) {
-    show(cardValuation, false);
-  } else {
-    show(cardValuation, selectedSections.valuation);
-  }
-
   // Metrics strip — age and availability always, MSRP/ACV only for tier 3+
   const ageShort = (releaseDate.estimatedAge || "").split(".")[0] || "—";
   setText("m-age", ageShort);
@@ -2234,13 +2221,19 @@ function renderFast(data) {
     }
   }
 
-  // Show results, reset to overview tab
+  // Reveal sec1 and sec2 content (hide skeletons)
+  document.querySelectorAll(".skel-1").forEach((el) => el.classList.add("hidden"));
+  document.querySelectorAll(".skel-2").forEach((el) => el.classList.add("hidden"));
+  const sec1 = byId("sec1-content"); if (sec1) sec1.classList.remove("hidden");
+  const sec2 = byId("sec2-content"); if (sec2) sec2.classList.remove("hidden");
+
+  // Show results, switch to research tab
   const results = byId("results");
   if (results) {
     results.classList.remove("hidden");
     results.scrollIntoView({ behavior: "smooth", block: "start" });
   }
-  setActiveTab("tab-overview");
+  switchMainTab("res-panel-research");
 }
 
 // ── renderDetail ─────────────────────────────────────────────────────────────
@@ -2255,16 +2248,7 @@ function renderDetail(data) {
   // Item Notes and Availability are consolidated into LKQ guidance in Replacement Options.
 
   // ─ Replacement table ─
-  if (!selectedSections.replacements) {
-    // Hide the table elements when section is off
-    const tl = byId("table-loading"); if (tl) tl.classList.add("hidden");
-    const te = byId("r-table"); if (te) te.classList.add("hidden");
-    const wtc = byId("lkq-evaluator-guidance");
-    if (wtc) {
-      wtc.innerHTML = "";
-      wtc.className = "hidden";
-    }
-  } else {
+  {
   // ─ LKQ Considerations Checklist ─
   const wtcEl = byId("lkq-evaluator-guidance");
   if (wtcEl) {
@@ -2532,24 +2516,25 @@ function renderDetail(data) {
     }
   }
 
-  } // end if (selectedSections.replacements)
+  } // end replacement block
 
-  // ─ Technical Details panel ─
-  // Technical Details tab removed.
+  // Reveal sec3 content
+  document.querySelectorAll(".skel-3").forEach((el) => el.classList.add("hidden"));
+  const sec3 = byId("sec3-content"); if (sec3) sec3.classList.remove("hidden");
 
   // ─ Service life (always in Release Date card) ─
   setText("r-service-life", data.serviceLife || "");
 
+  // Guard: only render diagnostics if user has clicked Generate
+  if (!diagGenerated) return;
+
   // ─ How It Works ─
-  if (selectedSections.howItWorks) {
-    const howContent = byId("how-it-works-content");
-    if (howContent) {
-      howContent.innerHTML = `<p class="how-it-works-text">${escapeHtml(data.howItWorks || "No description available.")}</p>`;
-    }
+  const howContent = byId("how-it-works-content");
+  if (howContent) {
+    howContent.innerHTML = `<p class="how-it-works-text">${escapeHtml(data.howItWorks || "No description available.")}</p>`;
   }
 
   // ─ Diagnostics group (Recalls, Error Codes, Failures, Manual, Troubleshooting) ─
-  if (!selectedSections.diagnostics) return; // skip rest
 
   // ─ Recalls ─
   const recallsContent = byId("recalls-content");
@@ -3279,13 +3264,22 @@ function resetResultsUI() {
   const resultsEl = byId("results");
   if (resultsEl) resultsEl.classList.add("hidden");
 
-  // Reset tabs to default without triggering scroll.
-  activeTab = "tab-overview";
-  TAB_IDS.forEach((id) => {
-    const panel = byId(id.replace("tab-", "panel-"));
-    if (panel) panel.classList.toggle("active", id === "tab-overview");
+  // Reset to research tab.
+  diagGenerated = false;
+  switchMainTab("res-panel-research");
+
+  // Reset skeleton/content visibility.
+  ["skel-1", "skel-2", "skel-3"].forEach((cls) => {
+    document.querySelectorAll("." + cls).forEach((el) => el.classList.remove("hidden"));
   });
-  renderReportSectionTabs();
+  ["sec1-content", "sec2-content", "sec3-content", "sec4-content"].forEach((id) => {
+    const el = byId(id); if (el) el.classList.add("hidden");
+  });
+  // Reset valuation on-demand prompt
+  const valPrompt = byId("valuation-prompt"); if (valPrompt) valPrompt.classList.remove("hidden");
+  // Reset diagnostics
+  const diagPlaceholder = byId("diag-placeholder"); if (diagPlaceholder) diagPlaceholder.classList.remove("hidden");
+  const diagSections = byId("diag-sections-wrap"); if (diagSections) diagSections.classList.add("hidden");
 
   // Clear dynamic containers.
   [
@@ -3449,6 +3443,34 @@ function showAssumedModelNotice(estimatedModel) {
   el.classList.remove("hidden");
 }
 
+// ── New tab + on-demand functions ─────────────────────────────────────────────
+
+function switchMainTab(panelId) {
+  document.querySelectorAll(".res-main-tab").forEach((btn) => {
+    btn.classList.toggle("active", btn.dataset.panel === panelId);
+  });
+  document.querySelectorAll(".res-panel").forEach((panel) => {
+    panel.classList.toggle("hidden", panel.id !== panelId);
+  });
+}
+
+function renderValuation() {
+  const prompt = byId("valuation-prompt");
+  const content = byId("sec4-content");
+  if (prompt) prompt.classList.add("hidden");
+  if (content) content.classList.remove("hidden");
+  recalcACV();
+}
+
+function renderDiagnostics() {
+  diagGenerated = true;
+  const placeholder = byId("diag-placeholder");
+  const wrap = byId("diag-sections-wrap");
+  if (placeholder) placeholder.classList.add("hidden");
+  if (wrap) wrap.classList.remove("hidden");
+  if (detailData) renderDetail(detailData);
+}
+
 // ── performSearch ─────────────────────────────────────────────────────────────
 
 async function performSearch() {
@@ -3457,7 +3479,6 @@ async function performSearch() {
   const query = queryInput.value.trim();
   if (!query) return;
   if (lkqModeActive) clearLkqInlineView();
-  applyReportLayoutMode();
 
   const searchToken = ++activeSearchToken;
   resetResultsUI();
@@ -3472,7 +3493,6 @@ async function performSearch() {
         if (searchToken !== activeSearchToken) return;
         renderFast(fast);
         if (detail) renderDetail(detail);
-        updateSectionVisibility();
         return;
       }
     }
@@ -3526,20 +3546,14 @@ async function performSearch() {
   const tableHeadRow = byId("table-head-row");
   if (tableHeadRow) tableHeadRow.innerHTML = `<th>Feature</th><th>Original Item</th><th class="highlight">Brand Match</th><th>Option 1</th><th>Option 2</th>`;
 
-  // Determine report type from checkboxes
-  const isLkqReport = byId("report-type-lkq")?.checked;
-  const isFullReport = byId("report-type-full")?.checked;
-
-  // Kick off both fetches simultaneously (skip detail for LKQ-only mode or if all detail sections are off)
+  // Kick off both fetches simultaneously
   const fastPromise = fetch(`/api/search?mode=research-fast&query=${encodeURIComponent(query)}`)
     .then((r) => r.json())
     .catch((err) => { console.error("Fast fetch error:", err); return null; });
 
-  const detailPromise = (!isLkqReport && (isFullReport || needsDetailFetch()))
-    ? fetch(`/api/search?mode=research-detail&query=${encodeURIComponent(query)}`)
-        .then((r) => r.json())
-        .catch((err) => { console.error("Detail fetch error:", err); return null; })
-    : Promise.resolve(null);
+  const detailPromise = fetch(`/api/search?mode=research-detail&query=${encodeURIComponent(query)}`)
+    .then((r) => r.json())
+    .catch((err) => { console.error("Detail fetch error:", err); return null; });
 
   // Render fast when ready — stops the loader
   fastPromise.then((fast) => {
@@ -3558,10 +3572,8 @@ async function performSearch() {
           onUnknown: () => {
             showAssumedModelNotice(fast.analysis?.estimatedModel || fast.analysis?.entered || query);
             renderFast(fast);
-            updateSectionVisibility();
             if (disambigPendingDetail) {
               renderDetail(disambigPendingDetail);
-              updateSectionVisibility();
               disambigPendingDetail = null;
             }
           }
@@ -3570,7 +3582,6 @@ async function performSearch() {
       }
       disambigSkip = false;
       renderFast(fast);
-      updateSectionVisibility();
     } else {
       const results = byId("results");
       if (results) results.classList.remove("hidden");
@@ -3592,7 +3603,6 @@ async function performSearch() {
         return;
       }
       renderDetail(detail);
-      updateSectionVisibility();
     }
   });
 
@@ -3611,11 +3621,6 @@ async function performSearch() {
 
 document.addEventListener("DOMContentLoaded", () => {
   const queryInput = byId("query");
-  const lkqReportBtn = byId("lkq-report-btn");
-  const fullReportBtn = byId("full-report-btn");
-  const fullReportRunBtn = byId("full-report-run-btn");
-  const fullReportDeselectBtn = byId("full-report-deselect-btn");
-  const fullReportSelectBtn = byId("full-report-select-btn");
   const copyBtn = byId("copy-btn");
   const printBtn = byId("print-btn");
   const recalcBtn = byId("recalc-btn");
@@ -3624,31 +3629,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const runReport = () => {
     const query = String(queryInput?.value || "").trim();
     if (!query) return;
-    const lkqChk = byId("report-type-lkq");
-    if (lkqChk?.checked) {
-      setActiveReportType("lkq");
-      clearLkqInlineView();
-      performLkqInlineSearch();
-    } else {
-      setActiveReportType("full");
-      setAllFullReportSectionsChecked(true);
-      applyFullReportSectionSelections();
-      clearLkqInlineView();
-      performSearch();
-    }
+    clearLkqInlineView();
+    performSearch();
   };
 
   const searchBtn = byId("btn");
   if (searchBtn) searchBtn.addEventListener("click", runReport);
   if (queryInput) queryInput.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); runReport(); } });
-
-  // Report type checkboxes — mutually exclusive
-  const lkqChk = byId("report-type-lkq");
-  const fullChk = byId("report-type-full");
-  if (lkqChk && fullChk) {
-    lkqChk.addEventListener("change", () => { if (lkqChk.checked) fullChk.checked = false; });
-    fullChk.addEventListener("change", () => { if (fullChk.checked) lkqChk.checked = false; });
-  }
 
   const queryForm = queryInput ? queryInput.closest("form") : null;
   if (queryForm) {
@@ -3658,19 +3645,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  if (fullReportDeselectBtn) {
-    fullReportDeselectBtn.addEventListener("click", () => {
-      setAllFullReportSectionsChecked(false);
-      applyFullReportSectionSelections();
-    });
-  }
-
-  if (fullReportSelectBtn) {
-    fullReportSelectBtn.addEventListener("click", () => {
-      setAllFullReportSectionsChecked(true);
-      applyFullReportSectionSelections();
-    });
-  }
   const imageSearchBtn = byId("image-search-btn");
   const imageSearchInput = byId("image-search-input");
   if (imageSearchBtn && imageSearchInput) {
@@ -3685,7 +3659,18 @@ document.addEventListener("DOMContentLoaded", () => {
   if (copyBtn) copyBtn.addEventListener("click", openSummaryModal);
   if (printBtn) printBtn.addEventListener("click", () => window.print());
   if (recalcBtn) recalcBtn.addEventListener("click", recalcACV);
-  initTabs();
+
+  // Wire main tab buttons
+  document.querySelectorAll(".res-main-tab").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const panelId = btn.dataset.panel;
+      if (panelId) switchMainTab(panelId);
+    });
+  });
+
+  // Wire on-demand buttons
+  byId("generate-valuation-btn")?.addEventListener("click", renderValuation);
+  byId("generate-diag-btn")?.addEventListener("click", renderDiagnostics);
 
   // Summary modal buttons
   byId("summary-modal-close")?.addEventListener("click", closeSummaryModal);
