@@ -2277,7 +2277,7 @@ function renderDetail(data) {
 
     const hasUnsafePanelSignal = unsafePanelTerms.some((term) => combinedText.includes(term));
     const hasObsoleteSignal = statusTerms.some((term) => combinedText.includes(term));
-    const isPanelLike = combinedText.includes("panel") || combinedText.includes("load center") || combinedText.includes("breaker");
+    const isPanelLike = combinedText.includes("load center") || combinedText.includes("breaker") || combinedText.includes("electrical panel") || combinedText.includes("service panel");
     const isSafetyDrivenReplacement = Boolean((hasUnsafePanelSignal && isPanelLike) || (hasObsoleteSignal && isPanelLike));
     const lkqFlags = {
       isObsolete: isSafetyDrivenReplacement,
