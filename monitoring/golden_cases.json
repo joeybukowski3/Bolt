@@ -1,0 +1,110 @@
+{
+  "version": "1.1",
+  "description": "Golden test cases for regression monitoring across Bolt Research Team sites.",
+  "sites": {
+    "itemassist.com": {
+      "description": "Smart lookup and serial number decoder — POST /api/age-lookup. Response fields: brand, estimatedYear (string|null), yearRange (string|null).",
+      "endpoint": "https://www.itemassist.com/api/age-lookup",
+      "method": "POST",
+      "cases": [
+        {
+          "label": "Bowflex TC20 smart lookup",
+          "input": {
+            "query": "bowflex TC20"
+          },
+          "expected": {
+            "brand": "Bowflex",
+            "estimatedYear": null,
+            "yearRange": "2012-2017"
+          }
+        },
+        {
+          "label": "Samsung fridge smart lookup",
+          "input": {
+            "query": "RS25J500DSR Samsung"
+          },
+          "expected": {
+            "brand": "Samsung",
+            "estimatedYear": null,
+            "yearRange": "2015-2018"
+          }
+        },
+        {
+          "label": "Sony TV smart lookup",
+          "input": {
+            "query": "XR 77A80L"
+          },
+          "expected": {
+            "brand": "Sony",
+            "estimatedYear": null,
+            "yearRange": "2023-2024"
+          }
+        },
+        {
+          "label": "Whirlpool serial decode",
+          "input": {
+            "query": "Brand=Whirlpool Serial=SS2042123"
+          },
+          "expected": {
+            "brand": "Whirlpool",
+            "estimatedYear": 2005,
+            "yearRange": null
+          }
+        },
+        {
+          "label": "Samsung serial decode",
+          "input": {
+            "query": "Brand=Samsung Serial=01G257BMB06164W"
+          },
+          "expected": {
+            "brand": "Samsung",
+            "estimatedYear": 2019,
+            "yearRange": null
+          }
+        },
+        {
+          "label": "Roper serial decode",
+          "input": {
+            "query": "Brand=Roper Serial=TRP4635593"
+          },
+          "expected": {
+            "brand": "Roper",
+            "estimatedYear": 2003,
+            "yearRange": null
+          }
+        }
+      ]
+    },
+    "boltresearchteam.com": {
+      "description": "Item lookup tool — GET /api/search?query=...&mode=research-fast. Response fields: releaseDate.ageNumeric (int, years old), releaseDate.estimatedAge (string).",
+      "endpoint": "https://www.boltresearchteam.com/api/search",
+      "method": "GET",
+      "cases": [
+        {
+          "label": "GE dishwasher — model number lookup",
+          "input": {
+            "query": "GDT630PSMSS",
+            "mode": "research-fast"
+          },
+          "expected": {
+            "brand": "GE",
+            "manufactureYear": 2021,
+            "ageBand": "5-10 years"
+          }
+        },
+        {
+          "label": "Samsung dryer — model number lookup",
+          "input": {
+            "query": "DVE45R6100W",
+            "mode": "research-fast"
+          },
+          "expected": {
+            "brand": "Samsung",
+            "manufactureYear": 2019,
+            "ageBand": "5-10 years"
+          }
+        }
+      ]
+    }
+  }
+}

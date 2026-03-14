@@ -1,0 +1,118 @@
+Serial Decoding Info
+
+1. Appliances (appliances.csv)
+
+
+    1 "Brand","Decoding Method"
+    2 "Admiral (post-2006)","Char 2 (9-digit) or Char 3 (10-digit)"
+    3 "Admiral (pre-2006)","Second-to-last character of serial"
+    4 "Amana (post-2006)","Char 2 (9-digit) or Char 3 (10-digit)"
+    5 "Amana (pre-2006)","Second-to-last character of serial"
+    6 "Bosch","FD digits 1-2 (first two numbers after FD)"
+    7 "Crosley","Char 2 (9-digit) or Char 3 (10-digit)"
+    8 "Electrolux","Character 3 (first digit after 2-letter factory
+      code)"
+    9 "Estate","Char 2 (9-digit) or Char 3 (10-digit)"
+   10 "Frigidaire","Character 3 (first digit after 2-letter factory
+      code)"
+   11 "Gaggenau","FD digits 1-2 (first two numbers after FD)"
+   12 "GE","Character 2 (second letter)"
+   13 "GE Cafe","Character 2 (second letter)"
+   14 "GE Monogram","Character 2 (second letter)"
+   15 "GE Profile","Character 2 (second letter)"
+   16 "Gibson","Character 3 (first digit after 2-letter factory code)"
+   17 "Hotpoint","Character 2 (second letter)"
+   18 "Inglis","Char 2 (9-digit) or Char 3 (10-digit)"
+   19 "Jenn-Air (post-2006)","Char 2 (9-digit) or Char 3 (10-digit)"
+   20 "Jenn-Air (pre-2006)","Second-to-last character of serial"
+   21 "Kelvinator","Character 3 (first digit after 2-letter factory
+      code)"
+   22 "Kenmore","See Group 1A for Whirlpool"
+   23 "KitchenAid","Char 3 (year code) + Char 4 (week)"
+   24 "LG","Character 1"
+   25 "Maytag (post-2006)","Char 2 (9-digit) or Char 3 (10-digit)"
+   26 "Maytag (pre-2006)","Second-to-last character of serial"
+   27 "RCA","Character 2 (second letter)"
+   28 "Roper","Char 3 (year code) + Char 4 (week)"
+   29 "Samsung","Char 8 (year code) + Char 9 (month)"
+   30 "Tappan","Character 3 (first digit after 2-letter factory code)"
+   31 "Thermador","FD digits 1-2 (first two numbers after FD)"
+   32 "Whirlpool","Char 3 (year code) + Char 4 (week)"
+   33 "White Consolidated Industries (WCI)","Character 3 (first digit
+      after 2-letter factory code)"
+   34 "White-Westinghouse","Character 3 (first digit after 2-letter
+      factory code)"
+
+  2. Water Heaters (water-heaters.csv)
+
+
+    1 "Brand","Decoding Method"
+    2 "A.O. Smith","Characters 3-4 (pre-2008 era)"
+    3 "American Water Heater Company","Characters 3-4 (pre-2008 era)"
+    4 "Aqua Therm","Characters 3-4 (Style 1)"
+    5 "Bradford White","Character 1"
+    6 "Cimarron","Characters 3-4 (Style 1)"
+    7 "Energy Master","Characters 3-4 (Style 1)"
+    8 "GE Water Heaters","Characters 3-4 (Style 1)"
+    9 "GSW","Characters 3-4 (pre-2008 era)"
+   10 "Intertherm/Miller","Characters 3-4 (Style 1)"
+   11 "Montgomery Ward","Characters 3-4 (Style 1)"
+   12 "Reliance Water Heaters","Characters 3-4 (pre-2008 era)"
+   13 "Rheem","Characters 3-4 (Style 1)"
+   14 "Richmond","Characters 3-4 (Style 1)"
+   15 "Ruud","Characters 3-4 (Style 1)"
+   16 "State Industries","Characters 3-4 (pre-2008 era)"
+   17 "U.S. Craftmaster","Characters 3-4 (pre-2008 era)"
+   18 "Vanguard","Characters 3-4 (Style 1)"
+   19 "Whirlpool Water Heaters","Characters 3-4 (pre-2008 era)"
+
+  3. HVAC (hvac.csv)
+
+
+    1 "Brand","Decoding Method"
+    2 "Amana","Digits 1-2 (year), digits 3-4 (month). Source:
+      Manufacturer Technical Specifications."
+    3 "American Standard","Digits 3-4 (year). Source: Manufacturer
+      Technical Specifications."
+    4 "Bryant","Digits 1-2 (week), digits 3-4 (year). Source:
+      Manufacturer Technical Specifications."
+    5 "Carrier","Digits 3-4 (year). Source: Manufacturer Technical
+      Specifications."
+    6 "Goodman","Digits 1-2 (year), digits 3-4 (month). Source:
+      Manufacturer Technical Specifications."
+    7 "Lennox","Digits 1-2 (week), digits 3-4 (year). Source:
+      Manufacturer Technical Specifications."
+    8 "Payne","Digits 1-2 (week), digits 3-4 (year). Source:
+      Manufacturer Technical Specifications."
+    9 "Rheem","4 digits following a letter (week + year). Source:
+      Manufacturer Technical Specifications."
+   10 "Ruud","4 digits following a letter (week + year). Source:
+      Manufacturer Technical Specifications."
+   11 "Trane","Digits 3-4 (year). Source: Manufacturer Technical
+      Specifications."
+   12 "York","Digits 1-2 (week), digits 3-4 (year). Source: Manufacturer
+      Technical Specifications."
+
+
+  4. Electronics (electronics.csv)
+
+
+    1 "Brand","Decoding Method"
+    2 "Apple","12-char serial: char 4 = Year, chars 5-6 = Week. 10-char
+      serial (post-2021): randomized."
+    3 "ASUS","Char 1 = Year (alpha code), char 2 = Month (1-9 = Jan-Sep,
+      A=Oct, B=Nov, C=Dec)."
+    4 "Google Pixel","Char 1 = Year last digit, chars 2-3 = Week number
+      (01-53)."
+    5 "HP","Char 4 = Year last digit, chars 5-6 = Week number (01-52)."
+    6 "LG Electronics","Character 1"
+    7 "Panasonic","Char 1 = Year last digit. Char 2 = Month or factory
+      code (mapping varies by product line)."
+    8 "Samsung (Phones & Tablets)","15-char serial: char 8 = Year.
+      Shorter serials: char 4 = Year. Next char = Month."
+    9 "Samsung Electronics","Char 8 (15-digit serial) or Char 4
+      (11-digit serial)"
+   10 "Sony","Last letter of MODEL number encodes year: H=2020, J=2021,
+      K=2022, L=2023, M=2024, N=2025."
+   11 "Vizio","Chars 4-5 = Year/Week code. Decoded using YYWW and WWYY
+      heuristics; verify with model info."
