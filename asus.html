@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <link rel="icon" type="image/svg+xml" href="/assets/favicon-bolt.svg?v=1">
@@ -7,7 +7,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ASUS Serial Number Decoder | Find ASUS Laptop & Motherboard Manufacture Date</title>
     <meta name="description" content="Decode your ASUS serial number to find the manufacture date and year. Covers ASUS laptops, desktops, and motherboards from 2010 onward. Free instant results.">
-    <link rel="canonical" href="https://www.boltresearchteam.com/asus.html">
+    <meta name="robots" content="noindex,follow">
+    <link rel="canonical" href="https://www.boltresearchteam.com/asus">
     <link rel="stylesheet" href="global.css">
     
 </head>
@@ -89,7 +90,7 @@
                 <div class="form-group era-group hidden" id="eraGroup">
                     <div class="step-label">
                         Manufacture Era
-                        <span class="info-icon" title="Manufacturer serial formats often repeat every 20 years; selecting the era ensures accuracy.">ⓘ</span>
+                        <span class="info-icon" title="Manufacturer serial formats often repeat every 20 years; selecting the era ensures accuracy.">â“˜</span>
                     </div>
                     <select id="eraSelect" class="form-select">
                         <option value="">-- Select Era --</option>
@@ -119,8 +120,8 @@
                         <input type="text" id="smart-lookup-input" class="form-input" placeholder="Search model number...">
                         <div class="helper-text">Enter a model number, brand + model, or description to estimate the age</div>
                     </div>
-                    <p class="alt-scope-note">&#128268; Works for appliances, water heaters, <strong>and electronics</strong> — TVs, computers, phones, and any brand not listed in the tabs above.</p>
-                    <p class="alt-disclaimer hidden">Note: Serial numbers are the most reliable way to date an item. This tool estimates age ranges using online research data—the more specific your info, the better the results. Keep in mind that general search terms may yield broader date ranges for long-running models.</p>
+                    <p class="alt-scope-note">&#128268; Works for appliances, water heaters, <strong>and electronics</strong> â€” TVs, computers, phones, and any brand not listed in the tabs above.</p>
+                    <p class="alt-disclaimer hidden">Note: Serial numbers are the most reliable way to date an item. This tool estimates age ranges using online research dataâ€”the more specific your info, the better the results. Keep in mind that general search terms may yield broader date ranges for long-running models.</p>
                     <button class="decode-btn" onclick="estimateAge()">Estimate Age</button>
                 </div>
             </div>
@@ -129,7 +130,7 @@
 <!-- Loading -->
 <div id="ageLoading" class="results-card hidden">
             <div class="loading-inner">
-                <span class="loading-emoji lightning" id="loadingEmoji">🌩️</span>
+                <span class="loading-emoji lightning" id="loadingEmoji">ðŸŒ©ï¸</span>
                 <div class="loading-text" id="loadingText">Researching product information...</div>
             </div>
         </div>
@@ -155,7 +156,7 @@
                 </div>
                 <div class="result-row">
                     <span class="result-label">Estimated Age</span>
-                    <span class="result-value" id="resultEstimatedAge">—</span>
+                    <span class="result-value" id="resultEstimatedAge">â€”</span>
                 </div>
                 <div class="info-block method">
                     <h4>Decoding Method</h4>
@@ -249,7 +250,7 @@
                     <h2>How ASUS Encodes Manufacture Dates</h2>
                     <p>ASUS serial numbers use a straightforward two-character date code at the start of the serial. The <strong>first character</strong> encodes the manufacture year using an alphabetic code, and the <strong>second character</strong> encodes the manufacture month.</p>
                     <p>The year code sequence runs A = 2010, B = 2011, C = 2012, and so on, <strong>skipping the letters I, O, and Q</strong> to avoid visual confusion with the digits 1, 0, and an ambiguous character. This means J = 2018, K = 2019, L = 2020, M = 2021, N = 2022, P = 2023, R = 2024, and S = 2025.</p>
-                    <p>The month code uses digits 1–9 for January through September, and the letters A, B, C for October, November, and December respectively. This compact encoding gives ASUS a clear, unambiguous manufacture date without any decade-cycling ambiguity — each year code maps to exactly one calendar year.</p>
+                    <p>The month code uses digits 1â€“9 for January through September, and the letters A, B, C for October, November, and December respectively. This compact encoding gives ASUS a clear, unambiguous manufacture date without any decade-cycling ambiguity â€” each year code maps to exactly one calendar year.</p>
                 </div>
 
                 <div class="static-section">
@@ -265,7 +266,7 @@
 
                 <div class="static-section">
                     <h2>Common Mistakes When Decoding ASUS Serials</h2>
-                    <p><strong>Confusing skipped letters.</strong> The ASUS year sequence skips I, O, and Q. If your first character is I or O, you are likely reading the wrong field — I is not a valid ASUS year code. Check that you are reading the serial number, not the product number.</p>
+                    <p><strong>Confusing skipped letters.</strong> The ASUS year sequence skips I, O, and Q. If your first character is I or O, you are likely reading the wrong field â€” I is not a valid ASUS year code. Check that you are reading the serial number, not the product number.</p>
                     <p><strong>Using the part number instead of the serial number.</strong> ASUS products often have both a serial number (S/N) and a part number or model number on the same label. The serial number for date decoding is the one in the S/N field, not the model code (e.g., UX3402ZA).</p>
                     <p><strong>Older products (pre-2010).</strong> Devices manufactured before 2010 may use a different or non-standardized serial format. If the first character does not appear in the year code table, use Smart Lookup for research.</p>
                 </div>
@@ -358,6 +359,7 @@
     </script>
     </body>
 </html>
+
 
 
 

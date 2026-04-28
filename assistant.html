@@ -1,14 +1,14 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <link rel="icon" type="image/svg+xml" href="/assets/favicon-bolt.svg?v=1">
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5946778263750869" crossorigin="anonymous"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bolt AI Assist — Item Research Tool</title>
-    <link rel="canonical" href="https://www.boltresearchteam.com/assistant.html">
+    <title>Bolt AI Assist â€” Item Research Tool</title>
+    <link rel="canonical" href="https://www.boltresearchteam.com/assistant">
     <meta name="description" content="Use Bolt AI Assist to research appliances, HVAC systems, electronics, and other technical items faster. Generate summaries, compare findings, and organize item research in one workspace.">
-    <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
+    <meta name="robots" content="noindex,follow">
     <meta property="og:type" content="website">
     <meta property="og:title" content="Bolt AI Assist">
     <meta property="og:description" content="AI-assisted technical item research for appliances, HVAC, electronics, and field documentation.">
@@ -90,7 +90,7 @@
         .nav-link.active { background: var(--accent); color: #000; font-weight: 600; }
         .nav-link.active:hover { background: var(--accent-hover); }
 
-        /* Content zone — fills remaining height */
+        /* Content zone â€” fills remaining height */
         .content-zone {
             background: #ffffff;
             border-radius: 24px 24px 0 0;
@@ -249,7 +249,7 @@
                                 <textarea
                                     id="assistant-input"
                                     class="assistant-input"
-                                    placeholder="Ask about any equipment, serial number, or insurance claim…"
+                                    placeholder="Ask about any equipment, serial number, or insurance claimâ€¦"
                                     rows="1"
                                     autocomplete="off"
                                 ></textarea>
@@ -286,14 +286,14 @@
     (function() {
         'use strict';
 
-        /* ── Constants ─────────────────────────────────────── */
+        /* â”€â”€ Constants â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
         var CONV_PREFIX   = 'bolt_conversation_';
         var SAVED_KEY     = 'bolt_saved_convs';
         var MAX_TOTAL     = 20;
         var MAX_RECENT_UI = 5;
         var MAX_SAVED_UI  = 3;
 
-        /* ── State ─────────────────────────────────────────── */
+        /* â”€â”€ State â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
         var history          = BoltChatService.loadHistory(); // current context segment
         var displayItems     = [];  // { type:'msg', msg:{} } | { type:'divider' }
         var isLoading        = false;
@@ -306,7 +306,7 @@
             displayItems.push({ type: 'msg', msg: msg });
         });
 
-        /* ── DOM refs ──────────────────────────────────────── */
+        /* â”€â”€ DOM refs â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
         var messagesEl         = document.getElementById('assistant-messages');
         var inputEl            = document.getElementById('assistant-input');
         var sendBtn            = document.getElementById('assistant-send');
@@ -326,7 +326,7 @@
         var convMobileToggle   = document.getElementById('conv-mobile-toggle');
         var convSidebarClose   = document.getElementById('conv-sidebar-close');
 
-        /* ── Storage helpers ───────────────────────────────── */
+        /* â”€â”€ Storage helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
         function getAllConvs() {
             var convs = [];
             for (var i = 0; i < localStorage.length; i++) {
@@ -368,7 +368,7 @@
             }
         }
 
-        /* ── Title generation (async, non-blocking) ────────── */
+        /* â”€â”€ Title generation (async, non-blocking) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
         function generateTitleAsync(messages, convId) {
             var titleHistory = messages.filter(function(m) { return m.role !== 'divider'; }).slice();
             titleHistory.push({
@@ -389,7 +389,7 @@
             }).catch(function() {});
         }
 
-        /* ── Save current segment to Recent ────────────────── */
+        /* â”€â”€ Save current segment to Recent â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
         function saveSegmentToRecent(messages) {
             if (!messages || messages.length === 0) return;
             var firstUserMsg = messages.find(function(m) { return m.role === 'user'; });
@@ -400,7 +400,7 @@
             generateTitleAsync(messages, id);
         }
 
-        /* ── Conv icon detection ───────────────────────────── */
+        /* â”€â”€ Conv icon detection â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
         function getConvIcon(messages) {
             var text = (messages || []).map(function(m) { return (m.text || '').toLowerCase(); }).join(' ');
             if (/serial|decode|manufactur/.test(text)) return '&#128269;';
@@ -409,7 +409,7 @@
             return '&#128172;';
         }
 
-        /* ── Relative time ─────────────────────────────────── */
+        /* â”€â”€ Relative time â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
         function relTime(ts) {
             var diff = Date.now() - ts;
             var day  = 86400000;
@@ -424,7 +424,7 @@
             return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
         }
 
-        /* ── Sidebar render ────────────────────────────────── */
+        /* â”€â”€ Sidebar render â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
         function renderSidebar() {
             var convs    = getAllConvs();
             var savedIds = getSavedIds();
@@ -476,7 +476,7 @@
             }
         }
 
-        /* ── Markdown / HTML helpers ───────────────────────── */
+        /* â”€â”€ Markdown / HTML helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
         function renderMarkdown(text) {
             if (typeof marked !== 'undefined') {
                 try { return marked.parse(text, { breaks: true, gfm: true }); } catch(_) {}
@@ -492,14 +492,14 @@
             return d.innerHTML.replace(/\n/g, '<br>');
         }
 
-        /* ── Message rendering ─────────────────────────────── */
+        /* â”€â”€ Message rendering â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
         function renderMessages() {
             if (displayItems.length === 0) {
                 messagesEl.innerHTML =
                     '<div class="assistant-welcome">' +
                     '  <div class="assistant-welcome-icon">&#9889;</div>' +
                     '  <h3>Bolt AI Assist</h3>' +
-                    '  <p>Ask me anything about equipment age, serial numbers, technical specifications, life expectancy, or replacement values — built for insurance professionals.</p>' +
+                    '  <p>Ask me anything about equipment age, serial numbers, technical specifications, life expectancy, or replacement values â€” built for insurance professionals.</p>' +
                     '</div>';
                 return;
             }
@@ -562,7 +562,7 @@
             if (el) el.parentNode.removeChild(el);
         }
 
-        /* ── Send ──────────────────────────────────────────── */
+        /* â”€â”€ Send â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
         async function send() {
             var text = (inputEl.value || '').trim();
             if (!text || isLoading || isViewingPast) return;
@@ -621,7 +621,7 @@
             inputEl.focus();
         }
 
-        /* ── New Chat ──────────────────────────────────────── */
+        /* â”€â”€ New Chat â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
         function startNewChat() {
             if (history.length > 0) {
                 saveSegmentToRecent(history.slice());
@@ -638,7 +638,7 @@
             inputEl.focus();
         }
 
-        /* ── Load past conversation ────────────────────────── */
+        /* â”€â”€ Load past conversation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
         function loadConversation(id) {
             var raw = localStorage.getItem(CONV_PREFIX + id);
             if (!raw) return;
@@ -676,11 +676,11 @@
             inputEl.disabled = disabled;
             sendBtn.disabled = disabled;
             inputEl.placeholder = disabled
-                ? 'Select "Resume This Chat" or "Start New Chat" to continue…'
-                : 'Ask about any equipment, serial number, or insurance claim…';
+                ? 'Select "Resume This Chat" or "Start New Chat" to continueâ€¦'
+                : 'Ask about any equipment, serial number, or insurance claimâ€¦';
         }
 
-        /* ── Resume past conversation ──────────────────────── */
+        /* â”€â”€ Resume past conversation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
         function resumeConversation() {
             if (!viewingConvId) return;
             var raw = localStorage.getItem(CONV_PREFIX + viewingConvId);
@@ -701,7 +701,7 @@
             } catch(e) {}
         }
 
-        /* ── Save / Unsave ─────────────────────────────────── */
+        /* â”€â”€ Save / Unsave â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
         var saveLimitTimer = null;
         function showSaveLimit() {
             var el = document.getElementById('conv-save-limit-msg');
@@ -731,7 +731,7 @@
             renderSidebar();
         }
 
-        /* ── Sidebar event delegation ───────────────────────── */
+        /* â”€â”€ Sidebar event delegation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
         function handleSidebarClick(e) {
             var btn = e.target.closest('[data-action]');
             if (btn) {
@@ -768,11 +768,11 @@
             }
         }
 
-        /* ── Mobile sidebar ────────────────────────────────── */
+        /* â”€â”€ Mobile sidebar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
         function openMobileSidebar()  { convSidebar.classList.add('conv-sidebar-open'); convOverlay.classList.add('conv-overlay-visible'); }
         function closeMobileSidebar() { convSidebar.classList.remove('conv-sidebar-open'); convOverlay.classList.remove('conv-overlay-visible'); }
 
-        /* ── Events ────────────────────────────────────────── */
+        /* â”€â”€ Events â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
         sendBtn.addEventListener('click', send);
 
         inputEl.addEventListener('keydown', function(e) {
@@ -827,7 +827,7 @@
             });
         });
 
-        /* ── Init ──────────────────────────────────────────── */
+        /* â”€â”€ Init â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
         renderMessages();
         renderSidebar();
         inputEl.focus();
@@ -847,3 +847,4 @@
     </script>
 </body>
 </html>
+

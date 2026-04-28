@@ -1,28 +1,26 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <link rel="icon" type="image/svg+xml" href="/assets/favicon-bolt.svg?v=1">
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5946778263750869" crossorigin="anonymous"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bolt — Item Research Tool</title>
+    <title>Item Research, Serial Number Lookup, and LKQ Replacement Tool for Insurance Claims</title>
     <link rel="canonical" href="https://www.boltresearchteam.com/">
-    <meta name="description" content="Research appliances, HVAC systems, electronics, and other items faster with Bolt. Use serial number decoding, age lookup, field references, and AI-assisted technical research in one place.">
+    <meta name="description" content="Use Bolt to verify item age, decode serial numbers, support LKQ replacement research, and document appliances, HVAC systems, electronics, and water heaters for insurance claims.">
     <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
     <meta property="og:type" content="website">
-    <meta property="og:title" content="Bolt Item Research Tool">
-    <meta property="og:description" content="Serial number decoder, age lookup, field references, and technical item research tools for appliances, HVAC, electronics, and more.">
+    <meta property="og:title" content="Item Research and Serial Number Lookup for Insurance Claims">
+    <meta property="og:description" content="Serial number lookup, age verification, LKQ replacement research, and item documentation tools for adjusters and claims professionals.">
     <meta property="og:url" content="https://www.boltresearchteam.com/">
     <meta property="og:image" content="https://www.boltresearchteam.com/assets/item-assist-banner.png">
     <meta property="og:site_name" content="Bolt">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Bolt Item Research Tool">
-    <meta name="twitter:description" content="Serial number decoder, age lookup, field references, and technical item research tools in one place.">
+    <meta name="twitter:title" content="Item Research and Serial Number Lookup for Insurance Claims">
+    <meta name="twitter:description" content="Use Bolt for serial number lookup, age verification, and LKQ replacement research across claim-driven equipment workflows.">
     <meta name="twitter:image" content="https://www.boltresearchteam.com/assets/item-assist-banner.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="shared.css">
-    <link rel="stylesheet" href="components/chat/bolt-chat.css">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -59,12 +57,12 @@
             line-height: 1.6;
         }
 
-        /* ── Decorative BG (hero area only) ── */
+        /* â”€â”€ Decorative BG (hero area only) â”€â”€ */
         .circuit-bg { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
         .circuit-bg::before { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent 49.5%, rgba(234,179,8,0.03) 49.5%, rgba(234,179,8,0.03) 50.5%, transparent 50.5%), linear-gradient(0deg, transparent 49.5%, rgba(234,179,8,0.03) 49.5%, rgba(234,179,8,0.03) 50.5%, transparent 50.5%); background-size: 60px 60px; }
         .circuit-bg::after { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 0%, rgba(234,179,8,0.05) 0%, transparent 55%); }
 
-        /* ── Mascot loader ── */
+        /* â”€â”€ Mascot loader â”€â”€ */
         @keyframes bounceBolt { 0%, 100% { transform: translate(-50%, -50%); } 50% { transform: translate(-50%, -70%); } }
         @keyframes pulse-glow { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
         .mascot-area { text-align: center; margin-bottom: 0.75rem; display: none; width: 100%; max-width: 660px; margin-left: auto; margin-right: auto; }
@@ -75,7 +73,7 @@
         .loader-text { color: rgba(255,255,255,0.78); font-style: italic; font-size: 0.9rem; display: none; }
         .loader-text.visible { display: block; animation: pulse-glow 2s ease-in-out infinite; }
 
-        /* ── Section filters ── */
+        /* â”€â”€ Section filters â”€â”€ */
         .section-filters { max-width: 700px; margin: 1rem auto 0; display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; justify-content: center; }
         .section-filters-label { font-size: 0.66rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: rgba(255,255,255,0.55); white-space: nowrap; flex-shrink: 0; }
         .section-filter-list { display: flex; flex-wrap: wrap; gap: 0.35rem; justify-content: center; }
@@ -84,7 +82,7 @@
         .section-filter-chip.is-checked { background: var(--accent-dim-dark); border-color: rgba(234,179,8,0.45); color: var(--text-white); }
         .section-filter-chip input[type="checkbox"] { width: 12px; height: 12px; accent-color: var(--accent); cursor: pointer; flex-shrink: 0; margin: 0; }
 
-        /* ── Search examples dropdown ── */
+        /* â”€â”€ Search examples dropdown â”€â”€ */
         .search-examples-dropdown { max-width: 700px; margin: 0.65rem auto 0; text-align: center; }
         .search-examples-toggle { background: none; border: none; cursor: pointer; font-family: inherit; font-size: 0.74rem; color: rgba(255,255,255,0.55); padding: 0.25rem 0.5rem; border-radius: 6px; display: inline-flex; align-items: center; gap: 0.35rem; transition: color 0.15s; }
         .search-examples-toggle:hover { color: rgba(255,255,255,0.85); }
@@ -94,10 +92,10 @@
         .search-examples-list.open { display: block; }
         .search-examples-list li button { width: 100%; text-align: left; background: none; border: none; border-bottom: 1px solid rgba(255,255,255,0.09); padding: 0.55rem 1rem; font-family: inherit; font-size: 0.8rem; color: rgba(255,255,255,0.85); cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: background 0.15s; }
         .search-examples-list li:last-child button { border-bottom: none; }
-        .search-examples-list li button::before { content: '→'; color: var(--accent); font-size: 0.7rem; flex-shrink: 0; }
+        .search-examples-list li button::before { content: 'â†’'; color: var(--accent); font-size: 0.7rem; flex-shrink: 0; }
         .search-examples-list li button:hover { background: rgba(255,255,255,0.09); color: var(--text-white); }
 
-        /* ── Results zone ── */
+        /* â”€â”€ Results zone â”€â”€ */
         .results-zone { background: #f1f5f9; border-radius: 24px 24px 0 0; padding: 2rem 2rem 3rem; min-height: 60vh; }
         .results-inner { max-width: 1100px; margin: 0 auto; }
         .results-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem; }
@@ -107,7 +105,7 @@
         .print-btn, .copy-btn { background: white; color: var(--text-mid); border: 1px solid var(--border-color); padding: 0.4rem 1rem; border-radius: 8px; font-size: 0.75rem; font-weight: 600; font-family: inherit; cursor: pointer; transition: all 0.2s; }
         .print-btn:hover, .copy-btn:hover { background: #f8fafc; border-color: var(--accent); color: var(--text-dark); }
 
-        /* ── Tab bar ── */
+        /* â”€â”€ Tab bar â”€â”€ */
         .tab-bar { display: flex; background: #e2e8f0; border-radius: 12px; padding: 3px; gap: 3px; margin-bottom: 1.25rem; overflow-x: auto; scrollbar-width: none; }
         .tab-bar::-webkit-scrollbar { display: none; }
         .tab-btn { flex: 1; min-width: max-content; border: none; background: transparent; padding: 0.45rem 0.9rem; border-radius: 9px; font-size: 0.75rem; font-weight: 600; font-family: inherit; cursor: pointer; color: var(--text-mid); transition: all 0.18s; white-space: nowrap; }
@@ -123,7 +121,7 @@
         #results.results-single-page #panel-overview > .card { grid-column: auto; margin-bottom: 1rem; }
         #results.results-single-page #panel-replacements,
         #results.results-single-page #panel-diagnostics { margin-top: 1rem; }
-        /* ── Overview panel grid ── */
+        /* â”€â”€ Overview panel grid â”€â”€ */
         #panel-overview.active { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
         #panel-overview > .metrics-strip,
         #panel-overview > #card-analysis { grid-column: 1 / -1; margin-bottom: 0.5rem; }
@@ -135,7 +133,7 @@
             #panel-overview > #card-analysis { margin-bottom: 0; }
         }
 
-        /* ── Metrics strip ── */
+        /* â”€â”€ Metrics strip â”€â”€ */
         .metrics-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
         @media (max-width: 640px) { .metrics-strip { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; } }
         .metric-card { background: white; border: 1px solid var(--border-color); border-radius: 14px; padding: 1rem 1.25rem; display: flex; flex-direction: column; gap: 0.3rem; box-shadow: 0 1px 3px rgba(0,0,0,0.04); min-height: 85px; justify-content: center; }
@@ -144,7 +142,7 @@
         .metric-value.acv { color: var(--green); }
         .metric-sub { font-size: 0.7rem; color: var(--text-muted-dark); }
 
-        /* ── Summary Modal ── */
+        /* â”€â”€ Summary Modal â”€â”€ */
         .summary-modal { position: fixed; inset: 0; z-index: 1000; background: #f1f5f9; overflow-y: auto; display: flex; flex-direction: column; }
         .summary-modal.hidden { display: none; }
         .summary-modal-bar { position: sticky; top: 0; z-index: 10; background: white; border-bottom: 1px solid var(--border-color); padding: 0.85rem 1.5rem; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
@@ -172,12 +170,12 @@
         .summary-toast.hidden { opacity: 0; }
         @media (max-width: 640px) { .summary-modal-body { padding: 1rem; } }
 
-        /* ── Tech expand button ── */
+        /* â”€â”€ Tech expand button â”€â”€ */
         .tech-expand-btn { display: inline-flex; align-items: center; gap: 0.35rem; margin-top: 0.75rem; background: none; border: 1px solid var(--border-color); border-radius: 8px; padding: 0.35rem 0.85rem; font-size: 0.78rem; font-weight: 600; font-family: inherit; color: var(--text-mid); cursor: pointer; transition: all 0.15s; }
         .tech-expand-btn:hover { border-color: var(--accent); color: var(--text-dark); background: var(--bg-card-alt); }
         .tech-extra-specs { margin-top: 0.25rem; }
 
-        /* ── Tier Badge ── */
+        /* â”€â”€ Tier Badge â”€â”€ */
         .tier-badge { display:inline-flex; align-items:center; padding:0.25rem 0.75rem; border-radius:999px; font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; }
         .tier-entry   { background:#e2e8f0; color:#475569; }
         .tier-mid     { background:#dbeafe; color:#1d4ed8; }
@@ -185,7 +183,7 @@
         .tier-premium { background:#fef3c7; color:#92400e; }
         .tier-luxury  { background:#1a202c; color:#eab308; }
 
-        /* ── Skeleton shimmer ── */
+        /* â”€â”€ Skeleton shimmer â”€â”€ */
         @keyframes skeleton-shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
         .skeleton-line { height:0.9rem; border-radius:6px; background:linear-gradient(90deg,#e2e8f0 25%,#f1f5f9 50%,#e2e8f0 75%); background-size:200% 100%; animation:skeleton-shimmer 1.4s infinite; margin-bottom:0.5rem; }
         .skeleton-line.short { width:40%; }
@@ -195,33 +193,33 @@
         .section-spinner::before { content:''; width:14px; height:14px; border:2px solid var(--border-color); border-top-color:var(--accent); border-radius:50%; animation:spin 0.8s linear infinite; flex-shrink:0; }
         @keyframes spin { to { transform:rotate(360deg); } }
 
-        /* ── MSRP two-value display ── */
+        /* â”€â”€ MSRP two-value display â”€â”€ */
         .msrp-pair { display:flex; flex-direction:column; gap:0.2rem; }
         .msrp-label { font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-muted-dark); }
         .msrp-value { font-size:0.88rem; color:var(--text-dark); font-weight:600; }
         .msrp-note  { font-size:0.75rem; color:var(--text-muted-dark); font-style:italic; }
 
-        /* ── ACV step breakdown ── */
+        /* â”€â”€ ACV step breakdown â”€â”€ */
         .acv-steps { font-size:0.82rem; color:var(--text-muted-dark); font-family:monospace; background:var(--bg-card-alt); padding:0.6rem 0.75rem; border-radius:8px; margin-top:0.5rem; line-height:1.8; white-space:pre-line; }
 
-        /* ── Refine tip ── */
+        /* â”€â”€ Refine tip â”€â”€ */
         .refine-tip { background:#f0f9ff; border:1px solid #bae6fd; border-radius:10px; padding:0.875rem 1rem; margin-top:1rem; font-size:0.85rem; color:#0c4a6e; }
         .refine-tip strong { font-weight:700; }
         .chip-btn { margin-right:0.4rem; margin-top:0.4rem; border-radius:999px; }
 
-        /* ── Top spec pills ── */
+        /* â”€â”€ Top spec pills â”€â”€ */
         .quick-spec-pills { display:flex; flex-wrap:wrap; gap:0.4rem; margin:0.75rem 0 0.25rem; }
         .quick-spec-pill { background:var(--bg-card-alt); border:1px solid var(--border-color); border-radius:8px; padding:0.3rem 0.65rem; font-size:0.78rem; color:var(--text-mid); }
         .quick-spec-pill strong { color:var(--text-dark); font-weight:600; }
 
-        /* ── Cards ── */
+        /* â”€â”€ Cards â”€â”€ */
         .card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 1.25rem 1.5rem; margin-bottom: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02); }
         .card-title { font-size: 0.95rem; font-weight: 700; color: var(--text-dark); margin-bottom: 0.85rem; padding-bottom: 0.6rem; border-bottom: 2px solid var(--accent-dim); display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
         .card-title .title-icon { color: var(--accent); font-size: 1.1rem; }
         .card-title .title-number { background: var(--accent); color: #000; width: 22px; height: 22px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 800; flex-shrink: 0; }
         .card-accent-stripe { height: 3px; background: linear-gradient(90deg, var(--accent), var(--blue), var(--accent)); border-radius: 3px; margin-bottom: 0.85rem; opacity: 0.6; }
 
-        /* ── Report text styles ── */
+        /* â”€â”€ Report text styles â”€â”€ */
         .report-overview { font-size: 0.85rem; color: var(--text-mid); line-height: 1.7; margin-bottom: 1rem; }
         .report-list { list-style: none; padding: 0; margin: 0; }
         .report-list li { padding: 0.4rem 0; font-size: 0.85rem; color: var(--text-mid); line-height: 1.6; border-bottom: 1px solid #f1f5f9; display: flex; align-items: baseline; gap: 0.5rem; }
@@ -229,7 +227,7 @@
         .report-list li::before { content: '\2022'; color: var(--accent); font-weight: 700; flex-shrink: 0; }
         .report-list .label { font-weight: 700; color: var(--text-dark); white-space: nowrap; }
         .report-list .label::after { content: ':'; }
-        /* ── Serial decode widget ── */
+        /* â”€â”€ Serial decode widget â”€â”€ */
         .report-list .sn-li::before { content: none; }
         .sn-ctrl { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; flex: 1; min-width: 0; }
         #sn-input { flex: 1; min-width: 140px; padding: 0.32rem 0.6rem; font-size: 0.82rem; font-family: inherit; border: 1px solid var(--border-color); border-radius: 6px; outline: none; color: var(--text-dark); background: #fff; transition: border-color 0.15s; }
@@ -244,7 +242,7 @@
         .sn-detail { font-size: 0.78rem; color: var(--text-mid); margin-left: 0.4rem; }
         .section-subtitle { font-size: 0.88rem; font-weight: 700; color: var(--text-dark); margin: 1.25rem 0 0.6rem; padding-bottom: 0.3rem; border-bottom: 1px solid var(--border-color); }
 
-        /* ── Estimation Banner ── */
+        /* â”€â”€ Estimation Banner â”€â”€ */
         .estimation-banner { background: #fef9c3; border: 1px solid #fde68a; border-left: 4px solid #f59e0b; border-radius: 10px; padding: 0.75rem 1rem; margin-bottom: 1rem; color: #92400e; font-size: 0.82rem; line-height: 1.5; display: flex; align-items: flex-start; gap: 0.5rem; }
         .estimation-banner .banner-icon { font-size: 1.1rem; flex-shrink: 0; }
 
@@ -256,7 +254,7 @@
         .advisory-tips { margin-top: 0.5rem; padding-left: 1rem; font-size: 0.75rem; color: #b45309; }
         .advisory-tips li { margin-bottom: 0.2rem; }
 
-        /* ── Valuation interactive ── */
+        /* â”€â”€ Valuation interactive â”€â”€ */
         .acv-value { color: var(--green); font-weight: 700; font-size: 1rem; }
         .acv-formula { font-style: italic; color: var(--text-muted-dark); font-size: 0.78rem; }
         .age-input-row { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem; flex-wrap: wrap; }
@@ -266,7 +264,7 @@
         .recalc-btn { background: var(--accent); color: #000; border: none; padding: 0.3rem 0.75rem; border-radius: 6px; font-size: 0.75rem; font-weight: 700; font-family: inherit; cursor: pointer; transition: background 0.2s; }
         .recalc-btn:hover { background: var(--accent-hover); }
 
-        /* ── Error Codes ── */
+        /* â”€â”€ Error Codes â”€â”€ */
         .error-codes-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
         .error-codes-table th { background: var(--bg-card-alt); color: var(--text-muted-dark); font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; padding: 0.4rem 0.6rem; text-align: left; border-bottom: 1px solid var(--border-color); }
         .error-codes-table td { padding: 0.4rem 0.6rem; border-bottom: 1px solid #f1f5f9; color: var(--text-mid); }
@@ -279,10 +277,10 @@
         .lkq-title { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted-dark); margin-bottom: 0.5rem; }
         .lkq-spec-list { list-style: none; padding: 0; margin: 0; }
         .lkq-spec-list li { font-size: 0.82rem; color: var(--text-mid); padding: 0.2rem 0; display: flex; align-items: baseline; gap: 0.4rem; }
-        .lkq-spec-list li::before { content: '✓'; color: var(--green); font-weight: 700; flex-shrink: 0; }
+        .lkq-spec-list li::before { content: 'âœ“'; color: var(--green); font-weight: 700; flex-shrink: 0; }
         .lkq-spec-list.variation li::before { content: '~'; color: var(--blue); }
 
-        /* ── Failures list ── */
+        /* â”€â”€ Failures list â”€â”€ */
         .failures-list { list-style: none; padding: 0; }
         .failures-list li { padding: 0.6rem 0; border-bottom: 1px solid #f1f5f9; font-size: 0.82rem; }
         .failures-list li:last-child { border-bottom: none; }
@@ -290,7 +288,7 @@
         .failures-detail { color: var(--text-mid); margin-top: 0.15rem; }
         .failures-symptoms { color: var(--text-muted-dark); font-size: 0.78rem; font-style: italic; margin-top: 0.1rem; }
 
-        /* ── Troubleshooting ── */
+        /* â”€â”€ Troubleshooting â”€â”€ */
         .troubleshoot-steps { list-style: none; padding: 0; counter-reset: step; }
         .troubleshoot-steps li { counter-increment: step; padding: 0.5rem 0 0.5rem 2rem; border-bottom: 1px solid #f1f5f9; font-size: 0.82rem; color: var(--text-mid); position: relative; }
         .troubleshoot-steps li:last-child { border-bottom: none; }
@@ -299,7 +297,7 @@
         .repair-link { display: inline-flex; align-items: center; gap: 0.3rem; background: var(--blue-light); color: #1d4ed8; padding: 0.35rem 0.75rem; border-radius: 999px; font-size: 0.72rem; font-weight: 700; text-decoration: none; border: 1px solid rgba(59,130,246,0.2); transition: all 0.2s; }
         .repair-link:hover { background: #bfdbfe; }
 
-        /* ── Repair Parts ── */
+        /* â”€â”€ Repair Parts â”€â”€ */
         .parts-list { list-style: none; padding: 0; }
         .part-item { padding: 0.65rem 0; border-bottom: 1px solid #f1f5f9; }
         .part-item:last-child { border-bottom: none; }
@@ -315,7 +313,7 @@
         .parts-footer-link:hover { text-decoration: underline; }
         .parts-available-note { font-size: 0.78rem; color: #1d4ed8; background: var(--blue-light); border: 1px solid rgba(59,130,246,0.2); border-radius: 6px; padding: 0.35rem 0.7rem; margin-top: 0.5rem; display: inline-block; }
 
-        /* ── Recalls list ── */
+        /* â”€â”€ Recalls list â”€â”€ */
         .recalls-list { list-style: none; padding: 0; }
         .recalls-list li { padding: 0.6rem 0; border-bottom: 1px solid #f1f5f9; font-size: 0.82rem; }
         .recalls-list li:last-child { border-bottom: none; }
@@ -325,14 +323,14 @@
         .recall-link { color: var(--blue); text-decoration: none; font-size: 0.78rem; font-weight: 600; }
         .recall-link:hover { text-decoration: underline; }
 
-        /* ── Manufacturer / Manual links ── */
+        /* â”€â”€ Manufacturer / Manual links â”€â”€ */
         .mfr-links { display: flex; flex-direction: column; gap: 0.5rem; }
         .mfr-link-item { display: flex; align-items: center; gap: 0.75rem; background: var(--bg-card-alt); border-radius: 8px; padding: 0.65rem 0.9rem; }
         .mfr-link-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted-dark); min-width: 90px; }
         .mfr-link-a { color: var(--blue); text-decoration: none; font-size: 0.82rem; font-weight: 600; }
         .mfr-link-a:hover { text-decoration: underline; }
 
-        /* ── Table (replacement) ── */
+        /* â”€â”€ Table (replacement) â”€â”€ */
         .data-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
         .data-table th { background: var(--bg-card-alt); color: var(--text-muted-dark); font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; padding: 0.55rem 0.65rem; text-align: left; border-bottom: 2px solid var(--border-color); }
         .data-table th.highlight { color: var(--accent); }
@@ -342,16 +340,16 @@
         .data-table td:first-child { font-weight: 600; color: var(--text-dark); background: var(--bg-card-alt); white-space: nowrap; }
         .data-table td.brand-match { color: #92400e; font-weight: 600; background: #fef9c3; }
         .retailer-links a { color: var(--blue); text-decoration: none; font-weight: 600; font-size: 0.78rem; }
-        .retailer-links a:not(:last-child)::after { content: ' · '; color: var(--text-muted-dark); font-weight: 400; }
+        .retailer-links a:not(:last-child)::after { content: ' Â· '; color: var(--text-muted-dark); font-weight: 400; }
         .retailer-links a:hover { text-decoration: underline; }
         .model-link { color: var(--blue); text-decoration: underline; font-weight: 700; cursor: pointer; }
         .model-link:hover { color: #1d4ed8; }
         .model-link::after { content: ' \2197'; font-size: 0.75em; font-weight: 400; opacity: 0.75; }
 
-        /* ── How It Works card ── */
+        /* â”€â”€ How It Works card â”€â”€ */
         .how-it-works-text { font-size: 0.85rem; color: var(--text-mid); line-height: 1.7; }
 
-        /* ── None found state ── */
+        /* â”€â”€ None found state â”€â”€ */
         .none-found { color: var(--text-muted-dark); font-style: italic; font-size: 0.82rem; padding: 0.5rem 0; }
 
         .hidden { display: none !important; }
@@ -359,7 +357,7 @@
         .collapse-btn { width: 100%; padding: 0.75rem; background: #f1f5f9; border: none; border-radius: 8px; color: var(--text-mid); font-size: 0.8rem; font-weight: 700; cursor: pointer; margin-top: 1rem; transition: background 0.2s; }
         .collapse-btn:hover { background: #e2e8f0; }
 
-        /* ── Variations ── */
+        /* â”€â”€ Variations â”€â”€ */
         .variations-section { margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--border-color); }
         .variations-label { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-muted-dark); margin-bottom: 0.5rem; }
         .variation-chips { display: flex; flex-wrap: wrap; gap: 0.4rem; }
@@ -369,11 +367,11 @@
         .variation-chip-note { font-size: 0.68rem; color: var(--text-muted-dark); margin-top: 0.2rem; line-height: 1.4; max-width: 18rem; }
         @media (max-width: 600px) { .variation-chip { width: 100%; } .variation-chip-note { max-width: 100%; } }
 
-        /* ── Table note ── */
+        /* â”€â”€ Table note â”€â”€ */
         .table-note { background:#fffbeb; border:1px solid #fde68a; border-radius:8px; padding:0.65rem 0.9rem; margin-bottom:0.75rem; font-size:0.8rem; color:#92400e; }
         .table-note strong { font-weight:700; }
 
-        /* ── What to Consider ── */
+        /* â”€â”€ What to Consider â”€â”€ */
         .wtc-box { border-radius:8px; padding:0.85rem 1rem; margin-bottom:0.75rem; }
         .wtc-specific { background:#f0fdf4; border:1px solid #bbf7d0; }
         .wtc-general { background:#eff6ff; border:1px solid #bfdbfe; }
@@ -384,22 +382,22 @@
         .wtc-list li { margin-bottom:0.25rem; }
         .wtc-note { margin-top:0.55rem; font-size:0.78rem; color:#92400e; background:#fffbeb; border:1px solid #fde68a; border-radius:6px; padding:0.4rem 0.6rem; }
 
-        /* ── Narrow Your Results ── */
+        /* â”€â”€ Narrow Your Results â”€â”€ */
         .narrow-results { background:#f0f9ff; border:1px solid #bae6fd; border-radius:10px; padding:0.875rem 1rem; margin-top:1.25rem; }
         .narrow-results-header { display:flex; align-items:center; gap:0.5rem; font-size:0.82rem; font-weight:700; color:#0c4a6e; margin-bottom:0.4rem; }
         .narrow-results p { font-size:0.82rem; color:#0c4a6e; line-height:1.6; margin:0; }
 
-        /* ── Model number hint ── */
+        /* â”€â”€ Model number hint â”€â”€ */
         .model-number-hint { display: flex; align-items: center; gap: 0.6rem; background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 10px; padding: 0.65rem 1rem; margin-bottom: 0.75rem; font-size: 0.82rem; color: #0c4a6e; }
         .model-number-hint .hint-icon { font-size: 1rem; flex-shrink: 0; }
 
-        /* ── Panel bottom navigation ── */
+        /* â”€â”€ Panel bottom navigation â”€â”€ */
         .panel-nav { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; padding: 1.25rem 0 0; border-top: 1px solid var(--border-color); margin-top: 1.25rem; }
         .panel-nav-label { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-muted-dark); flex-shrink: 0; margin-right: 0.25rem; }
         .panel-nav-btn { background: white; border: 1px solid var(--border-color); border-radius: 999px; padding: 0.35rem 0.9rem; font-size: 0.75rem; font-weight: 600; font-family: inherit; color: var(--text-mid); cursor: pointer; transition: border-color 0.15s, color 0.15s, background 0.15s; }
         .panel-nav-btn:hover { border-color: var(--accent); color: var(--text-dark); background: var(--accent-dim); }
 
-        /* ── Compare Replacement Option Tool ── */
+        /* â”€â”€ Compare Replacement Option Tool â”€â”€ */
         .compare-trigger-row { margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid var(--border-color); }
         .compare-toggle-btn { background: #fff; border: 1.5px solid var(--accent); border-radius: 999px; padding: 0.5rem 1.2rem; font-size: 0.81rem; font-weight: 600; color: #92400e; cursor: pointer; font-family: inherit; transition: background 0.15s, box-shadow 0.15s; }
         .compare-toggle-btn:hover { background: var(--accent-dim); box-shadow: 0 2px 8px rgba(234,179,8,0.2); }
@@ -442,14 +440,14 @@
 
         /* Tier comparison indicators */
         .tier-indicator { font-size: 0.68rem; font-weight: 700; margin-top: 0.2rem; display: flex; align-items: center; gap: 0.3rem; }
-        .tier-lower  { color: #16a34a; } /* Green as per prompt: "Display a green indicator: ✔ Luxury is greater than Average" */
+        .tier-lower  { color: #16a34a; } /* Green as per prompt: "Display a green indicator: âœ” Luxury is greater than Average" */
         .tier-equal  { color: #16a34a; }
         .tier-higher { color: #16a34a; }
         
         /* Config disclaimer */
         .config-disclaimer { font-size: 0.72rem; color: var(--text-muted-dark); font-style: italic; margin-top: 0.4rem; line-height: 1.4; font-weight: 400; }
 
-        /* ── Tiered table columns ── */
+        /* â”€â”€ Tiered table columns â”€â”€ */
         .tier-col-badge { display:inline-block; padding:0.15rem 0.5rem; border-radius:999px; font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.04em; margin-bottom:0.15rem; }
         .tier-col-entry  { background:#e2e8f0; color:#475569; }
         .tier-col-mid    { background:#dbeafe; color:#1d4ed8; }
@@ -458,11 +456,11 @@
         .data-table th.tier-mid-col   { background:#eff6ff; }
         .data-table th.tier-premium-col { background:#fffbeb; }
 
-        /* ═══════════════════════════════════════════════════════════════
+        /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
            HOMEPAGE / MARKETING SECTIONS
-        ═══════════════════════════════════════════════════════════════ */
+        â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 
-        /* ── Nav ── */
+        /* â”€â”€ Nav â”€â”€ */
         .brt-nav { background: #0d1220; border-bottom: 1px solid #1e2a45; padding: 14px 48px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
         .brt-nav-left { display: flex; align-items: center; gap: 12px; }
         .brt-nav-logo { font-size: 20px; font-weight: 800; color: #fff; white-space: nowrap; }
@@ -477,7 +475,7 @@
         .brt-hamburger { display: none; background: none; border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; padding: 6px 10px; cursor: pointer; flex-direction: column; gap: 4px; }
         .brt-hamburger span { display: block; width: 18px; height: 2px; background: rgba(255,255,255,0.8); border-radius: 2px; transition: all 0.2s; }
 
-        /* ── Hero ── */
+        /* â”€â”€ Hero â”€â”€ */
         .brt-hero { background: linear-gradient(135deg, #0d1220 0%, #0f1e3a 50%, #0d1220 100%); padding: 80px 48px 70px; text-align: center; border-bottom: 1px solid #1e2a45; position: relative; z-index: 1; }
         .brt-hero-inner { max-width: 780px; margin: 0 auto; }
         .brt-hero-badge { display: inline-block; background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.3); color: #f59e0b; font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; padding: 6px 16px; border-radius: 20px; margin-bottom: 22px; }
@@ -485,7 +483,7 @@
         .brt-hero-h1 span { color: #f59e0b; }
         .brt-hero-p { font-size: 17px; color: rgba(255,255,255,0.72); max-width: 620px; margin: 0 auto 36px; line-height: 1.7; }
 
-        /* ── Hero search bar ── */
+        /* â”€â”€ Hero search bar â”€â”€ */
         .brt-search-wrapper { max-width: 660px; margin: 0 auto 10px; display: flex; align-items: center; gap: 8px; }
         .brt-search-bar { flex: 1; min-width: 0; padding: 18px 22px; background: rgba(255,255,255,0.07); border: 1.5px solid #2d3f60; border-radius: 12px; font-size: 15px; color: #fff; font-family: inherit; outline: none; transition: border-color 0.2s; }
         .brt-search-bar::placeholder { color: rgba(255,255,255,0.38); }
@@ -508,7 +506,7 @@
         .report-type-chip:hover { color: rgba(255,255,255,0.9); }
         .report-type-chip input[type="checkbox"] { accent-color: #f59e0b; width: 15px; height: 15px; cursor: pointer; }
 
-        /* ── Disambiguation screen ── */
+        /* â”€â”€ Disambiguation screen â”€â”€ */
         .disambig-card { text-align: center; }
         .disambig-sub { font-size: 0.88rem; color: var(--text-mid); margin: 0.5rem 0 1.25rem; line-height: 1.55; }
         .disambig-options { display: flex; flex-direction: column; gap: 0.6rem; max-width: 560px; margin: 0 auto; }
@@ -520,27 +518,27 @@
         .disambig-btn-unknown .disambig-btn-label { color: var(--text-mid); }
         .assumed-model-notice { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 10px; padding: 0.7rem 1rem; font-size: 0.85rem; color: #1e40af; margin-bottom: 1rem; display: flex; align-items: flex-start; gap: 0.5rem; }
 
-        /* ── Example pills ── */
+        /* â”€â”€ Example pills â”€â”€ */
         .brt-example-pills { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 10px; }
         .brt-example-pill { background: rgba(255,255,255,0.06); border: 1px solid #2d3f60; color: rgba(255,255,255,0.78); font-size: 12px; padding: 5px 14px; border-radius: 20px; cursor: pointer; font-family: inherit; transition: border-color 0.15s, color 0.15s; }
         .brt-example-pill:hover { border-color: #f59e0b; color: #f59e0b; }
 
-        /* ── Search hint ── */
+        /* â”€â”€ Search hint â”€â”€ */
         .brt-search-hint { font-size: 11px; color: rgba(255,255,255,0.42); margin-bottom: 0; }
 
-        /* ── Trust Strip ── */
+        /* â”€â”€ Trust Strip â”€â”€ */
         .brt-trust-strip { background: #0d1220; border-bottom: 1px solid #1e2a45; padding: 16px 48px; display: flex; justify-content: center; gap: 40px; align-items: center; flex-wrap: wrap; }
         .brt-trust-item { display: flex; align-items: center; gap: 8px; color: #94a3b8; font-size: 13px; font-weight: 500; }
         .brt-trust-item strong { color: #cbd5e1; }
 
-        /* ── Shared section wrapper ── */
+        /* â”€â”€ Shared section wrapper â”€â”€ */
         .brt-section { padding: 72px 48px; max-width: 1200px; margin: 0 auto; }
         .brt-section-label { text-transform: uppercase; letter-spacing: 2px; font-size: 11px; font-weight: 700; color: #f59e0b; margin-bottom: 10px; }
         .brt-section-title { font-size: 32px; font-weight: 800; color: #fff; margin-bottom: 12px; letter-spacing: -0.3px; }
         .brt-section-sub { font-size: 15px; color: #94a3b8; max-width: 540px; line-height: 1.7; margin-bottom: 44px; }
         .brt-divider { border: none; border-top: 1px solid #1e2a45; }
 
-        /* ── Coverage grid ── */
+        /* â”€â”€ Coverage grid â”€â”€ */
         .brt-categories-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
         .brt-cat-card { background: #111827; border: 1px solid #1e2a45; border-radius: 12px; padding: 22px 18px; text-align: center; transition: border-color 0.2s; }
         .brt-cat-card:hover { border-color: #f59e0b; }
@@ -548,7 +546,7 @@
         .brt-cat-card h3 { font-size: 13px; font-weight: 700; color: #e2e8f0; margin-bottom: 5px; }
         .brt-cat-card p { font-size: 12px; color: #94a3b8; line-height: 1.5; }
 
-        /* ── Sample report section ── */
+        /* â”€â”€ Sample report section â”€â”€ */
         .brt-sample-section { background: #0d1220; border-top: 1px solid #1e2a45; border-bottom: 1px solid #1e2a45; padding: 72px 48px; }
         .brt-sample-inner { max-width: 1200px; margin: 0 auto; }
         .brt-sample-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; }
@@ -585,7 +583,7 @@
         .brt-report-footer span { font-size: 11px; color: #94a3b8; }
         .brt-pdf-btn { font-size: 11px; background: #1e2a45; color: #94a3b8; padding: 5px 12px; border-radius: 6px; font-weight: 600; border: none; cursor: default; }
 
-        /* ── How It Works ── */
+        /* â”€â”€ How It Works â”€â”€ */
         .brt-how-section { padding: 72px 48px; max-width: 1200px; margin: 0 auto; }
         .brt-how-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
         .brt-how-card { background: #111827; border: 1px solid #1e2a45; border-radius: 12px; padding: 30px 26px; }
@@ -594,7 +592,7 @@
         .brt-how-card h3 { font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 9px; }
         .brt-how-card p { font-size: 13px; color: #94a3b8; line-height: 1.7; }
 
-        /* ── Report Breakdown ── */
+        /* â”€â”€ Report Breakdown â”€â”€ */
         .brt-breakdown-section { background: #0d1220; border-top: 1px solid #1e2a45; border-bottom: 1px solid #1e2a45; padding: 72px 48px; }
         .brt-breakdown-inner { max-width: 1200px; margin: 0 auto; }
         .brt-breakdown-sub { font-size: 15px; color: #94a3b8; max-width: 540px; line-height: 1.7; margin-bottom: 36px; }
@@ -605,14 +603,14 @@
         .brt-breakdown-text h4 { font-size: 13px; font-weight: 700; color: #e2e8f0; margin-bottom: 4px; }
         .brt-breakdown-text p { font-size: 12px; color: #94a3b8; line-height: 1.5; }
 
-        /* ── Bottom CTA ── */
+        /* â”€â”€ Bottom CTA â”€â”€ */
         .brt-cta-section { text-align: center; padding: 80px 48px; max-width: 720px; margin: 0 auto; }
         .brt-cta-section h2 { font-size: 34px; font-weight: 800; color: #fff; margin-bottom: 14px; letter-spacing: -0.3px; }
         .brt-cta-section p { font-size: 16px; color: #94a3b8; margin-bottom: 32px; line-height: 1.7; }
         .brt-cta-search-wrap { display: flex; align-items: center; gap: 8px; max-width: 580px; margin: 0 auto; }
         .brt-cta-search-wrap .brt-search-bar { flex: 1; min-width: 0; }
 
-        /* ── Footer ── */
+        /* â”€â”€ Footer â”€â”€ */
         .brt-footer-new { background: #0a0e1a; border-top: 1px solid #1e2a45; padding: 22px 48px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
         .brt-footer-new p { font-size: 12px; color: #64748b; }
         .brt-footer-links { display: flex; gap: 20px; flex-wrap: wrap; }
@@ -622,10 +620,10 @@
         .brt-guide-links a { font-size: 12px; color: #94a3b8; text-decoration: none; }
         .brt-guide-links a:hover { color: #cbd5e1; }
 
-        /* ── Hide homepage sections when results are visible ── */
+        /* â”€â”€ Hide homepage sections when results are visible â”€â”€ */
         #results:not(.hidden) ~ #homepage-sections { display: none; }
 
-        /* ── Print ── */
+        /* â”€â”€ Print â”€â”€ */
         @media print {
             .no-print { display: none !important; }
             body { background: white !important; color: #000 !important; }
@@ -638,7 +636,7 @@
             .metrics-strip { display: none !important; }
         }
 
-        /* ── Mobile responsive ── */
+        /* â”€â”€ Mobile responsive â”€â”€ */
         @media (max-width: 1024px) {
             .brt-categories-grid { grid-template-columns: repeat(2, 1fr); }
             .brt-breakdown-grid { grid-template-columns: repeat(2, 1fr); }
@@ -702,34 +700,34 @@
             .disambig-options { gap: 0.5rem; }
         }
 
-        /* ── Main tab bar (Item Research / Diagnostics) ── */
+        /* â”€â”€ Main tab bar (Item Research / Diagnostics) â”€â”€ */
         .res-main-tab-bar { display: flex; background: #e2e8f0; border-radius: 12px; padding: 3px; gap: 3px; margin-bottom: 1.25rem; }
         .res-main-tab { flex: 1; border: none; background: transparent; padding: 0.5rem 1rem; border-radius: 9px; font-size: 0.82rem; font-weight: 600; font-family: inherit; cursor: pointer; color: var(--text-mid); transition: all 0.18s; }
         .res-main-tab.active { background: white; color: var(--text-dark); box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
         .res-main-tab:hover:not(.active) { color: var(--text-dark); background: rgba(255,255,255,0.5); }
 
-        /* ── Res panels ── */
+        /* â”€â”€ Res panels â”€â”€ */
         .res-panel { display: block; }
         .res-panel.hidden { display: none; }
 
-        /* ── Res cards ── */
+        /* â”€â”€ Res cards â”€â”€ */
         .res-card { margin-bottom: 1.25rem; }
         .res-card-hdr { cursor: default; }
 
-        /* ── Skeleton placeholders in cards ── */
+        /* â”€â”€ Skeleton placeholders in cards â”€â”€ */
         .skel-1, .skel-2, .skel-3 { padding: 0.5rem 0; }
 
-        /* ── On-demand prompt ── */
+        /* â”€â”€ On-demand prompt â”€â”€ */
         .ondemand-prompt { text-align: center; padding: 2rem 1rem; }
         .ondemand-prompt p { font-size: 0.88rem; color: var(--text-mid); margin-bottom: 1rem; }
         .ondemand-btn { background: var(--accent); color: #000; border: none; border-radius: 10px; padding: 0.75rem 1.75rem; font-size: 0.88rem; font-weight: 700; font-family: inherit; cursor: pointer; transition: background 0.2s; }
         .ondemand-btn:hover { background: var(--accent-hover); }
 
-        /* ── Diagnostics placeholder ── */
+        /* â”€â”€ Diagnostics placeholder â”€â”€ */
         .diag-placeholder { text-align: center; padding: 3rem 1rem; background: white; border: 1px solid var(--border-color); border-radius: 14px; margin-bottom: 1.25rem; }
         .diag-placeholder p { font-size: 0.88rem; color: var(--text-mid); margin-bottom: 1rem; }
 
-        /* ── Mobile tweaks for new layout ── */
+        /* â”€â”€ Mobile tweaks for new layout â”€â”€ */
         @media (max-width: 600px) {
             .res-main-tab { font-size: 0.72rem; padding: 0.4rem 0.5rem; }
         }
@@ -738,39 +736,38 @@
 <body>
     <div class="circuit-bg"></div>
 
-    <!-- ════════════════════════════════════════════════════════════
+    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
          NAVIGATION
-    ════════════════════════════════════════════════════════════ -->
+    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
     <nav class="brt-nav no-print">
         <div class="brt-nav-left">
             <div class="brt-nav-logo">Bolt <span class="brt-bolt-color">&#9889;</span></div>
-            <span class="brt-nav-tagline">Intuitive Data Aggregation</span>
+            <span class="brt-nav-tagline">Claim-Ready Item Research</span>
         </div>
         <button class="brt-hamburger" id="brt-hamburger" aria-label="Toggle menu" aria-expanded="false">
             <span></span><span></span><span></span>
         </button>
         <div class="brt-nav-links-wrap" id="brt-nav-links">
-            <a href="item-age.html" class="brt-nav-link">Serial Number Decoder</a>
-            <a href="field-reference.html" class="brt-nav-link">Field Reference</a>
-            <a href="why-bolt.html" class="brt-nav-link">Why Bolt?</a>
-            <a href="assistant.html" class="brt-nav-link">Bolt AI</a>
-            <a href="feedback.html" class="brt-nav-link">Feedback &amp; Bugs</a>
+            <a href="/category/appliances" class="brt-nav-link">Appliance Age Verification</a>
+            <a href="/category/hvac" class="brt-nav-link">HVAC Serial Number Decoder</a>
+            <a href="/serial/ge-serial-number-lookup" class="brt-nav-link">GE Serial Number Lookup</a>
+            <a href="/brand/rheem" class="brt-nav-link">Rheem Claim Research</a>
             <button id="nav-cta-btn" class="brt-nav-cta">Start Searching</button>
         </div>
     </nav>
 
-    <!-- ════════════════════════════════════════════════════════════
+    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
          HERO SECTION
-    ════════════════════════════════════════════════════════════ -->
+    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
     <div class="brt-hero no-print" id="hero-section">
         <div class="brt-hero-inner">
-            <div class="brt-hero-badge">&#9889; Built for Item Research</div>
-            <h1 class="brt-hero-h1">The Ultimate Assistant for <span>Technical Item Research</span></h1>
-            <p class="brt-hero-p">From Federal Pacific electrical panels to the latest iPhone &mdash; instant, comprehensive reports on age, value, recalls, diagnostics, and replacements. Built for professionals who need answers fast.</p>
+            <div class="brt-hero-badge">&#9889; Built for Insurance Workflows</div>
+            <h1 class="brt-hero-h1">Item Research, <span>Serial Number Lookup, and LKQ Replacement Support</span></h1>
+            <p class="brt-hero-p">Use Bolt to verify age, identify items correctly, compare current replacements, and document claim-ready equipment details across appliances, HVAC systems, electronics, and water heaters.</p>
 
             <!-- Main search bar (IDs preserved for JS) -->
             <div class="brt-search-wrapper">
-                <input type="text" id="query" class="brt-search-bar" placeholder='Try "Generac 22kW generator" or "Federal Pacific panel"' autocomplete="off">
+                <input type="text" id="query" class="brt-search-bar" placeholder='Try "GE refrigerator serial number" or "Carrier 3 ton condenser"' autocomplete="off">
                 <button type="button" id="image-search-btn" class="brt-search-camera-btn" aria-label="Search by image" title="Search by image">&#128247;</button>
                 <input type="file" id="image-search-input" class="brt-image-input" accept="image/*,.heic,.heif" capture="environment">
                 <button id="btn" class="brt-search-btn" type="button">&#9889; Search</button>
@@ -784,7 +781,7 @@
             <div class="mascot-area" id="mascot-wrapper">
                 <div id="loader-track">
                     <div id="loader-dog">
-                        ⚡
+                        âš¡
                     </div>
                 </div>
                 <span id="loader-text" class="loader-text">Consulting live market data and technical records...</span>
@@ -796,23 +793,29 @@
                 <div class="brt-example-pills" style="margin-bottom: 0;">
                     <span class="brt-example-pill" data-example='LG C3 65" TV'>LG C3 65" TV</span>
                     <span class="brt-example-pill" data-example="Samsung WA50R5400AV - 01G257BMB06164W">Samsung WA50R5400AV - 01G257BMB06164W</span>
-                    <span class="brt-example-pill" data-example="Oster CKSTRS18-HDV">Oster CKSTRS18-HDV</span>
-                    <span class="brt-example-pill" data-example="0058730 (generac generator)">0058730 (generac generator)</span>
-                    <span class="brt-example-pill" data-example="MACBOOK AIR">MACBOOK AIR</span>
-                    <span class="brt-example-pill" data-example="PRE Amplifier Aventage CX A5000 (Yamaha receiver)">PRE Amplifier Aventage CX A5000 (Yamaha receiver)</span>
-                    <span class="brt-example-pill" data-example="Federal Pacific Electrical Panel">Federal Pacific Electrical Panel</span>
-                    <span class="brt-example-pill" data-example="Sunpower Solar Inverter">Sunpower Solar Inverter</span>
+                    <span class="brt-example-pill" data-example="Whirlpool WRF535SWHZ">Whirlpool WRF535SWHZ</span>
+                    <span class="brt-example-pill" data-example="Rheem water heater serial number">Rheem water heater serial number</span>
+                    <span class="brt-example-pill" data-example="Carrier 24ACC636A003">Carrier 24ACC636A003</span>
+                    <span class="brt-example-pill" data-example="GE dishwasher serial number">GE dishwasher serial number</span>
+                    <span class="brt-example-pill" data-example="Samsung range model NSG6DG8700SR">Samsung range model NSG6DG8700SR</span>
                     <span class="brt-example-pill" data-example="Samsung Range Model#NSG6DG8700SR">Samsung Range Model#NSG6DG8700SR</span>
                 </div>
             </div>
             <div class="brt-search-hint" style="margin-top: 1rem;">Works with brand names, model numbers, serial numbers, or general descriptions</div>
+            <div class="brt-example-pills" style="margin-top: 1rem;">
+                <a href="/category/appliances" class="brt-example-pill">Appliance age verification</a>
+                <a href="/category/hvac" class="brt-example-pill">HVAC serial number decoder</a>
+                <a href="/serial/ge-serial-number-lookup" class="brt-example-pill">GE serial number lookup</a>
+                <a href="/serial/rheem-serial-number-lookup" class="brt-example-pill">Rheem serial number lookup</a>
+                <a href="/brand/whirlpool" class="brt-example-pill">Whirlpool brand research</a>
+            </div>
 
         </div>
     </div>
 
-    <!-- ════════════════════════════════════════════════════════════
-         RESULTS (hidden initially — sibling selector hides #homepage-sections when visible)
-    ════════════════════════════════════════════════════════════ -->
+    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+         RESULTS (hidden initially â€” sibling selector hides #homepage-sections when visible)
+    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
     <div id="results" class="hidden">
         <div class="results-zone">
             <div class="results-inner">
@@ -854,19 +857,19 @@
                 <div class="metrics-strip">
                     <div class="metric-card">
                         <span class="metric-label">Age</span>
-                        <span class="metric-value" id="m-age">—</span>
+                        <span class="metric-value" id="m-age">â€”</span>
                     </div>
                     <div class="metric-card">
                         <span class="metric-label">Launch MSRP</span>
-                        <span class="metric-value" id="m-msrp">—</span>
+                        <span class="metric-value" id="m-msrp">â€”</span>
                     </div>
                     <div class="metric-card">
                         <span class="metric-label">Est. ACV</span>
-                        <span class="metric-value acv" id="m-acv">—</span>
+                        <span class="metric-value acv" id="m-acv">â€”</span>
                     </div>
                     <div class="metric-card">
                         <span class="metric-label">Availability</span>
-                        <span class="metric-value" id="m-availability" style="font-size:0.78rem; line-height:1.3;">—</span>
+                        <span class="metric-value" id="m-availability" style="font-size:0.78rem; line-height:1.3;">â€”</span>
                     </div>
                 </div>
 
@@ -883,7 +886,7 @@
                     <div id="sec1-content" class="hidden">
                         <p class="report-overview" id="r-overview"></p>
                         <div id="r-field-ref-wrap" class="hidden no-print" style="margin-bottom:1rem;"></div>
-                        <div id="parts-available-note" class="parts-available-note hidden">&#128270; Parts research available — see Diagnostics &amp; Repair section.</div>
+                        <div id="parts-available-note" class="parts-available-note hidden">&#128270; Parts research available â€” see Diagnostics &amp; Repair section.</div>
                         <ul class="report-list">
                             <li><span class="label">Search Query</span> <span id="r-search-query"></span></li>
                             <li><span class="label">Assumptions Used</span> <span id="r-assumptions"></span></li>
@@ -915,7 +918,7 @@
                             <li class="sn-li" id="sn-input-li" style="display:none">
                                 <span class="label">Serial No.</span>
                                 <span class="sn-ctrl">
-                                    <input type="text" id="sn-input" placeholder="Enter serial number…" autocomplete="off" spellcheck="false" maxlength="40">
+                                    <input type="text" id="sn-input" placeholder="Enter serial numberâ€¦" autocomplete="off" spellcheck="false" maxlength="40">
                                     <button id="sn-decode-btn" type="button">Decode Serial Number</button>
                                 </span>
                             </li>
@@ -1086,10 +1089,10 @@
         </div>
     </div><!-- /results -->
 
-    <!-- ════════════════════════════════════════════════════════════
+    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
          HOMEPAGE MARKETING SECTIONS
          Hidden automatically when #results is visible (CSS sibling selector)
-    ════════════════════════════════════════════════════════════ -->
+    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
     <div id="homepage-sections">
 
         <!-- Trust Strip -->
@@ -1126,7 +1129,7 @@
                 <div class="brt-sample-layout">
                     <div>
                         <div class="brt-section-label">Sample Report</div>
-                        <h2 class="brt-section-title">See Exactly What You Get — Before You Search</h2>
+                        <h2 class="brt-section-title">See Exactly What You Get â€” Before You Search</h2>
                         <p class="brt-section-sub">Every search generates a structured, professional report with the data you need to research and document products with confidence.</p>
                         <div class="brt-report-highlights">
                             <div class="brt-highlight-item">
@@ -1253,16 +1256,18 @@
                 <a href="/terms">Terms of Use</a>
             </div>
             <div class="brt-guide-links">
-                <a href="/how-to-find-appliance-age">How to Find Appliance Age</a>
-                <a href="/how-to-find-hvac-age">How to Find HVAC Age</a>
+                <a href="/category/appliances">Appliance age verification</a>
+                <a href="/category/hvac">HVAC serial number decoder</a>
+                <a href="/serial/ge-serial-number-lookup">GE serial number lookup</a>
+                <a href="/serial/rheem-serial-number-lookup">Rheem serial number lookup</a>
             </div>
         </footer>
 
     </div><!-- /homepage-sections -->
 
-    <!-- ════════════════════════════════════════════════════════════
+    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
          SUMMARY MODAL (unchanged)
-    ════════════════════════════════════════════════════════════ -->
+    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
     <div id="summary-modal" class="summary-modal hidden" role="dialog" aria-modal="true" aria-labelledby="summary-modal-heading">
         <div class="summary-modal-bar">
             <span class="summary-modal-title" id="summary-modal-heading">&#128203; Generate Customized Summary</span>
@@ -1282,7 +1287,65 @@
     <div class="summary-toast hidden" id="summary-toast" aria-live="polite">&#10003; Summary copied to clipboard</div>
 
     <script src="index.js" defer></script>
-    <script src="components/chat/chat-bubble.js"></script>
+    <script>
+    (function() {
+      var chatLoaded = false;
+      var adsLoaded = false;
+      var listenerOptions = { passive: true, once: true };
+
+      function loadScript(src, attrs) {
+        var script = document.createElement('script');
+        script.src = src;
+        script.async = true;
+        if (attrs) {
+          Object.keys(attrs).forEach(function(key) {
+            script.setAttribute(key, attrs[key]);
+          });
+        }
+        document.head.appendChild(script);
+      }
+
+      function loadStyle(href) {
+        if (document.querySelector('link[data-bolt-chat]')) return;
+        var link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = href;
+        link.setAttribute('data-bolt-chat', 'true');
+        document.head.appendChild(link);
+      }
+
+      function detachInteractionListeners() {
+        ['pointerdown', 'keydown', 'touchstart', 'scroll'].forEach(function(evt) {
+          window.removeEventListener(evt, loadChat, listenerOptions);
+        });
+      }
+
+      function loadChat() {
+        if (chatLoaded) return;
+        chatLoaded = true;
+        loadStyle('/components/chat/bolt-chat.css');
+        loadScript('/components/chat/chat-bubble.js');
+        detachInteractionListeners();
+      }
+
+      function loadAds() {
+        if (adsLoaded) return;
+        adsLoaded = true;
+        loadScript(
+          'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5946778263750869',
+          { crossorigin: 'anonymous' }
+        );
+      }
+
+      ['pointerdown', 'keydown', 'touchstart', 'scroll'].forEach(function(evt) {
+        window.addEventListener(evt, loadChat, listenerOptions);
+      });
+
+      window.addEventListener('load', function() {
+        window.setTimeout(loadAds, 1200);
+      }, { once: true });
+    })();
+    </script>
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -1297,11 +1360,20 @@
           "@type": "WebSite",
           "name": "Bolt",
           "url": "https://www.boltresearchteam.com/",
-          "description": "Serial number decoding, age lookup, and technical item research tools for appliances, HVAC, electronics, and more."
+          "description": "Serial number lookup, age verification, LKQ replacement research, and technical item documentation tools for insurance claims."
+        },
+        {
+          "@type": "SoftwareApplication",
+          "name": "Bolt Item Research Tool",
+          "applicationCategory": "BusinessApplication",
+          "operatingSystem": "Web",
+          "url": "https://www.boltresearchteam.com/",
+          "description": "Claim-ready item research tool for serial number lookup, age verification, and LKQ replacement support across appliances, HVAC systems, electronics, and water heaters."
         }
       ]
     }
     </script>
 </body>
 </html>
+
 

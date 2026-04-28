@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <link rel="icon" type="image/svg+xml" href="/assets/favicon-bolt.svg?v=1">
@@ -7,7 +7,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trane Serial Number Decoder | Find Manufacture Date</title>
     <meta name="description" content="Decode your Trane serial number to find the manufacture date and equipment age.">
-    <link rel="canonical" href="https://www.boltresearchteam.com/trane.html">
+    <meta name="robots" content="noindex,follow">
+    <link rel="canonical" href="https://www.boltresearchteam.com/serial/trane-serial-number-lookup">
     <link rel="stylesheet" href="global.css">
     
 </head>
@@ -90,7 +91,7 @@
                 <div class="form-group era-group hidden" id="eraGroup">
                     <div class="step-label">
                         Manufacture Era
-                        <span class="info-icon" title="Manufacturer serial formats often repeat every 20 years; selecting the era ensures accuracy.">ⓘ</span>
+                        <span class="info-icon" title="Manufacturer serial formats often repeat every 20 years; selecting the era ensures accuracy.">â“˜</span>
                     </div>
                     <select id="eraSelect" class="form-select">
                         <option value="">-- Select Era --</option>
@@ -120,8 +121,8 @@
                         <input type="text" id="smart-lookup-input" class="form-input" placeholder="Search Trane model or description...">
                         <div class="helper-text">Enter a model number, brand + model, or description to estimate the age</div>
                     </div>
-                    <p class="alt-scope-note">&#128268; Works for appliances, water heaters, <strong>and electronics</strong> — TVs, computers, phones, and any brand not listed in the tabs above.</p>
-                    <p class="alt-disclaimer hidden">Note: Serial numbers are the most reliable way to date an item. This tool estimates age ranges using online research data—the more specific your info, the better the results. Keep in mind that general search terms may yield broader date ranges for long-running models.</p>
+                    <p class="alt-scope-note">&#128268; Works for appliances, water heaters, <strong>and electronics</strong> â€” TVs, computers, phones, and any brand not listed in the tabs above.</p>
+                    <p class="alt-disclaimer hidden">Note: Serial numbers are the most reliable way to date an item. This tool estimates age ranges using online research dataâ€”the more specific your info, the better the results. Keep in mind that general search terms may yield broader date ranges for long-running models.</p>
                     <button class="decode-btn" onclick="estimateAge()">Estimate Age</button>
                 </div>
             </div>
@@ -130,7 +131,7 @@
 <!-- Loading -->
 <div id="ageLoading" class="results-card hidden">
             <div class="loading-inner">
-                <span class="loading-emoji lightning" id="loadingEmoji">🌩️</span>
+                <span class="loading-emoji lightning" id="loadingEmoji">ðŸŒ©ï¸</span>
                 <div class="loading-text" id="loadingText">Researching product information...</div>
             </div>
         </div>
@@ -156,7 +157,7 @@
                 </div>
                 <div class="result-row">
                     <span class="result-label">Estimated Age</span>
-                    <span class="result-value" id="resultEstimatedAge">—</span>
+                    <span class="result-value" id="resultEstimatedAge">â€”</span>
                 </div>
                 <div class="info-block method">
                     <h4>Decoding Method</h4>
@@ -235,7 +236,7 @@
             <div class="static-card-body">
                 <div class="cta-block">
                     <h2>Decode Your Trane Serial Number</h2>
-                    <p>Enter your full Trane serial number for an instant manufacture date — no account needed.</p>
+                    <p>Enter your full Trane serial number for an instant manufacture date â€” no account needed.</p>
                 </div>
                 <div class="static-section">
                     <h2>Tag Location Guide</h2>
@@ -308,6 +309,7 @@
     <script src="smart-lookup.js"></script>
 </body>
 </html>
+
 
 
 

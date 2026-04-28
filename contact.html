@@ -1,12 +1,13 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <link rel="icon" type="image/svg+xml" href="/assets/favicon-bolt.svg?v=1">
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5946778263750869" crossorigin="anonymous"></script>
 <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact – Serial Number Decoder</title>
-    <link rel="canonical" href="https://www.boltresearchteam.com/contact.html">
+    <title>Contact â€“ Serial Number Decoder</title>
+    <link rel="canonical" href="https://www.boltresearchteam.com/contact">
+    <meta name="robots" content="noindex,follow">
     <link rel="stylesheet" href="global.css">
     
 </head>
@@ -103,7 +104,7 @@
                     <h3>Report a Decode Error</h3>
                     <p>
                         The fastest way to flag an incorrect result is to use the built-in error reporting
-                        tool directly in the results card after any decode — it pre-fills the brand and
+                        tool directly in the results card after any decode â€” it pre-fills the brand and
                         serial number automatically.
                     </p>
                     <a class="feedback-link" href="/">&#8592; Go to Decoder &amp; Use Feedback Button</a>
@@ -111,7 +112,7 @@
 
                 <div class="note-block">
                     We are a small team. Response times may vary. We do not provide certified appraisals
-                    or legal opinions — for those needs, please consult a licensed professional.
+                    or legal opinions â€” for those needs, please consult a licensed professional.
                 </div>
 
             </div>
@@ -146,7 +147,7 @@
         var message = document.getElementById('cfMessage').value.trim();
 
         btn.disabled = true;
-        btn.textContent = 'Sending…';
+        btn.textContent = 'Sendingâ€¦';
         status.className = 'cf-status hidden';
         status.textContent = '';
 
@@ -159,7 +160,7 @@
             var data = await res.json();
             if (data.ok) {
                 status.className = 'cf-status success';
-                status.textContent = '✓ Message sent! We\'ll get back to you soon.';
+                status.textContent = 'âœ“ Message sent! We\'ll get back to you soon.';
                 document.getElementById('contactForm').reset();
             } else {
                 throw new Error(data.error || 'Send failed');
@@ -177,6 +178,7 @@
     <script src="smart-lookup.js"></script>
 </body>
 </html>
+
 
 
 

@@ -1,0 +1,261 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+:root {
+  --seo-bg: #f4f7fb;
+  --seo-card: #ffffff;
+  --seo-border: #d9e3f0;
+  --seo-text: #1d2939;
+  --seo-muted: #52606d;
+  --seo-accent: #b98608;
+  --seo-accent-dark: #7a5600;
+  --seo-navy: #0f172a;
+  --seo-link: #0f4c81;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(180deg, #eef4fb 0%, #f7f9fc 240px, #f4f7fb 100%);
+  color: var(--seo-text);
+  line-height: 1.65;
+}
+
+a {
+  color: var(--seo-link);
+  text-decoration: none;
+}
+
+a:hover,
+a:focus {
+  text-decoration: underline;
+}
+
+.seo-shell {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 20px 48px;
+}
+
+.seo-header {
+  padding: 18px 0 10px;
+}
+
+.seo-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+
+.seo-logo {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--seo-navy);
+  letter-spacing: 0.01em;
+}
+
+.seo-logo span {
+  color: var(--seo-accent);
+}
+
+.seo-nav {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.seo-nav a {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--seo-muted);
+}
+
+.seo-breadcrumbs {
+  font-size: 0.84rem;
+  color: var(--seo-muted);
+  margin-bottom: 14px;
+}
+
+.seo-hero,
+.seo-card {
+  background: var(--seo-card);
+  border: 1px solid var(--seo-border);
+  border-radius: 18px;
+  box-shadow: 0 8px 30px rgba(15, 23, 42, 0.05);
+}
+
+.seo-hero {
+  padding: 32px 28px;
+  margin-bottom: 22px;
+}
+
+.seo-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 999px;
+  background: #fff8e1;
+  color: var(--seo-accent-dark);
+  padding: 6px 12px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 14px;
+}
+
+.seo-hero h1 {
+  margin: 0 0 12px;
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1.12;
+  color: var(--seo-navy);
+}
+
+.seo-lead {
+  max-width: 860px;
+  font-size: 1.02rem;
+  color: var(--seo-muted);
+  margin: 0 0 18px;
+}
+
+.seo-grid {
+  display: grid;
+  gap: 22px;
+  grid-template-columns: minmax(0, 2.15fr) minmax(280px, 0.85fr);
+}
+
+.seo-main {
+  display: grid;
+  gap: 22px;
+}
+
+.seo-card {
+  padding: 24px 24px 22px;
+}
+
+.seo-card h2 {
+  margin: 0 0 12px;
+  font-size: 1.28rem;
+  color: var(--seo-navy);
+}
+
+.seo-card p,
+.seo-card li {
+  font-size: 0.98rem;
+  color: var(--seo-text);
+}
+
+.seo-card ul,
+.seo-card ol {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.seo-card li + li {
+  margin-top: 8px;
+}
+
+.seo-steps {
+  display: grid;
+  gap: 12px;
+}
+
+.seo-step {
+  border: 1px solid var(--seo-border);
+  border-radius: 14px;
+  padding: 14px 16px;
+  background: #fbfdff;
+}
+
+.seo-step strong {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--seo-navy);
+}
+
+.seo-sidebar {
+  display: grid;
+  gap: 18px;
+  align-content: start;
+}
+
+.seo-sidebar h2 {
+  margin-top: 0;
+}
+
+.seo-link-list,
+.seo-faq-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.seo-link-list li + li,
+.seo-faq-list li + li {
+  margin-top: 10px;
+}
+
+.seo-link-list a {
+  font-weight: 600;
+}
+
+.seo-note {
+  border-left: 4px solid var(--seo-accent);
+  background: #fffaf0;
+  padding: 14px 16px;
+  border-radius: 0 14px 14px 0;
+  color: var(--seo-accent-dark);
+}
+
+.seo-metric {
+  display: grid;
+  gap: 10px;
+}
+
+.seo-metric div {
+  border: 1px solid var(--seo-border);
+  border-radius: 14px;
+  padding: 12px 14px;
+  background: #fbfdff;
+}
+
+.seo-metric strong {
+  display: block;
+  margin-bottom: 3px;
+  color: var(--seo-navy);
+}
+
+.seo-footer {
+  margin-top: 28px;
+  padding: 18px 0 0;
+  font-size: 0.88rem;
+  color: var(--seo-muted);
+}
+
+.seo-footer-links {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+@media (max-width: 860px) {
+  .seo-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .seo-hero,
+  .seo-card {
+    padding: 22px 18px;
+  }
+}

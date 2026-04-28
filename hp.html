@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <link rel="icon" type="image/svg+xml" href="/assets/favicon-bolt.svg?v=1">
@@ -7,7 +7,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HP Serial Number Decoder | Find HP Laptop & Desktop Manufacture Date</title>
     <meta name="description" content="Decode your HP laptop or desktop serial number to find the manufacture year and week. Covers HP computers, workstations, and printers. Free instant results.">
-    <link rel="canonical" href="https://www.boltresearchteam.com/hp.html">
+    <meta name="robots" content="noindex,follow">
+    <link rel="canonical" href="https://www.boltresearchteam.com/hp">
     <link rel="stylesheet" href="global.css">
     
 </head>
@@ -89,7 +90,7 @@
                 <div class="form-group era-group hidden" id="eraGroup">
                     <div class="step-label">
                         Manufacture Era
-                        <span class="info-icon" title="Manufacturer serial formats often repeat every 20 years; selecting the era ensures accuracy.">ⓘ</span>
+                        <span class="info-icon" title="Manufacturer serial formats often repeat every 20 years; selecting the era ensures accuracy.">â“˜</span>
                     </div>
                     <select id="eraSelect" class="form-select">
                         <option value="">-- Select Era --</option>
@@ -119,8 +120,8 @@
                         <input type="text" id="smart-lookup-input" class="form-input" placeholder="Search model number...">
                         <div class="helper-text">Enter a model number, brand + model, or description to estimate the age</div>
                     </div>
-                    <p class="alt-scope-note">&#128268; Works for appliances, water heaters, <strong>and electronics</strong> — TVs, computers, phones, and any brand not listed in the tabs above.</p>
-                    <p class="alt-disclaimer hidden">Note: Serial numbers are the most reliable way to date an item. This tool estimates age ranges using online research data—the more specific your info, the better the results. Keep in mind that general search terms may yield broader date ranges for long-running models.</p>
+                    <p class="alt-scope-note">&#128268; Works for appliances, water heaters, <strong>and electronics</strong> â€” TVs, computers, phones, and any brand not listed in the tabs above.</p>
+                    <p class="alt-disclaimer hidden">Note: Serial numbers are the most reliable way to date an item. This tool estimates age ranges using online research dataâ€”the more specific your info, the better the results. Keep in mind that general search terms may yield broader date ranges for long-running models.</p>
                     <button class="decode-btn" onclick="estimateAge()">Estimate Age</button>
                 </div>
             </div>
@@ -129,7 +130,7 @@
 <!-- Loading -->
 <div id="ageLoading" class="results-card hidden">
             <div class="loading-inner">
-                <span class="loading-emoji lightning" id="loadingEmoji">🌩️</span>
+                <span class="loading-emoji lightning" id="loadingEmoji">ðŸŒ©ï¸</span>
                 <div class="loading-text" id="loadingText">Researching product information...</div>
             </div>
         </div>
@@ -155,7 +156,7 @@
                 </div>
                 <div class="result-row">
                     <span class="result-label">Estimated Age</span>
-                    <span class="result-value" id="resultEstimatedAge">—</span>
+                    <span class="result-value" id="resultEstimatedAge">â€”</span>
                 </div>
                 <div class="info-block method">
                     <h4>Decoding Method</h4>
@@ -249,7 +250,7 @@
                     <h2>How HP Encodes Manufacture Dates</h2>
                     <p>HP serial numbers embed the manufacture year and production week directly in the serial string. The <strong>4th character</strong> (position 4 of the serial) encodes the last digit of the manufacture year, and <strong>characters 5 and 6</strong> encode the production week as a two-digit number from 01 to 52.</p>
                     <p>For example, a serial beginning with <strong>CNX7120BXX</strong> has a year digit of <strong>7</strong> (2017) and a week code of <strong>12</strong> (approximately March). Because only the last digit of the year is stored, a year code of <strong>7</strong> could represent 2007 or 2017. For laptops and desktops manufactured in the past decade, the more recent decade is almost always correct.</p>
-                    <p>HP products sold under the <strong>HP</strong> and <strong>Compaq</strong> names use the same serial format. Printers and enterprise equipment may follow slightly different conventions, but the 4th-character year and 5th–6th-character week pattern is consistent across HP personal computing devices.</p>
+                    <p>HP products sold under the <strong>HP</strong> and <strong>Compaq</strong> names use the same serial format. Printers and enterprise equipment may follow slightly different conventions, but the 4th-character year and 5thâ€“6th-character week pattern is consistent across HP personal computing devices.</p>
                 </div>
 
                 <div class="static-section">
@@ -362,6 +363,7 @@
     </script>
     </body>
 </html>
+
 
 
 

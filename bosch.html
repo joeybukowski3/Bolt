@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <link rel="icon" type="image/svg+xml" href="/assets/favicon-bolt.svg?v=1">
@@ -7,7 +7,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bosch Serial Number Decoder | Find Bosch Appliance Manufacture Date</title>
     <meta name="description" content="Decode your Bosch appliance serial number or FD code to find the manufacture date and age. Covers Bosch dishwashers, washers, refrigerators, and ranges. Free instant results.">
-    <link rel="canonical" href="https://www.boltresearchteam.com/bosch.html">
+    <meta name="robots" content="noindex,follow">
+    <link rel="canonical" href="https://www.boltresearchteam.com/bosch">
     <link rel="stylesheet" href="global.css">
     
 </head>
@@ -89,7 +90,7 @@
                 <div class="form-group era-group hidden" id="eraGroup">
                     <div class="step-label">
                         Manufacture Era
-                        <span class="info-icon" title="Manufacturer serial formats often repeat every 20 years; selecting the era ensures accuracy.">ⓘ</span>
+                        <span class="info-icon" title="Manufacturer serial formats often repeat every 20 years; selecting the era ensures accuracy.">â“˜</span>
                     </div>
                     <select id="eraSelect" class="form-select">
                         <option value="">-- Select Era --</option>
@@ -119,8 +120,8 @@
                         <input type="text" id="smart-lookup-input" class="form-input" placeholder="Search model number...">
                         <div class="helper-text">Enter a model number, brand + model, or description to estimate the age</div>
                     </div>
-                    <p class="alt-scope-note">&#128268; Works for appliances, water heaters, <strong>and electronics</strong> — TVs, computers, phones, and any brand not listed in the tabs above.</p>
-                    <p class="alt-disclaimer hidden">Note: Serial numbers are the most reliable way to date an item. This tool estimates age ranges using online research data—the more specific your info, the better the results. Keep in mind that general search terms may yield broader date ranges for long-running models.</p>
+                    <p class="alt-scope-note">&#128268; Works for appliances, water heaters, <strong>and electronics</strong> â€” TVs, computers, phones, and any brand not listed in the tabs above.</p>
+                    <p class="alt-disclaimer hidden">Note: Serial numbers are the most reliable way to date an item. This tool estimates age ranges using online research dataâ€”the more specific your info, the better the results. Keep in mind that general search terms may yield broader date ranges for long-running models.</p>
                     <button class="decode-btn" onclick="estimateAge()">Estimate Age</button>
                 </div>
             </div>
@@ -129,7 +130,7 @@
 <!-- Loading -->
 <div id="ageLoading" class="results-card hidden">
             <div class="loading-inner">
-                <span class="loading-emoji lightning" id="loadingEmoji">🌩️</span>
+                <span class="loading-emoji lightning" id="loadingEmoji">ðŸŒ©ï¸</span>
                 <div class="loading-text" id="loadingText">Researching product information...</div>
             </div>
         </div>
@@ -155,7 +156,7 @@
                 </div>
                 <div class="result-row">
                     <span class="result-label">Estimated Age</span>
-                    <span class="result-value" id="resultEstimatedAge">—</span>
+                    <span class="result-value" id="resultEstimatedAge">â€”</span>
                 </div>
                 <div class="info-block method">
                     <h4>Decoding Method</h4>
@@ -247,7 +248,7 @@
 
                 <div class="static-section">
                     <h2>How Bosch Encodes Manufacture Dates</h2>
-                    <p>Bosch home appliances use two methods to communicate the manufacture date: the standard <strong>serial number</strong> and a dedicated <strong>FD code</strong> (short for <em>Fertigungs Datum</em> — German for "manufacture date"). Both appear on the product label, and either can be used to determine when the appliance was made.</p>
+                    <p>Bosch home appliances use two methods to communicate the manufacture date: the standard <strong>serial number</strong> and a dedicated <strong>FD code</strong> (short for <em>Fertigungs Datum</em> â€” German for "manufacture date"). Both appear on the product label, and either can be used to determine when the appliance was made.</p>
                     <p><strong>FD code:</strong> The FD code is the most direct way to read the manufacture date on a Bosch appliance. It typically consists of four or five digits printed on the nameplate or rating sticker, clearly labeled "FD." The first two digits represent the year (last two digits of the year), and the following two digits represent the week number of that year. For example, <strong>FD 1823</strong> indicates week 23 of 2018.</p>
                     <p><strong>Serial number:</strong> The serial number (typically 10 characters) also encodes date information that the decoder can extract. The serial number is found on the same label as the FD code and is used for warranty registration and parts lookup in addition to date decoding.</p>
                     <p>The same FD code system applies to appliances sold under the <strong>Thermador</strong> brand, which is a Bosch premium brand sharing the same manufacturing infrastructure.</p>
@@ -257,7 +258,7 @@
                     <h2>Where to Find Your Bosch Serial Number and FD Code</h2>
                     <p>The rating label shows both the serial number and the FD code, typically printed next to each other. Look for the label labeled "FD" followed by digits:</p>
                     <ul>
-                        <li><strong>Dishwashers:</strong> Inner left edge of the door — visible when the door is fully open</li>
+                        <li><strong>Dishwashers:</strong> Inner left edge of the door â€” visible when the door is fully open</li>
                         <li><strong>Refrigerators:</strong> Inside the fresh food compartment, upper side wall</li>
                         <li><strong>Washing Machines:</strong> On the frame around the door opening</li>
                         <li><strong>Dryers:</strong> On the door frame or inner side panel</li>
@@ -268,7 +269,7 @@
 
                 <div class="static-section">
                     <h2>Common Mistakes When Decoding Bosch Serials</h2>
-                    <p><strong>Looking only for a serial number and overlooking the FD code.</strong> If the serial number decode returns an unexpected result, look specifically for the label marked "FD" on the nameplate — this gives the manufacture date most directly and unambiguously.</p>
+                    <p><strong>Looking only for a serial number and overlooking the FD code.</strong> If the serial number decode returns an unexpected result, look specifically for the label marked "FD" on the nameplate â€” this gives the manufacture date most directly and unambiguously.</p>
                     <p><strong>Misreading the FD code format.</strong> The FD code encodes the week number, not the month. Week 23 of a year is approximately late May or early June. This is different from brands that use a month code. The decoder converts the week number into an approximate date range for clarity.</p>
                     <p><strong>Confusing Bosch appliance and Bosch tool serial numbers.</strong> Bosch also manufactures power tools, which use a completely different serial format. This decoder covers Bosch home appliances only.</p>
                 </div>
@@ -366,6 +367,7 @@
     </script>
     </body>
 </html>
+
 
 
 

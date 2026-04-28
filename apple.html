@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <link rel="icon" type="image/svg+xml" href="/assets/favicon-bolt.svg?v=1">
@@ -7,7 +7,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Apple Serial Number Decoder | Find iPhone, iPad & Mac Manufacture Date</title>
     <meta name="description" content="Decode your Apple device serial number to find the manufacture date and year. Covers iPhone, iPad, Mac, and iPod legacy and post-2021 formats. Free instant results.">
-    <link rel="canonical" href="https://www.boltresearchteam.com/apple.html">
+    <meta name="robots" content="noindex,follow">
+    <link rel="canonical" href="https://www.boltresearchteam.com/apple">
     <link rel="stylesheet" href="global.css">
     
 </head>
@@ -89,7 +90,7 @@
                 <div class="form-group era-group hidden" id="eraGroup">
                     <div class="step-label">
                         Manufacture Era
-                        <span class="info-icon" title="Manufacturer serial formats often repeat every 20 years; selecting the era ensures accuracy.">ⓘ</span>
+                        <span class="info-icon" title="Manufacturer serial formats often repeat every 20 years; selecting the era ensures accuracy.">â“˜</span>
                     </div>
                     <select id="eraSelect" class="form-select">
                         <option value="">-- Select Era --</option>
@@ -119,8 +120,8 @@
                         <input type="text" id="smart-lookup-input" class="form-input" placeholder="Search model number...">
                         <div class="helper-text">Enter a model number, brand + model, or description to estimate the age</div>
                     </div>
-                    <p class="alt-scope-note">&#128268; Works for appliances, water heaters, <strong>and electronics</strong> — TVs, computers, phones, and any brand not listed in the tabs above.</p>
-                    <p class="alt-disclaimer hidden">Note: Serial numbers are the most reliable way to date an item. This tool estimates age ranges using online research data—the more specific your info, the better the results. Keep in mind that general search terms may yield broader date ranges for long-running models.</p>
+                    <p class="alt-scope-note">&#128268; Works for appliances, water heaters, <strong>and electronics</strong> â€” TVs, computers, phones, and any brand not listed in the tabs above.</p>
+                    <p class="alt-disclaimer hidden">Note: Serial numbers are the most reliable way to date an item. This tool estimates age ranges using online research dataâ€”the more specific your info, the better the results. Keep in mind that general search terms may yield broader date ranges for long-running models.</p>
                     <button class="decode-btn" onclick="estimateAge()">Estimate Age</button>
                 </div>
             </div>
@@ -129,7 +130,7 @@
 <!-- Loading -->
 <div id="ageLoading" class="results-card hidden">
             <div class="loading-inner">
-                <span class="loading-emoji lightning" id="loadingEmoji">🌩️</span>
+                <span class="loading-emoji lightning" id="loadingEmoji">ðŸŒ©ï¸</span>
                 <div class="loading-text" id="loadingText">Researching product information...</div>
             </div>
         </div>
@@ -155,7 +156,7 @@
                 </div>
                 <div class="result-row">
                     <span class="result-label">Estimated Age</span>
-                    <span class="result-value" id="resultEstimatedAge">—</span>
+                    <span class="result-value" id="resultEstimatedAge">â€”</span>
                 </div>
                 <div class="info-block method">
                     <h4>Decoding Method</h4>
@@ -248,8 +249,8 @@
                 <div class="static-section">
                     <h2>How Apple Encodes Manufacture Dates</h2>
                     <p>Apple uses two distinct serial number formats depending on the device's production era.</p>
-                    <p><strong>Legacy format (pre-2021) — 12 characters:</strong> The 4th character encodes the manufacture year using a letter code, and the 5th and 6th characters encode the production week. For example, the year code <strong>G</strong> represents 2011, and a week code of <strong>27</strong> indicates approximately late June or early July. Some year codes — C and D — each map to two possible years one decade apart, requiring the device's physical condition or model lineup to confirm the exact year.</p>
-                    <p><strong>Randomized format (post-2021) — 10 characters:</strong> Starting around 2021, Apple transitioned to randomly generated 10-character serial numbers that do not encode any manufacture date information directly. If your serial number is exactly 10 characters, the decoder cannot extract a date from it. In this case, use the Smart Lookup section with your model identifier (the A-number on the device label, such as A2341) to estimate the production era.</p>
+                    <p><strong>Legacy format (pre-2021) â€” 12 characters:</strong> The 4th character encodes the manufacture year using a letter code, and the 5th and 6th characters encode the production week. For example, the year code <strong>G</strong> represents 2011, and a week code of <strong>27</strong> indicates approximately late June or early July. Some year codes â€” C and D â€” each map to two possible years one decade apart, requiring the device's physical condition or model lineup to confirm the exact year.</p>
+                    <p><strong>Randomized format (post-2021) â€” 10 characters:</strong> Starting around 2021, Apple transitioned to randomly generated 10-character serial numbers that do not encode any manufacture date information directly. If your serial number is exactly 10 characters, the decoder cannot extract a date from it. In this case, use the Smart Lookup section with your model identifier (the A-number on the device label, such as A2341) to estimate the production era.</p>
                 </div>
 
                 <div class="static-section">
@@ -362,6 +363,7 @@
     </script>
     </body>
 </html>
+
 
 
 

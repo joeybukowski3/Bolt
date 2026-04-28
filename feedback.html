@@ -1,12 +1,13 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <link rel="icon" type="image/svg+xml" href="/assets/favicon-bolt.svg?v=1">
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5946778263750869" crossorigin="anonymous"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Feedback & Bugs — Bolt Item Research Tool</title>
-    <link rel="canonical" href="https://www.boltresearchteam.com/feedback.html">
+    <title>Feedback & Bugs â€” Bolt Item Research Tool</title>
+    <link rel="canonical" href="https://www.boltresearchteam.com/feedback">
+    <meta name="robots" content="noindex,follow">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="shared.css">
@@ -202,7 +203,7 @@
 
                 <div class="page-hero">
                     <h1>Feedback & Bugs</h1>
-                    <p class="subheadline">Help improve Bolt — report an issue, suggest a feature, or share what you think.</p>
+                    <p class="subheadline">Help improve Bolt â€” report an issue, suggest a feature, or share what you think.</p>
                 </div>
 
                 <div class="form-wrap">
@@ -210,7 +211,7 @@
                     <!-- Success message (hidden until submission) -->
                     <div class="msg-success" id="success-msg" style="display:none;">
                         <div class="msg-icon">&#10003;</div>
-                        <h3>Thanks — got it.</h3>
+                        <h3>Thanks â€” got it.</h3>
                         <p>Your feedback has been received. If you left an email address we'll follow up if needed.</p>
                     </div>
 
@@ -220,7 +221,7 @@
                         <div class="field-group">
                             <label class="field-label" for="fb_type">Type <span style="color:#ef4444;">*</span></label>
                             <select class="field-select" id="fb_type" name="fb_type" required>
-                                <option value="" disabled selected>Select a type…</option>
+                                <option value="" disabled selected>Select a typeâ€¦</option>
                                 <option value="Bug Report">Bug Report</option>
                                 <option value="Feature Request">Feature Request</option>
                                 <option value="General Feedback">General Feedback</option>
@@ -244,11 +245,11 @@
 
                         <div class="field-group">
                             <label class="field-label" for="fb_message">Message <span style="color:#ef4444;">*</span></label>
-                            <textarea class="field-textarea" id="fb_message" name="fb_message" required placeholder="Describe the issue or suggestion in as much detail as you can…"></textarea>
+                            <textarea class="field-textarea" id="fb_message" name="fb_message" required placeholder="Describe the issue or suggestion in as much detail as you canâ€¦"></textarea>
                         </div>
 
                         <div class="field-group">
-                            <label class="field-label" for="fb_email">Your email <span class="optional">— only if you'd like a response</span></label>
+                            <label class="field-label" for="fb_email">Your email <span class="optional">â€” only if you'd like a response</span></label>
                             <input class="field-input" type="email" id="fb_email" name="fb_email" placeholder="you@example.com" autocomplete="email">
                         </div>
 
@@ -314,7 +315,7 @@
             }
 
             submitBtn.disabled = true;
-            submitBtn.textContent = 'Sending…';
+            submitBtn.textContent = 'Sendingâ€¦';
 
             fetch('/api/send-feedback', {
                 method: 'POST',
@@ -333,7 +334,7 @@
             })
             .catch(function(err) {
                 console.error('Feedback error:', err);
-                errorMsg.textContent = 'Something went wrong — please try again or reach out directly.';
+                errorMsg.textContent = 'Something went wrong â€” please try again or reach out directly.';
                 errorMsg.classList.add('visible');
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Send Feedback';
@@ -343,3 +344,4 @@
     <script src="components/chat/chat-bubble.js"></script>
 </body>
 </html>
+
